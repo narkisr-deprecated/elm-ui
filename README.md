@@ -1,5 +1,5 @@
 # Intro
-This the Celestial 2.0 UI
+This NEW Celestial UI
 
 # Usage
 In order to build first install:
