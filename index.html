@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Celestial</title>
+  <script type="text/javascript" src="main.js"></script>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="assets/bootstrap-3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap-3.3.5/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="bower_components/jquery-contextmenu/dist/jquery.contextMenu.css">
+
+  <!-- This will be minified into a single file in the future -->
+  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/jquery-contextmenu/dist/jquery.contextMenu.min.js"></script>
+  <script src="bower_components/jquery-contextmenu/dist/jquery.ui.position.min.js"></script>
+  <script src="bower_components/pegjs/peg-0.8.0.js"></script>
+  <script src="assets/js/query/query.js"></script>
+
+  <script src="assets/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="assets/font-awesome.min.css">
+  <style>
+    #systemsListing tr:hover {
+      background-color: #e7e7e7;
+    }
+    #runningJobs tbody>tr:hover {
+      background-color: #e7e7e7;
+    }
+    #doneJobs tbody>tr:hover {
+      background-color: #e7e7e7;
+    }
+    /* Job stats legend */
+    .legend { list-style: none; line-height: 1;}
+    .legend li { float: left; margin-right: 20px; }
+    .legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
+   </style>
+</head>
+
+<body>
+  <div id="elmui"></div>
+</body>
+
+<script type="text/javascript">
+  var elmDiv = document.getElementById('elmui');
+  var empty = { "result" : "", "source" : "", "message":"" };
+  var main = Elm.embed(Elm.Main, elmDiv, {parsingOk : empty, parsingErr : empty, menuPort : ""});
+
+  main.ports.redirectPort.subscribe(function(event) {
+    var url = window.location.href;
+    var arr = url.split("/");
+    window.location =  arr[0] + "//" + arr[2] + "/login";
+    console.log(event);
+  });
+
+
+  main.ports.newtabPort.subscribe(function(event) {
+    var redirectWindow = window.open(event, '_blank');
+    redirectWindow.location;
+  });
+
+
+  main.ports.parserPort.subscribe(function(event) {
+   try { 
+     var result = parseQuery(event);
+      main.ports.parsingOk.send({
+	   "result" : btoa(JSON.stringify(result)),
+	   "source" : event,
+	   "message":""
+     });
+    } catch (e) {
+     main.ports.parsingErr.send({
+	 "message" : e.message,
+	 "source": event,
+	 "result": "" 
+     });
+    }
+  });
+ 
+  $.contextMenu({
+    selector: "#systemsListing tr",
+    items: {
+        start: {name: "Start", callback: function(key, opt){ main.ports.menuPort.send("start"); }},
+        stop: {name: "Stop", callback: function(key, opt){ main.ports.menuPort.send("stop") }},
+        provision: {name: "Provision", callback: function(key, opt){ main.ports.menuPort.send("provision") }},
+        destroy: {name: "Destroy", callback: function(key, opt){  main.ports.menuPort.send("destroy") }},
+	  destroy: {name: "Reload", callback: function(key, opt){  main.ports.menuPort.send("reload") }},
+    }
+  }); 
+</script>
+
+</html>

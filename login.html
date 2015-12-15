@@ -1,0 +1,41 @@
+<html ng-app="celestial" ng-controller="AppCtrl">
+  <head>
+    <title ng-bind="Celestial"></title>
+    <link rel="stylesheet" type="text/css" href="assets/ng-boilerplate-0.3.1.css" />
+  </head>
+
+  <body> 
+    <div class="container">
+	<div class="row">
+	  <div class="span4 offset4 well">
+	    <legend>Please Sign In</legend>
+	    <div id="alert" class="alert alert-error">
+		Incorrect Username or Password!
+	    </div>
+	    <form id="login" method="POST" action="" accept-charset="UTF-8">
+		<input type="text" id="username" class="span4" name="username" placeholder="Username">
+		<input type="password" id="password" class="span4" name="password" placeholder="Password">
+		<button type="submit" name="submit" class="btn btn-info btn-block">Sign in</button>
+	    </form>    
+	  </div>
+	</div>
+    </div>
+
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+
+    <script> 
+     function getURLParameter(name) {
+         return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+     }
+     $(document).ready(function() {
+        if(getURLParameter('login_failed')!=null){
+           $('.alert').toggle(true); 
+           $('#username').val(getURLParameter('user'));
+        }else {
+           $('.alert').toggle(false); 
+        }
+
+     }); 
+    </script>
+  </body>
+</html>
