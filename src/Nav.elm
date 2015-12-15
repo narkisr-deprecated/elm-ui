@@ -8,8 +8,17 @@ import Effects exposing (Effects)
 import Html.Events exposing (onClick)
 
 
-type Active = Systems | Types | Jobs
-type Section = Add | Launch | List | Stats
+type Active = 
+  Systems 
+    | Types 
+    | Jobs
+
+type Section = 
+  Add 
+    | Launch 
+    | List 
+    | View
+    | Stats
 
 type alias Model = 
   { active : Active , section : Section }

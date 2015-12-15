@@ -67,11 +67,10 @@ port parserPort =
      |> filter (\s -> s /= Search.NoOp) Search.NoOp
      |> map toQuery
 
-
 port parsingOk : Signal Search.ParseResult
 
 parsingInput action p =
-  Signal.map (\r -> Application.SystemsView (Systems.List.Searching (action r))) p
+  Signal.map (\r -> Application.SystemsListing (Systems.List.Searching (action r))) p
 
 port parsingErr : Signal Search.ParseResult
 

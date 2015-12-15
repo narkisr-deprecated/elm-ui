@@ -36,6 +36,7 @@ update action ({selected, rows} as model) =
   case action of
     UpdateRows rs ->
       { model | rows = rs, selected = Set.empty}
+
     SelectAll -> 
       let 
         all = Set.fromList (List.map (\(id, _) -> id) rows)
@@ -50,6 +51,7 @@ update action ({selected, rows} as model) =
         { model | selected = Set.remove id selected}
       else
         { model | selected = Set.insert id selected}
+
     _ -> model
 
 -- View
