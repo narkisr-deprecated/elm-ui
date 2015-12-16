@@ -2,9 +2,11 @@ module Systems.Add.Encoders where
 
 import Json.Encode exposing (..)
 import Systems.Model.Common exposing (..)
+import Systems.Model.AWS exposing (..)
 import Systems.Add.AWS exposing (Model, ebsTypes)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
+import Common.Utils exposing (defaultEmpty)
 import String
 
 volumeEncoder : Volume -> Value
@@ -43,10 +45,10 @@ awsEncoder ({aws} as model) =
     , ("endpoint", string aws.endpoint)
     , ("instance-type", string aws.instanceType)
     , ("availability-zone", string (withDefault "" aws.availabilityZone))
-    , ("security-groups", list (List.map string aws.securityGroups))
-    , ("vpc", vpcEncoder aws.vpc)
-    , ("block-devices", list (List.map blockEncoder aws.blockDevices))
-    , ("volumes", list (List.map volumeEncoder aws.volumes))
+    , ("security-groups", list (List.map string (defaultEmpty aws.securityGroups)))
+    , ("vpc", vpcEncoder (withDefault emptyVpc aws.vpc))
+    , ("block-devices", list (List.map blockEncoder (defaultEmpty aws.blockDevices)))
+    , ("volumes", list (List.map volumeEncoder (defaultEmpty aws.volumes)))
   ]
 
 machineEncoder : Model -> Value
