@@ -1,7 +1,7 @@
 module Systems.View.AWS where
 
 import Html exposing (..)
-import Common.Utils exposing (partition)
+import Common.Utils exposing (partition, withDefaultProp)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Systems.Model.Common exposing (Machine, AWS)
 import Bootstrap.Html exposing (..)
@@ -63,6 +63,7 @@ summaryPanel contents =
     ] 
   ]
   
+    
 summarySections : (AWS, Machine) -> List (List Html)
 summarySections ((aws, machine) as model)=
    List.filter (not << List.isEmpty) [ 
@@ -71,19 +72,19 @@ summarySections ((aws, machine) as model)=
        [aws.instanceType, machine.os, aws.endpoint, withDefault "" aws.availabilityZone]
    , overviewSection "Security"
        ["user", "keypair", "security groups" ]
-       [ machine.user, aws.keyName, (String.join " " aws.securityGroups)]
+       [ machine.user, aws.keyName, (String.join " " (withDefault [] aws.securityGroups))]
    , overviewSection "DNS"
        ["hostname", "domain", "ip" ]
        [ machine.hostname, machine.domain, withDefault "" machine.ip]
    , optionalSection "VPC" 
        ["VPC id", "Subnet id", "Assign IP"]
-       [aws.vpc.vpcId, aws.vpc.subnetId, (toString aws.vpc.assignPublic)]
-       (not (String.isEmpty aws.vpc.vpcId))
+       (List.map (withDefaultProp aws.vpc "") [.vpcId , .subnetId])
+       (aws.vpc /= Nothing)
    , tablizedSection "EBS volumes" 
-       ["device", "size", "type", "clear"] aws.volumes
+       ["device", "size", "type", "clear"] (withDefault [] aws.volumes)
        [.device, (toString << .size), .type', (toString << .clear)]
    , tablizedSection "Instance store blocks" 
-       ["device", "volume"] aws.blockDevices
+       ["device", "volume"] (withDefault [] aws.blockDevices)
        [.device, .volume]
 
    ]
