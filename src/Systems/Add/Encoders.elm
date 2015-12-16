@@ -44,6 +44,7 @@ awsEncoder ({aws} as model) =
       ("key-name", string aws.keyName)
     , ("endpoint", string aws.endpoint)
     , ("instance-type", string aws.instanceType)
+    , ("ebs-optimized", bool (withDefault False aws.ebsOptimized))
     , ("availability-zone", string (withDefault "" aws.availabilityZone))
     , ("security-groups", list (List.map string (defaultEmpty aws.securityGroups)))
     , ("vpc", vpcEncoder (withDefault emptyVpc aws.vpc))

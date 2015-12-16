@@ -28,7 +28,7 @@ type alias AWS =
   , endpoint : String
   , availabilityZone : Maybe String
   , securityGroups : Maybe (List String)
-  , ebsOptimized : Bool
+  , ebsOptimized : Maybe Bool
   , volumes : Maybe (List Volume)
   , blockDevices :Maybe (List Block)
   , vpc : Maybe VPC
@@ -59,7 +59,7 @@ emptyAws =
         Nothing ->
            ""
   in
-    AWS instanceType Nothing "" url Nothing (Just []) False (Just []) (Just []) (Just emptyVpc)
+    AWS instanceType Nothing "" url Nothing (Just []) (Just False) (Just []) (Just []) (Just emptyVpc)
 
 instanceTypes = [
     "t1.micro", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m3.medium", "m3.large", "m3.xlarge",

@@ -319,7 +319,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         |> validate step "EBS Device" tupleValidations
 
     EBSOptimized -> 
-      setAWS (\aws -> {aws | ebsOptimized = not aws.ebsOptimized}) model
+      setAWS (\aws -> {aws | ebsOptimized = Just (not (withDefault False aws.ebsOptimized))}) model
 
     EBSClear -> 
       setVolume (\volume -> { volume | clear = not volume.clear}) model
@@ -500,7 +500,7 @@ ebs address ({errors, volume, aws} as model) =
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
     [ 
       legend [] [text "Global"]
-    , group' "EBS Optimized" (checkbox address EBSOptimized aws.ebsOptimized)
+    , group' "EBS Optimized" (checkbox address EBSOptimized (withDefault False aws.ebsOptimized))
     , legend [] [text "Devices"]
     , check "EBS Device" (inputText address EBSDeviceInput "sdh" volume.device)
     , group' "Size" (inputNumber address EBSSizeInput "" (toString volume.size))
