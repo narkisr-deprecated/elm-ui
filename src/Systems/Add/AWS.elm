@@ -10,13 +10,14 @@ import Systems.View.AWS exposing (summarize)
 import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor)
 import Dict as Dict exposing (Dict)
-import Systems.Model.Common exposing (Machine, AWS, VPC, Block, Volume)
-import Maybe exposing (withDefault)
-import String
+import Systems.Model.Common exposing (Machine, emptyMachine)
+import Systems.Model.AWS exposing (..)
 import Effects exposing (Effects, batch)
-import Debug
 import Common.Components exposing (panelContents)
-
+import Common.Utils exposing (withDefaultProp, defaultEmpty)
+import String
+import Maybe exposing (withDefault)
+import Debug
 
 -- Model 
 
@@ -31,30 +32,6 @@ type alias Model =
   , volume : Volume
   , block : Block
   }
-
-emptyVolume : Volume
-emptyVolume =
-  Volume "Magnetic" 50 (Just 50) "" False
-
-emptyBlock: Block
-emptyBlock =
-  Block "" ""
-
-emptyAws : AWS 
-emptyAws = 
-  let
-    (_,url,_) = withDefault ("","",[]) (Dict.get "us-east-1" endpoints)
-    vpc = VPC "" "" False
-  in
-    case List.head instanceTypes of
-      Just small ->
-        AWS small "" url Nothing [] False [] [] vpc
-      Nothing ->
-        AWS "" "" url Nothing [] False [] [] vpc
-
-emptyMachine : Machine
-emptyMachine =
-  Machine "" "" "" (Just "") ""
 
 init : (Model , Effects Action)
 init =
@@ -155,8 +132,8 @@ stringValidations = Dict.fromList [
         ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
       , ("Domain", validationOf "Domain" [notEmpty] (\({machine} as model) -> machine.domain))
       , ("IP", validationOf "IP" [validIp] extractIp)
-      , ("VPC Id", validationOf "VPC Id" [validId 12 "vpc-" True] (\{aws} -> aws.vpc.vpcId))
-      , ("Subnet Id", validationOf "Subnet Id" [validId 15 "subnet-" True] (\{aws} -> aws.vpc.subnetId))
+      , ("VPC Id", validationOf "VPC Id" [validId 12 "vpc-" True] (\{aws} -> withDefaultProp aws.vpc "" .vpcId))
+      , ("Subnet Id", validationOf "Subnet Id" [validId 15 "subnet-" True] (\{aws} -> withDefaultProp aws.vpc "" .subnetId))
     ]
   , vpair Instance [
         ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user))
@@ -167,17 +144,17 @@ stringValidations = Dict.fromList [
   
 listValidations = Dict.fromList [
     vpair Instance [
-      ("Security groups", validationOf "Security groups" [hasItems] (\({aws} as model) -> aws.securityGroups))
+      ("Security groups", validationOf "Security groups" [hasItems] (\({aws} as model) -> (defaultEmpty aws.securityGroups)))
     ]
  ]
 
 tupleValidations = Dict.fromList [
   vpair EBS [
-    ("EBS Device", validationOf "EBS Device" [notContained] (\{volume, aws} -> (volume.device, (List.map .device aws.volumes))))
+    ("EBS Device", validationOf "EBS Device" [notContained] (\{volume, aws} -> (volume.device, (List.map .device (defaultEmpty aws.volumes)))))
   ] ,
   vpair Store [
-     ("Instance Device", validationOf "Instance Device" [notContained] (\{block, aws} -> (block.device, (List.map .device aws.blockDevices))))
-   , ("Volume", validationOf "Volume" [notContained] (\{block, aws} -> (block.volume, (List.map .volume aws.blockDevices))))
+     ("Instance Device", validationOf "Instance Device" [notContained] (\{block, aws} -> (block.device, (List.map .device (defaultEmpty aws.blockDevices)))))
+   , ("Volume", validationOf "Volume" [notContained] (\{block, aws} -> (block.volume, (List.map .volume (withDefault [] aws.blockDevices)))))
 
   ]
  ]
@@ -218,7 +195,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
     Next -> 
       let
         nextStep = withDefault Instance (List.head next)
-        nextSteps = withDefault [] (List.tail next)
+        nextSteps = defaultEmpty (List.tail next)
         prevSteps = if step /= Zero then List.append prev [step] else prev
         ({errors} as newModel) = ignoreDevices (validateAll step model)
       in
@@ -274,7 +251,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         splited = String.split " " groups 
       in
         model  
-          |>  setAWS (\aws -> {aws | securityGroups = if splited == [""] then [] else splited})
+          |>  setAWS (\aws -> {aws | securityGroups = Just (if splited == [""] then [] else splited)})
           |>  validate step "Security groups" listValidations
 
     UserInput user -> 
@@ -299,25 +276,25 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
 
     VPCIdInput vpcId -> 
       let
-        newVpc = aws.vpc
+        newVpc = withDefault emptyVpc aws.vpc
       in
         model 
-          |> setAWS (\aws -> {aws | vpc = { newVpc | vpcId = vpcId }})
+          |> setAWS (\aws -> {aws | vpc = Just { newVpc | vpcId = vpcId }})
           |> validate step "VPC Id" stringValidations
 
     SubnetIdInput subnetId -> 
       let
-        newVpc = aws.vpc
+        newVpc = withDefault emptyVpc aws.vpc
       in
         model 
-          |> setAWS (\aws -> {aws | vpc = { newVpc | subnetId = subnetId }})
+          |> setAWS (\aws -> {aws | vpc = Just { newVpc | subnetId = subnetId }})
           |> validate step "Subnet Id" stringValidations
 
     AssignIp -> 
       let
-        newVpc = aws.vpc
+        newVpc = withDefault emptyVpc aws.vpc
       in
-        setAWS (\aws -> {aws | vpc = { newVpc | assignPublic = not aws.vpc.assignPublic }}) model
+        setAWS (\aws -> {aws | vpc = Just { newVpc | assignPublic = not newVpc.assignPublic }}) model
 
     SelectEBSType type' ->
        setVolume (\volume -> {volume | type' = type'}) model
@@ -350,7 +327,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
     VolumeAdd -> 
       let 
         ({errors} as newModel) = validate step "EBS Device" tupleValidations model
-        newAws = {aws | volumes = (List.append [volume] aws.volumes) } 
+        newAws = {aws | volumes = Just (List.append [volume] (defaultEmpty aws.volumes)) } 
       in 
         if notAny errors then
           { newModel | volume = emptyVolume, aws = newAws }
@@ -372,7 +349,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         ({errors} as newModel) = model 
                                   |> validate step "Instance Device" tupleValidations 
                                   |> validate step "Volume" tupleValidations 
-        newAws = { aws | blockDevices = (List.append [block] aws.blockDevices) } 
+        newAws = { aws | blockDevices = Just (List.append [block] (defaultEmpty aws.blockDevices)) } 
       in 
         if notAny errors then
           { newModel | block = emptyBlock, aws = newAws }
@@ -381,13 +358,15 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         
     VolumeRemove device -> 
       let 
-        newAws = { aws | volumes = (List.filter (\volume -> volume.device /= device) aws.volumes) } 
+        newVolumes = (List.filter (\volume -> volume.device /= device) (defaultEmpty aws.volumes))
+        newAws = { aws | volumes = Just newVolumes} 
       in 
         { model | aws = newAws } 
 
     BlockRemove device -> 
       let 
-        newAws = { aws | blockDevices = (List.filter (\block -> block.device /= device) aws.blockDevices) } 
+        newBlocks = (List.filter (\block -> block.device /= device) (defaultEmpty aws.blockDevices))
+        newAws = { aws | blockDevices = Just newBlocks} 
       in 
         { model | aws = newAws } 
 
@@ -399,23 +378,6 @@ hasNext model =
 hasPrev : Model -> Bool
 hasPrev model =
   not (List.isEmpty model.prev)
-
-instanceTypes = [
-    "t1.micro", "m1.small", "m1.medium", "m1.large", "m1.xlarge", "m3.medium", "m3.large", "m3.xlarge",
-    "m3.2xlarge", "c1.medium", "c1.xlarge", "c1.xlarge", "cc2.8xlarge", "c3.large", "c3.xlarge", 
-    "c3.2xlarge", "c3.4xlarge", "c3.8xlarge", "r3.large", "r3.xlarge", "r3.2xlarge", "r3.4xlarge",
-    "r3.8xlarge", "m2.xlarge", "m2.2xlarge", "m2.4xlarge", "cr1.8xlarge", "hi1.4xlarge", "cg1.4xlarge"]
-
-endpoints = Dict.fromList [
-   ("us-east-1",("US East (N. Virginia)","ec2.us-east-1.amazonaws.com", ["a", "b", "d", "e"])), 
-   ("us-west-1",("US West (N. California)","ec2.us-west-1.amazonaws.com", ["a", "b"])),
-   ("us-west-2",("US West (Oregon)","ec2.us-west-2.amazonaws.com", ["a", "b", "c"])), 
-   ("eu-west-1",("EU (Ireland)","ec2.eu-west-1.amazonaws.com",["a","b","c"])),
-   ("eu-central-1",("EU (Frankfurt)","ec2.eu-central-1.amazonaws.com",["a", "b"])),
-   ("ap-southeast-1",("Asia Pacific (Singapore)","ec2.ap-southeast-1.amazonaws.com",["a", "b"])),
-   ("ap-southeast-2",("Asia Pacific (Sydney)","ec2.ap-southeast-2.amazonaws.com",["a", "b"])),
-   ("ap-northeast-1",("Asia Pacific (Tokyo)","ec2.ap-northeast-1.amazonaws.com",["a", "c"])), 
-   ("sa-east-1",("South America (Sao Paulo)","ec2.sa-east-1.amazonaws.com", ["a","b","c"]))]
 
 
 
@@ -435,7 +397,7 @@ instance : Signal.Address Action -> Model -> List Html
 instance address ({aws, machine, errors} as model) =
   let
     check = withErrors errors
-    groups = (String.join " " aws.securityGroups)
+    groups = (String.join " " (defaultEmpty aws.securityGroups))
     points = (List.map (\(name,_,_) -> name) (Dict.values endpoints))
     zone = withDefault "" (List.head (Dict.keys (Dict.filter (\k (name,url,zones) -> url == aws.endpoint) endpoints)))
     (name,_,zones) = withDefault ("","",[]) (Dict.get zone endpoints)
@@ -456,7 +418,7 @@ instance address ({aws, machine, errors} as model) =
 
 withErrors : Dict String (List Error) -> String ->  Html -> Html
 withErrors errors key widget =
-  group key widget (withDefault [] (Dict.get key errors))
+  group key widget (defaultEmpty  (Dict.get key errors))
 
 networking: Signal.Address Action -> Model -> List Html
 networking address ({errors, aws, machine} as model) =
@@ -470,9 +432,9 @@ networking address ({errors, aws, machine} as model) =
      , check "Domain"  (inputText address DomainInput "" machine.domain)
      , check "IP" (inputText address IPInput "" (withDefault "" machine.ip))
      , legend [] [text "VPC"]
-     , check "VPC Id" (inputText address VPCIdInput "" aws.vpc.vpcId)
-     , check "Subnet Id"  (inputText address SubnetIdInput "" aws.vpc.subnetId)
-     , group' "Assign public IP" (checkbox address AssignIp aws.vpc.assignPublic)
+     , check "VPC Id" (inputText address VPCIdInput "" (withDefaultProp aws.vpc "" .vpcId))
+     , check "Subnet Id"  (inputText address SubnetIdInput "" (withDefaultProp aws.vpc "" .subnetId))
+     , group' "Assign public IP" (checkbox address AssignIp (withDefaultProp aws.vpc False .assignPublic))
      ]
   ]
 
@@ -550,7 +512,7 @@ ebs address ({errors, volume, aws} as model) =
     , group' "Clear" (checkbox address EBSClear volume.clear)
     , group' ""  (button [class "btn btn-sm col-md-2", onClick address VolumeAdd] [text "Add"])
     , legend [] [text "Volumes"]
-    , volumes address aws.volumes
+    , volumes address (defaultEmpty aws.volumes)
     ]
   ]
 
@@ -565,7 +527,7 @@ store address ({errors, block, aws} as model) =
     , check "Instance Device" (inputText address InstanceDeviceInput "sdb" block.device)
     , check "Volume" (inputText address InstanceVolumeInput "ephemeral0" block.volume)
     , group' ""  (button [class "btn btn-sm col-md-2", onClick address BlockAdd] [text "Add"])
-    , blocks address aws.blockDevices
+    , blocks address (defaultEmpty aws.blockDevices)
     ]
   ]
 

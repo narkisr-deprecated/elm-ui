@@ -1,5 +1,7 @@
 module Systems.Model.Common where
 
+import Systems.Model.AWS exposing (AWS)
+
 type alias Machine = 
   { user : String
   , hostname : String
@@ -16,34 +18,8 @@ type alias System =
   , aws : Maybe AWS
   }
 
--- AWS 
-type alias Volume = 
-  { type' : String
-  , size : Int
-  , iops : Maybe Int
-  , device : String
-  , clear : Bool
-  } 
+emptyMachine : Machine
+emptyMachine =
+  Machine "" "" "" (Just "") ""
 
-type alias Block = 
-  { volume : String
-  , device : String
-  }
 
-type alias VPC = 
-  { subnetId : String
-  , vpcId : String
-  , assignPublic : Bool
-  }
-
-type alias AWS = 
-  { instanceType : String
-  , keyName : String
-  , endpoint : String
-  , availabilityZone : Maybe String
-  , securityGroups : List String 
-  , ebsOptimized : Bool
-  , volumes : List Volume
-  , blockDevices : List Block
-  , vpc : VPC
-  }
