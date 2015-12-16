@@ -14,6 +14,7 @@ import Task
 import Dict exposing (Dict)
 import Debug
 import Systems.Model.Common exposing (Machine, System)
+import Systems.Model.AWS exposing (emptyAws)
 import Systems.Decoders exposing (..)
 import Common.Redirect exposing (successHandler)
 
@@ -26,6 +27,7 @@ import Table exposing (view)
 import Search exposing (view)
 
 -- Model
+
 type alias Systems = 
   ((Dict String Int), List (String, System))
 
