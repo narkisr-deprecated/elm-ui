@@ -63,7 +63,7 @@ identitySuccess model res =
 
 identityFail : m -> Errors -> (m, Effects a)
 identityFail model res =
-  (model, Effects.none)
+  Debug.log ("request failed" ++ (toString res)) (model, Effects.none)
 
 resultHandler : Result Http.Error r -> m -> (r -> (m, Effects a)) -> (Errors -> (m, Effects a)) -> a -> (m, Effects a)
 resultHandler result model success fail noop = 
