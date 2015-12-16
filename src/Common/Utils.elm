@@ -9,4 +9,19 @@ partition n list =
     else
       [catch]
 
+withDefaultProp :  Maybe a -> b -> (a -> b) -> b
+withDefaultProp parent default prop = 
+ case parent of
+   Just v -> 
+     (prop v)
+   Nothing ->
+     default
+ 
 
+defaultEmpty : Maybe (List a) -> List a
+defaultEmpty list =
+  case list of
+    Just result  ->
+      result
+    Nothing -> 
+      []
