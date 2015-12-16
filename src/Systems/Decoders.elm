@@ -1,6 +1,7 @@
 module Systems.Decoders where
 
 import Systems.Model.Common exposing (..)
+import Systems.Model.AWS exposing (..)
 import Json.Decode as Json exposing (..)
 
 apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
@@ -33,15 +34,16 @@ volumeDecoder =
 awsDecoder: Decoder AWS
 awsDecoder = 
   map AWS
-    ("instanceType" := string)
-   `apply` ("keyName" := string)
+    ("instance-type" := string)
+   `apply` (maybe ("instance-id" := string))
+   `apply` ("key-name" := string)
    `apply` ("endpoint" := string)
-   `apply` (maybe ("availabilityZone" := string))
-   `apply` ("securityGroups" := list string)
-   `apply` ("ebsOptimized" := bool)
-   `apply` ("volumes" := list volumeDecoder)
-   `apply` ("blockDevices" := list blockDecoder)
-   `apply` ("vpc" := vpcDecoder)
+   `apply` (maybe ("availability-zone" := string))
+   `apply` (maybe ("security-groups" := list string))
+   `apply` ("ebs-optimized" := bool)
+   `apply` (maybe ("volumes" := list volumeDecoder))
+   `apply` (maybe ("block-devices" := list blockDecoder))
+   `apply` (maybe ("vpc" := vpcDecoder))
  
 machineDecoder: Decoder Machine
 machineDecoder = 
