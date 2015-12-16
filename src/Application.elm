@@ -22,6 +22,7 @@ init : (Model, Effects Action)
 init =
   let 
     (systemsList, systemsListAction) = SystemsList.init 
+    (systemsView, _) = SystemsView.init 
     (systemsAdd, systemsAddAction ) = Add.init 
     (systemsLaunch, _) = Launch.init 
     (jobsList, jobsListAction) = Jobs.List.init
@@ -33,7 +34,7 @@ init =
               , Effects.map JobsStats jobsStatAction
               , Effects.map SystemsAdd systemsAddAction]
   in
-    (Model systemsList systemsAdd {} systemsLaunch jobsList jobsStat typesModel Nav.init , Effects.batch effects) 
+    (Model systemsList systemsAdd systemsView systemsLaunch jobsList jobsStat typesModel Nav.init , Effects.batch effects) 
 
 type alias Model = 
   { systemsList : SystemsList.Model
@@ -48,7 +49,7 @@ type alias Model =
 type Action = 
      SystemsListing SystemsList.Action
    | SystemsAdd Add.Action
-   | SystemView SystemsView.Action
+   | SystemsView SystemsView.Action
    | SystemsLaunch Launch.Action
    | JobsList Jobs.List.Action
    | JobsStats Jobs.Stats.Action
@@ -83,15 +84,21 @@ systemListing ({nav} as model) =
   ({model |  nav = Nav.update (Nav.Goto Systems List) nav}, Effects.none)
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({nav, systemsList, systemsAdd, jobsList, jobsStats} as model) =
+update action ({nav, systemsList, systemsAdd, jobsList, jobsStats, systemsView} as model) =
   case action of 
-    SystemView _ -> 
-      (model, Effects.none)
+    SystemsView action -> 
+      let
+        (newSystems, effects) = SystemsView.update action systemsView
+      in
+        ({model | systemsView = newSystems}, Effects.map SystemsView effects)
 
     SystemsListing systemsAction -> 
       case systemsAction of 
         SystemsList.LoadPage (Table.View id) ->
-           ({model |  nav = Nav.update (Nav.Goto Systems View) nav}, Effects.none)        
+          let 
+            (newSystems, effects) = SystemsView.update (SystemsView.ViewSystem id) systemsView
+          in
+           ({model | systemsView = newSystems,  nav = Nav.update (Nav.Goto Systems View) nav}, Effects.map SystemsView effects)        
         _ ->
           let 
             (newSystems, effect ) = SystemsList.update systemsAction systemsList
@@ -178,7 +185,7 @@ activeView address ({jobsList, jobsStats} as model) =
          Add.view (Signal.forwardTo address SystemsAdd) model.systemsAdd
 
        View -> 
-         SystemsView.view (Signal.forwardTo address SystemView) model.systemsView
+         SystemsView.view (Signal.forwardTo address SystemsView) model.systemsView
 
        _ -> 
            []
