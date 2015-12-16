@@ -8,6 +8,8 @@ import Common.Redirect as Redirect
 import Systems.Add.Common exposing (..)
 import Dict exposing (Dict)
 
+import Common.Components exposing (panelContents)
+
 type alias Model = 
   {errors : Redirect.Errors}
 

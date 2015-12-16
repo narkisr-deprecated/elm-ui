@@ -14,6 +14,8 @@ import Environments.List exposing (Environments, Environment, getEnvironments)
 import Users.List exposing (User, getUsers)
 import Types.List exposing (Type, getTypes)
 
+import Common.Components exposing (panelContents)
+
 import Debug
 
 -- Model
