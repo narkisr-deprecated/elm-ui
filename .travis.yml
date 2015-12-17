@@ -1,0 +1,10 @@
+language: haskell
+install:
+  - npm install -g elm
+  - npm install -g grunt-cli --save-dev
+  - npm install grunt --save-dev
+  - npm install grunt-elm --save-dev
+  - npm install bower --save-dev
+  - elm-package install -y
+  - bower install
+script: grunt
