@@ -6,7 +6,7 @@
   "dependencies": {
     "pegjs": "v0.8.0",
     "jquery": "v1.11.3",
-    "jquery-contextmenu":"git@github.com:swisnl/jQuery-contextMenu.git#v2.0.0"
+    "jquery-contextmenu":"git://github.com/swisnl/jQuery-contextMenu.git#v2.0.0"
   },
   "resolutions": {
     "angular": "~1.2.16"
