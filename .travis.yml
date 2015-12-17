@@ -2,6 +2,8 @@ language: haskell
 install:
   - npm install -g elm
   - npm install -g grunt-cli --save-dev
+  - npm install grunt-contrib-watch --save-dev
+  - npm install grunt-contrib-clean --save-dev
   - npm install grunt --save-dev
   - npm install grunt-elm --save-dev
   - npm install bower --save-dev
