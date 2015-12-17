@@ -1,5 +1,6 @@
 # Intro
-This NEW Celestial UI
+
+The new Celestial UI
 
 # Usage
 In order to build first install:
