@@ -25,9 +25,9 @@ blockDecoder =
 volumeDecoder : Decoder Volume
 volumeDecoder = 
   object5 Volume 
-   ("type" := string) 
+   ("volume-type" := string) 
    ("size" := int) 
-   ("iops" := maybe int) 
+   (maybe ("iops" := int))
    ("device" := string) 
    ("clear" := bool) 
 

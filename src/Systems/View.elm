@@ -36,7 +36,7 @@ type Action =
 
 setSystem : Model -> System -> (Model , Effects Action)
 setSystem model system =
-  Debug.log "here" ({model | system = system}, Effects.none)
+  ({model | system = system}, Effects.none)
 
 update : Action ->  Model-> (Model , Effects Action)
 update action model =
