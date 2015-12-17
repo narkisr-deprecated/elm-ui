@@ -1,6 +1,6 @@
 [submodule "modules/elm-chartjs"]
 	path = modules/elm-chartjs
-	url = git@github.com:narkisr/elm-chartjs.git
+	url = git://github.com/narkisr/elm-chartjs.git
 [submodule "modules/elm-http"]
 	path = modules/elm-http
-	url = git@github.com:narkisr/elm-http.git
+	url = git://github.com/narkisr/elm-http.git
