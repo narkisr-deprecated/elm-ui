@@ -19,6 +19,13 @@ JS depdencies:
 $ npm install bower --save-dev
 $ bower install
 ```
+
+Elm packages:
+
+```bash
+$ git submodule update --init
+$ elm package install
+``
 Then run:
 
 ```bash
