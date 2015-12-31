@@ -17,6 +17,7 @@ import Effects exposing (Effects, batch)
 import Dict exposing (Dict)
 import Systems.Add.Common exposing (..)
 import Systems.Add.AWS as AWS exposing (..)
+import Systems.Add.GCE as GCE exposing (..)
 import Systems.Add.General as General exposing (..)
 import Systems.Add.Errors as Errors exposing (..)
 import Systems.Add.Encoders exposing (..)
@@ -33,6 +34,7 @@ type Stage =
     | Proxmox
     | AWS
     | Openstack
+    | GCE
 
 type alias Flow = 
   List Stage
@@ -40,6 +42,7 @@ type alias Flow =
 type alias Model = 
   { stage : Stage
   , aws : AWS.Model
+  , gce : GCE.Model
   , general : General.Model
   , hasNext : Bool
   , saveErrors : Errors.Model
@@ -54,6 +57,7 @@ type Action =
   | Back
   | NoOp
   | AWSView AWS.Action
+  | GCEView GCE.Action
   | GeneralView General.Action
   | ErrorsView Errors.Action
   | SystemSaved Action (Result Http.Error SaveResponse)
@@ -63,10 +67,11 @@ init : (Model, Effects Action)
 init =
   let 
     (aws, _) = AWS.init 
+    (gce, _) = GCE.init 
     (errors, _) = Errors.init
     (general, effects) = General.init 
   in 
-   (Model General aws general True errors, Effects.map GeneralView effects)
+   (Model General aws gce general True errors, Effects.map GeneralView effects)
 
 
 setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
@@ -90,7 +95,7 @@ encodeAwsModel ({aws, general}) =
   , ("machine" , machineEncoder aws)
  ]
 update : Action ->  Model-> (Model , Effects Action)
-update action ({general, aws} as model) =
+update action ({general, aws, gce} as model) =
   case action of
     Next -> 
       case general.hypervisor of
@@ -100,6 +105,13 @@ update action ({general, aws} as model) =
              newAws = aws |> AWS.update (AWS.Update current) |> AWS.update AWS.Next
            in
              ({ model | stage = AWS , aws = newAws, hasNext = AWS.hasNext newAws}, Effects.none)
+
+        "gce" -> 
+           let
+             current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
+             newGce = gce |> GCE.update (GCE.Update current) |> GCE.update GCE.Next
+           in
+             ({ model | stage = GCE , gce = newGce , hasNext = GCE.hasNext newGce}, Effects.none)
 
         _ -> 
           (model, Effects.none)
@@ -122,6 +134,13 @@ update action ({general, aws} as model) =
         newAws = AWS.update action aws 
       in
         ({ model | aws = newAws }, Effects.none)
+
+    GCEView action -> 
+      let
+        newGce= GCE.update action gce
+      in
+        ({ model | gce = newGce }, Effects.none)
+
 
     GeneralView action -> 
       let
@@ -156,10 +175,16 @@ currentView address model  =
   case model.stage of 
     General -> 
       (General.view (Signal.forwardTo address GeneralView) model.general)
+
     AWS -> 
       (AWS.view (Signal.forwardTo address AWSView) model.aws)
+
+    GCE -> 
+      (GCE.view (Signal.forwardTo address GCEView) model.gce)
+
     Error -> 
       (Errors.view (Signal.forwardTo address ErrorsView) model.saveErrors)
+
     _ -> 
       [div [] []]
 
