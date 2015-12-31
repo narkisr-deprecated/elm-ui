@@ -22,6 +22,7 @@ type alias Environments =
 
 type Hypervisor = 
   AWS (Dict String Template)
+    | GCE (Dict String Template)
     | Proxmox (Dict String (Dict String String))  (Dict String Template)
     | Physical 
     | Empty 

@@ -42,11 +42,12 @@ type Action =
   Next 
   | Back 
   | Update Environment
-  | SelectMachieType String
+  | SelectMachineType String
   | SelectOS String
   | SelectZone String
-  | SecurityGroupsInput String
   | UserInput String
+  | ProjectIdInput String
+  | TagsInput String
   | HostnameInput String
   | DomainInput String
 
@@ -204,11 +205,6 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate step "Domain" stringValidations
 
-    IPInput ip -> 
-      model 
-        |> setMachine (\machine -> {machine | ip = Just ip })
-        |> validate step "IP" stringValidations
-
 hasNext : Model -> Bool
 hasNext model =
   not (List.isEmpty model.next)
@@ -233,23 +229,19 @@ instance : Signal.Address Action -> Model -> List Html
 instance address ({gce, machine, errors} as model) =
   let
     check = withErrors errors
-    groups = (String.join " " (defaultEmpty gce.securityGroups))
-    points = (List.map (\(name,_,_) -> name) (Dict.values endpoints))
-    zone = withDefault "" (List.head (Dict.keys (Dict.filter (\k (name,url,zones) -> url == gce.endpoint) endpoints)))
-    (name,_,zones) = withDefault ("","",[]) (Dict.get zone endpoints)
-    zoneOptions = (List.append [""] (List.map (\k -> zone ++ k) zones))
+    tags = (String.join " " (defaultEmpty gce.tags))
+    zone = withDefault "" (List.head zones)
   in
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
        , group' "Machine type" (selector address SelectMachineType instanceTypes gce.instanceType)
        , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os)
-       , group' "Endpoint" (selector address SelectEndpoint points name)
-       , group' "Availability Zone" (selector address SelectZone zoneOptions (withDefault "" gce.availabilityZone))
+       , group' "Zone" (selector address SelectZone zones (withDefault "" gce.zone))
+       , check "Project id" (inputText address ProjectIdInput "" gce.projectId)
        , legend [] [text "Security"]
        , check "User" (inputText address UserInput "" model.machine.user) 
-       , check "Keypair" (inputText address KeyPairInput "" gce.keyName)
-       , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
+       , check "Tags" (inputText address TagsInput " " tags)]
    ]
 
 withErrors : Dict String (List Error) -> String ->  Html -> Html
