@@ -8,7 +8,7 @@ import Html.Events exposing (onClick)
 import Systems.Add.Common exposing (..)
 import Systems.View.AWS exposing (summarize)
 import Systems.Add.Validations exposing (..)
-import Environments.List as ENV exposing (Environment, Template, Hypervisor)
+import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
 import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Model.AWS exposing (..)
@@ -384,10 +384,10 @@ hasPrev model =
 getOses : Model -> Dict String Template
 getOses model =
   let 
-    hypervisor = withDefault (ENV.AWS Dict.empty) (Dict.get "aws" model.environment)
+    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "aws" model.environment)
   in 
     case hypervisor of
-      ENV.AWS oses -> 
+      OSTemplates oses -> 
         oses
       _ -> 
         Dict.empty

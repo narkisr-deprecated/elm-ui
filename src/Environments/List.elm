@@ -21,8 +21,7 @@ type alias Environments =
   Dict String Environment
 
 type Hypervisor = 
-  AWS (Dict String Template)
-    | GCE (Dict String Template)
+  OSTemplates (Dict String Template)
     | Proxmox (Dict String (Dict String String))  (Dict String Template)
     | Physical 
     | Empty 
@@ -40,7 +39,7 @@ node =
 hypervisor : Decoder Hypervisor
 hypervisor = 
   oneOf [
-      object1 AWS ("ostemplates" := dict template)
+      object1 OSTemplates("ostemplates" := dict template)
     , object2 Proxmox ("nodes" := dict node) ("ostemplates" := dict template)
     , succeed Physical
   ]
