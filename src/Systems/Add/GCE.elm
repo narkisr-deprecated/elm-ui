@@ -61,9 +61,9 @@ type Step =
 setGCE : (GCE -> GCE) -> Model -> Model
 setGCE f ({gce, errors} as model) =
   let
-    newGce = f aws
+    newGce = f gce
   in
-   { model | aws = newGce }
+   { model | gce = newGce }
 
 setMachine: (Machine-> Machine) -> Model -> Model
 setMachine f ({machine} as model) =
@@ -71,22 +71,6 @@ setMachine f ({machine} as model) =
     newMachine = f machine
   in
    { model | machine = newMachine }
-
-setVolume : (Volume -> Volume) -> Model -> Model
-setVolume f ({volume} as model) =
-  let
-    newVolume = f volume
-  in
-    { model | volume = newVolume }  
-
-setBlock : (Block -> Block)-> Model -> Model
-setBlock f ({block} as model) =
-  let
-    newBlock = f block
-  in
-    { model | block = newBlock }  
-
-
 
 validationOf : String -> List (a -> Error) -> (Model -> a) -> Model -> Model
 validationOf key validations value ({errors} as model) =
@@ -105,21 +89,16 @@ extractIp ({machine} as model) =
       ""
   
 stringValidations = Dict.fromList [
-    vpair Networking [
-        ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
-      , ("Domain", validationOf "Domain" [notEmpty] (\({machine} as model) -> machine.domain))
-      , ("IP", validationOf "IP" [validIp] extractIp)
-    ]
-  , vpair Instance [
-        ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user))
-      , ("Keypair", validationOf "Keypair" [notEmpty] (\({aws} as model) -> aws.keyName))
+    vpair Instance [
+        ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user)),
+        ("Project id", validationOf "Project id" [notEmpty] (\({gce} as model) -> gce.projectId))
     ]
  ]
 
   
 listValidations = Dict.fromList [
     vpair Instance [
-      ("Security groups", validationOf "Security groups" [hasItems] (\({aws} as model) -> (defaultEmpty aws.securityGroups)))
+      ("Tags", validationOf "Tags" [hasItems] (\({gce} as model) -> (defaultEmpty gce.tags)))
     ]
  ]
 
@@ -145,7 +124,7 @@ notAny errors =
   List.isEmpty (List.filter (\e -> not (List.isEmpty e)) (Dict.values errors))
 
 update : Action -> Model-> Model
-update action ({next, prev, step, aws, machine, volume, block} as model) =
+update action ({next, prev, step, gce, machine} as model) =
   case action of
     Next -> 
       let
@@ -182,13 +161,13 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
                newModel
 
     SelectMachineType type' -> 
-      setGCE (\gce -> {gce | instanceType = type' }) model
+      setGCE (\gce -> {gce | machineType = type' }) model
 
     SelectOS os -> 
       setMachine (\machine -> {machine | os = os }) model
 
     SelectZone zone -> 
-      setGCE (\gce -> {gce | availabilityZone = (Just zone) }) model 
+      setGCE (\gce -> {gce | zone = zone }) model 
 
     UserInput user -> 
        model 
@@ -199,6 +178,20 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
       model 
         |> setMachine (\machine -> {machine | hostname = host })
         |> validate step "Hostname" stringValidations
+         
+    ProjectIdInput id -> 
+      model 
+        |> setGCE (\gce-> {gce | projectId = id })
+        |> validate step "Project id" stringValidations
+
+    TagsInput tags -> 
+      let
+        splited = String.split " " tags
+      in
+        model  
+          |>  setGCE (\gce -> {gce | tags = Just (if splited == [""] then [] else splited)})
+          |>  validate step "Tags" listValidations
+
 
     DomainInput domain -> 
       model 
@@ -235,9 +228,9 @@ instance address ({gce, machine, errors} as model) =
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
-       , group' "Machine type" (selector address SelectMachineType instanceTypes gce.instanceType)
+       , group' "Machine type" (selector address SelectMachineType machineTypes gce.machineType)
        , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os)
-       , group' "Zone" (selector address SelectZone zones (withDefault "" gce.zone))
+       , group' "Zone" (selector address SelectZone zones gce.zone)
        , check "Project id" (inputText address ProjectIdInput "" gce.projectId)
        , legend [] [text "Security"]
        , check "User" (inputText address UserInput "" model.machine.user) 

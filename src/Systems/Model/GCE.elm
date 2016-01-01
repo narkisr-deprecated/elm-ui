@@ -5,7 +5,7 @@ type alias GCE =
   { 
     machineType : String,
     zone : String,
-    tags : List String,
+    tags : Maybe (List String),
     projectId : String
   }
 
@@ -15,7 +15,7 @@ emptyGce =
     type' = (withDefault "" (List.head machineTypes))
     zone = (withDefault "" (List.head zones))
   in
-    GCE type' zone [] ""
+    GCE type' zone (Just []) ""
 
 machineTypes = [
     "n1-standard-1", "n1-standard-2", "n1-standard-4", 
