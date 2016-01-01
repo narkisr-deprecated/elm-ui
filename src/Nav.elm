@@ -46,50 +46,29 @@ sectionItem address active section =
 
 drop : Signal.Address Action -> Active -> List Section -> Html
 drop address active actions =
-  li [class "dropdown"] [
-    a [class  "dropdown-toggle"
-      , href "#" 
-      , attribute "data-toggle" "dropdown"
-      , attribute "role" "button"
-      , attribute "aria-haspopup" "true"
-      , attribute "aria-expanded" "false"
-      ] 
-      [text (toString active)
-      , span [class "caret"] []
-      ] 
-  , ul [ class "dropdown-menu" ] 
+  li [class "treeview"] [
+    a [href "#"]  [
+      i [class "fa fa-link"] []
+    , span [] [text (toString active)]
+    , i [class "fa fa-angle-left pull-right"] []
+    ] 
+      
+  , ul [ class "treeview-menu" ] 
       (List.map (\section -> sectionItem address active section) actions)
   ]
 
-navHeader : Html
-navHeader  =
- div' {class ="navbar-header"} 
-   [img'  { class = ""
-   , src = "assets/img/cropped.png"
-   , alt = "Celestial"
-   , width  = 110
-   , height = 50 } ]
-
-menus : Signal.Address Action -> Html
+menus : Signal.Address Action -> List Html
 menus address =
-  div [class "collapse navbar-collapse"]  [
-    ul [class "nav navbar-nav"] [
-      li [class ""] 
-        [a [class "", href "" ] [text " "] ]
-        , drop address Systems [List, Add]
-        , drop address Types [List, Add]
-        , drop address Jobs [List, Stats]
-        , li [class "" ] [a [class "", href "" ] [text "Documentation"] ]
-    ]
-  ]
+   [ drop address Systems [List, Add]
+   , drop address Types [List, Add]
+   , drop address Jobs [List, Stats]
+   ]
 
 view : Signal.Address Action -> Model -> List Html
 view address model =
-  [row_ 
-    [div [class "col-md-12"] [
-       navbarDefault' "" [
-        div [class "container-fluid"] [ navHeader , menus address]
-       ]
-      ]
-    ]
-  ]
+ [aside [class "main-sidebar"] 
+   [section [class "sidebar"] 
+     [ul [class "sidebar-menu"]  (menus address)
+     ]
+   ]
+ ] 

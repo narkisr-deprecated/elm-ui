@@ -4,6 +4,7 @@
   "devDependencies": {
   },
   "dependencies": {
+    "admin-lte":"2.3.2",
     "pegjs": "v0.8.0",
     "jquery": "v1.11.3",
     "jquery-contextmenu":"git://github.com/swisnl/jQuery-contextMenu.git#v2.0.0"

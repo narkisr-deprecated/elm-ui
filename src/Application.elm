@@ -14,7 +14,7 @@ import Types.List as Types
 import Table as Table
 import Nav exposing (view, Active(Types, Systems, Jobs), Section(Stats, Launch, Add, List, View))
 
-import Html.Attributes exposing (type', class, id)
+import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Bootstrap.Html exposing (..)
 import Debug
 
@@ -203,8 +203,33 @@ activeView address ({jobsList, jobsStats} as model) =
        _ ->
            []
 
+navHeader : Html
+navHeader  =
+ div [class  "navbar-header"] [
+   img [ class  "", src "assets/img/cropped.png", alt "Celestial", width 110 , height 50] []
+ ]
+
+
+mainHeader : List Html
+mainHeader  =
+  [header [class "main-header"] [
+      a [href "/index.html", class "logo"] [
+         span [class "logo-mini"] [text "CEL"]   
+       , span [class "logo-lg"] [navHeader]   
+      ]
+    , nav [class "navbar navbar-static-top", attribute "role" "navigation"] [ 
+        a [href "#" , class "sidebar-toggle", attribute "data-toggle" "offcanvas",attribute "role" "button"] [
+          span [class "sr-only"][text "Toggle navigation"]
+        ]
+      ]
+    ]
+  ]
+
 view : Signal.Address Action -> Model -> Html
 view address model = 
-  div [ class "container-fluid" ] 
-    (List.append (Nav.view (Signal.forwardTo address NavAction) model.nav) (activeView address model))
+  div [ class "wrapper" ] 
+    (List.append
+       (List.append (mainHeader) (Nav.view (Signal.forwardTo address NavAction) model.nav))
+       [div [class "content-wrapper"]
+         [section [class "content"] (activeView address model)]])
 

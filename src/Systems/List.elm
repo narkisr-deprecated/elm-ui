@@ -136,14 +136,14 @@ systemRow id {env, owner, type', machine} =
 flash : Model -> Html
 flash model =
   let 
-    result = div [class "col-md-3 col-md-offset-3 alert alert-danger", attribute "role" "alert"]
+    result = div [class "callout callout-danger"]
   in
     case model.error of
       NoError ->
         div [] []
 
       NoSystemSelected ->
-        result [text "Please select a system first"]
+        result [p [] [text "Please select a system first"]]
 
       SearchParseFailed error ->
         result [text error]
