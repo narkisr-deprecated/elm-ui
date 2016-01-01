@@ -126,6 +126,17 @@ update action ({general, aws, gce} as model) =
               ({ model | stage = AWS , aws = newAws, hasNext = True}, Effects.none)
              else 
               ({ model | stage = General , aws = newAws , hasNext = True}, Effects.none)
+
+        "gce" -> 
+           let
+             newGCE = GCE.update GCE.Back gce
+           in
+             if GCE.hasPrev gce then
+              ({ model | stage = GCE , gce = newGCE, hasNext = True}, Effects.none)
+             else 
+              ({ model | stage = General , gce = newGCE  , hasNext = True}, Effects.none)
+
+
         _ -> 
           (model, Effects.none)
 
