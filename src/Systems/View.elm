@@ -57,6 +57,7 @@ view address ({system} as model) =
   case system.aws of
     Just aws ->
      panelContents "AWS system" (div [] (AWSView.summarize (aws, system.machine)))
+
     Nothing ->
       [div  [] [text "not implemented"]]
   
