@@ -92,8 +92,32 @@ encodeAwsModel ({aws, general}) =
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
   , ("aws" , awsEncoder aws)
-  , ("machine" , machineEncoder aws)
+  , ("machine" , machineEncoder aws.machine)
  ]
+
+encodeGceModel : Model -> E.Value
+encodeGceModel ({gce, general}) =
+ E.object [
+    ("type" , E.string general.type')
+  , ("owner" , E.string general.owner)
+  , ("env" , E.string general.environment)
+  , ("gce" , gceEncoder gce)
+  , ("machine" , machineEncoder gce.machine)
+ ]
+
+encodeModel : Model -> Action -> (Model , Effects Action)
+encodeModel ({stage} as model) action =
+  case stage of
+    AWS -> 
+      (model, saveSystem (E.encode 0 (encodeAwsModel model)) action)
+
+    GCE -> 
+      (model, saveSystem (E.encode 0 (encodeGceModel model)) action)
+   
+    _ -> 
+      (model, Effects.none)
+
+
 update : Action ->  Model-> (Model , Effects Action)
 update action ({general, aws, gce} as model) =
   case action of
@@ -160,14 +184,13 @@ update action ({general, aws, gce} as model) =
         ({ model | general = newGeneral }, Effects.none)
 
     Stage -> 
-       (model, saveSystem (E.encode 0 (encodeAwsModel model)) Stage)
+       encodeModel model Stage
 
     Save -> 
-       (model, saveSystem (E.encode 0 (encodeAwsModel model)) NoOp)
+       encodeModel model NoOp
 
     Create -> 
-       (model, saveSystem (E.encode 0 (encodeAwsModel model)) Create)
-
+      encodeModel model Create
 
     SystemSaved next result -> 
       let

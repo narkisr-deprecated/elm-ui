@@ -3,7 +3,8 @@ module Systems.Add.Encoders where
 import Json.Encode exposing (..)
 import Systems.Model.Common exposing (..)
 import Systems.Model.AWS exposing (..)
-import Systems.Add.AWS exposing (Model, ebsTypes)
+import Systems.Add.AWS as AWS exposing (ebsTypes)
+import Systems.Add.GCE as GCE 
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
@@ -38,7 +39,7 @@ vpcEncoder ({vpcId} as vpc) =
       , ("assign-public", bool vpc.assignPublic)
     ]
 
-awsEncoder :Model -> Value
+awsEncoder : AWS.Model -> Value
 awsEncoder ({aws} as model) =
   object [
       ("key-name", string aws.keyName)
@@ -52,8 +53,18 @@ awsEncoder ({aws} as model) =
     , ("volumes", list (List.map volumeEncoder (defaultEmpty aws.volumes)))
   ]
 
-machineEncoder : Model -> Value
-machineEncoder ({machine} as model) =
+gceEncoder : GCE.Model -> Value
+gceEncoder ({gce} as model) =
+  object [
+      ("machine-type", string gce.machineType)
+    , ("zone", string gce.zone)
+    , ("tags", list (List.map string (defaultEmpty gce.tags)))
+    , ("project-id", string gce.projectId)
+  ]
+
+
+machineEncoder : Machine -> Value
+machineEncoder machine =
   object [
       ("domain", string machine.domain)
     , ("hostname", string machine.hostname)

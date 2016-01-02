@@ -2,6 +2,7 @@ module Systems.Decoders where
 
 import Systems.Model.Common exposing (..)
 import Systems.Model.AWS exposing (..)
+import Systems.Model.GCE exposing (..)
 import Json.Decode as Json exposing (..)
 
 apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
@@ -44,7 +45,15 @@ awsDecoder =
    `apply` (maybe ("volumes" := list volumeDecoder))
    `apply` (maybe ("block-devices" := list blockDecoder))
    `apply` (maybe ("vpc" := vpcDecoder))
- 
+
+gceDecoder: Decoder GCE
+gceDecoder = 
+  object4 GCE
+    ("machine-type" := string)
+    ("zone" := string)
+    (maybe ("tags" := list string))
+    ("project-id" := string)
+
 machineDecoder: Decoder Machine
 machineDecoder = 
   object5 Machine 
@@ -57,12 +66,13 @@ machineDecoder =
     
 systemDecoder : Decoder System
 systemDecoder = 
-  object5 System 
+  object6 System 
     ("owner" := string )
     ("env" := string )
     ("type" := string )
     ("machine" := machineDecoder)
     (maybe ("aws" := awsDecoder))
+    (maybe ("gce" := gceDecoder))
 
 
 
