@@ -14,6 +14,7 @@ import Common.Redirect exposing (successHandler)
 import Common.Components exposing (panelContents)
 import Html exposing (..)
 import Systems.View.AWS  as AWSView
+import Systems.View.GCE as GCEView
 
 -- Model 
 type alias Model = 
@@ -24,7 +25,7 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let
-    emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing
+    emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing
   in
    (Model emptySystem, Effects.none)
 
@@ -59,9 +60,13 @@ view address ({system} as model) =
      panelContents "AWS system" (div [] (AWSView.summarize (aws, system.machine)))
 
     Nothing ->
-      [div  [] [text "not implemented"]]
-  
+      case system.gce of
+        Just gce ->
+          panelContents "GCE system" (div [] (GCEView.summarize (gce, system.machine)))
 
+        Nothing -> 
+          [div  [] [text "not implemented"]]
+  
 -- Effects
 
 getSystem : String -> Effects Action

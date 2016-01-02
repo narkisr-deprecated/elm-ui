@@ -1,6 +1,7 @@
 module Systems.Model.Common where
 
 import Systems.Model.AWS exposing (AWS)
+import Systems.Model.GCE exposing (GCE)
 
 type alias Machine = 
   { user : String
@@ -16,6 +17,7 @@ type alias System =
   , type' : String 
   , machine: Machine
   , aws : Maybe AWS
+  , gce : Maybe GCE
   }
 
 emptyMachine : Machine

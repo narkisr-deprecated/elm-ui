@@ -6,9 +6,9 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Systems.Add.Common exposing (..)
--- import Systems.View.AWS exposing (summarize)
+import Systems.View.GCE exposing (summarize)
 import Systems.Add.Validations exposing (..)
-import Environments.List as ENV exposing (Environment, Template, Hypervisor)
+import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
 import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Model.GCE exposing (..)
@@ -209,10 +209,10 @@ hasPrev model =
 getOses : Model -> Dict String Template
 getOses model =
   let 
-    hypervisor = withDefault (ENV.GCE Dict.empty) (Dict.get "gce" model.environment)
+    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "gce" model.environment)
   in 
     case hypervisor of
-      ENV.GCE oses -> 
+      OSTemplates oses -> 
         oses
       _ -> 
         Dict.empty
@@ -249,8 +249,7 @@ stepView address ({gce, machine} as model) =
       instance address model 
 
     Summary -> 
-      Debug.log (toString model.step) [div [] []]
-      -- summarize (gce, machine)
+      summarize (gce, machine)
 
     _ -> 
       Debug.log (toString model.step) [div [] []]
