@@ -6,7 +6,7 @@ import Html.Attributes exposing (type', class, id, href, attribute, height, widt
 navHeader : Html
 navHeader  =
  div [class  "navbar-header"] [
-   img [ class  "", src "assets/img/cropped.png", alt "Celestial", width 110 , height 50] []
+   img [src "assets/img/cropped.png", alt "Celestial", width 110 , height 50] []
  ]
 
 
@@ -17,8 +17,7 @@ mainHeader  =
          span [class "logo-mini"] [text "CEL"]   
        , span [class "logo-lg"] [navHeader]   
       ]
-    , nav [class "navbar navbar-static-top", attribute "role" "navigation"] 
-       [ 
+    , nav [class "navbar navbar-static-top", attribute "role" "navigation"] [ 
         a [href "#", class "sidebar-toggle", 
            attribute "data-toggle" "offcanvas",attribute "role" "button"] [
           span [class "sr-only"][text "Toggle navigation"]
@@ -32,8 +31,8 @@ topNav : Html
 topNav =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
-     [li [ class "dropdown user user-menu open"] [
-        a [attribute "aria-expanded" "true", class "dropdown-toggle" , attribute "data-toggle" "dropdown", href "#" ]
+     [li [ class "dropdown user user-menu"] [
+        a [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ]
             [ span [ class "hidden-xs" ]
                 [ text "Set current User!" ]
             ]
