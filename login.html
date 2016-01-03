@@ -1,29 +1,72 @@
-<html ng-app="celestial" ng-controller="AppCtrl">
+<html>
   <head>
-    <title ng-bind="Celestial"></title>
-    <link rel="stylesheet" type="text/css" href="assets/ng-boilerplate-0.3.1.css" />
-  </head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Celestial | Log in</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="bower_components/admin-lte/plugins/iCheck/square/blue.css">
 
-  <body> 
-    <div class="container">
-	<div class="row">
-	  <div class="span4 offset4 well">
-	    <legend>Please Sign In</legend>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="assets/bootstrap-3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/jquery-contextmenu/dist/jquery.contextMenu.css">
+    <link rel="stylesheet" href="bower_components/admin-lte/dist/css/AdminLTE.min.css">
+
+    <!-- This will be minified into a single file in the future -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="bower_components/jquery-contextmenu/dist/jquery.contextMenu.min.js"></script>
+    <script src="bower_components/jquery-contextmenu/dist/jquery.ui.position.min.js"></script>
+    <script src="bower_components/pegjs/peg-0.8.0.js"></script>
+    <script src="assets/js/query/query.js"></script>
+
+    <script src="assets/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+    <script src="bower_components/admin-lte/dist/js/app.min.js"></script>
+    <script src="bower_components/admin-lte/plugins/iCheck/icheck.min.js"></script>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+	  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+  <body class="hold-transition login-page">
+    <div class="login-box">
+	<div class="login-logo">
+	  <a href="index.html">Celestial</a>
+	</div><!-- /.login-logo -->
 	    <div id="alert" class="alert alert-error">
 		Incorrect Username or Password!
 	    </div>
-	    <form id="login" method="POST" action="" accept-charset="UTF-8">
-		<input type="text" id="username" class="span4" name="username" placeholder="Username">
-		<input type="password" id="password" class="span4" name="password" placeholder="Password">
-		<button type="submit" name="submit" class="btn btn-info btn-block">Sign in</button>
-	    </form>    
-	  </div>
-	</div>
-    </div>
 
-    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+
+	<div class="login-box-body">
+	  <p class="login-box-msg">Sign in to start your session</p>
+	  <form id="login" method="POST" action="" accept-charset="UTF-8">
+	    <div class="form-group has-feedback">
+		<input type="text" id="username" name="username" class="form-control" placeholder="Username">
+		<span class="glyphicon glyphicon-user form-control-feedback"></span>
+	    </div>
+	    <div class="form-group has-feedback">
+		<input type="password" id="password" name="password" class="form-control" placeholder="Password">
+		<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+	    </div>
+	    <div class="row">
+		<div class="col-xs-4">
+		  <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+		</div><!-- /.col -->
+	    </div>
+	  </form>
+
+	</div><!-- /.login-box-body -->
+    </div><!-- /.login-box -->
 
     <script> 
+	console.log("here");
      function getURLParameter(name) {
          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
      }
