@@ -2,10 +2,11 @@ module Nav.Header where
 
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
-import Users.Session exposing (getSession, Session, emptySession)
+import Users.Session exposing (getSession, Session, emptySession, logout)
 import Effects exposing (Effects)
-import Common.Redirect exposing (successHandler)
+import Common.Redirect exposing (successHandler, redirect)
 import Http exposing (Error(BadResponse))
+import Html.Events exposing (onClick)
 import String
 
 type alias Model = 
@@ -18,7 +19,9 @@ init =
 
 type Action = 
   LoadSession (Result Http.Error Session)
-    | NoOp
+    | SignOut
+    | Redirect (Result Http.Error String)
+    | NoOp 
 
 setSession model session = 
    ({model | session = session }, Effects.none)
@@ -28,6 +31,12 @@ update action model =
   case action of
     LoadSession result -> 
       (successHandler result model (setSession model) NoOp)
+
+    SignOut -> 
+     (model, logout Redirect)
+
+    Redirect _ -> 
+     (model, redirect NoOp)
 
     NoOp -> 
      (model, Effects.none)
@@ -40,8 +49,8 @@ navHeader  =
  ]
 
 
-topNav : Session -> Html
-topNav ({username, envs} as session) =
+topNav : Signal.Address Action  -> Session -> Html
+topNav address ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
      [li [ class "dropdown user user-menu"] [
@@ -61,7 +70,7 @@ topNav ({username, envs} as session) =
                    ]
                 ]
                 , div [ class "pull-right" ] [
-                   a [ class "btn btn-default btn-flat", href "#" ]
+                   a [ class "btn btn-default btn-flat", href "#", onClick address SignOut]
                         [ text "Sign out" ]
                    ]
                 ]
@@ -86,7 +95,7 @@ view address ({session} as model) =
            attribute "data-toggle" "offcanvas",attribute "role" "button"] [
           span [class "sr-only"][text "Toggle navigation"]
         ]
-      , (topNav session)
+      , (topNav address session)
       ]
     ]
   ]

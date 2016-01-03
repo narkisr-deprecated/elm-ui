@@ -12,7 +12,6 @@ import Table exposing (view)
 import Bootstrap.Html exposing (..)
 import Debug
 import Systems.Model.Common exposing (System)
-import Common.Redirect exposing (redirect)
 
 import Set exposing (Set)
 -- Model 

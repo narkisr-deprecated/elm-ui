@@ -16,7 +16,7 @@ redirectActions =
   Signal.mailbox NoOp
 
 redirect : a -> Effects a
-redirect noop= 
+redirect noop = 
   (Signal.send redirectActions.address Prompt)
      |> Task.map (always noop)
      |> Effects.task 

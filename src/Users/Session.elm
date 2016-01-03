@@ -34,5 +34,10 @@ getSession action =
     |> Task.map action
     |> Effects.task
 
+logout action =
+    Http.getString "/logout" 
+      |> Task.toResult
+      |> Task.map action
+      |> Effects.task
 
 
