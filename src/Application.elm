@@ -12,7 +12,8 @@ import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
 import Types.List as Types
 import Table as Table
-import Nav exposing (view, Active(Types, Systems, Jobs), Section(Stats, Launch, Add, List, View))
+import Nav.Side as Nav exposing (view, Active(Types, Systems, Jobs), Section(Stats, Launch, Add, List, View))
+import Nav.Header exposing (mainHeader)
 
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Bootstrap.Html exposing (..)
@@ -202,28 +203,6 @@ activeView address ({jobsList, jobsStats} as model) =
 
        _ ->
            []
-
-navHeader : Html
-navHeader  =
- div [class  "navbar-header"] [
-   img [ class  "", src "assets/img/cropped.png", alt "Celestial", width 110 , height 50] []
- ]
-
-
-mainHeader : List Html
-mainHeader  =
-  [header [class "main-header"] [
-      a [href "/index.html", class "logo"] [
-         span [class "logo-mini"] [text "CEL"]   
-       , span [class "logo-lg"] [navHeader]   
-      ]
-    , nav [class "navbar navbar-static-top", attribute "role" "navigation"] [ 
-        a [href "#" , class "sidebar-toggle", attribute "data-toggle" "offcanvas",attribute "role" "button"] [
-          span [class "sr-only"][text "Toggle navigation"]
-        ]
-      ]
-    ]
-  ]
 
 view : Signal.Address Action -> Model -> Html
 view address model = 
