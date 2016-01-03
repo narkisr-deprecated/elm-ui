@@ -1,4 +1,4 @@
-module Session where
+module Users.Session where
 
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
@@ -14,6 +14,10 @@ type alias Session =
     username : String
   }
 
+emptySession : Session
+emptySession  =
+  (Session [] "" [] [] "")
+
 session : Decoder Session
 session  =
   object5 Session 
@@ -22,7 +26,6 @@ session  =
     ("operations" := list string )
     ("roles" := list string )
     ("username" := string )
-
 
 
 getSession action = 

@@ -2,6 +2,36 @@ module Nav.Header where
 
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
+import Users.Session exposing (getSession, Session, emptySession)
+import Effects exposing (Effects)
+import Common.Redirect exposing (successHandler)
+import Http exposing (Error(BadResponse))
+import String
+
+type alias Model = 
+  { session : Session}
+
+init : (Model , Effects Action)
+init =
+  (Model emptySession, getSession LoadSession)
+
+
+type Action = 
+  LoadSession (Result Http.Error Session)
+    | NoOp
+
+setSession model session = 
+   ({model | session = session }, Effects.none)
+
+update : Action ->  Model-> (Model , Effects Action)
+update action model =
+  case action of
+    LoadSession result -> 
+      (successHandler result model (setSession model) NoOp)
+
+    NoOp -> 
+     (model, Effects.none)
+
 
 navHeader : Html
 navHeader  =
@@ -10,35 +40,18 @@ navHeader  =
  ]
 
 
-mainHeader : List Html
-mainHeader  =
-  [header [class "main-header"] [
-      a [href "/index.html", class "logo"] [
-         span [class "logo-mini"] [text "CEL"]   
-       , span [class "logo-lg"] [navHeader]   
-      ]
-    , nav [class "navbar navbar-static-top", attribute "role" "navigation"] [ 
-        a [href "#", class "sidebar-toggle", 
-           attribute "data-toggle" "offcanvas",attribute "role" "button"] [
-          span [class "sr-only"][text "Toggle navigation"]
-        ]
-      , topNav
-      ]
-    ]
-  ]
-
-topNav : Html
-topNav =
+topNav : Session -> Html
+topNav ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
      [li [ class "dropdown user user-menu"] [
         a [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ]
             [ span [ class "hidden-xs" ]
-                [ text "Set current User!" ]
+                [text  username]
             ]
         , ul [ class "dropdown-menu" ]
             [ li [ class "user-header" ]
-                [ p [] [ text "Alexander Pierce - Web Developer" ]
+                [ p [] [ text ("Environments you can access: " ++ (String.join " " envs)) ]
                 ]
             , li [ class "user-body" ] [ ]
             , li [ class "user-footer" ] [
@@ -60,3 +73,22 @@ topNav =
         ]
      ]
   ]
+
+view : Signal.Address Action -> Model -> List Html
+view address ({session} as model) =
+  [header [class "main-header"] [
+      a [href "/index.html", class "logo"] [
+         span [class "logo-mini"] [text "CEL"]   
+       , span [class "logo-lg"] [navHeader]   
+      ]
+    , nav [class "navbar navbar-static-top", attribute "role" "navigation"] [ 
+        a [href "#", class "sidebar-toggle", 
+           attribute "data-toggle" "offcanvas",attribute "role" "button"] [
+          span [class "sr-only"][text "Toggle navigation"]
+        ]
+      , (topNav session)
+      ]
+    ]
+  ]
+
+
