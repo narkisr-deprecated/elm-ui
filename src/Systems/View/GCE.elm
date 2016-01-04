@@ -74,6 +74,10 @@ summarySections ((gce, machine) as model)=
    , overviewSection "Security"
        ["user", "tags" ]
        [ machine.user, (String.join " " (withDefault [] gce.tags))]
+   , overviewSection "Networking"
+       ["hostname", "domain", "ip", "static ip" ]
+       [ machine.hostname, machine.domain, withDefault "" machine.ip, withDefault "" gce.staticIp]
+
    ]
 
 summarize: (GCE, Machine) -> List Html

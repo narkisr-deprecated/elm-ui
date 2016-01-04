@@ -34,7 +34,7 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let 
-    steps = [ Instance, Summary ]
+    steps = [ Instance, Networking, Summary ]
   in 
   (Model Zero [] steps (emptyGce) (emptyMachine) Dict.empty Dict.empty, Effects.none)
 
@@ -50,10 +50,12 @@ type Action =
   | TagsInput String
   | HostnameInput String
   | DomainInput String
+  | IPInput String
 
 type Step = 
   Zero
   | Instance
+  | Networking
   | Summary
 
 -- Update
@@ -81,14 +83,19 @@ validationOf key validations value ({errors} as model) =
      {model | errors = newErrors}
 
 extractIp : Model -> String
-extractIp ({machine} as model) =
-  case machine.ip of
+extractIp ({gce} as model) =
+  case gce.staticIp of
     Just ip ->
       ip
     Nothing -> 
       ""
   
 stringValidations = Dict.fromList [
+    vpair Networking [
+        ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
+      , ("Domain", validationOf "Domain" [notEmpty] (\({machine} as model) -> machine.domain))
+      , ("IP", validationOf "IP" [validIp] extractIp)
+    ],
     vpair Instance [
         ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user)),
         ("Project id", validationOf "Project id" [notEmpty] (\({gce} as model) -> gce.projectId))
@@ -192,11 +199,16 @@ update action ({next, prev, step, gce, machine} as model) =
           |>  setGCE (\gce -> {gce | tags = Just (if splited == [""] then [] else splited)})
           |>  validate step "Tags" listValidations
 
-
     DomainInput domain -> 
       model 
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate step "Domain" stringValidations
+
+    IPInput ip -> 
+      model 
+        |> setGCE (\gce -> {gce | staticIp = Just ip})
+        |> validate step "IP" stringValidations
+
 
 hasNext : Model -> Bool
 hasNext model =
@@ -216,6 +228,20 @@ getOses model =
         oses
       _ -> 
         Dict.empty
+
+networking: Signal.Address Action -> Model -> List Html
+networking address ({errors, gce, machine} as model) =
+  let 
+    check = withErrors errors
+  in
+  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+     [
+       legend [] [text "DNS"]
+     , check "Hostname" (inputText address HostnameInput "" machine.hostname)
+     , check "Domain"  (inputText address DomainInput "" machine.domain)
+     , check "IP" (inputText address IPInput "" (withDefault "" gce.staticIp))
+     ]
+  ]
 
 
 instance : Signal.Address Action -> Model -> List Html
@@ -247,6 +273,9 @@ stepView address ({gce, machine} as model) =
   case model.step of
     Instance -> 
       instance address model 
+
+    Networking -> 
+      networking address model
 
     Summary -> 
       summarize (gce, machine)
