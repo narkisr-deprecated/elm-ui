@@ -222,7 +222,10 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         in 
           case List.head (Dict.keys (getOses newModel)) of
              Just os -> 
-               { newModel | machine = {machine | os = os }}
+               if (String.isEmpty machine.os) then
+                 { newModel | machine = {machine | os = os }}
+               else 
+                 newModel
              Nothing -> 
                newModel
 

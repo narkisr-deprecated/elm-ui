@@ -163,15 +163,18 @@ update action ({next, prev, step, gce, machine} as model) =
         in 
           case List.head (Dict.keys (getOses newModel)) of
              Just os -> 
-               { newModel | machine = {machine | os = os }}
+               if (String.isEmpty machine.os) then
+                 { newModel | machine = {machine | os = os }}
+               else 
+                 newModel
              Nothing -> 
                newModel
 
     SelectMachineType type' -> 
       setGCE (\gce -> {gce | machineType = type' }) model
 
-    SelectOS os -> 
-      setMachine (\machine -> {machine | os = os }) model
+    SelectOS newOS -> 
+      setMachine (\machine -> {machine | os = newOS }) model
 
     SelectZone zone -> 
       setGCE (\gce -> {gce | zone = zone }) model 
