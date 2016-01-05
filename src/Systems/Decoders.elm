@@ -48,11 +48,12 @@ awsDecoder =
 
 gceDecoder: Decoder GCE
 gceDecoder = 
-  object4 GCE
+  object5 GCE
     ("machine-type" := string)
     ("zone" := string)
     (maybe ("tags" := list string))
     ("project-id" := string)
+    (maybe ("static-ip" := string))
 
 machineDecoder: Decoder Machine
 machineDecoder = 
