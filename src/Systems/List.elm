@@ -23,8 +23,8 @@ import Set exposing (Set)
 
 -- Components
 import Pager exposing (..)
-import Table exposing (view)
-import Search exposing (view)
+import Table 
+import Search
 
 -- Model
 

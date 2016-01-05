@@ -4,10 +4,18 @@ import Html exposing (..)
 import Effects exposing (Effects)
 import Dict exposing (Dict)
 
+import Pager exposing (..)
+import Table
+
+import Bootstrap.Html exposing (..)
 import Json.Decode as Json exposing (..)
+import Html.Attributes exposing (type', class, id, style, attribute)
 import Http exposing (Error(BadResponse))
 import Effects exposing (Effects)
 import Task
+import Maybe exposing (withDefault)
+import Common.Redirect exposing (successHandler)
+import Debug
 
 
 type alias Module = 
@@ -17,25 +25,70 @@ type alias PuppetStd =
   { module' : Module }
 
 type alias Type = 
-  { type' : String, puppetStd : Dict String PuppetStd}
+  { type' : String
+  , description : Maybe String
+  , puppetStd : Dict String PuppetStd
+  }
 
 type alias Model = 
-  { types : List Type} 
+  { types : List Type
+  , table : Table.Model Type
+  , pager : Pager.Model
+  } 
+
+typeRow : String -> Type -> List Html
+typeRow id {type', description } = 
+    [ td [] [ text type' ]
+    , td [] [ text "Puppet standalone"]
+    , td [] [ text (withDefault "" description)]
+    ]
 
 init : (Model , Effects Action)
 init =
-  ({ types = []} , Effects.none)
+  let 
+    table = Table.init "typesListing" True ["Name", "Provisioner", "Description"] typeRow "Types"
+  in 
+    (Model [] table Pager.init , getTypes SetTypes)
 
 type Action = 
-  Load
+  LoadPage (Table.Action Type)
+    | GotoPage Pager.Action
+    | SetTypes (Result Http.Error (List Type))
+    | NoOp
+
+setTypes: Model -> List Type -> (Model , Effects Action)
+setTypes model types = 
+  let
+    total = List.length types
+    typePairs = List.map (\ ({type'} as item) -> (type', item)) types
+    newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
+    newTable = (Table.update (Table.UpdateRows typePairs) model.table)
+  in
+    Debug.log "" ({ model | types = types, pager = newPager, table = newTable } , Effects.none)
+
 
 update : Action ->  Model-> (Model , Effects Action)
-update address model =
-  (model, Effects.none)
+update action model =
+  case action of
+    SetTypes result ->
+      successHandler result model (setTypes model) NoOp
+     
+    _ -> 
+      (model, Effects.none)
 
 view : Signal.Address Action -> Model -> List Html
-view address model =
-  [div  [] [text "types"]]
+view address ({types, pager, table} as model) =
+  [div  [class "box box-info"] [
+     div [class "box-body"] [
+       row_ [
+         div [class "col-md-offset-1 col-md-10"] [
+           panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
+         ]
+       ],
+       row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+      ]
+    ] 
+  ]
 
 -- Decoding
 
@@ -52,8 +105,9 @@ puppetStd =
 
 type': Decoder Type
 type' = 
-  object2 Type
+  object3 Type
     ("type" := string)
+    (maybe ("description" := string))
     ("puppet-std" := dict puppetStd)
 
 typesList : Decoder (List Type)
