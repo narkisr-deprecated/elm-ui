@@ -99,8 +99,8 @@
         start: {name: "Start", callback: function(key, opt){ main.ports.menuPort.send("start"); }},
         stop: {name: "Stop", callback: function(key, opt){ main.ports.menuPort.send("stop") }},
         provision: {name: "Provision", callback: function(key, opt){ main.ports.menuPort.send("provision") }},
-        destroy: {name: "Destroy", callback: function(key, opt){  main.ports.menuPort.send("destroy") }},
-	  destroy: {name: "Reload", callback: function(key, opt){  main.ports.menuPort.send("reload") }},
+	  reload: {name: "Reload", callback: function(key, opt){  main.ports.menuPort.send("reload") }},
+        destroy: {name: "Destroy", callback: function(key, opt){  main.ports.menuPort.send("destroy") }}
     }
   }); 
 </script>
