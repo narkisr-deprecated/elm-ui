@@ -1,5 +1,7 @@
 module Common.Utils where
 
+import Effects exposing (Effects, Never, batch, map)
+
 partition n list =
   let
     catch = (List.take n list)
@@ -25,3 +27,7 @@ defaultEmpty list =
       result
     Nothing -> 
       []
+
+none : a -> (a, Effects b)
+none a =
+  (a, Effects.none)

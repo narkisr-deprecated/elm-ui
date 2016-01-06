@@ -7,7 +7,8 @@ import Common.NewTab as NewTab exposing (newtabActions)
 import Search exposing (searchActions)
 import Application exposing (init, view, update)
 import Systems.List
-import Systems.Launch
+import Systems.Launch as SystemsLaunch
+import Systems.Core as SystemsCore
 
 import Time exposing (every, second)
 import Jobs.List exposing (Action(Polling))
@@ -70,12 +71,12 @@ port parserPort =
 port parsingOk : Signal Search.ParseResult
 
 parsingInput action p =
-  Signal.map (\r -> Application.SystemsListing (Systems.List.Searching (action r))) p
+  Signal.map (\r -> Application.SystemsAction (SystemsCore.SystemsListing (Systems.List.Searching (action r)))) p
 
 port parsingErr : Signal Search.ParseResult
 
 menuClick p =
- Signal.map (\job -> Application.SystemsLaunch (Systems.Launch.SetupJob job)) p
+ Signal.map (\job -> Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))) p
 
 jobsListPolling : Signal Application.Action
 jobsListPolling =

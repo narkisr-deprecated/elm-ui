@@ -2,16 +2,12 @@ module Application where
 
 import Html exposing (..)
 import Effects exposing (Effects, Never, batch, map)
-import Set
 
-import Systems.List as SystemsList exposing (Error(NoSystemSelected, NoError))
-import Systems.Add as Add
-import Systems.View as SystemsView
-import Systems.Launch as Launch exposing (Action(Cancel, SetupJob, Run))
+import Systems.Core as Systems exposing(NavChange(Launched, Canceled, ToList, None, PreLaunch))
 import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
+import Common.Utils exposing (none)
 import Types.Core as Types
-import Table as Table
 import Nav.Side as NavSide exposing (Active(Types, Systems, Jobs), Section(Stats, Launch, Add, List, View))
 import Nav.Header as NavHeader
 
@@ -22,30 +18,24 @@ import Debug
 init : (Model, Effects Action)
 init =
   let 
-    (systemsList, systemsListAction) = SystemsList.init 
-    (systemsView, _) = SystemsView.init 
-    (systemsAdd, systemsAddAction ) = Add.init 
-    (systemsLaunch, _) = Launch.init 
     (jobsList, jobsListAction) = Jobs.List.init
     (jobsStat, jobsStatAction) = Jobs.Stats.init
     (navHeaderModel, navHeaderAction) = NavHeader.init
     (types, typesAction) = Types.init
-    effects = [ Effects.map SystemsListing systemsListAction
-              , Effects.map TypesAction typesAction
+    (systems, systemsAction) = Systems.init
+    effects = [ 
+                Effects.map TypesAction typesAction
+              , Effects.map SystemsAction systemsAction
               , Effects.map NavHeaderAction navHeaderAction
               , Effects.map JobsList jobsListAction
               , Effects.map JobsStats jobsStatAction
-              , Effects.map SystemsAdd systemsAddAction]
+              ]
   in
-    (Model systemsList systemsAdd systemsView 
-           systemsLaunch jobsList jobsStat types
-           NavSide.init navHeaderModel, Effects.batch effects) 
+    (Model systems jobsList jobsStat types NavSide.init navHeaderModel, Effects.batch effects) 
 
 type alias Model = 
-  { systemsList : SystemsList.Model
-  , systemsAdd : Add.Model
-  , systemsView : SystemsView.Model
-  , systemsLaunch : Launch.Model
+  { 
+    systems : Systems.Model
   , jobsList : Jobs.List.Model
   , jobsStats : Jobs.Stats.Model
   , types : Types.Model
@@ -55,31 +45,14 @@ type alias Model =
 
 
 type Action = 
-     SystemsListing SystemsList.Action
-   | SystemsAdd Add.Action
-   | SystemsView SystemsView.Action
-   | SystemsLaunch Launch.Action
-   | JobsList Jobs.List.Action
-   | JobsStats Jobs.Stats.Action
-   | NavSideAction NavSide.Action
-   | NavHeaderAction NavHeader.Action
-   | TypesAction Types.Action
+  SystemsAction Systems.Action
+    | JobsList Jobs.List.Action
+    | JobsStats Jobs.Stats.Action
+    | NavSideAction NavSide.Action
+    | NavHeaderAction NavHeader.Action
+    | TypesAction Types.Action
 
-setupJob : Launch.Action -> Model -> (Model, Effects Action)
-setupJob action ({ systemsList, systemsLaunch } as model) =
-  let
-    (_, systems) = systemsList.systems
-    table = systemsList.table
-    selected = List.filter (\(id,s) -> Set.member id table.selected) systems
-    selectedTable = { table | rows = selected, selected = Set.empty, id = "launchListing" }
-    (newLaunch, effect) = Launch.update action { systemsLaunch |  table =  selectedTable }
-    newNavSide = NavSide.update (NavSide.Goto Systems Launch) model.navSide
-  in
-    if List.isEmpty selected then
-      ({ model | systemsList = { systemsList | error = NoSystemSelected}} , Effects.none)
-    else
-      ({ model | systemsLaunch = newLaunch, navSide = newNavSide, systemsList = { systemsList | error = NoError}}, Effects.map SystemsLaunch effect)
-
+-- Navigation changes
 jobListing : Model -> (Model , Effects Action)
 jobListing ({navSide} as model) = 
   let
@@ -88,73 +61,26 @@ jobListing ({navSide} as model) =
   in 
     ({model | navSide = newNavSide , jobsList = newJobs}, Effects.map JobsList effects)
 
-systemListing : Model -> (Model , Effects Action)
+launchListing : Model -> Model
+launchListing ({navSide} as model)= 
+  {model | navSide = NavSide.update (NavSide.Goto Systems Launch) navSide}
+
+
+systemListing : Model -> Model
 systemListing ({navSide} as model) = 
-  ({model |  navSide = NavSide.update (NavSide.Goto Systems List) navSide}, Effects.none)
+  {model |  navSide = NavSide.update (NavSide.Goto Systems List) navSide}
 
+systemView : Model -> Model
+systemView ({navSide} as model) = 
+  {model | navSide = NavSide.update (NavSide.Goto Systems View) navSide}
+
+-- clearEffect : (Model, Effects Action) -> (Model, Effects Action)
+-- clearEffect (model, effects) =
+--    ({ model | navChange = None}, effects) 
+--
 update : Action ->  Model-> (Model , Effects Action)
-update action ({navSide, systemsList, types, systemsAdd, jobsList, jobsStats, systemsView} as model) =
+update action ({navSide, types, jobsList, jobsStats, systems} as model) =
   case action of 
-    SystemsView action -> 
-      let
-        (newSystems, effects) = SystemsView.update action systemsView
-      in
-        ({model | systemsView = newSystems}, Effects.map SystemsView effects)
-
-    SystemsListing systemsAction -> 
-      case systemsAction of 
-        SystemsList.LoadPage (Table.View id) ->
-          let 
-            (newSystems, effects) = SystemsView.update (SystemsView.ViewSystem id) systemsView
-          in
-           ({model | systemsView = newSystems,  navSide = NavSide.update (NavSide.Goto Systems View) navSide}, Effects.map SystemsView effects)        
-
-        _ ->
-          let 
-            (newSystems, effect ) = SystemsList.update systemsAction systemsList
-          in
-            ({ model | systemsList = newSystems }, Effects.map SystemsListing effect)
-
-    SystemsAdd systemsAction -> 
-      case systemsAction of
-        Add.JobLaunched _ -> 
-          jobListing model
-
-        Add.SystemSaved next result -> 
-          let
-            (newSystems, effect) = Add.update systemsAction systemsAdd
-          in
-            if effect /= Effects.none && next == Add.NoOp then
-              systemListing {model | systemsAdd = newSystems}
-            else  
-              ({model | systemsAdd = newSystems }, Effects.map SystemsAdd effect)
-
-        _ -> 
-          let 
-            (newSystems, effect) = Add.update systemsAction systemsAdd
-          in
-            ({model | systemsAdd = newSystems }, Effects.map SystemsAdd effect)
-
-    SystemsLaunch launchAction -> 
-      case launchAction of 
-        Cancel -> 
-          systemListing model
-
-        Launch.JobLaunched _ -> 
-          jobListing model
-
-        SetupJob job -> 
-          setupJob launchAction model
-
-        Run job -> 
-          let 
-             (newLaunch, effect) = Launch.update launchAction model.systemsLaunch
-          in 
-           ({ model | systemsLaunch = newLaunch}, Effects.map SystemsLaunch effect)
-
-        _ -> 
-          Debug.log (toString launchAction) (model, Effects.none)
-
     JobsList jobAction -> 
       if jobAction == Polling && navSide.active /= Jobs then
         (model, Effects.none)
@@ -188,26 +114,34 @@ update action ({navSide, systemsList, types, systemsAdd, jobsList, jobsStats, sy
        (newTypes, effects) = Types.update action types
       in
        ({ model | types = newTypes}, Effects.map TypesAction effects) 
+
+    SystemsAction action -> 
+      let 
+       (newSystems, effects) = Systems.update action systems
+       newModel = { model | systems = newSystems}
+      in
+        case newSystems.navChange of
+          Canceled -> 
+            (systemListing newModel, Effects.map SystemsAction effects)
+
+          Launched ->  
+            (jobListing newModel)
+
+          PreLaunch -> 
+            (launchListing newModel, Effects.map SystemsAction effects)
+
+          ToList -> 
+            (systemView newModel, Effects.map SystemsAction effects)
+
+          None ->  
+           (newModel, Effects.map SystemsAction effects) 
  
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats} as model) =
   case model.navSide.active of
    Systems -> 
-     case model.navSide.section of
-       List -> 
-         SystemsList.view (Signal.forwardTo address SystemsListing) model.systemsList 
+     Systems.view (Signal.forwardTo address SystemsAction) model.systems model.navSide.section 
 
-       Launch ->
-         Launch.view (Signal.forwardTo address SystemsLaunch) model.systemsLaunch
-
-       Add ->
-         Add.view (Signal.forwardTo address SystemsAdd) model.systemsAdd
-
-       View -> 
-         SystemsView.view (Signal.forwardTo address SystemsView) model.systemsView
-
-       _ -> 
-           []
    Types -> 
      Types.view (Signal.forwardTo address TypesAction) model.types model.navSide.section
 
