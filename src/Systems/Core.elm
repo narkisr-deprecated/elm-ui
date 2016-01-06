@@ -92,7 +92,7 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
             (newSystems, effect) = Add.update systemsAction systemsAdd
           in
             if effect /= Effects.none && next == Add.NoOp then
-              none {model | navChange = Canceled, systemsAdd = newSystems}
+              none {model | navChange = ToList, systemsAdd = newSystems}
             else  
               ({model | systemsAdd = newSystems }, Effects.map SystemsAdd effect)
 
@@ -139,5 +139,5 @@ view address model section =
       View.view (Signal.forwardTo address SystemsView) model.systemsView
 
     _ -> 
-      [div  [] [text "not implemented"]]
+     [div  [] [text "not implemented"]]
  

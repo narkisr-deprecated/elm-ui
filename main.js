@@ -16217,7 +16217,7 @@ Elm.Types.List.make = function (_elm) {
       var newTable = A2($Table.update,$Table.UpdateRows(typePairs),model.table);
       var total = $List.length(types);
       var newPager = A2($Pager.update,$Pager.UpdateTotal($Basics.toFloat(total)),model.pager);
-      return A2($Debug.log,"",{ctor: "_Tuple2",_0: _U.update(model,{types: types,pager: newPager,table: newTable}),_1: $Effects.none});
+      return {ctor: "_Tuple2",_0: _U.update(model,{types: types,pager: newPager,table: newTable}),_1: $Effects.none};
    });
    var NoOp = {ctor: "NoOp"};
    var update = F2(function (action,model) {
@@ -16235,12 +16235,13 @@ Elm.Types.List.make = function (_elm) {
       var _p4 = _p3;
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("box box-info")]),
-      _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("box-body")]),
-      _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-              _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-              _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
-              ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]))]);
+      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("box-header")]),_U.list([$Html.text("")]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.$class("box-body")]),
+              _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                      _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+                      _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
+                      ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]))]);
    });
    var typeRow = F2(function (id,_p5) {
       var _p6 = _p5;
@@ -17174,9 +17175,9 @@ Elm.Systems.Core.make = function (_elm) {
                 var newSystems = _p17._0;
                 var effect = _p17._1;
                 return !_U.eq(effect,$Effects.none) && _U.eq(_p16._0,$Systems$Add.NoOp) ? $Common$Utils.none(_U.update(_p23,
-                {navChange: Canceled,systemsAdd: newSystems})) : {ctor: "_Tuple2"
-                                                                 ,_0: _U.update(_p23,{systemsAdd: newSystems})
-                                                                 ,_1: A2($Effects.map,SystemsAdd,effect)};
+                {navChange: ToList,systemsAdd: newSystems})) : {ctor: "_Tuple2"
+                                                               ,_0: _U.update(_p23,{systemsAdd: newSystems})
+                                                               ,_1: A2($Effects.map,SystemsAdd,effect)};
               default: var _p18 = A2($Systems$Add.update,_p19,_p24);
                 var newSystems = _p18._0;
                 var effect = _p18._1;
@@ -21738,7 +21739,7 @@ Elm.Application.make = function (_elm) {
    var _op = {};
    var $goto = F2(function (_p0,section) {
       var _p1 = _p0;
-      return _U.update(_p1,{navSide: A2($Nav$Side.update,A2($Nav$Side.Goto,$Nav$Side.Systems,$Nav$Side.View),_p1.navSide)});
+      return _U.update(_p1,{navSide: A2($Nav$Side.update,A2($Nav$Side.Goto,$Nav$Side.Systems,section),_p1.navSide)});
    });
    var TypesAction = function (a) {    return {ctor: "TypesAction",_0: a};};
    var NavHeaderAction = function (a) {    return {ctor: "NavHeaderAction",_0: a};};
@@ -21842,7 +21843,7 @@ Elm.Application.make = function (_elm) {
            {case "Canceled": return {ctor: "_Tuple2",_0: A2($goto,newModel,$Nav$Side.List),_1: newEffects};
               case "Launched": return jobListing(newModel);
               case "PreLaunch": return {ctor: "_Tuple2",_0: A2($goto,newModel,$Nav$Side.Launch),_1: newEffects};
-              case "ToList": return {ctor: "_Tuple2",_0: A2($goto,newModel,$Nav$Side.View),_1: newEffects};
+              case "ToList": return {ctor: "_Tuple2",_0: A2($goto,newModel,$Nav$Side.List),_1: newEffects};
               default: return {ctor: "_Tuple2",_0: newModel,_1: newEffects};}}
    });
    return _elm.Application.values = {_op: _op
