@@ -61,23 +61,10 @@ jobListing ({navSide} as model) =
   in 
     ({model | navSide = newNavSide , jobsList = newJobs}, Effects.map JobsList effects)
 
-launchListing : Model -> Model
-launchListing ({navSide} as model)= 
-  {model | navSide = NavSide.update (NavSide.Goto Systems Launch) navSide}
-
-
-systemListing : Model -> Model
-systemListing ({navSide} as model) = 
-  {model |  navSide = NavSide.update (NavSide.Goto Systems List) navSide}
-
-systemView : Model -> Model
-systemView ({navSide} as model) = 
+goto : Model -> Section -> Model
+goto ({navSide} as model) section =
   {model | navSide = NavSide.update (NavSide.Goto Systems View) navSide}
 
--- clearEffect : (Model, Effects Action) -> (Model, Effects Action)
--- clearEffect (model, effects) =
---    ({ model | navChange = None}, effects) 
---
 update : Action ->  Model-> (Model , Effects Action)
 update action ({navSide, types, jobsList, jobsStats, systems} as model) =
   case action of 
@@ -119,22 +106,23 @@ update action ({navSide, types, jobsList, jobsStats, systems} as model) =
       let 
        (newSystems, effects) = Systems.update action systems
        newModel = { model | systems = newSystems}
+       newEffects = Effects.map SystemsAction effects
       in
         case newSystems.navChange of
           Canceled -> 
-            (systemListing newModel, Effects.map SystemsAction effects)
+            (goto newModel List, newEffects)
 
           Launched ->  
             (jobListing newModel)
 
           PreLaunch -> 
-            (launchListing newModel, Effects.map SystemsAction effects)
+            (goto newModel Launch, newEffects)
 
           ToList -> 
-            (systemView newModel, Effects.map SystemsAction effects)
+            (goto newModel View, newEffects)
 
           None ->  
-           (newModel, Effects.map SystemsAction effects) 
+           (newModel, newEffects)
  
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats} as model) =
