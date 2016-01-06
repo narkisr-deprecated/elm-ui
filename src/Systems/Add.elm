@@ -23,10 +23,7 @@ import Systems.Add.Errors as Errors exposing (..)
 import Systems.Add.Encoders exposing (..)
 import Systems.Launch as Launch exposing (runJob, JobResponse)
 import String exposing (toLower)
-
 import Maybe exposing (withDefault)
-
-import Debug
 
 type Stage = 
   General 
@@ -35,9 +32,6 @@ type Stage =
     | AWS
     | Openstack
     | GCE
-
-type alias Flow = 
-  List Stage
 
 type alias Model = 
   { stage : Stage
