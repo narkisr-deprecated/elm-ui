@@ -18,6 +18,7 @@ import Dict exposing (Dict)
 import Systems.Add.Common exposing (..)
 import Systems.Add.AWS as AWS exposing (..)
 import Systems.Add.GCE as GCE exposing (..)
+import Systems.Add.Digital as Digital exposing (..)
 import Systems.Add.General as General exposing (..)
 import Systems.Add.Errors as Errors exposing (..)
 import Systems.Add.Encoders exposing (..)
@@ -32,11 +33,13 @@ type Stage =
     | AWS
     | Openstack
     | GCE
+    | Digital
 
 type alias Model = 
   { stage : Stage
   , aws : AWS.Model
   , gce : GCE.Model
+  , digital: Digital.Model
   , general : General.Model
   , hasNext : Bool
   , saveErrors : Errors.Model
@@ -52,6 +55,7 @@ type Action =
   | NoOp
   | AWSView AWS.Action
   | GCEView GCE.Action
+  | DigitalView Digital.Action
   | GeneralView General.Action
   | ErrorsView Errors.Action
   | SystemSaved Action (Result Http.Error SaveResponse)
@@ -62,10 +66,11 @@ init =
   let 
     (aws, _) = AWS.init 
     (gce, _) = GCE.init 
+    (digital, _) = Digital.init 
     (errors, _) = Errors.init
     (general, effects) = General.init 
   in 
-   (Model General aws gce general True errors, Effects.map GeneralView effects)
+   (Model General aws gce digital general True errors, Effects.map GeneralView effects)
 
 
 setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
@@ -99,6 +104,17 @@ encodeGceModel ({gce, general}) =
   , ("machine" , machineEncoder gce.machine)
  ]
 
+encodeDigitalModel : Model -> E.Value
+encodeDigitalModel ({digital, general}) =
+ E.object [
+    ("type" , E.string general.type')
+  , ("owner" , E.string general.owner)
+  , ("env" , E.string general.environment)
+  , ("digital" , digitalEncoder digital)
+  , ("machine" , machineEncoder digital.machine)
+ ]
+
+
 encodeModel : Model -> Action -> (Model , Effects Action)
 encodeModel ({stage} as model) action =
   case stage of
@@ -107,29 +123,46 @@ encodeModel ({stage} as model) action =
 
     GCE -> 
       (model, saveSystem (E.encode 0 (encodeGceModel model)) action)
-   
+
+    Digital -> 
+      (model, saveSystem (E.encode 0 (encodeDigitalModel model)) action)
+
     _ -> 
       (model, Effects.none)
 
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({general, aws, gce} as model) =
+update action ({general, aws, gce, digital} as model) =
   case action of
     Next -> 
       case general.hypervisor of
         "aws" -> 
            let
              current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
-             newAws = aws |> AWS.update (AWS.Update current) |> AWS.update AWS.Next
+             newAws = aws 
+                       |> AWS.update (AWS.Update current) 
+                       |> AWS.update AWS.Next
            in
              ({ model | stage = AWS , aws = newAws, hasNext = AWS.hasNext newAws}, Effects.none)
 
         "gce" -> 
            let
              current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
-             newGce = gce |> GCE.update (GCE.Update current) |> GCE.update GCE.Next
+             newGce = gce 
+                        |> GCE.update (GCE.Update current) 
+                        |> GCE.update GCE.Next
            in
              ({ model | stage = GCE , gce = newGce , hasNext = GCE.hasNext newGce}, Effects.none)
+
+        "digital-ocean" -> 
+           let
+             current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
+             newDigital = digital 
+                           |> Digital.update (Digital.Update current) 
+                           |> Digital.update Digital.Next
+           in
+             ({ model | stage = Digital , digital = newDigital , hasNext = Digital.hasNext newDigital}, Effects.none)
+
 
         _ -> 
           (model, Effects.none)
@@ -209,6 +242,9 @@ currentView address model  =
 
     GCE -> 
       (GCE.view (Signal.forwardTo address GCEView) model.gce)
+
+    Digital -> 
+      (Digital.view (Signal.forwardTo address DigitalView) model.digital)
 
     Error -> 
       (Errors.view (Signal.forwardTo address ErrorsView) model.saveErrors)

@@ -5,6 +5,7 @@ import Systems.Model.Common exposing (..)
 import Systems.Model.AWS exposing (..)
 import Systems.Add.AWS as AWS exposing (ebsTypes)
 import Systems.Add.GCE as GCE 
+import Systems.Add.Digital as Digital
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
@@ -62,6 +63,13 @@ gceEncoder ({gce} as model) =
     , ("project-id", string gce.projectId)
   ]
 
+digitalEncoder : Digital.Model -> Value
+digitalEncoder ({digital} as model) =
+  object [
+      ("size", string digital.size)
+    , ("region", string digital.region)
+    , ("private-networking", bool digital.privateNetworking)
+  ]
 
 machineEncoder : Machine -> Value
 machineEncoder machine =
