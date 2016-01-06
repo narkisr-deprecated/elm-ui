@@ -16160,6 +16160,25 @@ Elm.Users.List.make = function (_elm) {
    return _elm.Users.List.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
 };
 Elm.Types = Elm.Types || {};
+Elm.Types.Model = Elm.Types.Model || {};
+Elm.Types.Model.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.Model = _elm.Types.Model || {};
+   if (_elm.Types.Model.values) return _elm.Types.Model.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var PuppetStd = function (a) {    return {module$: a};};
+   var Module = F2(function (a,b) {    return {name: a,src: b};});
+   return _elm.Types.Model.values = {_op: _op,Module: Module,PuppetStd: PuppetStd};
+};
+Elm.Types = Elm.Types || {};
 Elm.Types.List = Elm.Types.List || {};
 Elm.Types.List.make = function (_elm) {
    "use strict";
@@ -16183,8 +16202,14 @@ Elm.Types.List.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Table = Elm.Table.make(_elm),
-   $Task = Elm.Task.make(_elm);
+   $Task = Elm.Task.make(_elm),
+   $Types$Model = Elm.Types.Model.make(_elm);
    var _op = {};
+   var module$ = A3($Json$Decode.object2,
+   $Types$Model.Module,
+   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"src",$Json$Decode.string));
+   var puppetStd = A2($Json$Decode.object1,$Types$Model.PuppetStd,A2($Json$Decode._op[":="],"module",module$));
    var setTypes = F2(function (model,types) {
       var typePairs = A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1.type$,_1: _p1};},types);
       var newTable = A2($Table.update,$Table.UpdateRows(typePairs),model.table);
@@ -16223,10 +16248,6 @@ Elm.Types.List.make = function (_elm) {
    });
    var Model = F3(function (a,b,c) {    return {types: a,table: b,pager: c};});
    var Type = F3(function (a,b,c) {    return {type$: a,description: b,puppetStd: c};});
-   var PuppetStd = function (a) {    return {module$: a};};
-   var Module = F2(function (a,b) {    return {name: a,src: b};});
-   var module$ = A3($Json$Decode.object2,Module,A2($Json$Decode._op[":="],"name",$Json$Decode.string),A2($Json$Decode._op[":="],"src",$Json$Decode.string));
-   var puppetStd = A2($Json$Decode.object1,PuppetStd,A2($Json$Decode._op[":="],"module",module$));
    var type$ = A4($Json$Decode.object3,
    Type,
    A2($Json$Decode._op[":="],"type",$Json$Decode.string),
@@ -16239,8 +16260,6 @@ Elm.Types.List.make = function (_elm) {
       return {ctor: "_Tuple2",_0: A3(Model,_U.list([]),table,$Pager.init),_1: getTypes(SetTypes)};
    }();
    return _elm.Types.List.values = {_op: _op
-                                   ,Module: Module
-                                   ,PuppetStd: PuppetStd
                                    ,Type: Type
                                    ,Model: Model
                                    ,typeRow: typeRow
@@ -21239,6 +21258,32 @@ Elm.Jobs.Stats.make = function (_elm) {
                                    ,metricsDecoder: metricsDecoder
                                    ,getMetrics: getMetrics};
 };
+Elm.Types = Elm.Types || {};
+Elm.Types.Add = Elm.Types.Add || {};
+Elm.Types.Add.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.Add = _elm.Types.Add || {};
+   if (_elm.Types.Add.values) return _elm.Types.Add.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Types$Model = Elm.Types.Model.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {    return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);});
+   var update = F2(function (action,model) {    return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
+   var NoOp = {ctor: "NoOp"};
+   var Model = F4(function (a,b,c,d) {    return {description: a,type$: b,env: c,puppetStd: d};});
+   var init = {ctor: "_Tuple2",_0: A4(Model,"","","",$Dict.empty),_1: $Effects.none};
+   return _elm.Types.Add.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,update: update,view: view};
+};
 Elm.Nav = Elm.Nav || {};
 Elm.Nav.Side = Elm.Nav.Side || {};
 Elm.Nav.Side.make = function (_elm) {
@@ -21314,6 +21359,64 @@ Elm.Nav.Side.make = function (_elm) {
                                  ,drop: drop
                                  ,menus: menus
                                  ,view: view};
+};
+Elm.Types = Elm.Types || {};
+Elm.Types.Core = Elm.Types.Core || {};
+Elm.Types.Core.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.Core = _elm.Types.Core || {};
+   if (_elm.Types.Core.values) return _elm.Types.Core.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Nav$Side = Elm.Nav.Side.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Types$Add = Elm.Types.Add.make(_elm),
+   $Types$List = Elm.Types.List.make(_elm);
+   var _op = {};
+   var TypesAdding = function (a) {    return {ctor: "TypesAdding",_0: a};};
+   var TypesListing = function (a) {    return {ctor: "TypesListing",_0: a};};
+   var update = F2(function (action,_p0) {
+      var _p1 = _p0;
+      var _p5 = _p1;
+      var _p2 = action;
+      if (_p2.ctor === "TypesListing") {
+            var _p3 = A2($Types$List.update,_p2._0,_p1.typesList);
+            var newTypes = _p3._0;
+            var effect = _p3._1;
+            return {ctor: "_Tuple2",_0: _U.update(_p5,{typesList: newTypes}),_1: A2($Effects.map,TypesListing,effect)};
+         } else {
+            var _p4 = A2($Types$Add.update,_p2._0,_p1.typesAdd);
+            var newTypes = _p4._0;
+            var effect = _p4._1;
+            return {ctor: "_Tuple2",_0: _U.update(_p5,{typesAdd: newTypes}),_1: A2($Effects.map,TypesAdding,effect)};
+         }
+   });
+   var view = F3(function (address,model,section) {
+      var _p6 = section;
+      switch (_p6.ctor)
+      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,TypesListing),model.typesList);
+         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,TypesAdding),model.typesAdd);
+         default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
+   });
+   var Model = F2(function (a,b) {    return {typesList: a,typesAdd: b};});
+   var init = function () {
+      var _p7 = $Types$Add.init;
+      var typesAdd = _p7._0;
+      var typesAddAction = _p7._1;
+      var _p8 = $Types$List.init;
+      var typesList = _p8._0;
+      var typesListAction = _p8._1;
+      var effects = _U.list([A2($Effects.map,TypesListing,typesListAction),A2($Effects.map,TypesAdding,typesAddAction)]);
+      return {ctor: "_Tuple2",_0: A2(Model,typesList,typesAdd),_1: $Effects.batch(effects)};
+   }();
+   return _elm.Types.Core.values = {_op: _op,Model: Model,init: init,TypesListing: TypesListing,TypesAdding: TypesAdding,update: update,view: view};
 };
 Elm.Users = Elm.Users || {};
 Elm.Users.Session = Elm.Users.Session || {};
@@ -21488,7 +21591,7 @@ Elm.Application.make = function (_elm) {
    $Systems$List = Elm.Systems.List.make(_elm),
    $Systems$View = Elm.Systems.View.make(_elm),
    $Table = Elm.Table.make(_elm),
-   $Types$List = Elm.Types.List.make(_elm);
+   $Types$Core = Elm.Types.Core.make(_elm);
    var _op = {};
    var systemListing = function (_p0) {
       var _p1 = _p0;
@@ -21496,7 +21599,7 @@ Elm.Application.make = function (_elm) {
              ,_0: _U.update(_p1,{navSide: A2($Nav$Side.update,A2($Nav$Side.Goto,$Nav$Side.Systems,$Nav$Side.List),_p1.navSide)})
              ,_1: $Effects.none};
    };
-   var TypesListing = function (a) {    return {ctor: "TypesListing",_0: a};};
+   var TypesAction = function (a) {    return {ctor: "TypesAction",_0: a};};
    var NavHeaderAction = function (a) {    return {ctor: "NavHeaderAction",_0: a};};
    var NavSideAction = function (a) {    return {ctor: "NavSideAction",_0: a};};
    var JobsStats = function (a) {    return {ctor: "JobsStats",_0: a};};
@@ -21547,7 +21650,7 @@ Elm.Application.make = function (_elm) {
               case "Add": return A2($Systems$Add.view,A2($Signal.forwardTo,address,SystemsAdd),_p18.systemsAdd);
               case "View": return A2($Systems$View.view,A2($Signal.forwardTo,address,SystemsView),_p18.systemsView);
               default: return _U.list([]);}
-         case "Types": return A2($Types$List.view,A2($Signal.forwardTo,address,TypesListing),_p18.typesList);
+         case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p18.types,_p18.navSide.section);
          default: var _p17 = _p18.navSide.section;
            switch (_p17.ctor)
            {case "List": return A2($Jobs$List.view,A2($Signal.forwardTo,address,JobsList),_p14.jobsList);
@@ -21566,15 +21669,15 @@ Elm.Application.make = function (_elm) {
       _U.list([A2($Html.section,_U.list([$Html$Attributes.$class("content")]),A2(activeView,address,model))]))])));
    });
    var Model = F9(function (a,b,c,d,e,f,g,h,i) {
-      return {systemsList: a,systemsAdd: b,systemsView: c,systemsLaunch: d,jobsList: e,jobsStats: f,typesList: g,navSide: h,navHeader: i};
+      return {systemsList: a,systemsAdd: b,systemsView: c,systemsLaunch: d,jobsList: e,jobsStats: f,types: g,navSide: h,navHeader: i};
    });
    var init = function () {
-      var _p19 = $Nav$Header.init;
-      var navHeaderModel = _p19._0;
-      var navHeaderAction = _p19._1;
-      var _p20 = $Types$List.init;
-      var typesModel = _p20._0;
-      var typesAction = _p20._1;
+      var _p19 = $Types$Core.init;
+      var types = _p19._0;
+      var typesAction = _p19._1;
+      var _p20 = $Nav$Header.init;
+      var navHeaderModel = _p20._0;
+      var navHeaderAction = _p20._1;
       var _p21 = $Jobs$Stats.init;
       var jobsStat = _p21._0;
       var jobsStatAction = _p21._1;
@@ -21592,13 +21695,13 @@ Elm.Application.make = function (_elm) {
       var systemsList = _p26._0;
       var systemsListAction = _p26._1;
       var effects = _U.list([A2($Effects.map,SystemsListing,systemsListAction)
-                            ,A2($Effects.map,TypesListing,typesAction)
+                            ,A2($Effects.map,TypesAction,typesAction)
                             ,A2($Effects.map,NavHeaderAction,navHeaderAction)
                             ,A2($Effects.map,JobsList,jobsListAction)
                             ,A2($Effects.map,JobsStats,jobsStatAction)
                             ,A2($Effects.map,SystemsAdd,systemsAddAction)]);
       return {ctor: "_Tuple2"
-             ,_0: A9(Model,systemsList,systemsAdd,systemsView,systemsLaunch,jobsList,jobsStat,typesModel,$Nav$Side.init,navHeaderModel)
+             ,_0: A9(Model,systemsList,systemsAdd,systemsView,systemsLaunch,jobsList,jobsStat,types,$Nav$Side.init,navHeaderModel)
              ,_1: $Effects.batch(effects)};
    }();
    var update = F2(function (action,_p27) {
@@ -21673,10 +21776,10 @@ Elm.Application.make = function (_elm) {
            var newNavHeader = _p46._0;
            var effects = _p46._1;
            return {ctor: "_Tuple2",_0: _U.update(_p49,{navHeader: newNavHeader}),_1: A2($Effects.map,NavHeaderAction,effects)};
-         default: var _p47 = A2($Types$List.update,_p29._0,_p28.typesList);
+         default: var _p47 = A2($Types$Core.update,_p29._0,_p28.types);
            var newTypes = _p47._0;
-           var effect = _p47._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p49,{typesList: newTypes}),_1: A2($Effects.map,TypesListing,effect)};}
+           var effects = _p47._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p49,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};}
    });
    return _elm.Application.values = {_op: _op
                                     ,init: init
@@ -21689,7 +21792,7 @@ Elm.Application.make = function (_elm) {
                                     ,JobsStats: JobsStats
                                     ,NavSideAction: NavSideAction
                                     ,NavHeaderAction: NavHeaderAction
-                                    ,TypesListing: TypesListing
+                                    ,TypesAction: TypesAction
                                     ,setupJob: setupJob
                                     ,jobListing: jobListing
                                     ,systemListing: systemListing

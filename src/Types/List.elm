@@ -4,6 +4,7 @@ import Html exposing (..)
 import Effects exposing (Effects)
 import Dict exposing (Dict)
 
+import Types.Model exposing (..)
 import Pager exposing (..)
 import Table
 
@@ -16,13 +17,6 @@ import Task
 import Maybe exposing (withDefault)
 import Common.Redirect exposing (successHandler)
 import Debug
-
-
-type alias Module = 
-  { name : String , src : String }
-
-type alias PuppetStd = 
-  { module' : Module }
 
 type alias Type = 
   { type' : String
