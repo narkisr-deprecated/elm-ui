@@ -58,7 +58,7 @@ setTypes model types =
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
     newTable = (Table.update (Table.UpdateRows typePairs) model.table)
   in
-    Debug.log "" ({ model | types = types, pager = newPager, table = newTable } , Effects.none)
+    ({ model | types = types, pager = newPager, table = newTable } , Effects.none)
 
 
 update : Action ->  Model-> (Model , Effects Action)
@@ -73,7 +73,8 @@ update action model =
 view : Signal.Address Action -> Model -> List Html
 view address ({types, pager, table} as model) =
   [div  [class "box box-info"] [
-     div [class "box-body"] [
+       div  [class "box-header"] [text ""]
+    ,  div [class "box-body"] [
        row_ [
          div [class "col-md-offset-1 col-md-10"] [
            panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
