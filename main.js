@@ -21966,3 +21966,26 @@ Elm.Main.make = function (_elm) {
                              ,jobsListPolling: jobsListPolling
                              ,jobsStatsPolling: jobsStatsPolling};
 };
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Model = Elm.Systems.Model || {};
+Elm.Systems.Model.Digital = Elm.Systems.Model.Digital || {};
+Elm.Systems.Model.Digital.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Model = _elm.Systems.Model || {};
+   _elm.Systems.Model.Digital = _elm.Systems.Model.Digital || {};
+   if (_elm.Systems.Model.Digital.values) return _elm.Systems.Model.Digital.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var regions = _U.list(["nyc1","ams1","sfo1","nyc2","ams2","sgp1"]);
+   var sizes = _U.list(["512mb","1gb","2gb","4gb","8gb","16gb","32gb","48gb","64gb"]);
+   var Digital = F3(function (a,b,c) {    return {size: a,region: b,privateNetworking: c};});
+   var emptyDigital = A3(Digital,"","",false);
+   return _elm.Systems.Model.Digital.values = {_op: _op,Digital: Digital,emptyDigital: emptyDigital,sizes: sizes,regions: regions};
+};
