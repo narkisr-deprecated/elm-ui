@@ -17036,15 +17036,14 @@ Elm.Nav.Side.make = function (_elm) {
    var sectionItem = F3(function (address,active,section) {
       return $Html$Shorthand.li_(_U.list([A2($Html.a,
       _U.list([$Html$Attributes.$class(""),$Html$Attributes.href("#"),A2($Html$Events.onClick,address,A2(Goto,active,section))]),
-      _U.list([$Html.text($Basics.toString(section))]))]));
+      _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-circle-o")]),_U.list([])),$Html.text($Basics.toString(section))]))]));
    });
    var drop = F3(function (address,active,actions) {
       return A2($Html.li,
       _U.list([$Html$Attributes.$class("treeview")]),
       _U.list([A2($Html.a,
               _U.list([$Html$Attributes.href("#")]),
-              _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-link")]),_U.list([]))
-                      ,A2($Html.span,_U.list([]),_U.list([$Html.text($Basics.toString(active))]))
+              _U.list([A2($Html.span,_U.list([]),_U.list([$Html.text($Basics.toString(active))]))
                       ,A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-angle-left pull-right")]),_U.list([]))]))
               ,A2($Html.ul,
               _U.list([$Html$Attributes.$class("treeview-menu")]),
