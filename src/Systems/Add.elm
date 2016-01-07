@@ -17,6 +17,7 @@ import Effects exposing (Effects, batch)
 import Dict exposing (Dict)
 import Systems.Add.Common exposing (..)
 import Systems.Add.AWS as AWS exposing (..)
+import Systems.Add.Openstack as Openstack exposing (..)
 import Systems.Add.GCE as GCE exposing (..)
 import Systems.Add.Digital as Digital exposing (..)
 import Systems.Add.General as General exposing (..)
@@ -40,6 +41,7 @@ type alias Model =
   , aws : AWS.Model
   , gce : GCE.Model
   , digital: Digital.Model
+  , openstack : Openstack.Model
   , general : General.Model
   , hasNext : Bool
   , saveErrors : Errors.Model
@@ -56,6 +58,7 @@ type Action =
   | AWSView AWS.Action
   | GCEView GCE.Action
   | DigitalView Digital.Action
+  | OpenstackView Openstack.Action
   | GeneralView General.Action
   | ErrorsView Errors.Action
   | SystemSaved Action (Result Http.Error SaveResponse)
@@ -65,12 +68,13 @@ init : (Model, Effects Action)
 init =
   let 
     (aws, _) = AWS.init 
+    (openstack, _) = Openstack.init 
     (gce, _) = GCE.init 
     (digital, _) = Digital.init 
     (errors, _) = Errors.init
     (general, effects) = General.init 
   in 
-   (Model General aws gce digital general True errors, Effects.map GeneralView effects)
+   (Model General aws gce digital openstack general True errors, Effects.map GeneralView effects)
 
 
 setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
@@ -84,23 +88,38 @@ setSaved : Action -> Model -> SaveResponse -> (Model, Effects Action)
 setSaved next model {id} =
   (model, runJob (toString id) (toLower (toString next)) JobLaunched)
 
+encoder stage model =
+ let 
+   key = (String.toLower (toString stage))
+   encoders = Dict.fromList [
+       ("aws" , (\ ({aws}) -> awsEncoder aws))
+     , ("gce" , (\ ({gce}) -> gceEncoder gce))
+   ]
+ in
+  case (Dict.get key encoders) of
+    Just  enc -> 
+       (key, (enc model))
+    Nothing -> 
+       (key, E.null)
+   
+
 encodeAwsModel : Model -> E.Value
-encodeAwsModel ({aws, general}) =
+encodeAwsModel ({aws, general} as model) =
  E.object [
     ("type" , E.string general.type')
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
-  , ("aws" , awsEncoder aws)
+  , (encoder AWS model)
   , ("machine" , machineEncoder aws.machine)
  ]
 
 encodeGceModel : Model -> E.Value
-encodeGceModel ({gce, general}) =
+encodeGceModel ({gce, general} as model) =
  E.object [
     ("type" , E.string general.type')
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
-  , ("gce" , gceEncoder gce)
+  , (encoder GCE model)
   , ("machine" , machineEncoder gce.machine)
  ]
 
@@ -245,6 +264,9 @@ currentView address model  =
 
     Digital -> 
       (Digital.view (Signal.forwardTo address DigitalView) model.digital)
+
+    Openstack -> 
+      (Openstack.view (Signal.forwardTo address OpenstackView) model.openstack)
 
     Error -> 
       (Errors.view (Signal.forwardTo address ErrorsView) model.saveErrors)
