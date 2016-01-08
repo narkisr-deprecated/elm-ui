@@ -4,7 +4,7 @@ import Systems.List as List exposing (Error(NoSystemSelected, NoError))
 import Systems.Add as Add
 import Systems.View as View
 import Systems.Launch as Launch exposing (Action(Cancel, SetupJob, Run))
-import Nav.Side as NavSide exposing (Section(Stats, Launch, Add, List, View))
+import Nav.Side as NavSide exposing (Active(Types, Systems, Jobs), Section(Stats, Launch, Add, List, View))
 import Html exposing (..)
 import Effects exposing (Effects, batch, map)
 import Common.Utils exposing (none)
@@ -16,7 +16,7 @@ type alias Model =
   , systemsAdd : Add.Model
   , systemsView : View.Model
   , systemsLaunch : Launch.Model
-  , navChange : NavChange
+  , navChange : (Active, Section)
   }
 
   
@@ -30,20 +30,13 @@ init =
      effects = [ Effects.map SystemsListing systemsListAction 
                , Effects.map SystemsAdd systemsAddAction ]
   in
-    (Model systemsList systemsAdd systemsView systemsLaunch None, Effects.batch effects)
+    (Model systemsList systemsAdd systemsView systemsLaunch (Systems, List), Effects.batch effects)
 
 type Action = 
   SystemsListing List.Action
    | SystemsAdd Add.Action
    | SystemsView View.Action
    | SystemsLaunch Launch.Action
-
-type NavChange = 
-  Canceled
-   | Launched
-   | PreLaunch
-   | ToList
-   | None
 
 setupJob : Launch.Action -> Model -> (Model, Effects Action)
 setupJob action ({ systemsList, systemsLaunch } as model) =
@@ -57,7 +50,10 @@ setupJob action ({ systemsList, systemsLaunch } as model) =
     if List.isEmpty selected then
       ({ model | systemsList = { systemsList | error = NoSystemSelected}} , Effects.none)
     else
-      ({ model | systemsLaunch = newLaunch, navChange = PreLaunch, systemsList = { systemsList | error = NoError}}, Effects.map SystemsLaunch effect)
+      let
+        newList = { systemsList | error = NoError}
+      in
+      ({model | systemsLaunch = newLaunch, navChange = (Systems, Launch), systemsList = newList}, Effects.map SystemsLaunch effect)
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({systemsView, systemsList, systemsAdd} as model) =
@@ -74,7 +70,7 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
           let 
             (newSystems, effects) = View.update (View.ViewSystem id) systemsView
           in
-           ({model | systemsView = newSystems, navChange = ToList}, Effects.map SystemsView effects)        
+           ({model | systemsView = newSystems, navChange = (Systems,View)}, Effects.map SystemsView effects)        
         _ ->
 
           let 
@@ -92,7 +88,7 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
             (newSystems, effect) = Add.update systemsAction systemsAdd
           in
             if effect /= Effects.none && next == Add.NoOp then
-              none {model | navChange = ToList, systemsAdd = newSystems}
+              none {model | navChange = (Systems, List), systemsAdd = newSystems}
             else  
               ({model | systemsAdd = newSystems }, Effects.map SystemsAdd effect)
 
@@ -105,10 +101,10 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
     SystemsLaunch launchAction -> 
       case launchAction of 
         Launch.Cancel -> 
-          none { model | navChange = Canceled }
+          none { model | navChange = (Systems,List) }
 
         Launch.JobLaunched _ -> 
-          none {model | navChange = Launched}
+          none {model | navChange = (Jobs, List)}
 
         SetupJob job -> 
           setupJob launchAction model
