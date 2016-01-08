@@ -3,6 +3,7 @@ module Systems.Decoders where
 import Systems.Model.Common exposing (..)
 import Systems.Model.AWS exposing (..)
 import Systems.Model.GCE exposing (..)
+import Systems.Model.Digital exposing (..)
 import Json.Decode as Json exposing (..)
 
 apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
@@ -55,6 +56,14 @@ gceDecoder =
     ("project-id" := string)
     (maybe ("static-ip" := string))
 
+digitalDecoder: Decoder Digital
+digitalDecoder = 
+  object3 Digital
+    ("size" := string)
+    ("region" := string)
+    ("private-networking" := bool)
+
+
 machineDecoder: Decoder Machine
 machineDecoder = 
   object5 Machine 
@@ -67,13 +76,14 @@ machineDecoder =
     
 systemDecoder : Decoder System
 systemDecoder = 
-  object6 System 
+  object7 System 
     ("owner" := string )
     ("env" := string )
     ("type" := string )
     ("machine" := machineDecoder)
     (maybe ("aws" := awsDecoder))
     (maybe ("gce" := gceDecoder))
+    (maybe ("digital-ocean" := digitalDecoder))
 
 
 

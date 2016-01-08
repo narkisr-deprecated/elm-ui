@@ -15,6 +15,7 @@ import Common.Components exposing (panelContents)
 import Html exposing (..)
 import Systems.View.AWS  as AWSView
 import Systems.View.GCE as GCEView
+import Systems.View.Digital as DigitalView
 
 -- Model 
 type alias Model = 
@@ -25,7 +26,7 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let
-    emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing
+    emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing Nothing
   in
    (Model emptySystem, Effects.none)
 
@@ -53,6 +54,7 @@ update action model =
       
 -- View
 
+
 view : Signal.Address Action -> Model -> List Html
 view address ({system} as model) =
   case system.aws of
@@ -65,7 +67,12 @@ view address ({system} as model) =
           panelContents "GCE system" (div [] (GCEView.summarize (gce, system.machine)))
 
         Nothing -> 
-          [div  [] [text "not implemented"]]
+          case system.digital of
+            Just digital ->
+              panelContents "Digital system" (div [] (DigitalView.summarize (digital, system.machine)))
+
+            Nothing -> 
+              [div  [] [text "not implemented"]]
   
 -- Effects
 
