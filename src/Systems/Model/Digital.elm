@@ -14,6 +14,6 @@ emptyDigital =
 
 sizes = ["512mb", "1gb", "2gb", "4gb", "8gb", "16gb", "32gb", "48gb", "64gb"]
 
-regions = ["nyc1", "ams1", "sfo1", "nyc2", "ams2", "sgp1" ]
+regions = ["lon1", "nyc1", "ams1", "sfo1", "nyc2", "ams2", "sgp1" ]
 
 
