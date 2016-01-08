@@ -26,6 +26,7 @@ import Systems.Add.Encoders exposing (..)
 import Systems.Launch as Launch exposing (runJob, JobResponse)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
+import Common.Utils exposing (none)
 
 type Stage = 
   General 
@@ -129,7 +130,7 @@ encodeDigitalModel ({digital, general}) =
     ("type" , E.string general.type')
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
-  , ("digital" , digitalEncoder digital)
+  , ("digital-ocean" , digitalEncoder digital)
   , ("machine" , machineEncoder digital.machine)
  ]
 
@@ -149,42 +150,40 @@ encodeModel ({stage} as model) action =
     _ -> 
       (model, Effects.none)
 
-
 update : Action ->  Model-> (Model , Effects Action)
 update action ({general, aws, gce, digital} as model) =
   case action of
     Next -> 
-      case general.hypervisor of
-        "aws" -> 
-           let
-             current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
-             newAws = aws 
-                       |> AWS.update (AWS.Update current) 
-                       |> AWS.update AWS.Next
-           in
-             ({ model | stage = AWS , aws = newAws, hasNext = AWS.hasNext newAws}, Effects.none)
+      let 
+        current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
+      in
+        case general.hypervisor of
+          "aws" -> 
+             let
+               newAws = aws 
+                         |> AWS.update (AWS.Update current) 
+                         |> AWS.update AWS.Next
+             in
+              none { model | stage = AWS , aws = newAws, hasNext = AWS.hasNext newAws}
 
-        "gce" -> 
-           let
-             current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
-             newGce = gce 
-                        |> GCE.update (GCE.Update current) 
-                        |> GCE.update GCE.Next
-           in
-             ({ model | stage = GCE , gce = newGce , hasNext = GCE.hasNext newGce}, Effects.none)
+          "gce" -> 
+             let
+                newGce = gce 
+                         |> GCE.update (GCE.Update current) 
+                         |> GCE.update GCE.Next
+             in
+               none { model | stage = GCE , gce = newGce , hasNext = GCE.hasNext newGce}
+ 
+          "digital-ocean" -> 
+            let
+               newDigital = digital 
+                               |> Digital.update (Digital.Update current) 
+                               |> Digital.update Digital.Next
+            in
+              none { model | stage = Digital , digital = newDigital , hasNext = Digital.hasNext newDigital}
 
-        "digital-ocean" -> 
-           let
-             current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
-             newDigital = digital 
-                           |> Digital.update (Digital.Update current) 
-                           |> Digital.update Digital.Next
-           in
-             ({ model | stage = Digital , digital = newDigital , hasNext = Digital.hasNext newDigital}, Effects.none)
-
-
-        _ -> 
-          (model, Effects.none)
+          _ -> 
+            (model, Effects.none)
 
     Back -> 
       case general.hypervisor of
@@ -206,6 +205,14 @@ update action ({general, aws, gce, digital} as model) =
              else 
               ({ model | stage = General , gce = newGCE  , hasNext = True}, Effects.none)
 
+        "digital-ocean" -> 
+           let
+             newDigital= Digital.update Digital.Back digital
+           in
+             if Digital.hasPrev digital then
+              ({ model | stage = Digital , digital = newDigital, hasNext = True}, Effects.none)
+             else 
+              ({ model | stage = General , digital = newDigital  , hasNext = True}, Effects.none)
 
         _ -> 
           (model, Effects.none)
@@ -222,6 +229,11 @@ update action ({general, aws, gce, digital} as model) =
       in
         ({ model | gce = newGce }, Effects.none)
 
+    DigitalView action -> 
+      let
+        newDigital= Digital.update action digital
+      in
+        ({ model | digital = newDigital }, Effects.none)
 
     GeneralView action -> 
       let
