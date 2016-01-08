@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Systems.Add.Common exposing (..)
-import Systems.View.GCE exposing (summarize)
+import Systems.View.Digital exposing (summarize)
 import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
 import Dict as Dict exposing (Dict)
@@ -53,7 +53,6 @@ type Action =
 type Step = 
   Zero
   | Instance
-  | Networking
   | Summary
 
 -- Update
@@ -119,9 +118,9 @@ update action ({next, prev, step, digital, machine} as model) =
         ({errors} as newModel) = (validateAll step model)
       in
         if notAny errors then
-          {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
+           {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
         else 
-          newModel
+           newModel
 
     Back -> 
       let
@@ -161,6 +160,7 @@ update action ({next, prev, step, digital, machine} as model) =
        model 
         |> setMachine (\machine -> {machine | user = user })
         |> validate step "User" stringValidations
+        
 
     HostnameInput host -> 
       model 
@@ -188,7 +188,7 @@ hasPrev model =
 getOses : Model -> Dict String Template
 getOses model =
   let 
-    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "digital" model.environment)
+    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "digital-ocean" model.environment)
   in 
     case hypervisor of
       OSTemplates oses -> 
@@ -206,10 +206,12 @@ instance address ({digital, machine, errors} as model) =
        [ 
          legend [] [text "Properties"]
        , group' "Size" (selector address SelectSize sizes digital.size)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os)
-       , group' "Region" (selector address SelectRegion regions digital.region)
+       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os) , group' "Region" (selector address SelectRegion regions digital.region)
        , legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" model.machine.user) 
+       , check "User" (inputText address UserInput "" machine.user) 
+       , legend [] [text "Networking"]
+       , check "Hostname" (inputText address HostnameInput "" machine.hostname)
+       , check "Domain"  (inputText address DomainInput "" machine.domain)
        , group' "Private Networking" (checkbox address PrivateNetworking digital.privateNetworking)
        ]
     ]
@@ -226,8 +228,7 @@ stepView address ({digital, machine} as model) =
       instance address model 
 
     Summary -> 
-      [div  [] [ ]]
-      -- summarize (digital, machine)
+      summarize (digital, machine)
 
     _ -> 
       Debug.log (toString model.step) [div [] []]
