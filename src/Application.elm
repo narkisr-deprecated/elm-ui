@@ -3,7 +3,7 @@ module Application where
 import Html exposing (..)
 import Effects exposing (Effects, Never, batch, map)
 
-import Systems.Core as Systems exposing(NavChange(Launched, Canceled, ToList, None, PreLaunch))
+import Systems.Core as Systems 
 import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
 import Common.Utils exposing (none)
@@ -57,13 +57,13 @@ jobListing : Model -> (Model , Effects Action)
 jobListing ({navSide} as model) = 
   let
     (newJobs, effects) = Jobs.List.init
-    newNavSide = NavSide.update (NavSide.Goto Jobs List) navSide
   in 
-    ({model | navSide = newNavSide , jobsList = newJobs}, Effects.map JobsList effects)
+    ({model | jobsList = newJobs}, Effects.map JobsList effects)
 
-goto : Model -> Section -> Model
-goto ({navSide} as model) section =
-  {model | navSide = NavSide.update (NavSide.Goto Systems section) navSide}
+goto : (Active, Section) -> Model -> Model
+goto (active, section) ({navSide} as model)  =
+  {model | navSide = NavSide.update (NavSide.Goto active section) navSide}
+
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({navSide, types, jobsList, jobsStats, systems} as model) =
@@ -108,22 +108,16 @@ update action ({navSide, types, jobsList, jobsStats, systems} as model) =
        newModel = { model | systems = newSystems}
        newEffects = Effects.map SystemsAction effects
       in
-        case newSystems.navChange of
-          Canceled -> 
-            (goto newModel List, newEffects)
+        case newSystems.navChange  of
+          (Jobs, Launch) -> 
+            let
+             (withJobs, jobEffects) = (jobListing newModel)
+            in
+             (goto newSystems.navChange withJobs , jobEffects)
 
-          Launched ->  
-            (jobListing newModel)
+          _ -> 
+             (goto newSystems.navChange newModel , newEffects)
 
-          PreLaunch -> 
-            (goto newModel Launch, newEffects)
-
-          ToList -> 
-            (goto newModel List, newEffects)
-
-          None ->  
-           (newModel, newEffects)
- 
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats} as model) =
   case model.navSide.active of
