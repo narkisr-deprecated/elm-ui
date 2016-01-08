@@ -109,7 +109,7 @@ update action ({navSide, types, jobsList, jobsStats, systems} as model) =
        newEffects = Effects.map SystemsAction effects
       in
         case newSystems.navChange  of
-          Just (Jobs, Launch) -> 
+          Just (Jobs, List) -> 
             let
              (withJobs, jobEffects) = (jobListing newModel)
             in
