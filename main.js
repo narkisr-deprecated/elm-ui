@@ -16183,7 +16183,7 @@ Elm.Systems.Model.Digital.make = function (_elm) {
    var regions = _U.list(["nyc1","ams1","sfo1","nyc2","ams2","sgp1"]);
    var sizes = _U.list(["512mb","1gb","2gb","4gb","8gb","16gb","32gb","48gb","64gb"]);
    var Digital = F3(function (a,b,c) {    return {size: a,region: b,privateNetworking: c};});
-   var emptyDigital = A3(Digital,"","",false);
+   var emptyDigital = A3(Digital,A2($Maybe.withDefault,"",$List.head(sizes)),A2($Maybe.withDefault,"",$List.head(regions)),false);
    return _elm.Systems.Model.Digital.values = {_op: _op,Digital: Digital,emptyDigital: emptyDigital,sizes: sizes,regions: regions};
 };
 Elm.Systems = Elm.Systems || {};
@@ -16302,7 +16302,7 @@ Elm.Systems.Add.Digital.make = function (_elm) {
       return _U.update(_p4,{errors: newErrors});
    });
    var setMachine = F2(function (f,_p5) {    var _p6 = _p5;var newMachine = f(_p6.machine);return _U.update(_p6,{machine: newMachine});});
-   var setDigital = F2(function (f,_p7) {    var _p8 = _p7;var newGce = f(_p8.digital);return _U.update(_p8,{digital: newGce});});
+   var setDigital = F2(function (f,_p7) {    var _p8 = _p7;var newDigital = f(A2($Debug.log,"",_p8.digital));return _U.update(_p8,{digital: newDigital});});
    var Summary = {ctor: "Summary"};
    var Instance = {ctor: "Instance"};
    var stringValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
