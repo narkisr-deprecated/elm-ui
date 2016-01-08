@@ -61,7 +61,7 @@ jobListing ({navSide} as model) =
     ({model | jobsList = newJobs}, Effects.map JobsList effects)
 
 goto : Active -> Section -> Model -> Model
-goto active  section ({navSide} as model)  =
+goto active section ({navSide} as model)  =
   {model | navSide = NavSide.update (NavSide.Goto active section) navSide}
 
 
@@ -113,7 +113,7 @@ update action ({navSide, types, jobsList, jobsStats, systems} as model) =
             let
              (withJobs, jobEffects) = (jobListing newModel)
             in
-             (goto  Jobs Launch withJobs , jobEffects)
+             (goto Jobs List withJobs, jobEffects)
 
           Just (Systems, section) -> 
              (goto Systems section newModel , newEffects)
