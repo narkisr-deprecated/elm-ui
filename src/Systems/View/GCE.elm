@@ -8,6 +8,7 @@ import Systems.Model.GCE exposing (GCE)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (panelContents)
+import Systems.View.Common exposing (..)
 import Effects exposing (Effects, Never, map)
 import String
 
@@ -57,14 +58,6 @@ optionalSection title headers values pred =
   else
     []
 
-summaryPanel : List Html -> List Html
-summaryPanel contents =
-  [ div [class "panel col-md-4 col-md-offset-1"] [
-      div  [class "panel-body"] contents
-    ] 
-  ]
-  
-    
 summarySections : (GCE, Machine) -> List (List Html)
 summarySections ((gce, machine) as model)=
    List.filter (not << List.isEmpty) [ 
