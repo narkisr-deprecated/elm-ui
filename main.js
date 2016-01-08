@@ -17807,31 +17807,25 @@ Elm.Systems.View.make = function (_elm) {
    $Systems$View$GCE = Elm.Systems.View.GCE.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var view = F2(function (address,_p0) {
+   var toHtml = F4(function (title,_p0,f,prop) {
       var _p1 = _p0;
-      var _p5 = _p1.system;
-      var _p2 = _p5.aws;
+      var _p2 = prop;
       if (_p2.ctor === "Just") {
-            return A2($Common$Components.panelContents,
-            "AWS system",
-            A2($Html.div,_U.list([]),$Systems$View$AWS.summarize({ctor: "_Tuple2",_0: _p2._0,_1: _p5.machine})));
+            return A2($Common$Components.panelContents,title,A2($Html.div,_U.list([]),f({ctor: "_Tuple2",_0: _p2._0,_1: _p1.system.machine})));
          } else {
-            var _p3 = _p5.gce;
-            if (_p3.ctor === "Just") {
-                  return A2($Common$Components.panelContents,
-                  "GCE system",
-                  A2($Html.div,_U.list([]),$Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p3._0,_1: _p5.machine})));
-               } else {
-                  var _p4 = _p5.digital;
-                  if (_p4.ctor === "Just") {
-                        return A2($Common$Components.panelContents,
-                        "Digital system",
-                        A2($Html.div,_U.list([]),$Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p4._0,_1: _p5.machine})));
-                     } else {
-                        return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
-                     }
-               }
+            return _U.list([]);
          }
+   });
+   var view = F2(function (address,_p3) {
+      var _p4 = _p3;
+      var _p7 = _p4.system;
+      var _p6 = _p4;
+      var options = _U.list([A4(toHtml,"AWS system",_p6,$Systems$View$AWS.summarize,_p7.aws)
+                            ,A4(toHtml,"GCE system",_p6,$Systems$View$GCE.summarize,_p7.gce)
+                            ,A4(toHtml,"Digital system",_p6,$Systems$View$Digital.summarize,_p7.digital)]);
+      return A2($Maybe.withDefault,
+      _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]),
+      $List.head(A2($List.filter,function (_p5) {    return $Basics.not($List.isEmpty(_p5));},options)));
    });
    var setSystem = F2(function (model,system) {    return {ctor: "_Tuple2",_0: _U.update(model,{system: system}),_1: $Effects.none};});
    var NoOp = {ctor: "NoOp"};
@@ -17840,10 +17834,10 @@ Elm.Systems.View.make = function (_elm) {
       return $Effects.task(A2($Task.map,SetSystem,$Task.toResult(A2($Http.get,$Systems$Decoders.systemDecoder,A2($Basics._op["++"],"/systems/",id)))));
    };
    var update = F2(function (action,model) {
-      var _p6 = action;
-      switch (_p6.ctor)
-      {case "ViewSystem": return {ctor: "_Tuple2",_0: model,_1: getSystem(_p6._0)};
-         case "SetSystem": return A4($Common$Redirect.successHandler,_p6._0,model,setSystem(model),NoOp);
+      var _p8 = action;
+      switch (_p8.ctor)
+      {case "ViewSystem": return {ctor: "_Tuple2",_0: model,_1: getSystem(_p8._0)};
+         case "SetSystem": return A4($Common$Redirect.successHandler,_p8._0,model,setSystem(model),NoOp);
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
    var ViewSystem = function (a) {    return {ctor: "ViewSystem",_0: a};};
@@ -17867,6 +17861,7 @@ Elm.Systems.View.make = function (_elm) {
                                      ,NoOp: NoOp
                                      ,setSystem: setSystem
                                      ,update: update
+                                     ,toHtml: toHtml
                                      ,view: view
                                      ,getSystem: getSystem};
 };

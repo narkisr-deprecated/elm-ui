@@ -17,6 +17,8 @@ import Systems.View.AWS  as AWSView
 import Systems.View.GCE as GCEView
 import Systems.View.Digital as DigitalView
 
+import Maybe exposing (withDefault)
+
 -- Model 
 type alias Model = 
   {
@@ -54,26 +56,23 @@ update action model =
       
 -- View
 
+toHtml title ({system} as model) f prop= 
+  case prop of
+    Just value -> 
+       panelContents title (div [] (f (value, system.machine)))
+    Nothing -> 
+       []
 
 view : Signal.Address Action -> Model -> List Html
 view address ({system} as model) =
-  case system.aws of
-    Just aws ->
-     panelContents "AWS system" (div [] (AWSView.summarize (aws, system.machine)))
+    let
+      options = [ toHtml "AWS system" model AWSView.summarize system.aws
+                , toHtml "GCE system" model GCEView.summarize system.gce
+                , toHtml "Digital system" model DigitalView.summarize system.digital]
 
-    Nothing ->
-      case system.gce of
-        Just gce ->
-          panelContents "GCE system" (div [] (GCEView.summarize (gce, system.machine)))
+    in 
+      withDefault [div  [] [text "not implemented"]] (List.head (List.filter (not << List.isEmpty) options))
 
-        Nothing -> 
-          case system.digital of
-            Just digital ->
-              panelContents "Digital system" (div [] (DigitalView.summarize (digital, system.machine)))
-
-            Nothing -> 
-              [div  [] [text "not implemented"]]
-  
 -- Effects
 
 getSystem : String -> Effects Action
