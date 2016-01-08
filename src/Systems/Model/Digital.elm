@@ -10,7 +10,7 @@ type alias Digital =
 
 emptyDigital: Digital
 emptyDigital = 
-   Digital "" "" False
+   Digital (withDefault "" (List.head sizes)) (withDefault "" (List.head regions)) False
 
 sizes = ["512mb", "1gb", "2gb", "4gb", "8gb", "16gb", "32gb", "48gb", "64gb"]
 

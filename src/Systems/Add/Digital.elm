@@ -60,9 +60,9 @@ type Step =
 setDigital : (Digital -> Digital) -> Model -> Model
 setDigital f ({digital, errors} as model) =
   let
-    newGce = f digital
+    newDigital = f (Debug.log "" digital)
   in
-   { model | digital = newGce }
+   { model | digital = newDigital}
 
 setMachine: (Machine-> Machine) -> Model -> Model
 setMachine f ({machine} as model) =
@@ -148,7 +148,7 @@ update action ({next, prev, step, digital, machine} as model) =
                newModel
 
     SelectSize size -> 
-      setDigital (\digital-> {digital| size = size }) model
+      setDigital (\digital-> {digital | size = size }) model
 
     SelectOS newOS -> 
       setMachine (\machine -> {machine | os = newOS }) model
