@@ -17534,7 +17534,7 @@ Elm.Systems.Core.make = function (_elm) {
          case "SystemsAdd": var _p19 = _p10._0;
            var _p16 = _p19;
            switch (_p16.ctor)
-           {case "JobLaunched": return $Common$Utils.none(_U.update(_p23,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.Launch})}));
+           {case "JobLaunched": return $Common$Utils.none(_U.update(_p23,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.List})}));
               case "SystemSaved": var _p17 = A2($Systems$Add.update,_p19,_p24);
                 var newSystems = _p17._0;
                 var effect = _p17._1;
@@ -22203,7 +22203,7 @@ Elm.Application.make = function (_elm) {
            _v7_2: do {
               if (_p25.ctor === "Just" && _p25._0.ctor === "_Tuple2") {
                     switch (_p25._0._0.ctor)
-                    {case "Jobs": if (_p25._0._1.ctor === "Launch") {
+                    {case "Jobs": if (_p25._0._1.ctor === "List") {
                                var _p26 = jobListing(newModel);
                                var withJobs = _p26._0;
                                var jobEffects = _p26._1;

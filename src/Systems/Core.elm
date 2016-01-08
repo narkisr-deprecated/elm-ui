@@ -81,7 +81,7 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
     SystemsAdd systemsAction -> 
       case systemsAction of
         Add.JobLaunched _ -> 
-          none {model | navChange =  Just (Jobs, Launch)}
+          none {model | navChange =  Just (Jobs, List)}
 
         Add.SystemSaved next result -> 
           let
