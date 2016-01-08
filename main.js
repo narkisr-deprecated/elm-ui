@@ -14048,6 +14048,29 @@ Elm.Systems.Model.GCE.make = function (_elm) {
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Model = Elm.Systems.Model || {};
+Elm.Systems.Model.Digital = Elm.Systems.Model.Digital || {};
+Elm.Systems.Model.Digital.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Model = _elm.Systems.Model || {};
+   _elm.Systems.Model.Digital = _elm.Systems.Model.Digital || {};
+   if (_elm.Systems.Model.Digital.values) return _elm.Systems.Model.Digital.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var regions = _U.list(["lon1","nyc1","ams1","sfo1","nyc2","ams2","sgp1"]);
+   var sizes = _U.list(["512mb","1gb","2gb","4gb","8gb","16gb","32gb","48gb","64gb"]);
+   var Digital = F3(function (a,b,c) {    return {size: a,region: b,privateNetworking: c};});
+   var emptyDigital = A3(Digital,A2($Maybe.withDefault,"",$List.head(sizes)),A2($Maybe.withDefault,"",$List.head(regions)),false);
+   return _elm.Systems.Model.Digital.values = {_op: _op,Digital: Digital,emptyDigital: emptyDigital,sizes: sizes,regions: regions};
+};
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Model = Elm.Systems.Model || {};
 Elm.Systems.Model.Common = Elm.Systems.Model.Common || {};
 Elm.Systems.Model.Common.make = function (_elm) {
    "use strict";
@@ -14063,9 +14086,10 @@ Elm.Systems.Model.Common.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Systems$Model$AWS = Elm.Systems.Model.AWS.make(_elm),
+   $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
    $Systems$Model$GCE = Elm.Systems.Model.GCE.make(_elm);
    var _op = {};
-   var System = F6(function (a,b,c,d,e,f) {    return {owner: a,env: b,type$: c,machine: d,aws: e,gce: f};});
+   var System = F7(function (a,b,c,d,e,f,g) {    return {owner: a,env: b,type$: c,machine: d,aws: e,gce: f,digital: g};});
    var Machine = F5(function (a,b,c,d,e) {    return {user: a,hostname: b,domain: c,ip: d,os: e};});
    var emptyMachine = A5(Machine,"","","",$Maybe.Just(""),"");
    return _elm.Systems.Model.Common.values = {_op: _op,Machine: Machine,System: System,emptyMachine: emptyMachine};
@@ -14087,6 +14111,7 @@ Elm.Systems.Decoders.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Systems$Model$AWS = Elm.Systems.Model.AWS.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
+   $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
    $Systems$Model$GCE = Elm.Systems.Model.GCE.make(_elm);
    var _op = {};
    var machineDecoder = A6($Json$Decode.object5,
@@ -14096,6 +14121,11 @@ Elm.Systems.Decoders.make = function (_elm) {
    A2($Json$Decode._op[":="],"domain",$Json$Decode.string),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"ip",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"os",$Json$Decode.string));
+   var digitalDecoder = A4($Json$Decode.object3,
+   $Systems$Model$Digital.Digital,
+   A2($Json$Decode._op[":="],"size",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"region",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"private-networking",$Json$Decode.bool));
    var gceDecoder = A6($Json$Decode.object5,
    $Systems$Model$GCE.GCE,
    A2($Json$Decode._op[":="],"machine-type",$Json$Decode.string),
@@ -14139,14 +14169,15 @@ Elm.Systems.Decoders.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(volumeDecoder)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"block-devices",$Json$Decode.list(blockDecoder)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"vpc",vpcDecoder)));
-   var systemDecoder = A7($Json$Decode.object6,
+   var systemDecoder = A8($Json$Decode.object7,
    $Systems$Model$Common.System,
    A2($Json$Decode._op[":="],"owner",$Json$Decode.string),
    A2($Json$Decode._op[":="],"env",$Json$Decode.string),
    A2($Json$Decode._op[":="],"type",$Json$Decode.string),
    A2($Json$Decode._op[":="],"machine",machineDecoder),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"aws",awsDecoder)),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"gce",gceDecoder)));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"gce",gceDecoder)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"digital-ocean",digitalDecoder)));
    return _elm.Systems.Decoders.values = {_op: _op
                                          ,apply: apply
                                          ,vpcDecoder: vpcDecoder
@@ -14154,6 +14185,7 @@ Elm.Systems.Decoders.make = function (_elm) {
                                          ,volumeDecoder: volumeDecoder
                                          ,awsDecoder: awsDecoder
                                          ,gceDecoder: gceDecoder
+                                         ,digitalDecoder: digitalDecoder
                                          ,machineDecoder: machineDecoder
                                          ,systemDecoder: systemDecoder};
 };
@@ -16164,29 +16196,6 @@ Elm.Systems.Add.GCE.make = function (_elm) {
                                         ,view: view};
 };
 Elm.Systems = Elm.Systems || {};
-Elm.Systems.Model = Elm.Systems.Model || {};
-Elm.Systems.Model.Digital = Elm.Systems.Model.Digital || {};
-Elm.Systems.Model.Digital.make = function (_elm) {
-   "use strict";
-   _elm.Systems = _elm.Systems || {};
-   _elm.Systems.Model = _elm.Systems.Model || {};
-   _elm.Systems.Model.Digital = _elm.Systems.Model.Digital || {};
-   if (_elm.Systems.Model.Digital.values) return _elm.Systems.Model.Digital.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var regions = _U.list(["lon1","nyc1","ams1","sfo1","nyc2","ams2","sgp1"]);
-   var sizes = _U.list(["512mb","1gb","2gb","4gb","8gb","16gb","32gb","48gb","64gb"]);
-   var Digital = F3(function (a,b,c) {    return {size: a,region: b,privateNetworking: c};});
-   var emptyDigital = A3(Digital,A2($Maybe.withDefault,"",$List.head(sizes)),A2($Maybe.withDefault,"",$List.head(regions)),false);
-   return _elm.Systems.Model.Digital.values = {_op: _op,Digital: Digital,emptyDigital: emptyDigital,sizes: sizes,regions: regions};
-};
-Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};
 Elm.Systems.View.Digital = Elm.Systems.View.Digital || {};
 Elm.Systems.View.Digital.make = function (_elm) {
@@ -17327,25 +17336,33 @@ Elm.Systems.View.make = function (_elm) {
    $Systems$Decoders = Elm.Systems.Decoders.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Systems$View$AWS = Elm.Systems.View.AWS.make(_elm),
+   $Systems$View$Digital = Elm.Systems.View.Digital.make(_elm),
    $Systems$View$GCE = Elm.Systems.View.GCE.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
    var view = F2(function (address,_p0) {
       var _p1 = _p0;
-      var _p4 = _p1.system;
-      var _p2 = _p4.aws;
+      var _p5 = _p1.system;
+      var _p2 = _p5.aws;
       if (_p2.ctor === "Just") {
             return A2($Common$Components.panelContents,
             "AWS system",
-            A2($Html.div,_U.list([]),$Systems$View$AWS.summarize({ctor: "_Tuple2",_0: _p2._0,_1: _p4.machine})));
+            A2($Html.div,_U.list([]),$Systems$View$AWS.summarize({ctor: "_Tuple2",_0: _p2._0,_1: _p5.machine})));
          } else {
-            var _p3 = _p4.gce;
+            var _p3 = _p5.gce;
             if (_p3.ctor === "Just") {
                   return A2($Common$Components.panelContents,
                   "GCE system",
-                  A2($Html.div,_U.list([]),$Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p3._0,_1: _p4.machine})));
+                  A2($Html.div,_U.list([]),$Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p3._0,_1: _p5.machine})));
                } else {
-                  return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
+                  var _p4 = _p5.digital;
+                  if (_p4.ctor === "Just") {
+                        return A2($Common$Components.panelContents,
+                        "Digital system",
+                        A2($Html.div,_U.list([]),$Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p4._0,_1: _p5.machine})));
+                     } else {
+                        return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
+                     }
                }
          }
    });
@@ -17356,16 +17373,23 @@ Elm.Systems.View.make = function (_elm) {
       return $Effects.task(A2($Task.map,SetSystem,$Task.toResult(A2($Http.get,$Systems$Decoders.systemDecoder,A2($Basics._op["++"],"/systems/",id)))));
    };
    var update = F2(function (action,model) {
-      var _p5 = action;
-      switch (_p5.ctor)
-      {case "ViewSystem": return {ctor: "_Tuple2",_0: model,_1: getSystem(_p5._0)};
-         case "SetSystem": return A4($Common$Redirect.successHandler,_p5._0,model,setSystem(model),NoOp);
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "ViewSystem": return {ctor: "_Tuple2",_0: model,_1: getSystem(_p6._0)};
+         case "SetSystem": return A4($Common$Redirect.successHandler,_p6._0,model,setSystem(model),NoOp);
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
    var ViewSystem = function (a) {    return {ctor: "ViewSystem",_0: a};};
    var Model = function (a) {    return {system: a};};
    var init = function () {
-      var emptySystem = A6($Systems$Model$Common.System,"","","",A5($Systems$Model$Common.Machine,"","","",$Maybe.Just(""),""),$Maybe.Nothing,$Maybe.Nothing);
+      var emptySystem = A7($Systems$Model$Common.System,
+      "",
+      "",
+      "",
+      A5($Systems$Model$Common.Machine,"","","",$Maybe.Just(""),""),
+      $Maybe.Nothing,
+      $Maybe.Nothing,
+      $Maybe.Nothing);
       return {ctor: "_Tuple2",_0: Model(emptySystem),_1: $Effects.none};
    }();
    return _elm.Systems.View.values = {_op: _op
