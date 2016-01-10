@@ -10,6 +10,7 @@ import Maybe exposing (withDefault)
 import Common.Components exposing (panelContents)
 import Systems.View.Common exposing (..)
 import Effects exposing (Effects, Never, map)
+import Systems.View.Common exposing (..)
 import String
 
 -- Model 
@@ -27,37 +28,6 @@ type Action =
   NoOp
 
 -- View
-overviewSection : String -> List String -> List String ->  List Html
-overviewSection title headers values =
-   [ text title
-   , ul [style [("list-style-type", "none")]] 
-       (List.map2 (\ title value -> li [] [(text (title ++ ": "++ value))] ) headers values)
-   ]
-
-tablizedRow: List (a -> String) -> a -> Html
-tablizedRow props v = 
-   tr [] (List.map (\prop -> td [] [text (prop v)]) props) 
-
-tablizedSection : String -> List String -> List a -> List (a -> String) -> List Html
-tablizedSection title headers rows props =
-  if (not (List.isEmpty rows)) then
-      [ text title
-      , table [class "table", id title]
-         [thead []
-            [ tr [] (List.map (\k -> (th [] [text k])) headers)]
-            , tbody [] (List.map (\value -> (tablizedRow props value)) rows)
-         ]
-      ]
-  else 
-    []
-
-optionalSection : String -> List String -> List String -> Bool -> List Html
-optionalSection title headers values pred =
-  if pred then
-    overviewSection title headers values
-  else
-    []
-
 summarySections : (GCE, Machine) -> List (List Html)
 summarySections ((gce, machine) as model)=
    List.filter (not << List.isEmpty) [ 
