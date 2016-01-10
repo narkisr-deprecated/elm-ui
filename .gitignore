@@ -2,3 +2,6 @@ elm-stuff
 node_modules
 bower_components
 elm.js
+target
+.nrepl-port
+.lein-repl-history
