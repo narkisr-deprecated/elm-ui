@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Systems.Add.Common exposing (..)
--- import Systems.View.Openstack exposing (summarize)
+import Systems.View.Openstack exposing (summarize)
 import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor(Openstack))
 import Dict as Dict exposing (Dict)
@@ -395,8 +395,7 @@ stepView address ({openstack, machine} as model) =
       cinder address model
 
     Summary -> 
-      [div  [] [ ]]
-      -- summarize (openstack, machine)
+      summarize (openstack, machine)
 
     _ -> 
       Debug.log (toString model.step) [div [] []]

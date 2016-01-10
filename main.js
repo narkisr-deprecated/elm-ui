@@ -14160,7 +14160,7 @@ Elm.Systems.Decoders.make = function (_elm) {
    A2($Json$Decode._op[":="],"tenant",$Json$Decode.string),
    A2($Json$Decode._op[":="],"key-name",$Json$Decode.string),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"security-groups",$Json$Decode.list($Json$Decode.string))),
-   A2($Json$Decode._op[":="],"networking",$Json$Decode.list($Json$Decode.string)),
+   A2($Json$Decode._op[":="],"networks",$Json$Decode.list($Json$Decode.string)),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(openstackVolumeDecoder))));
    var digitalDecoder = A4($Json$Decode.object3,
    $Systems$Model$Digital.Digital,
@@ -15831,6 +15831,149 @@ Elm.Systems.Add.AWS.make = function (_elm) {
                                         ,view: view};
 };
 Elm.Systems = Elm.Systems || {};
+Elm.Systems.View = Elm.Systems.View || {};
+Elm.Systems.View.Common = Elm.Systems.View.Common || {};
+Elm.Systems.View.Common.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.View = _elm.Systems.View || {};
+   _elm.Systems.View.Common = _elm.Systems.View.Common || {};
+   if (_elm.Systems.View.Common.values) return _elm.Systems.View.Common.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var tablizedRow = F2(function (props,v) {
+      return A2($Html.tr,_U.list([]),A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(v))]));},props));
+   });
+   var tablizedSection = F4(function (title,headers,rows,props) {
+      return $Basics.not($List.isEmpty(rows)) ? _U.list([$Html.text(title)
+                                                        ,A2($Html.table,
+                                                        _U.list([$Html$Attributes.$class("table"),$Html$Attributes.id(title)]),
+                                                        _U.list([A2($Html.thead,
+                                                                _U.list([]),
+                                                                _U.list([A2($Html.tr,
+                                                                _U.list([]),
+                                                                A2($List.map,
+                                                                function (k) {
+                                                                   return A2($Html.th,_U.list([]),_U.list([$Html.text(k)]));
+                                                                },
+                                                                headers))]))
+                                                                ,A2($Html.tbody,
+                                                                _U.list([]),
+                                                                A2($List.map,
+                                                                function (value) {
+                                                                   return A2(tablizedRow,props,value);
+                                                                },
+                                                                rows))]))]) : _U.list([]);
+   });
+   var summaryPanel = function (contents) {
+      return _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("panel col-md-4 col-md-offset-1")]),
+      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("panel-body")]),contents)]))]);
+   };
+   var overviewSection = F3(function (title,headers,values) {
+      return _U.list([$Html.text(title)
+                     ,A2($Html.ul,
+                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+                     A3($List.map2,
+                     F2(function (title,value) {
+                        return A2($Html.li,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],title,A2($Basics._op["++"],": ",value)))]));
+                     }),
+                     headers,
+                     values))]);
+   });
+   var optionalSection = F4(function (title,headers,values,pred) {    return pred ? A3(overviewSection,title,headers,values) : _U.list([]);});
+   return _elm.Systems.View.Common.values = {_op: _op
+                                            ,overviewSection: overviewSection
+                                            ,summaryPanel: summaryPanel
+                                            ,optionalSection: optionalSection
+                                            ,tablizedSection: tablizedSection
+                                            ,tablizedRow: tablizedRow};
+};
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.View = Elm.Systems.View || {};
+Elm.Systems.View.Openstack = Elm.Systems.View.Openstack || {};
+Elm.Systems.View.Openstack.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.View = _elm.Systems.View || {};
+   _elm.Systems.View.Openstack = _elm.Systems.View.Openstack || {};
+   if (_elm.Systems.View.Openstack.values) return _elm.Systems.View.Openstack.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
+   $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
+   $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {
+      return A2($Html.div,_U.list([]),A2($Common$Components.panelContents,"System",A2($Html.div,_U.list([]),_U.list([]))));
+   });
+   var summarySections = function (_p0) {
+      var _p1 = _p0;
+      var _p6 = _p1._0;
+      var _p5 = _p1._1;
+      return A2($List.filter,
+      function (_p2) {
+         return $Basics.not($List.isEmpty(_p2));
+      },
+      _U.list([A3($Systems$View$Common.overviewSection,"Instance",_U.list(["flavor","os","tenant"]),_U.list([_p6.flavor,_p5.os,_p6.tenant]))
+              ,A3($Systems$View$Common.overviewSection,
+              "Security",
+              _U.list(["user","keypair","security groups"]),
+              _U.list([_p5.user,_p6.keyName,A2($String.join," ",A2($Maybe.withDefault,_U.list([]),_p6.securityGroups))]))
+              ,A3($Systems$View$Common.overviewSection,
+              "DNS",
+              _U.list(["hostname","domain","ip"]),
+              _U.list([_p5.hostname,_p5.domain,A2($Maybe.withDefault,"",_p5.ip)]))
+              ,A4($Systems$View$Common.tablizedSection,
+              "Volumes",
+              _U.list(["device","size","clear"]),
+              A2($Maybe.withDefault,_U.list([]),_p6.volumes),
+              _U.list([function (_) {
+                         return _.device;
+                      }
+                      ,function (_p3) {
+                         return $Basics.toString(function (_) {    return _.size;}(_p3));
+                      }
+                      ,function (_p4) {
+                         return $Basics.toString(function (_) {    return _.clear;}(_p4));
+                      }]))]));
+   };
+   var summarize = function (model) {
+      return _U.list([A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("System overview")]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+              A2($List.map,
+              $Bootstrap$Html.row_,
+              A2($List.map,$List.concat,A2($Common$Utils.partition,2,A2($List.map,$Systems$View$Common.summaryPanel,summarySections(model))))))]))]);
+   };
+   var NoOp = {ctor: "NoOp"};
+   var Model = function (a) {    return {id: a};};
+   var init = {ctor: "_Tuple2",_0: Model(0),_1: $Effects.none};
+   return _elm.Systems.View.Openstack.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,summarySections: summarySections,summarize: summarize,view: view};
+};
+Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
 Elm.Systems.Add.Openstack = Elm.Systems.Add.Openstack || {};
 Elm.Systems.Add.Openstack.make = function (_elm) {
@@ -15858,7 +16001,8 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    $Systems$Add$Common = Elm.Systems.Add.Common.make(_elm),
    $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
-   $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm);
+   $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
+   $Systems$View$Openstack = Elm.Systems.View.Openstack.make(_elm);
    var _op = {};
    var ebsTypes = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "Magnetic",_1: "standard"}
                                          ,{ctor: "_Tuple2",_0: "General Purpose (SSD)",_1: "gp2"}
@@ -16175,7 +16319,7 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
       {case "Instance": return A2(instance,address,_p62);
          case "Networking": return A2(networking,address,_p62);
          case "Cinder": return A2(cinder,address,_p62);
-         case "Summary": return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);
+         case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p60.openstack,_1: _p60.machine});
          default: return A2($Debug.log,$Basics.toString(_p62.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
    var view = F2(function (address,_p63) {
@@ -16250,73 +16394,6 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                               ,cinder: cinder
                                               ,stepView: stepView
                                               ,view: view};
-};
-Elm.Systems = Elm.Systems || {};
-Elm.Systems.View = Elm.Systems.View || {};
-Elm.Systems.View.Common = Elm.Systems.View.Common || {};
-Elm.Systems.View.Common.make = function (_elm) {
-   "use strict";
-   _elm.Systems = _elm.Systems || {};
-   _elm.Systems.View = _elm.Systems.View || {};
-   _elm.Systems.View.Common = _elm.Systems.View.Common || {};
-   if (_elm.Systems.View.Common.values) return _elm.Systems.View.Common.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var tablizedRow = F2(function (props,v) {
-      return A2($Html.tr,_U.list([]),A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(v))]));},props));
-   });
-   var tablizedSection = F4(function (title,headers,rows,props) {
-      return $Basics.not($List.isEmpty(rows)) ? _U.list([$Html.text(title)
-                                                        ,A2($Html.table,
-                                                        _U.list([$Html$Attributes.$class("table"),$Html$Attributes.id(title)]),
-                                                        _U.list([A2($Html.thead,
-                                                                _U.list([]),
-                                                                _U.list([A2($Html.tr,
-                                                                _U.list([]),
-                                                                A2($List.map,
-                                                                function (k) {
-                                                                   return A2($Html.th,_U.list([]),_U.list([$Html.text(k)]));
-                                                                },
-                                                                headers))]))
-                                                                ,A2($Html.tbody,
-                                                                _U.list([]),
-                                                                A2($List.map,
-                                                                function (value) {
-                                                                   return A2(tablizedRow,props,value);
-                                                                },
-                                                                rows))]))]) : _U.list([]);
-   });
-   var summaryPanel = function (contents) {
-      return _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("panel col-md-4 col-md-offset-1")]),
-      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("panel-body")]),contents)]))]);
-   };
-   var overviewSection = F3(function (title,headers,values) {
-      return _U.list([$Html.text(title)
-                     ,A2($Html.ul,
-                     _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
-                     A3($List.map2,
-                     F2(function (title,value) {
-                        return A2($Html.li,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],title,A2($Basics._op["++"],": ",value)))]));
-                     }),
-                     headers,
-                     values))]);
-   });
-   var optionalSection = F4(function (title,headers,values,pred) {    return pred ? A3(overviewSection,title,headers,values) : _U.list([]);});
-   return _elm.Systems.View.Common.values = {_op: _op
-                                            ,overviewSection: overviewSection
-                                            ,summaryPanel: summaryPanel
-                                            ,optionalSection: optionalSection
-                                            ,tablizedSection: tablizedSection
-                                            ,tablizedRow: tablizedRow};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};
@@ -17903,82 +17980,6 @@ Elm.Systems.Add.make = function (_elm) {
                                     ,saveResponse: saveResponse
                                     ,saveSystem: saveSystem
                                     ,postJson: postJson};
-};
-Elm.Systems = Elm.Systems || {};
-Elm.Systems.View = Elm.Systems.View || {};
-Elm.Systems.View.Openstack = Elm.Systems.View.Openstack || {};
-Elm.Systems.View.Openstack.make = function (_elm) {
-   "use strict";
-   _elm.Systems = _elm.Systems || {};
-   _elm.Systems.View = _elm.Systems.View || {};
-   _elm.Systems.View.Openstack = _elm.Systems.View.Openstack || {};
-   if (_elm.Systems.View.Openstack.values) return _elm.Systems.View.Openstack.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
-   $Common$Components = Elm.Common.Components.make(_elm),
-   $Common$Utils = Elm.Common.Utils.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm),
-   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
-   $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
-   $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
-   var _op = {};
-   var view = F2(function (address,model) {
-      return A2($Html.div,_U.list([]),A2($Common$Components.panelContents,"System",A2($Html.div,_U.list([]),_U.list([]))));
-   });
-   var summarySections = function (_p0) {
-      var _p1 = _p0;
-      var _p6 = _p1._0;
-      var _p5 = _p1._1;
-      return A2($List.filter,
-      function (_p2) {
-         return $Basics.not($List.isEmpty(_p2));
-      },
-      _U.list([A3($Systems$View$Common.overviewSection,"Instance",_U.list(["flavor","os","tenant"]),_U.list([_p6.flavor,_p5.os,_p6.tenant]))
-              ,A3($Systems$View$Common.overviewSection,
-              "Security",
-              _U.list(["user","keypair","security groups"]),
-              _U.list([_p5.user,_p6.keyName,A2($String.join," ",A2($Maybe.withDefault,_U.list([]),_p6.securityGroups))]))
-              ,A3($Systems$View$Common.overviewSection,
-              "DNS",
-              _U.list(["hostname","domain","ip"]),
-              _U.list([_p5.hostname,_p5.domain,A2($Maybe.withDefault,"",_p5.ip)]))
-              ,A4($Systems$View$Common.tablizedSection,
-              "Volumes",
-              _U.list(["device","size","clear"]),
-              A2($Maybe.withDefault,_U.list([]),_p6.volumes),
-              _U.list([function (_) {
-                         return _.device;
-                      }
-                      ,function (_p3) {
-                         return $Basics.toString(function (_) {    return _.size;}(_p3));
-                      }
-                      ,function (_p4) {
-                         return $Basics.toString(function (_) {    return _.clear;}(_p4));
-                      }]))]));
-   };
-   var summarize = function (model) {
-      return _U.list([A2($Html.div,
-      _U.list([]),
-      _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("System overview")]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
-              A2($List.map,
-              $Bootstrap$Html.row_,
-              A2($List.map,$List.concat,A2($Common$Utils.partition,2,A2($List.map,$Systems$View$Common.summaryPanel,summarySections(model))))))]))]);
-   };
-   var NoOp = {ctor: "NoOp"};
-   var Model = function (a) {    return {id: a};};
-   var init = {ctor: "_Tuple2",_0: Model(0),_1: $Effects.none};
-   return _elm.Systems.View.Openstack.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,summarySections: summarySections,summarize: summarize,view: view};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};

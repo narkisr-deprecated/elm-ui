@@ -80,7 +80,7 @@ openstackDecoder =
     ("tenant" := string)
     ("key-name" := string)
     (maybe ("security-groups" := list string))
-    ("networking" := list string)
+    ("networks" := list string)
     (maybe ("volumes" := list openstackVolumeDecoder))
 
 machineDecoder: Decoder Machine
