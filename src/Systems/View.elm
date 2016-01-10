@@ -14,6 +14,7 @@ import Common.Redirect exposing (successHandler)
 import Common.Components exposing (panelContents)
 import Html exposing (..)
 import Systems.View.AWS  as AWSView
+import Systems.View.Openstack as OpenstackView
 import Systems.View.GCE as GCEView
 import Systems.View.Digital as DigitalView
 
@@ -28,7 +29,7 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let
-    emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing Nothing
+    emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing Nothing Nothing
   in
    (Model emptySystem, Effects.none)
 
@@ -68,6 +69,7 @@ view address ({system} as model) =
     let
       options = [ toHtml "AWS system" model AWSView.summarize system.aws
                 , toHtml "GCE system" model GCEView.summarize system.gce
+                , toHtml "Openstack system" model OpenstackView.summarize system.openstack
                 , toHtml "Digital system" model DigitalView.summarize system.digital]
 
     in 

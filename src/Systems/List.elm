@@ -46,7 +46,7 @@ type alias Model =
 init : (Model, Effects Action)
 init =
  let 
-   emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing
+   emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing Nothing Nothing
    systems = (Dict.empty, [("", emptySystem)])
    table = Table.init "systemsListing" True ["#","Hostname", "Type", "Env","Owner"] systemRow "Systems"
    search = Search.init

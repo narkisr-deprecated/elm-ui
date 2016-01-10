@@ -2,17 +2,19 @@ module Systems.Add.Encoders where
 
 import Json.Encode exposing (..)
 import Systems.Model.Common exposing (..)
-import Systems.Model.AWS exposing (..)
+import Systems.Model.AWS as AWSModel exposing (..)
+import Systems.Model.Openstack as OpenstackModel exposing (..)
 import Systems.Add.AWS as AWS exposing (ebsTypes)
 import Systems.Add.GCE as GCE 
+import Systems.Add.Openstack as Openstack
 import Systems.Add.Digital as Digital
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
 import String
 
-volumeEncoder : Volume -> Value
-volumeEncoder volume =
+awsVolumeEncoder : AWSModel.Volume -> Value
+awsVolumeEncoder volume =
   object [
       ("volume-type", string (withDefault "" (Dict.get volume.type' ebsTypes)))
     , ("size", int volume.size)
@@ -51,7 +53,7 @@ awsEncoder ({aws} as model) =
     , ("security-groups", list (List.map string (defaultEmpty aws.securityGroups)))
     , ("vpc", vpcEncoder (withDefault emptyVpc aws.vpc))
     , ("block-devices", list (List.map blockEncoder (defaultEmpty aws.blockDevices)))
-    , ("volumes", list (List.map volumeEncoder (defaultEmpty aws.volumes)))
+    , ("volumes", list (List.map awsVolumeEncoder (defaultEmpty aws.volumes)))
   ]
 
 gceEncoder : GCE.Model -> Value
@@ -69,6 +71,25 @@ digitalEncoder ({digital} as model) =
       ("size", string digital.size)
     , ("region", string digital.region)
     , ("private-networking", bool digital.privateNetworking)
+  ]
+
+openstackVolumeEncoder : OpenstackModel.Volume -> Value
+openstackVolumeEncoder volume =
+  object [
+      ("device", string volume.device)
+    , ("size", int volume.size)
+    , ("clear", bool volume.clear)
+  ]
+
+openstackEncoder : Openstack.Model -> Value
+openstackEncoder ({openstack} as model) =
+  object [
+      ("flavor", string openstack.flavor)
+    , ("tenant", string openstack.tenant)
+    , ("key-name", string openstack.keyName)
+    , ("security-groups", list (List.map string (defaultEmpty openstack.securityGroups)))
+    , ("networks", list (List.map string (defaultEmpty openstack.securityGroups)))
+    , ("volumes", list (List.map openstackVolumeEncoder (defaultEmpty openstack.volumes)))
   ]
 
 machineEncoder : Machine -> Value

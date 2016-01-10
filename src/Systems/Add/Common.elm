@@ -9,6 +9,9 @@ import Html.Events exposing (onClick)
 import Json.Decode as Json exposing (at, string)
 import Systems.Add.Validations exposing (Error(Invalid,None))
 import Maybe exposing (withDefault)
+import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
+import Dict exposing (Dict)
+import String
 
 withError : List Error -> String -> String
 withError errors class =
@@ -88,4 +91,30 @@ inputText address action place currentValue =
 checkbox : Signal.Address a -> a -> Bool -> Html
 checkbox address action currentValue= 
    input [type' "checkbox", attribute "aria-label" "...", style [("margin","10px 0 0")], onClick address action, checked currentValue] []
+
+getOses hyp model =
+  let 
+    hypervisor = withDefault ENV.Empty (Dict.get hyp model.environment)
+  in 
+    case hypervisor of
+      OSTemplates oses -> 
+        oses
+
+      ENV.Openstack flavors oses -> 
+        oses
+      _ -> 
+        Dict.empty
+
+
+setDefaultOS hyp ({machine} as model) = 
+   case List.head (Dict.keys (getOses hyp model)) of
+     Just os -> 
+       if (String.isEmpty machine.os) then
+         { model | machine = {machine | os = os }}
+       else 
+         model
+
+     Nothing -> 
+       model
+
 

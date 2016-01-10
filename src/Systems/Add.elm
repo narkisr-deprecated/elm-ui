@@ -134,6 +134,17 @@ encodeDigitalModel ({digital, general}) =
   , ("machine" , machineEncoder digital.machine)
  ]
 
+encodeOpenstackModel : Model -> E.Value
+encodeOpenstackModel ({openstack, general}) =
+ E.object [
+    ("type" , E.string general.type')
+  , ("owner" , E.string general.owner)
+  , ("env" , E.string general.environment)
+  , ("openstack" , openstackEncoder openstack)
+  , ("machine" , machineEncoder openstack.machine)
+ ]
+
+
 
 encodeModel : Model -> Action -> (Model , Effects Action)
 encodeModel ({stage} as model) action =
@@ -147,11 +158,20 @@ encodeModel ({stage} as model) action =
     Digital -> 
       (model, saveSystem (E.encode 0 (encodeDigitalModel model)) action)
 
-    _ -> 
-      (model, Effects.none)
+    Openstack -> 
+      (model, saveSystem (E.encode 0 (encodeOpenstackModel model)) action)
+
+    Proxmox -> 
+      none model 
+
+    General -> 
+      none model 
+   
+    Error -> 
+      none model
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({general, aws, gce, digital} as model) =
+update action ({general, aws, gce, digital, openstack} as model) =
   case action of
     Next -> 
       let 
@@ -181,6 +201,16 @@ update action ({general, aws, gce, digital} as model) =
                                |> Digital.update Digital.Next
             in
               none { model | stage = Digital , digital = newDigital , hasNext = Digital.hasNext newDigital}
+
+
+          "openstack" -> 
+            let
+               newOpenstack = openstack 
+                               |> Openstack.update (Openstack.Update current) 
+                               |> Openstack.update Openstack.Next
+            in
+              none { model | stage = Openstack , openstack = newOpenstack , hasNext = Openstack.hasNext newOpenstack}
+
 
           _ -> 
             (model, Effects.none)
@@ -234,6 +264,13 @@ update action ({general, aws, gce, digital} as model) =
         newDigital= Digital.update action digital
       in
         ({ model | digital = newDigital }, Effects.none)
+
+    OpenstackView action -> 
+      let
+        newOpenstack = Openstack.update action openstack
+      in
+        ({ model | openstack = newOpenstack }, Effects.none)
+
 
     GeneralView action -> 
       let

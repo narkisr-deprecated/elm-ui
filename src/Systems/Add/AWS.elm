@@ -217,17 +217,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
           model
 
     Update environment -> 
-        let
-           newModel = { model | environment = environment }
-        in 
-          case List.head (Dict.keys (getOses newModel)) of
-             Just os -> 
-               if (String.isEmpty machine.os) then
-                 { newModel | machine = {machine | os = os }}
-               else 
-                 newModel
-             Nothing -> 
-               newModel
+       (setDefaultOS "aws" { model | environment = environment })
 
     SelectInstanceType type' -> 
       setAWS (\aws -> {aws | instanceType = type' }) model
@@ -383,19 +373,6 @@ hasPrev model =
   not (List.isEmpty model.prev)
 
 
-
-getOses : Model -> Dict String Template
-getOses model =
-  let 
-    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "aws" model.environment)
-  in 
-    case hypervisor of
-      OSTemplates oses -> 
-        oses
-      _ -> 
-        Dict.empty
-
-
 instance : Signal.Address Action -> Model -> List Html
 instance address ({aws, machine, errors} as model) =
   let
@@ -410,7 +387,7 @@ instance address ({aws, machine, errors} as model) =
        [ 
          legend [] [text "Properties"]
        , group' "Instance type" (selector address SelectInstanceType instanceTypes aws.instanceType)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os)
+       , group' "OS" (selector address SelectOS (Dict.keys (getOses "aws" model)) machine.os)
        , group' "Endpoint" (selector address SelectEndpoint points name)
        , group' "Availability Zone" (selector address SelectZone zoneOptions (withDefault "" aws.availabilityZone))
        , legend [] [text "Security"]

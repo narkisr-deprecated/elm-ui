@@ -8,7 +8,7 @@ import Html.Events exposing (onClick)
 import Systems.Add.Common exposing (..)
 -- import Systems.View.Openstack exposing (summarize)
 import Systems.Add.Validations exposing (..)
-import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
+import Environments.List as ENV exposing (Environment, Template, Hypervisor(Openstack))
 import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Model.Openstack exposing (..)
@@ -161,6 +161,29 @@ ignoreDevices ({errors} as model) =
   in 
     { model | errors =  ignored }
 
+getFlavors model =
+  let 
+    hypervisor = withDefault ENV.Empty (Dict.get "openstack" model.environment)
+  in 
+    case hypervisor of
+      ENV.Openstack flavors _ -> 
+        flavors
+      _ -> 
+        Dict.empty
+
+
+setDefaultFlavor hyp ({openstack} as model) = 
+   case List.head (Dict.keys (getFlavors model)) of
+     Just flavor -> 
+       if (String.isEmpty openstack.flavor) then
+         { model | openstack = {openstack | flavor = flavor }}
+       else 
+         model
+
+     Nothing -> 
+       model
+
+
 update : Action -> Model-> Model
 update action ({next, prev, step, openstack, machine, volume} as model) =
   case action of
@@ -189,17 +212,8 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
           model
 
     Update environment -> 
-        let
-           newModel = { model | environment = environment }
-        in 
-          case List.head (Dict.keys (getOses newModel)) of
-             Just os -> 
-               if (String.isEmpty machine.os) then
-                 { newModel | machine = {machine | os = os }}
-               else 
-                 newModel
-             Nothing -> 
-               newModel
+      setDefaultOS "openstack" { model | environment = environment} 
+        |> setDefaultFlavor model
 
     SelectFlavor flavor -> 
       setOpenstack (\openstack -> {openstack | flavor = flavor }) model
@@ -283,30 +297,19 @@ hasPrev model =
 
 
 
-getOses : Model -> Dict String Template
-getOses model =
-  let 
-    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "openstack" model.environment)
-  in 
-    case hypervisor of
-      OSTemplates oses -> 
-        oses
-      _ -> 
-        Dict.empty
-
-
 instance : Signal.Address Action -> Model -> List Html
 instance address ({openstack, machine, errors} as model) =
   let
     check = withErrors errors
     groups = (String.join " " (defaultEmpty openstack.securityGroups))
-    flavors = []
+    flavors = (Dict.values (getFlavors model))
+    oses = (Dict.keys (getOses "openstack" model))
   in
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
        , group' "Flavor" (selector address SelectFlavor flavors openstack.flavor)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os)
+       , group' "OS" (selector address SelectOS oses machine.os)
        , legend [] [text "Security"]
        , check "User" (inputText address UserInput "" model.machine.user) 
        , check "Keypair" (inputText address KeyPairInput "" openstack.keyName)
