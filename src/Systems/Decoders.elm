@@ -83,7 +83,6 @@ openstackDecoder =
     ("networking" := list string)
     (maybe ("volumes" := list openstackVolumeDecoder))
 
-
 machineDecoder: Decoder Machine
 machineDecoder = 
   object5 Machine 

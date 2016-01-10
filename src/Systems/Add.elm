@@ -211,7 +211,6 @@ update action ({general, aws, gce, digital, openstack} as model) =
             in
               none { model | stage = Openstack , openstack = newOpenstack , hasNext = Openstack.hasNext newOpenstack}
 
-
           _ -> 
             (model, Effects.none)
 
@@ -270,7 +269,6 @@ update action ({general, aws, gce, digital, openstack} as model) =
         newOpenstack = Openstack.update action openstack
       in
         ({ model | openstack = newOpenstack }, Effects.none)
-
 
     GeneralView action -> 
       let
