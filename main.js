@@ -14984,7 +14984,7 @@ Elm.Systems.Add.Common.make = function (_elm) {
    var withError = F2(function (errors,$class) {    return $List.isEmpty(errors) ? $class : A2($Basics._op["++"],$class," has-error");});
    var group = F3(function (title,widget,errors) {
       return A2($Html.div,
-      _U.list([$Html$Attributes.$class(A2(withError,errors,"form-group"))]),
+      _U.list([$Html$Attributes.$class(A2(withError,errors,"form-group")),$Html$Attributes.id(title)]),
       _U.list([A2($Html.label,_U.list([$Html$Attributes.$for(title),$Html$Attributes.$class("col-sm-3 control-label")]),_U.list([$Html.text(title)]))
               ,A2($Html.div,_U.list([$Html$Attributes.$class("col-sm-6")]),_U.list([widget]))
               ,withMessage(errors)]));
@@ -17690,21 +17690,27 @@ Elm.Systems.Add.make = function (_elm) {
       _U.list([$Html$Attributes.$class("dropdown-menu")]),
       _U.list([A2($Html.li,
               _U.list([]),
-              _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,Save)]),_U.list([$Html.text("Save only")]))]))
+              _U.list([A2($Html.a,
+              _U.list([$Html$Attributes.$class("SaveOnly"),$Html$Attributes.href("#"),A2($Html$Events.onClick,address,Save)]),
+              _U.list([$Html.text("Save only")]))]))
               ,A2($Html.li,
               _U.list([]),
-              _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,Create)]),_U.list([$Html.text("Create System")]))]))]));
+              _U.list([A2($Html.a,
+              _U.list([$Html$Attributes.$class("Create"),$Html$Attributes.href("#"),A2($Html$Events.onClick,address,Create)]),
+              _U.list([$Html.text("Create System")]))]))]));
    };
    var Next = {ctor: "Next"};
    var buttons = F2(function (address,_p18) {
       var _p19 = _p18;
       var click = $Html$Events.onClick(address);
       var margin = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "30%"}]));
-      return _U.list([A2($Html.button,_U.list([$Html$Attributes.$class("btn btn-primary"),margin,click(Back)]),_U.list([$Html.text("<< Back")]))
+      return _U.list([A2($Html.button,
+                     _U.list([$Html$Attributes.id("Back"),$Html$Attributes.$class("btn btn-primary"),margin,click(Back)]),
+                     _U.list([$Html.text("<< Back")]))
                      ,_p19.hasNext ? A2($Html.div,
                      _U.list([$Html$Attributes.$class("btn-group"),margin]),
                      _U.list([A2($Html.button,
-                     _U.list([$Html$Attributes.$class("btn btn-primary"),click(Next)]),
+                     _U.list([$Html$Attributes.id("Next"),$Html$Attributes.$class("btn btn-primary"),click(Next)]),
                      _U.list([$Html.text("Next >>")]))])) : A2($Html.div,
                      _U.list([$Html$Attributes.$class("btn-group"),margin]),
                      _U.list([A2($Html.button,
@@ -18003,14 +18009,16 @@ Elm.Nav.Side.make = function (_elm) {
    var Goto = F2(function (a,b) {    return {ctor: "Goto",_0: a,_1: b};});
    var sectionItem = F3(function (address,active,section) {
       return $Html$Shorthand.li_(_U.list([A2($Html.a,
-      _U.list([$Html$Attributes.$class(""),$Html$Attributes.href("#"),A2($Html$Events.onClick,address,A2(Goto,active,section))]),
+      _U.list([$Html$Attributes.$class(A2($Basics._op["++"],$Basics.toString(active),$Basics.toString(section)))
+              ,$Html$Attributes.href("#")
+              ,A2($Html$Events.onClick,address,A2(Goto,active,section))]),
       _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-circle-o")]),_U.list([])),$Html.text($Basics.toString(section))]))]));
    });
    var drop = F3(function (address,active,actions) {
       return A2($Html.li,
       _U.list([$Html$Attributes.$class("treeview")]),
       _U.list([A2($Html.a,
-              _U.list([$Html$Attributes.href("#")]),
+              _U.list([$Html$Attributes.$class(A2($Basics._op["++"],$Basics.toString(active),"Menu")),$Html$Attributes.href("#")]),
               _U.list([A2($Html.span,_U.list([]),_U.list([$Html.text($Basics.toString(active))]))
                       ,A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-angle-left pull-right")]),_U.list([]))]))
               ,A2($Html.ul,

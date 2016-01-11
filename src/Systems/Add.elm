@@ -324,8 +324,8 @@ currentView address model  =
 saveDropdown : Signal.Address Action -> Html 
 saveDropdown address =
   ul [class "dropdown-menu"] [
-    li [] [a [href "#", onClick address Save ] [text "Save only"]]
-  , li [] [a [href "#", onClick address Create ] [text "Create System"]]
+    li [] [a [class "SaveOnly", href "#", onClick address Save ] [text "Save only"]]
+  , li [] [a [class "Create", href "#", onClick address Create ] [text "Create System"]]
   ]
     
 buttons : Signal.Address Action -> Model -> List Html
@@ -335,10 +335,10 @@ buttons address ({hasNext} as model) =
     click = onClick address
   in 
     [ 
-      button [class "btn btn-primary", margin, click Back] [text "<< Back"]
+      button [id "Back", class "btn btn-primary", margin, click Back] [text "<< Back"]
     , if hasNext then
        div [class "btn-group", margin]
-           [button [class "btn btn-primary", click Next] [text "Next >>"]]
+           [button [id "Next", class "btn btn-primary", click Next] [text "Next >>"]]
       else
         div [class "btn-group", margin]
          [  button [type' "button", class "btn btn-primary", click Stage] [text "Stage"]

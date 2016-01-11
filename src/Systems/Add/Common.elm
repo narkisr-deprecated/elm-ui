@@ -3,7 +3,7 @@ module Systems.Add.Common where
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
 import Html exposing (..)
-import Html.Attributes exposing (class, for, placeholder, attribute, type', checked, value, style)
+import Html.Attributes exposing (class, for, placeholder, attribute, type', checked, value, style, id)
 import Html.Events exposing (onClick)
 
 import Json.Decode as Json exposing (at, string)
@@ -40,7 +40,7 @@ withMessage errors =
  
 group : String -> Html -> List Error -> Html
 group title widget errors = 
-  div [class (withError errors "form-group")] 
+  div [class (withError errors "form-group"), id title] 
     [ label [for title, class "col-sm-3 control-label"] [(text title)]
     , div [class "col-sm-6"] [widget]
     , withMessage errors]

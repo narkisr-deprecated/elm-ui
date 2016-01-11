@@ -42,7 +42,8 @@ update action model =
 
 sectionItem : Signal.Address Action -> Active -> Section -> Html
 sectionItem address active section =
-  li_ [a [class "", href "#", onClick address (Goto active section)] 
+  li_ [a [class ((toString active) ++ (toString section)), 
+          href "#", onClick address (Goto active section)] 
         [ i [class "fa fa-circle-o"][]
         , text (toString section) ]
       ]
@@ -50,7 +51,7 @@ sectionItem address active section =
 drop : Signal.Address Action -> Active -> List Section -> Html
 drop address active actions =
   li [class "treeview"] [
-    a [href "#"]  [
+    a [class ((toString active) ++ "Menu"), href "#"]  [
       span [] [text (toString active)]
     , i [class "fa fa-angle-left pull-right"] []
     ] 
