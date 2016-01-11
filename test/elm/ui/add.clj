@@ -1,6 +1,5 @@
 (ns elm.ui.add
-  (:use midje.sweet 
-        clj-webdriver.taxi))
+  (:use midje.sweet clj-webdriver.taxi))
 
 
 (defn login []
@@ -30,8 +29,15 @@
   (input-text (find-element-under {:tag "div" :id "Hostname"} {:tag :input}) "red1")
   (input-text (find-element-under {:tag "div" :id "Domain"} {:tag :input}) "local"))
 
-(defn click-next []
-  (click "button#Next") 
+(defn click-next [] (click "button#Next"))
+
+(defn click-hidden [q]
+  (execute-script
+    (str "document.querySelector('" q "').click();")))
+
+(defn search [query]
+  (wait-until #(exists? {:tag "input" :id "systemSearch"}))
+  (input-text "input#systemSearch" query)
   )
 
 (System/setProperty "webdriver.chrome.driver" "/usr/bin/chromedriver")
@@ -67,5 +73,7 @@
      (click-next) 
      (click-next) 
      (save) 
-     (Thread/sleep 3000)
-    ))
+     ;; (click-hidden "Destroy")
+     (search "hostname=red1")
+     (Thread/sleep 500)
+     (text (find-table-cell "table#systemsListing" [1 1])) => "red1"))
