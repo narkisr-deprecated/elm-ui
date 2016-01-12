@@ -8,6 +8,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 
+
 import Http exposing (Error(BadResponse))
 import Task exposing (Task)
 import Json.Decode exposing (..)
