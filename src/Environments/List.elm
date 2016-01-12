@@ -2,6 +2,7 @@ module Environments.List where
 
 import Effects exposing (Effects)
 import Dict exposing (Dict)
+import Common.Http exposing (getJson)
 
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
@@ -56,7 +57,7 @@ environmentsList =
 
 -- Effects
 getEnvironments action = 
-  Http.get environmentsList "/environments" 
+  getJson environmentsList "/environments" 
     |> Task.toResult
     |> Task.map action
     |> Effects.task

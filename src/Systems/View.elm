@@ -3,6 +3,7 @@ module Systems.View where
 import Effects exposing (Effects)
 import Systems.Model.Common exposing (System, Machine)
 import Systems.Model.AWS exposing (emptyAws)
+import Common.Http exposing (getJson)
 
 -- Effects
 import Task
@@ -79,7 +80,7 @@ view address ({system} as model) =
 
 getSystem : String -> Effects Action
 getSystem id = 
-  Http.get systemDecoder ("/systems/" ++ id)
+  getJson systemDecoder ("/systems/" ++ id)
     |> Task.toResult
     |> Task.map SetSystem
     |> Effects.task

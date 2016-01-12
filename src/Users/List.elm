@@ -3,6 +3,7 @@ module Users.List where
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
 import Common.Redirect exposing (successHandler)
+import Common.Http exposing (getJson)
 
 import Effects exposing (Effects)
 import Task
@@ -29,7 +30,7 @@ usersList =
 -- Effects
 
 getUsers action = 
-  Http.get usersList "/users" 
+  getJson usersList "/users" 
     |> Task.toResult
     |> Task.map action
     |> Effects.task

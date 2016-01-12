@@ -5,6 +5,7 @@ import Time exposing (Time,second)
 import Maybe exposing (withDefault)
 import Date.Format exposing (format)
 import Common.Redirect exposing (successHandler)
+import Common.Http exposing (getJson)
 import Date
 import Now
 import String
@@ -167,7 +168,7 @@ metricsDecoder =
 
 getMetrics : Effects Action
 getMetrics = 
-  Http.get metricsDecoder "/metrics" 
+  getJson metricsDecoder "/metrics" 
     |> Task.toResult
     |> Task.map Load
     |> Effects.task

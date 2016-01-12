@@ -2,6 +2,7 @@ module Users.Session where
 
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
+import Common.Http exposing (getJson)
 import Effects exposing (Effects)
 import Task
 
@@ -29,7 +30,7 @@ session  =
 
 
 getSession action = 
-  Http.get session "/sessions" 
+  getJson session "/sessions" 
     |> Task.toResult
     |> Task.map action
     |> Effects.task

@@ -14329,6 +14329,36 @@ Elm.Common.Redirect.make = function (_elm) {
                                         ,successHandler: successHandler
                                         ,failHandler: failHandler};
 };
+Elm.Common = Elm.Common || {};
+Elm.Common.Http = Elm.Common.Http || {};
+Elm.Common.Http.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Http = _elm.Common.Http || {};
+   if (_elm.Common.Http.values) return _elm.Common.Http.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var httpJson = F4(function (verb,body,decoder,url) {
+      var request = {verb: verb
+                    ,headers: _U.list([{ctor: "_Tuple2",_0: "Content-Type",_1: "application/json;charset=UTF-8"}
+                                      ,{ctor: "_Tuple2",_0: "Accept",_1: "application/json, text/plain, */*"}])
+                    ,url: url
+                    ,body: body};
+      return A2($Http.fromJson,decoder,A2($Http.send,$Http.defaultSettings,request));
+   });
+   var getJson = A2(httpJson,"GET",$Http.empty);
+   var postJson = httpJson("POST");
+   return _elm.Common.Http.values = {_op: _op,httpJson: httpJson,getJson: getJson,postJson: postJson};
+};
 Elm.Pager = Elm.Pager || {};
 Elm.Pager.make = function (_elm) {
    "use strict";
@@ -14594,6 +14624,7 @@ Elm.Systems.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
@@ -14670,14 +14701,14 @@ Elm.Systems.List.make = function (_elm) {
    var getSystems = F2(function (page,offset) {
       return $Effects.task(A2($Task.map,
       SetSystems,
-      $Task.toResult(A2($Http.get,
+      $Task.toResult(A2($Common$Http.getJson,
       systemPage,
       A2($Basics._op["++"],"/systems?page=",A2($Basics._op["++"],$Basics.toString(page),A2($Basics._op["++"],"&offset=",$Basics.toString(offset))))))));
    });
    var getSystemsQuery = F3(function (page,offset,query) {
       return $Effects.task(A2($Task.map,
       SetSystems,
-      $Task.toResult(A2($Http.get,
+      $Task.toResult(A2($Common$Http.getJson,
       systemPage,
       A2($Basics._op["++"],
       "/systems/query?page=",
@@ -14837,10 +14868,10 @@ Elm.Environments.List.make = function (_elm) {
    if (_elm.Environments.List.values) return _elm.Environments.List.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
-   $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -14867,7 +14898,9 @@ Elm.Environments.List.make = function (_elm) {
                                                ,$Json$Decode.succeed(Physical)]));
    var environment = $Json$Decode.dict(hypervisor);
    var environmentsList = A2($Json$Decode.at,_U.list(["environments"]),$Json$Decode.dict(environment));
-   var getEnvironments = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Http.get,environmentsList,"/environments"))));};
+   var getEnvironments = function (action) {
+      return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,environmentsList,"/environments"))));
+   };
    return _elm.Environments.List.values = {_op: _op
                                           ,OSTemplates: OSTemplates
                                           ,Proxmox: Proxmox
@@ -16981,9 +17014,9 @@ Elm.Users.List.make = function (_elm) {
    if (_elm.Users.List.values) return _elm.Users.List.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
-   $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -16999,7 +17032,7 @@ Elm.Users.List.make = function (_elm) {
    A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
    A2($Json$Decode._op[":="],"envs",$Json$Decode.list($Json$Decode.string)));
    var usersList = $Json$Decode.list(user);
-   var getUsers = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Http.get,usersList,"/users"))));};
+   var getUsers = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,usersList,"/users"))));};
    return _elm.Users.List.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
 };
 Elm.Types = Elm.Types || {};
@@ -17031,6 +17064,7 @@ Elm.Types.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
@@ -17098,7 +17132,7 @@ Elm.Types.List.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"puppet-std",$Json$Decode.dict(puppetStd)));
    var typesList = A2($Json$Decode.at,_U.list(["types"]),$Json$Decode.list(type$));
-   var getTypes = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Http.get,typesList,"/types"))));};
+   var getTypes = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,typesList,"/types"))));};
    var init = function () {
       var table = A5($Table.init,"typesListing",true,_U.list(["Name","Provisioner","Description"]),typeRow,"Types");
       return {ctor: "_Tuple2",_0: A3(Model,_U.list([]),table,$Pager.init),_1: getTypes(SetTypes)};
@@ -17568,6 +17602,7 @@ Elm.Systems.Add.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -17594,14 +17629,6 @@ Elm.Systems.Add.make = function (_elm) {
    $Systems$Launch = Elm.Systems.Launch.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var postJson = F3(function (decoder,url,body) {
-      var request = {verb: "POST"
-                    ,headers: _U.list([{ctor: "_Tuple2",_0: "Content-Type",_1: "application/json;charset=UTF-8"}
-                                      ,{ctor: "_Tuple2",_0: "Accept",_1: "application/json, text/plain, */*"}])
-                    ,url: url
-                    ,body: body};
-      return A2($Http.fromJson,decoder,A2($Http.send,$Http.defaultSettings,request));
-   });
    var SaveResponse = F2(function (a,b) {    return {message: a,id: b};});
    var saveResponse = A3($Json$Decode.object2,
    SaveResponse,
@@ -17660,7 +17687,7 @@ Elm.Systems.Add.make = function (_elm) {
    });
    var SystemSaved = F2(function (a,b) {    return {ctor: "SystemSaved",_0: a,_1: b};});
    var saveSystem = F2(function (model,next) {
-      return $Effects.task(A2($Task.map,SystemSaved(next),$Task.toResult(A3(postJson,saveResponse,"/systems",$Http.string(model)))));
+      return $Effects.task(A2($Task.map,SystemSaved(next),$Task.toResult(A3($Common$Http.postJson,$Http.string(model),saveResponse,"/systems"))));
    });
    var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
    var GeneralView = function (a) {    return {ctor: "GeneralView",_0: a};};
@@ -17896,8 +17923,7 @@ Elm.Systems.Add.make = function (_elm) {
                                     ,view: view
                                     ,SaveResponse: SaveResponse
                                     ,saveResponse: saveResponse
-                                    ,saveSystem: saveSystem
-                                    ,postJson: postJson};
+                                    ,saveSystem: saveSystem};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};
@@ -17909,6 +17935,7 @@ Elm.Systems.View.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -17951,7 +17978,9 @@ Elm.Systems.View.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    var SetSystem = function (a) {    return {ctor: "SetSystem",_0: a};};
    var getSystem = function (id) {
-      return $Effects.task(A2($Task.map,SetSystem,$Task.toResult(A2($Http.get,$Systems$Decoders.systemDecoder,A2($Basics._op["++"],"/systems/",id)))));
+      return $Effects.task(A2($Task.map,
+      SetSystem,
+      $Task.toResult(A2($Common$Http.getJson,$Systems$Decoders.systemDecoder,A2($Basics._op["++"],"/systems/",id)))));
    };
    var update = F2(function (action,model) {
       var _p8 = action;
@@ -18238,6 +18267,7 @@ Elm.Jobs.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Common$NewTab = Elm.Common.NewTab.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Date = Elm.Date.make(_elm),
@@ -18365,7 +18395,7 @@ Elm.Jobs.List.make = function (_elm) {
    var getDone = F2(function (page,offset) {
       return $Effects.task(A2($Task.map,
       SetDone,
-      $Task.toResult(A2($Http.get,
+      $Task.toResult(A2($Common$Http.getJson,
       doneList,
       A2($Basics._op["++"],"/jobs/done?offset=",A2($Basics._op["++"],$Basics.toString(offset),A2($Basics._op["++"],"&page=",$Basics.toString(page))))))));
    });
@@ -18380,7 +18410,7 @@ Elm.Jobs.List.make = function (_elm) {
    A2($Json$Decode._op[":="],"tid-link",$Json$Decode.oneOf(_U.list([$Json$Decode.string,$Json$Decode.$null("")]))),
    A2($Json$Decode._op[":="],"type",$Json$Decode.string));
    var runningList = A2($Json$Decode.at,_U.list(["jobs"]),$Json$Decode.list(runningJob));
-   var getRunning = $Effects.task(A2($Task.map,SetRunning,$Task.toResult(A2($Http.get,runningList,"/jobs/running"))));
+   var getRunning = $Effects.task(A2($Task.map,SetRunning,$Task.toResult(A2($Common$Http.getJson,runningList,"/jobs/running"))));
    var init = function () {
       var done = A5($Table.init,"doneJobs",false,_U.list(["#","Start","Host","Queue","Runtime (min:sec)","Status"]),doneRow,"Done Jobs");
       var running = A5($Table.init,"runningJobs",false,_U.list(["#","Queue","Status"]),runningRow,"Running Jobs");
@@ -22273,6 +22303,7 @@ Elm.Jobs.Stats.make = function (_elm) {
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Chartjs$Line = Elm.Chartjs.Line.make(_elm),
    $Color = Elm.Color.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Date = Elm.Date.make(_elm),
@@ -22419,7 +22450,7 @@ Elm.Jobs.Stats.make = function (_elm) {
    A2($Json$Decode.at,_U.list(["default.default.stop-time"]),timer),
    A2($Json$Decode.at,_U.list(["default.default.provision-time"]),timer),
    A2($Json$Decode.at,_U.list(["default.default.reload-time"]),timer));
-   var getMetrics = $Effects.task(A2($Task.map,Load,$Task.toResult(A2($Http.get,metricsDecoder,"/metrics"))));
+   var getMetrics = $Effects.task(A2($Task.map,Load,$Task.toResult(A2($Common$Http.getJson,metricsDecoder,"/metrics"))));
    var init = {ctor: "_Tuple2",_0: A4(Model,_U.list([]),_U.list([]),$Now.loadTime,15),_1: getMetrics};
    var update = F2(function (action,_p37) {
       var _p38 = _p37;
@@ -22547,6 +22578,7 @@ Elm.Users.Session.make = function (_elm) {
    if (_elm.Users.Session.values) return _elm.Users.Session.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Http = Elm.Http.make(_elm),
@@ -22567,7 +22599,7 @@ Elm.Users.Session.make = function (_elm) {
    A2($Json$Decode._op[":="],"operations",$Json$Decode.list($Json$Decode.string)),
    A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
    A2($Json$Decode._op[":="],"username",$Json$Decode.string));
-   var getSession = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Http.get,session,"/sessions"))));};
+   var getSession = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,session,"/sessions"))));};
    return _elm.Users.Session.values = {_op: _op,Session: Session,emptySession: emptySession,session: session,getSession: getSession,logout: logout};
 };
 Elm.Nav = Elm.Nav || {};

@@ -4,6 +4,7 @@ module Jobs.List where
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, attribute, href)
 import Bootstrap.Html exposing (..)
+import Common.Http exposing (getJson)
 
 -- remoting
 import Json.Decode as Json exposing (..)
@@ -235,14 +236,14 @@ doneList =
 
 getRunning : Effects Action
 getRunning = 
-  Http.get runningList "/jobs/running" 
+  getJson runningList "/jobs/running" 
     |> Task.toResult
     |> Task.map SetRunning
     |> Effects.task
 
 getDone : Int -> Int -> Effects Action
 getDone page offset= 
-  Http.get doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page))
+  getJson doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page))
     |> Task.toResult
     |> Task.map SetDone
     |> Effects.task

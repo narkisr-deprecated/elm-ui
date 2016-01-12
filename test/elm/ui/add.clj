@@ -1,7 +1,6 @@
 (ns elm.ui.add
   (:use midje.sweet clj-webdriver.taxi))
 
-
 (defn login []
   (to "https://localhost:8443/")
   (input-text "#username" "admin")
@@ -42,8 +41,10 @@
 
 (System/setProperty "webdriver.chrome.driver" "/usr/bin/chromedriver")
 
-(fact "Adding gce system" :gce :chrome
-  (with-driver {:browser :chrome}
+(def browser {:browser :firefox})
+
+(fact "Adding gce system" :gce 
+  (with-driver browser
      (login)    
      (add-a-system) 
      (select-hypervisor "gce" "redis") 
@@ -58,10 +59,11 @@
      (save)
     ))
 
-(fact "Adding openstack system" :openstack :chrome
-  (with-driver {:browser :chrome}
+(fact "Adding openstack system" :openstack
+  (with-driver browser
      (login)
      (add-a-system)
+     (println "alive")
      (select-hypervisor "openstack" "redis") 
      (click-next)
      (wait-until #(exists? {:tag "div" :id "User"}))

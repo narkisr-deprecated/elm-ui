@@ -3,6 +3,7 @@ module Types.List where
 import Html exposing (..)
 import Effects exposing (Effects)
 import Dict exposing (Dict)
+import Common.Http exposing (getJson)
 
 import Types.Model exposing (..)
 import Pager exposing (..)
@@ -111,7 +112,7 @@ typesList =
 
 -- Effects
 getTypes action = 
-  Http.get typesList "/types" 
+  getJson typesList "/types" 
     |> Task.toResult
     |> Task.map action
     |> Effects.task

@@ -10,13 +10,14 @@ import Html.Attributes exposing (type', class, id, style, attribute)
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
 
-import Task
+import Task exposing (Task)
 import Dict exposing (Dict)
 import Debug
 import Systems.Model.Common exposing (Machine, System)
 import Systems.Model.AWS exposing (emptyAws)
 import Systems.Decoders exposing (..)
 import Common.Redirect exposing (successHandler)
+import Common.Http exposing (getJson)
 
 import String exposing (isEmpty)
 import Set exposing (Set)
@@ -184,17 +185,16 @@ systemPage =
     ("systems" := list systemPair)
 
 -- Effects
-
 getSystems : Int -> Int -> Effects Action
 getSystems page offset = 
-  Http.get systemPage ("/systems?page=" ++ (toString page) ++  "&offset=" ++ (toString offset))
+  getJson systemPage ("/systems?page=" ++ (toString page) ++  "&offset=" ++ (toString offset)) 
     |> Task.toResult
     |> Task.map SetSystems
     |> Effects.task
 
 getSystemsQuery : Int -> Int  -> String -> Effects Action
 getSystemsQuery page offset query= 
-  Http.get systemPage ("/systems/query?page=" ++ (toString page) ++  "&offset=" ++ (toString offset) ++ "&query=" ++ query)
+  getJson systemPage ("/systems/query?page=" ++ (toString page) ++  "&offset=" ++ (toString offset) ++ "&query=" ++ query)
     |> Task.toResult
     |> Task.map SetSystems
     |> Effects.task

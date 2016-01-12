@@ -2,6 +2,7 @@ module Systems.Add where
 
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
+import Common.Http exposing (postJson)
 import Common.Redirect as Redirect exposing (resultHandler, successHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
@@ -375,22 +376,9 @@ saveResponse =
 
 saveSystem : String -> Action -> Effects Action
 saveSystem model next = 
-  postJson saveResponse "/systems" (Http.string model) 
+  postJson (Http.string model) saveResponse "/systems"  
     |> Task.toResult
     |> Task.map (SystemSaved next)
     |> Effects.task
 
 
-postJson : Decoder value -> String -> Http.Body -> Task Http.Error value
-postJson decoder url body =
-  let request =
-        { verb = "POST"
-        , headers = [
-             ("Content-Type", "application/json;charset=UTF-8")
-           , ("Accept", "application/json, text/plain, */*")
-         ]
-        , url = url
-        , body = body
-        }
-  in
-    Http.fromJson decoder (Http.send Http.defaultSettings request)
