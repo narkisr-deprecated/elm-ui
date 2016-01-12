@@ -8,10 +8,14 @@
   (wait-until #(exists? "a.SystemsMenu")))
 
 (defn add-a-system []
+  (wait-until #(visible? "a.SystemsMenu"))
   (click "a.SystemsMenu") 
-  (wait-until #(visible? "a.SystemsAdd"))
+  (wait-until #(visible? "a.SystemsAdd") 5000 1000)
   (click "a.SystemsAdd") 
-  (wait-until #(exists? "div#Hypervisor")))
+  (wait-until #(exists? "div#Hypervisor"))
+  (println "alive")
+  
+  )
 
 (defn select-hypervisor [hypervisor type]
   (select-by-text (find-element-under "div#Type" {:tag :select}) type)
@@ -41,7 +45,7 @@
 
 (System/setProperty "webdriver.chrome.driver" "/usr/bin/chromedriver")
 
-(def browser {:browser :firefox})
+(def browser {:browser :chrome})
 
 (fact "Adding gce system" :gce 
   (with-driver browser
@@ -63,7 +67,6 @@
   (with-driver browser
      (login)
      (add-a-system)
-     (println "alive")
      (select-hypervisor "openstack" "redis") 
      (click-next)
      (wait-until #(exists? {:tag "div" :id "User"}))
