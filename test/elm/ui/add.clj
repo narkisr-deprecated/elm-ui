@@ -8,16 +8,21 @@
      midje.sweet 
      clj-webdriver.taxi
      clj-webdriver.driver
- ))
+ )
+  (:require 
+    [taoensso.timbre :as timbre]
+    ) 
+  )
+
+(defn take-snapshot []
+  (.getScreenshotAs (:webdriver clj-webdriver.taxi/*driver*) OutputType/FILE))
 
 (defn login []
   (to "https://localhost:8443/")
   (wait-until #(exists? "input#username"))
   (input-text "#username" "admin")
   (-> "#password" (input-text "changeme") submit)
-  (println (.getScreenshotAs (:webdriver clj-webdriver.taxi/*driver*) OutputType/FILE))
-  (wait-until #(exists? "a.SystemsMenu"))
- )
+  (wait-until #(exists? "a.SystemsMenu")))
 
 (defn add-a-system []
   (wait-until #(visible? "a.SystemsMenu") 5000 1000)
@@ -28,8 +33,7 @@
 
 (defn select-hypervisor [hypervisor type]
   (select-by-text (find-element-under "div#Type" {:tag :select}) type)
-  (select-by-text (find-element-under "div#Hypervisor" {:tag :select}) hypervisor)
-  )
+  (select-by-text (find-element-under "div#Hypervisor" {:tag :select}) hypervisor))
 
 (defn save []
   (wait-until #(exists? {:tag "span" :class "caret"}))
@@ -54,25 +58,33 @@
 (System/setProperty "webdriver.chrome.driver" "/usr/bin/chromedriver")
 
 (defn set-view-size [driver]
-  (.setSize (.window (.manage driver)) (Dimension. 1920 1080)))
+  (.setSize (.window (.manage driver)) (Dimension. 1920 1080)) driver)
  
+(defn phantom-driver []
+  (let [args (into-array String ["--ignore-ssl-errors=true" "--webdriver-loglevel=ERROR"])]
+  (PhantomJSDriver. 
+    (doto (DesiredCapabilities.)
+       (.setCapability "phantomjs.page.settings.userAgent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0")
+       (.setCapability "phantomjs.page.customHeaders.Accept-Language" "en-US")
+       (.setCapability "phantomjs.page.customHeaders.Connection" "keep-alive")
+       (.setCapability "phantomjs.cli.args" args)))))
+
 (defn create-phantom []
-  (init-driver
-    {:webdriver
-      (set-view-size 
-        (PhantomJSDriver. 
-         (doto (DesiredCapabilities.)
-          (.setCapability "phantomjs.page.settings.userAgent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0")
-          (.setCapability "phantomjs.page.customHeaders.Accept-Language" "en-US")
-          (.setCapability "phantomjs.page.viewportSize" "{width:1024,height:1024}")
-          (.setCapability "phantomjs.page.customHeaders.Connection" "keep-alive")
-          (.setCapability "phantomjs.cli.args" (into-array String ["--ignore-ssl-errors=true" "--webdriver-loglevel=WARN"])))
-        ))}))
+  (init-driver {:webdriver (set-view-size (phantom-driver))}))
 
 (def browser {:browser :phantomjs})
 
-#_(fact "Adding gce system" :gce 
-  (with-driver browser
+(defmacro with-driver-
+  [driver & body]
+  `(binding [clj-webdriver.taxi/*driver* ~driver]
+     (try ~@body
+       (catch Exception e# 
+         (timbre/error e#)
+         (take-snapshot))
+       (finally (quit)))))
+
+(fact "Adding gce system" :gce 
+  (with-driver- (create-phantom)
      (login)    
      (add-a-system) 
      (select-hypervisor "gce" "redis") 
@@ -85,14 +97,8 @@
      (network)
      (click-next)
      (save)
-    ))
-
-(defmacro with-driver-
-  [driver & body]
-  `(binding [clj-webdriver.taxi/*driver* ~driver]
-    (try ~@body
-      (finally
-        (quit)))))
+     (search "hostname=red1")
+     #_(text (find-table-cell "table#systemsListing" [1 1]) => "red1")))
 
 (fact "Adding openstack system" :openstack
   (with-driver- (create-phantom)
@@ -109,7 +115,5 @@
     (click-next) 
     (click-next) 
     (save) 
-    ;; (click-hidden "Destroy")
     (search "hostname=red1")
-    (Thread/sleep 500)
-    (text (find-table-cell "table#systemsListing" [1 1])) => "red1" ))
+    (text (find-table-cell "table#systemsListing" [1 1])) => "red1"))
