@@ -398,7 +398,7 @@ cinder address ({errors, volume, openstack} as model) =
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
     [ 
       legend [] [text "Devices"]
-    , check "Device" (inputText address CinderDeviceInput "sdh" volume.device)
+    , check "Cinder Device" (inputText address CinderDeviceInput "sdh" volume.device)
     , group' "Size" (inputNumber address CinderSizeInput "" (toString volume.size))
     , group' "Clear" (checkbox address CinderClear volume.clear)
     , group' ""  (button [class "btn btn-sm col-md-2", onClick address VolumeAdd] [text "Add"])

@@ -16290,7 +16290,7 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Devices")]))
-              ,A2(check,"Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p55.device))
+              ,A2(check,"Cinder Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p55.device))
               ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p55.size)))
               ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p55.clear))
               ,A2($Systems$Add$Common.group$,
