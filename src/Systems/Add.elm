@@ -172,6 +172,28 @@ encodeModel ({stage} as model) action =
     Error -> 
       none model
 
+
+back action hasPrev model =
+   let
+     newModel = { model |  hasNext = True}
+   in
+     if hasPrev then
+       newModel 
+     else 
+       {newModel | stage = General}
+
+getBack ({aws, gce, digital, openstack} as model) hyp = 
+  let
+   backs = Dict.fromList [
+      ("aws", (back AWS.Back (AWS.hasPrev aws) {model | stage = AWS , aws = (AWS.update AWS.Back aws)}))
+    , ("gce", (back GCE.Back (GCE.hasPrev gce) {model | stage = GCE , gce = (GCE.update GCE.Back gce)}))
+    , ("openstack", (back Openstack.Back (Openstack.hasPrev openstack) {model | stage = Openstack , openstack = (Openstack.update Openstack.Back openstack)}))
+    , ("digital-ocean", (back Digital.Back (Digital.hasPrev digital) {model | stage = Digital, digital = (Digital.update Digital.Back digital)}))
+   ]
+  in
+   withDefault model (Dict.get hyp backs)
+
+
 update : Action ->  Model-> (Model , Effects Action)
 update action ({general, aws, gce, digital, openstack} as model) =
   case action of
@@ -217,36 +239,7 @@ update action ({general, aws, gce, digital, openstack} as model) =
             (model, Effects.none)
 
     Back -> 
-      case general.hypervisor of
-        "aws" -> 
-           let
-             newAws = AWS.update AWS.Back aws
-           in
-             if AWS.hasPrev aws then
-              ({ model | stage = AWS , aws = newAws, hasNext = True}, Effects.none)
-             else 
-              ({ model | stage = General , aws = newAws , hasNext = True}, Effects.none)
-
-        "gce" -> 
-           let
-             newGCE = GCE.update GCE.Back gce
-           in
-             if GCE.hasPrev gce then
-              ({ model | stage = GCE , gce = newGCE, hasNext = True}, Effects.none)
-             else 
-              ({ model | stage = General , gce = newGCE  , hasNext = True}, Effects.none)
-
-        "digital-ocean" -> 
-           let
-             newDigital= Digital.update Digital.Back digital
-           in
-             if Digital.hasPrev digital then
-              ({ model | stage = Digital , digital = newDigital, hasNext = True}, Effects.none)
-             else 
-              ({ model | stage = General , digital = newDigital  , hasNext = True}, Effects.none)
-
-        _ -> 
-          (model, Effects.none)
+     none  (getBack model general.hypervisor)
 
     AWSView action -> 
       let
