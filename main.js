@@ -15936,8 +15936,12 @@ Elm.Systems.View.Openstack.make = function (_elm) {
               _U.list([_p5.user,_p6.keyName,A2($String.join," ",A2($Maybe.withDefault,_U.list([]),_p6.securityGroups))]))
               ,A3($Systems$View$Common.overviewSection,
               "Networking",
-              _U.list(["hostname","domain","floating ip","floating ip pool"]),
-              _U.list([_p5.hostname,_p5.domain,A2($Maybe.withDefault,"",_p6.floatingIp),A2($Maybe.withDefault,"",_p6.floatingIpPool)]))
+              _U.list(["hostname","domain","ip","ip pool","networks"]),
+              _U.list([_p5.hostname
+                      ,_p5.domain
+                      ,A2($Maybe.withDefault,"",_p6.floatingIp)
+                      ,A2($Maybe.withDefault,"",_p6.floatingIpPool)
+                      ,A2($String.join," ",_p6.networks)]))
               ,A4($Systems$View$Common.tablizedSection,
               "Volumes",
               _U.list(["device","size","clear"]),
@@ -16313,8 +16317,8 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
               ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p58.hostname))
               ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p58.domain))
-              ,A2(check,"Floating IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p59.floatingIp)))
-              ,A2(check,"Floating IP Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p59.floatingIpPool)))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p59.floatingIp)))
+              ,A2(check,"IP Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p59.floatingIpPool)))
               ,A2(check,"Networks",A4($Systems$Add$Common.inputText,address,NetworksInput," ",networks))]))]);
    });
    var TenantInput = function (a) {    return {ctor: "TenantInput",_0: a};};
