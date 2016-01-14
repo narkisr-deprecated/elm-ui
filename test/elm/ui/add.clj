@@ -40,10 +40,12 @@
   (click ".caret") 
   (click ".SaveOnly"))
 
-(defn network []
-  (wait-until #(exists? {:tag "div" :id "Hostname"}))
-  (input-text (find-element-under {:tag "div" :id "Hostname"} {:tag :input}) "red1")
-  (input-text (find-element-under {:tag "div" :id "Domain"} {:tag :input}) "local"))
+(defn network
+  ([] (network "red1"))
+  ([hostname] 
+    (wait-until #(exists? {:tag "div" :id "Hostname"}))
+    (input-text (find-element-under {:tag "div" :id "Hostname"} {:tag :input}) hostname)
+    (input-text (find-element-under {:tag "div" :id "Domain"} {:tag :input}) "local")))
 
 (defn click-next [] (click "button#Next"))
 
@@ -83,6 +85,9 @@
          (take-snapshot))
        (finally (quit)))))
 
+
+(defn uuid [] (first (.split (str (java.util.UUID/randomUUID)) "-")))
+
 (with-driver- (create-phantom)
   (login)    
   (fact "Adding gce system" :gce 
@@ -94,13 +99,14 @@
      (input-text (find-element-under "div#User" {:tag :input}) "ronen")
      (input-text (find-element-under "div#Tags" {:tag :input}) "ssh-enabled")
      (click-next)
-     (network)
-     (click-next)
-     (save)
-     (search "hostname=red1")
-     #_(text (find-table-cell "table#systemsListing" [1 1]) => "red1"))
+     (let [hostname (uuid)] 
+       (network hostname)
+       (click-next)
+       (save)
+       (search (str "hostname=" hostname))
+       (text (find-table-cell "table#systemsListing" [1 1]) => hostname)))
 
-   (fact "Adding openstack system" :openstack
+   #_(fact "Adding openstack system" :openstack
      (add-a-system)
      (select-hypervisor "openstack" "redis") 
      (click-next)
