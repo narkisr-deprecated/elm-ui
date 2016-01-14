@@ -48,9 +48,12 @@ type Action =
   | KeyPairInput String
   | SecurityGroupsInput String
   | UserInput String
+  | TenantInput String
   | HostnameInput String
   | DomainInput String
   | IPInput String
+  | IPPoolInput String
+  | NetworksInput String
   | CinderSizeInput String
   | CinderDeviceInput String
   | CinderClear
@@ -99,8 +102,8 @@ validationOf key validations value ({errors} as model) =
      {model | errors = newErrors}
 
 extractIp : Model -> String
-extractIp ({machine} as model) =
-  case machine.ip of
+extractIp {openstack} =
+  case openstack.floatingIp of
     Just ip ->
       ip
     Nothing -> 
@@ -108,13 +111,14 @@ extractIp ({machine} as model) =
   
 stringValidations = Dict.fromList [
     vpair Networking [
-        ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
-      , ("Domain", validationOf "Domain" [notEmpty] (\({machine} as model) -> machine.domain))
+        ("Hostname", validationOf "Hostname" [notEmpty] (\{machine} -> machine.hostname))
+      , ("Domain", validationOf "Domain" [notEmpty] (\{machine} -> machine.domain))
       , ("IP", validationOf "IP" [validIp] extractIp)
     ]
   , vpair Instance [
         ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user))
       , ("Keypair", validationOf "Keypair" [notEmpty] (\({openstack} as model) -> openstack.keyName))
+      , ("Tenant", validationOf "Tenant" [notEmpty] (\{openstack} -> openstack.tenant))
     ]
  ]
 
@@ -122,6 +126,9 @@ stringValidations = Dict.fromList [
 listValidations = Dict.fromList [
     vpair Instance [
       ("Security groups", validationOf "Security groups" [hasItems] (\({openstack} as model) -> (defaultEmpty openstack.securityGroups)))
+    ],
+   vpair Networking [
+      ("Networks", validationOf "Networks" [hasItems] (\({openstack} as model) -> openstack.networks))
     ]
  ]
 
@@ -220,7 +227,13 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
 
     SelectOS os -> 
       setMachine (\machine -> {machine | os = os }) model
-    
+
+    TenantInput tenant -> 
+      model 
+        |> setOpenstack (\openstack -> {openstack | tenant = tenant }) 
+        |> validate step "Tenant" stringValidations
+
+   
     KeyPairInput key -> 
       model 
         |> setOpenstack (\openstack -> {openstack | keyName = key }) 
@@ -233,6 +246,16 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
         model  
           |>  setOpenstack (\openstack -> {openstack | securityGroups = Just (if splited == [""] then [] else splited)})
           |>  validate step "Security groups" listValidations
+
+
+    NetworksInput networks -> 
+      let
+        splited = String.split " " networks
+      in
+        model  
+          |>  setOpenstack (\openstack -> {openstack | networks = splited})
+          |>  validate step "Networks" listValidations
+
 
     UserInput user -> 
        model 
@@ -251,8 +274,12 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
 
     IPInput ip -> 
       model 
-        |> setMachine (\machine -> {machine | ip = Just ip })
+        |> setOpenstack (\openstack -> {openstack | floatingIp = Just ip })
         |> validate step "IP" stringValidations
+
+    IPPoolInput pool -> 
+      model 
+        |> setOpenstack (\openstack -> {openstack | floatingIpPool = Just pool })
 
     CinderSizeInput size -> 
       case (String.toInt size) of
@@ -302,7 +329,7 @@ instance address ({openstack, machine, errors} as model) =
   let
     check = withErrors errors
     groups = (String.join " " (defaultEmpty openstack.securityGroups))
-    flavors = (Dict.values (getFlavors model))
+    flavors = (Dict.keys (getFlavors model))
     oses = (Dict.keys (getOses "openstack" model))
   in
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
@@ -310,6 +337,7 @@ instance address ({openstack, machine, errors} as model) =
          legend [] [text "Properties"]
        , group' "Flavor" (selector address SelectFlavor flavors openstack.flavor)
        , group' "OS" (selector address SelectOS oses machine.os)
+       , check "Tenant" (inputText address TenantInput "" openstack.tenant) 
        , legend [] [text "Security"]
        , check "User" (inputText address UserInput "" model.machine.user) 
        , check "Keypair" (inputText address KeyPairInput "" openstack.keyName)
@@ -324,20 +352,17 @@ networking: Signal.Address Action -> Model -> List Html
 networking address ({errors, openstack, machine} as model) =
   let 
     check = withErrors errors
+    networks = (String.join " " openstack.networks)
   in
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
      [
-       legend [] [text "DNS"]
+       legend [] [text "Networking"]
      , check "Hostname" (inputText address HostnameInput "" machine.hostname)
      , check "Domain"  (inputText address DomainInput "" machine.domain)
-     , check "IP" (inputText address IPInput "" (withDefault "" machine.ip))
+     , check "Floating IP" (inputText address IPInput "" (withDefault "" openstack.floatingIp))
+     , check "Floating IP Pool" (inputText address IPPoolInput "" (withDefault "" openstack.floatingIpPool))
+     , check "Networks" (inputText address NetworksInput " " networks)
      ]
-  ]
-
-ebsTypes = Dict.fromList [
-     ("Magnetic", "standard")
-   , ("General Purpose (SSD)", "gp2")
-   , ("Provisioned IOPS (SSD)", "io1")
   ]
 
 volumeRow : Signal.Address Action -> Volume -> Html

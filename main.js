@@ -14086,10 +14086,12 @@ Elm.Systems.Model.Openstack.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var Openstack = F6(function (a,b,c,d,e,f) {    return {flavor: a,tenant: b,keyName: c,securityGroups: d,networks: e,volumes: f};});
+   var Openstack = F8(function (a,b,c,d,e,f,g,h) {
+      return {flavor: a,tenant: b,keyName: c,floatingIp: d,floatingIpPool: e,securityGroups: f,networks: g,volumes: h};
+   });
    var emptyOpenstack = function () {
       var justString = $Maybe.Just("");
-      return A6(Openstack,"","","",$Maybe.Just(_U.list([])),_U.list([]),$Maybe.Just(_U.list([])));
+      return A8(Openstack,"","","",$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,_U.list([]),$Maybe.Nothing);
    }();
    var Volume = F3(function (a,b,c) {    return {device: a,size: b,clear: c};});
    var emptyVolume = A3(Volume,"",0,false);
@@ -14154,14 +14156,6 @@ Elm.Systems.Decoders.make = function (_elm) {
    A2($Json$Decode._op[":="],"device",$Json$Decode.string),
    A2($Json$Decode._op[":="],"size",$Json$Decode.$int),
    A2($Json$Decode._op[":="],"clear",$Json$Decode.bool));
-   var openstackDecoder = A7($Json$Decode.object6,
-   $Systems$Model$Openstack.Openstack,
-   A2($Json$Decode._op[":="],"flavor",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"tenant",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"key-name",$Json$Decode.string),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"security-groups",$Json$Decode.list($Json$Decode.string))),
-   A2($Json$Decode._op[":="],"networks",$Json$Decode.list($Json$Decode.string)),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(openstackVolumeDecoder))));
    var digitalDecoder = A4($Json$Decode.object3,
    $Systems$Model$Digital.Digital,
    A2($Json$Decode._op[":="],"size",$Json$Decode.string),
@@ -14210,6 +14204,21 @@ Elm.Systems.Decoders.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(awsVolumeDecoder)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"block-devices",$Json$Decode.list(blockDecoder)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"vpc",vpcDecoder)));
+   var openstackDecoder = A2(apply,
+   A2(apply,
+   A2(apply,
+   A2(apply,
+   A2(apply,
+   A2(apply,
+   A2(apply,
+   A2($Json$Decode.map,$Systems$Model$Openstack.Openstack,A2($Json$Decode._op[":="],"flavor",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"tenant",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"key-name",$Json$Decode.string)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"floating-ip",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"floating-ip-pool",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"security-groups",$Json$Decode.list($Json$Decode.string)))),
+   A2($Json$Decode._op[":="],"networks",$Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(openstackVolumeDecoder))));
    var systemDecoder = A9($Json$Decode.object8,
    $Systems$Model$Common.System,
    A2($Json$Decode._op[":="],"owner",$Json$Decode.string),
@@ -15926,9 +15935,9 @@ Elm.Systems.View.Openstack.make = function (_elm) {
               _U.list(["user","keypair","security groups"]),
               _U.list([_p5.user,_p6.keyName,A2($String.join," ",A2($Maybe.withDefault,_U.list([]),_p6.securityGroups))]))
               ,A3($Systems$View$Common.overviewSection,
-              "DNS",
-              _U.list(["hostname","domain","ip"]),
-              _U.list([_p5.hostname,_p5.domain,A2($Maybe.withDefault,"",_p5.ip)]))
+              "Networking",
+              _U.list(["hostname","domain","floating ip","floating ip pool"]),
+              _U.list([_p5.hostname,_p5.domain,A2($Maybe.withDefault,"",_p6.floatingIp),A2($Maybe.withDefault,"",_p6.floatingIpPool)]))
               ,A4($Systems$View$Common.tablizedSection,
               "Volumes",
               _U.list(["device","size","clear"]),
@@ -15989,9 +15998,6 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$View$Openstack = Elm.Systems.View.Openstack.make(_elm);
    var _op = {};
-   var ebsTypes = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "Magnetic",_1: "standard"}
-                                         ,{ctor: "_Tuple2",_0: "General Purpose (SSD)",_1: "gp2"}
-                                         ,{ctor: "_Tuple2",_0: "Provisioned IOPS (SSD)",_1: "io1"}]));
    var withErrors = F3(function (errors,key,widget) {
       return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
    });
@@ -16027,7 +16033,7 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
       var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
       return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
    });
-   var extractIp = function (_p8) {    var _p9 = _p8;var _p10 = _p9.machine.ip;if (_p10.ctor === "Just") {    return _p10._0;} else {    return "";}};
+   var extractIp = function (_p8) {    var _p9 = _p8;var _p10 = _p9.openstack.floatingIp;if (_p10.ctor === "Just") {    return _p10._0;} else {    return "";}};
    var validationOf = F4(function (key,validations,value,_p11) {
       var _p12 = _p11;
       var _p14 = _p12;
@@ -16101,129 +16107,161 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                                            function (_p29) {
                                                               var _p30 = _p29;
                                                               return _p30.openstack.keyName;
+                                                           })}
+                                                          ,{ctor: "_Tuple2"
+                                                           ,_0: "Tenant"
+                                                           ,_1: A3(validationOf,
+                                                           "Tenant",
+                                                           _U.list([$Systems$Add$Validations.notEmpty]),
+                                                           function (_p31) {
+                                                              var _p32 = _p31;
+                                                              return _p32.openstack.tenant;
                                                            })}]))]));
    var listValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
-   Instance,
-   _U.list([{ctor: "_Tuple2"
-            ,_0: "Security groups"
-            ,_1: A3(validationOf,
-            "Security groups",
-            _U.list([$Systems$Add$Validations.hasItems]),
-            function (_p31) {
-               var _p32 = _p31;
-               return $Common$Utils.defaultEmpty(_p32.openstack.securityGroups);
-            })}]))]));
+                                                Instance,
+                                                _U.list([{ctor: "_Tuple2"
+                                                         ,_0: "Security groups"
+                                                         ,_1: A3(validationOf,
+                                                         "Security groups",
+                                                         _U.list([$Systems$Add$Validations.hasItems]),
+                                                         function (_p33) {
+                                                            var _p34 = _p33;
+                                                            return $Common$Utils.defaultEmpty(_p34.openstack.securityGroups);
+                                                         })}]))
+                                                ,A2($Systems$Add$Validations.vpair,
+                                                Networking,
+                                                _U.list([{ctor: "_Tuple2"
+                                                         ,_0: "Networks"
+                                                         ,_1: A3(validationOf,
+                                                         "Networks",
+                                                         _U.list([$Systems$Add$Validations.hasItems]),
+                                                         function (_p35) {
+                                                            var _p36 = _p35;
+                                                            return _p36.openstack.networks;
+                                                         })}]))]));
    var validateAll = F2(function (step,model) {
       var validations = _U.list([listValidations,stringValidations]);
       var stepValues = A2($List.map,function (vs) {    return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));},validations);
       return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
    });
    var Zero = {ctor: "Zero"};
-   var update = F2(function (action,_p33) {
-      var _p34 = _p33;
-      var _p44 = _p34.step;
-      var _p43 = _p34.prev;
-      var _p42 = _p34.openstack;
-      var _p41 = _p34.next;
-      var _p40 = _p34;
-      var _p35 = action;
-      switch (_p35.ctor)
-      {case "Next": var _p36 = ignoreDevices(A2(validateAll,_p44,_p40));
-           var newModel = _p36;
-           var errors = _p36.errors;
-           var prevSteps = !_U.eq(_p44,Zero) ? A2($List.append,_p43,_U.list([_p44])) : _p43;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p41));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p41));
+   var update = F2(function (action,_p37) {
+      var _p38 = _p37;
+      var _p48 = _p38.step;
+      var _p47 = _p38.prev;
+      var _p46 = _p38.openstack;
+      var _p45 = _p38.next;
+      var _p44 = _p38;
+      var _p39 = action;
+      switch (_p39.ctor)
+      {case "Next": var _p40 = ignoreDevices(A2(validateAll,_p48,_p44));
+           var newModel = _p40;
+           var errors = _p40.errors;
+           var prevSteps = !_U.eq(_p48,Zero) ? A2($List.append,_p47,_U.list([_p48])) : _p47;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p45));
+           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p45));
            return notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p37 = ignoreDevices(A2(validateAll,_p44,_p40));
-           var newModel = _p37;
-           var errors = _p37.errors;
-           var nextSteps = !_U.eq(_p44,Zero) ? A2($List.append,_U.list([_p44]),_p41) : _p41;
-           var prevSteps = A2($List.take,$List.length(_p43) - 1,_p43);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p43)));
-           return notAny(errors) ? _U.update(_p40,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p40;
-         case "Update": return A2(setDefaultFlavor,_p40,A2($Systems$Add$Common.setDefaultOS,"openstack",_U.update(_p40,{environment: _p35._0})));
-         case "SelectFlavor": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{flavor: _p35._0});},_p40);
-         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p35._0});},_p40);
+         case "Back": var _p41 = ignoreDevices(A2(validateAll,_p48,_p44));
+           var newModel = _p41;
+           var errors = _p41.errors;
+           var nextSteps = !_U.eq(_p48,Zero) ? A2($List.append,_U.list([_p48]),_p45) : _p45;
+           var prevSteps = A2($List.take,$List.length(_p47) - 1,_p47);
+           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p47)));
+           return notAny(errors) ? _U.update(_p44,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p44;
+         case "Update": return A2(setDefaultFlavor,_p44,A2($Systems$Add$Common.setDefaultOS,"openstack",_U.update(_p44,{environment: _p39._0})));
+         case "SelectFlavor": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{flavor: _p39._0});},_p44);
+         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p39._0});},_p44);
+         case "TenantInput": return A4(validate,
+           _p48,
+           "Tenant",
+           stringValidations,
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{tenant: _p39._0});},_p44));
          case "KeyPairInput": return A4(validate,
-           _p44,
+           _p48,
            "Keypair",
            stringValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{keyName: _p35._0});},_p40));
-         case "SecurityGroupsInput": var splited = A2($String.split," ",_p35._0);
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{keyName: _p39._0});},_p44));
+         case "SecurityGroupsInput": var splited = A2($String.split," ",_p39._0);
            return A4(validate,
-           _p44,
+           _p48,
            "Security groups",
            listValidations,
            A2(setOpenstack,
            function (openstack) {
               return _U.update(openstack,{securityGroups: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});
            },
-           _p40));
+           _p44));
+         case "NetworksInput": var splited = A2($String.split," ",_p39._0);
+           return A4(validate,
+           _p48,
+           "Networks",
+           listValidations,
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{networks: splited});},_p44));
          case "UserInput": return A4(validate,
-           _p44,
+           _p48,
            "User",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p35._0});},_p40));
+           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p39._0});},_p44));
          case "HostnameInput": return A4(validate,
-           _p44,
+           _p48,
            "Hostname",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p35._0});},_p40));
+           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p39._0});},_p44));
          case "DomainInput": return A4(validate,
-           _p44,
+           _p48,
            "Domain",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p35._0});},_p40));
+           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p39._0});},_p44));
          case "IPInput": return A4(validate,
-           _p44,
+           _p48,
            "IP",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{ip: $Maybe.Just(_p35._0)});},_p40));
-         case "CinderSizeInput": var _p38 = $String.toInt(_p35._0);
-           if (_p38.ctor === "Ok") {
-                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p38._0});},_p40);
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIp: $Maybe.Just(_p39._0)});},_p44));
+         case "IPPoolInput": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIpPool: $Maybe.Just(_p39._0)});},_p44);
+         case "CinderSizeInput": var _p42 = $String.toInt(_p39._0);
+           if (_p42.ctor === "Ok") {
+                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p42._0});},_p44);
               } else {
-                 return _p40;
+                 return _p44;
               }
          case "CinderDeviceInput": return A4(validate,
-           _p44,
+           _p48,
            "Cinder Device",
            tupleValidations,
-           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p35._0});},_p40));
-         case "CinderClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p40);
-         case "VolumeAdd": var newOpenstack = _U.update(_p42,
-           {volumes: $Maybe.Just(A2($List.append,_U.list([_p34.volume]),$Common$Utils.defaultEmpty(_p42.volumes)))});
-           var _p39 = A4(validate,_p44,"Cinder Device",tupleValidations,_p40);
-           var newModel = _p39;
-           var errors = _p39.errors;
+           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p39._0});},_p44));
+         case "CinderClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p44);
+         case "VolumeAdd": var newOpenstack = _U.update(_p46,
+           {volumes: $Maybe.Just(A2($List.append,_U.list([_p38.volume]),$Common$Utils.defaultEmpty(_p46.volumes)))});
+           var _p43 = A4(validate,_p48,"Cinder Device",tupleValidations,_p44);
+           var newModel = _p43;
+           var errors = _p43.errors;
            return notAny(errors) ? _U.update(newModel,{volume: $Systems$Model$Openstack.emptyVolume,openstack: newOpenstack}) : _U.update(newModel,
-           {openstack: _p42});
-         default: var newVolumes = A2($List.filter,function (volume) {    return !_U.eq(volume.device,_p35._0);},$Common$Utils.defaultEmpty(_p42.volumes));
-           var newOpenstack = _U.update(_p42,{volumes: $Maybe.Just(newVolumes)});
-           return _U.update(_p40,{openstack: newOpenstack});}
+           {openstack: _p46});
+         default: var newVolumes = A2($List.filter,function (volume) {    return !_U.eq(volume.device,_p39._0);},$Common$Utils.defaultEmpty(_p46.volumes));
+           var newOpenstack = _U.update(_p46,{volumes: $Maybe.Just(newVolumes)});
+           return _U.update(_p44,{openstack: newOpenstack});}
    });
    var VolumeRemove = function (a) {    return {ctor: "VolumeRemove",_0: a};};
-   var volumeRow = F2(function (address,_p45) {
-      var _p46 = _p45;
+   var volumeRow = F2(function (address,_p49) {
+      var _p50 = _p49;
       var props = _U.list([function (_) {
                              return _.device;
                           }
-                          ,function (_p47) {
-                             return $Basics.toString(function (_) {    return _.size;}(_p47));
+                          ,function (_p51) {
+                             return $Basics.toString(function (_) {    return _.size;}(_p51));
                           }
-                          ,function (_p48) {
-                             return $Basics.toString(function (_) {    return _.clear;}(_p48));
+                          ,function (_p52) {
+                             return $Basics.toString(function (_) {    return _.clear;}(_p52));
                           }]);
       var remove = A2($Html.span,
       _U.list([$Html$Attributes.$class("glyphicon glyphicon-remove")
               ,A2($Html$Attributes.attribute,"aria-hidden","true")
               ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "top",_1: "5px"}]))
-              ,A2($Html$Events.onClick,address,VolumeRemove(_p46.device))]),
+              ,A2($Html$Events.onClick,address,VolumeRemove(_p50.device))]),
       _U.list([]));
       return A2($Html.tr,
       _U.list([]),
-      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p46))]));},props),_U.list([remove])));
+      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p50))]));},props),_U.list([remove])));
    });
    var volumes = F2(function (address,vs) {
       return A2($Html.div,
@@ -16241,75 +16279,83 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    var CinderClear = {ctor: "CinderClear"};
    var CinderDeviceInput = function (a) {    return {ctor: "CinderDeviceInput",_0: a};};
    var CinderSizeInput = function (a) {    return {ctor: "CinderSizeInput",_0: a};};
-   var cinder = F2(function (address,_p49) {
-      var _p50 = _p49;
-      var _p51 = _p50.volume;
-      var check = withErrors(_p50.errors);
+   var cinder = F2(function (address,_p53) {
+      var _p54 = _p53;
+      var _p55 = _p54.volume;
+      var check = withErrors(_p54.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Devices")]))
-              ,A2(check,"Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p51.device))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p51.size)))
-              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p51.clear))
+              ,A2(check,"Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p55.device))
+              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p55.size)))
+              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p55.clear))
               ,A2($Systems$Add$Common.group$,
               "",
               A2($Html.button,
               _U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,VolumeAdd)]),
               _U.list([$Html.text("Add")])))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Volumes")]))
-              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p50.openstack.volumes))]))]);
+              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p54.openstack.volumes))]))]);
    });
+   var NetworksInput = function (a) {    return {ctor: "NetworksInput",_0: a};};
+   var IPPoolInput = function (a) {    return {ctor: "IPPoolInput",_0: a};};
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
-   var networking = F2(function (address,_p52) {
-      var _p53 = _p52;
-      var _p54 = _p53.machine;
-      var check = withErrors(_p53.errors);
+   var networking = F2(function (address,_p56) {
+      var _p57 = _p56;
+      var _p59 = _p57.openstack;
+      var _p58 = _p57.machine;
+      var networks = A2($String.join," ",_p59.networks);
+      var check = withErrors(_p57.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("DNS")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p54.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p54.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p54.ip)))]))]);
+      _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p58.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p58.domain))
+              ,A2(check,"Floating IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p59.floatingIp)))
+              ,A2(check,"Floating IP Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p59.floatingIpPool)))
+              ,A2(check,"Networks",A4($Systems$Add$Common.inputText,address,NetworksInput," ",networks))]))]);
    });
+   var TenantInput = function (a) {    return {ctor: "TenantInput",_0: a};};
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
    var SecurityGroupsInput = function (a) {    return {ctor: "SecurityGroupsInput",_0: a};};
    var KeyPairInput = function (a) {    return {ctor: "KeyPairInput",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectFlavor = function (a) {    return {ctor: "SelectFlavor",_0: a};};
-   var instance = F2(function (address,_p55) {
-      var _p56 = _p55;
-      var _p58 = _p56.openstack;
-      var _p57 = _p56;
-      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"openstack",_p57));
-      var flavors = $Dict.values(getFlavors(_p57));
-      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p58.securityGroups));
-      var check = withErrors(_p56.errors);
+   var instance = F2(function (address,_p60) {
+      var _p61 = _p60;
+      var _p63 = _p61.openstack;
+      var _p62 = _p61;
+      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"openstack",_p62));
+      var flavors = $Dict.keys(getFlavors(_p62));
+      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p63.securityGroups));
+      var check = withErrors(_p61.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,"Flavor",A4($Systems$Add$Common.selector,address,SelectFlavor,flavors,_p58.flavor))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,oses,_p56.machine.os))
+              ,A2($Systems$Add$Common.group$,"Flavor",A4($Systems$Add$Common.selector,address,SelectFlavor,flavors,_p63.flavor))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,oses,_p61.machine.os))
+              ,A2(check,"Tenant",A4($Systems$Add$Common.inputText,address,TenantInput,"",_p63.tenant))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p57.machine.user))
-              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p58.keyName))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p62.machine.user))
+              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p63.keyName))
               ,A2(check,"Security groups",A4($Systems$Add$Common.inputText,address,SecurityGroupsInput," ",groups))]))]);
    });
-   var stepView = F2(function (address,_p59) {
-      var _p60 = _p59;
-      var _p62 = _p60;
-      var _p61 = _p62.step;
-      switch (_p61.ctor)
-      {case "Instance": return A2(instance,address,_p62);
-         case "Networking": return A2(networking,address,_p62);
-         case "Cinder": return A2(cinder,address,_p62);
-         case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p60.openstack,_1: _p60.machine});
-         default: return A2($Debug.log,$Basics.toString(_p62.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p64) {
+      var _p65 = _p64;
+      var _p67 = _p65;
+      var _p66 = _p67.step;
+      switch (_p66.ctor)
+      {case "Instance": return A2(instance,address,_p67);
+         case "Networking": return A2(networking,address,_p67);
+         case "Cinder": return A2(cinder,address,_p67);
+         case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p65.openstack,_1: _p65.machine});
+         default: return A2($Debug.log,$Basics.toString(_p67.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p63) {
-      var _p64 = _p63;
-      return A2($Common$Components.panelContents,$Basics.toString(_p64.step),A2($Html.form,_U.list([]),A2(stepView,address,_p64)));
+   var view = F2(function (address,_p68) {
+      var _p69 = _p68;
+      return A2($Common$Components.panelContents,$Basics.toString(_p69.step),A2($Html.form,_U.list([]),A2(stepView,address,_p69)));
    });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var Back = {ctor: "Back"};
@@ -16340,9 +16386,12 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                               ,KeyPairInput: KeyPairInput
                                               ,SecurityGroupsInput: SecurityGroupsInput
                                               ,UserInput: UserInput
+                                              ,TenantInput: TenantInput
                                               ,HostnameInput: HostnameInput
                                               ,DomainInput: DomainInput
                                               ,IPInput: IPInput
+                                              ,IPPoolInput: IPPoolInput
+                                              ,NetworksInput: NetworksInput
                                               ,CinderSizeInput: CinderSizeInput
                                               ,CinderDeviceInput: CinderDeviceInput
                                               ,CinderClear: CinderClear
@@ -16373,7 +16422,6 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                               ,instance: instance
                                               ,withErrors: withErrors
                                               ,networking: networking
-                                              ,ebsTypes: ebsTypes
                                               ,volumeRow: volumeRow
                                               ,volumes: volumes
                                               ,cinder: cinder
@@ -17381,86 +17429,92 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                          ,{ctor: "_Tuple2",_0: "os",_1: $Json$Encode.string(machine.os)}
                                          ,{ctor: "_Tuple2",_0: "user",_1: $Json$Encode.string(machine.user)}]));
    };
+   var maybeString = function (optional) {
+      var _p0 = optional;
+      if (_p0.ctor === "Just") {
+            return $Json$Encode.string(_p0._0);
+         } else {
+            return $Json$Encode.$null;
+         }
+   };
    var openstackVolumeEncoder = function (volume) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "device",_1: $Json$Encode.string(volume.device)}
                                          ,{ctor: "_Tuple2",_0: "size",_1: $Json$Encode.$int(volume.size)}
                                          ,{ctor: "_Tuple2",_0: "clear",_1: $Json$Encode.bool(volume.clear)}]));
    };
-   var openstackEncoder = function (_p0) {
-      var _p1 = _p0;
-      var _p2 = _p1.openstack;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "flavor",_1: $Json$Encode.string(_p2.flavor)}
-                                         ,{ctor: "_Tuple2",_0: "tenant",_1: $Json$Encode.string(_p2.tenant)}
-                                         ,{ctor: "_Tuple2",_0: "key-name",_1: $Json$Encode.string(_p2.keyName)}
+   var openstackEncoder = function (_p1) {
+      var _p2 = _p1;
+      var _p3 = _p2.openstack;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "flavor",_1: $Json$Encode.string(_p3.flavor)}
+                                         ,{ctor: "_Tuple2",_0: "tenant",_1: $Json$Encode.string(_p3.tenant)}
+                                         ,{ctor: "_Tuple2",_0: "floating-ip",_1: maybeString(_p3.floatingIp)}
+                                         ,{ctor: "_Tuple2",_0: "floating-ip-pool",_1: maybeString(_p3.floatingIpPool)}
+                                         ,{ctor: "_Tuple2",_0: "key-name",_1: $Json$Encode.string(_p3.keyName)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "security-groups"
-                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(_p2.securityGroups)))}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "networks"
-                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(_p2.securityGroups)))}
+                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(_p3.securityGroups)))}
+                                         ,{ctor: "_Tuple2",_0: "networks",_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,_p3.networks))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "volumes"
-                                          ,_1: $Json$Encode.list(A2($List.map,openstackVolumeEncoder,$Common$Utils.defaultEmpty(_p2.volumes)))}]));
+                                          ,_1: $Json$Encode.list(A2($List.map,openstackVolumeEncoder,$Common$Utils.defaultEmpty(_p3.volumes)))}]));
    };
-   var digitalEncoder = function (_p3) {
-      var _p4 = _p3;
-      var _p5 = _p4.digital;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "size",_1: $Json$Encode.string(_p5.size)}
-                                         ,{ctor: "_Tuple2",_0: "region",_1: $Json$Encode.string(_p5.region)}
-                                         ,{ctor: "_Tuple2",_0: "private-networking",_1: $Json$Encode.bool(_p5.privateNetworking)}]));
+   var digitalEncoder = function (_p4) {
+      var _p5 = _p4;
+      var _p6 = _p5.digital;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "size",_1: $Json$Encode.string(_p6.size)}
+                                         ,{ctor: "_Tuple2",_0: "region",_1: $Json$Encode.string(_p6.region)}
+                                         ,{ctor: "_Tuple2",_0: "private-networking",_1: $Json$Encode.bool(_p6.privateNetworking)}]));
    };
-   var gceEncoder = function (_p6) {
-      var _p7 = _p6;
-      var _p8 = _p7.gce;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "machine-type",_1: $Json$Encode.string(_p8.machineType)}
-                                         ,{ctor: "_Tuple2",_0: "zone",_1: $Json$Encode.string(_p8.zone)}
+   var gceEncoder = function (_p7) {
+      var _p8 = _p7;
+      var _p9 = _p8.gce;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "machine-type",_1: $Json$Encode.string(_p9.machineType)}
+                                         ,{ctor: "_Tuple2",_0: "zone",_1: $Json$Encode.string(_p9.zone)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "tags"
-                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(_p8.tags)))}
-                                         ,{ctor: "_Tuple2",_0: "project-id",_1: $Json$Encode.string(_p8.projectId)}]));
+                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(_p9.tags)))}
+                                         ,{ctor: "_Tuple2",_0: "project-id",_1: $Json$Encode.string(_p9.projectId)}]));
    };
-   var vpcEncoder = function (_p9) {
-      var _p10 = _p9;
+   var vpcEncoder = function (_p10) {
       var _p11 = _p10;
-      return $String.isEmpty(_p10.vpcId) ? $Json$Encode.$null : $Json$Encode.object(_U.list([{ctor: "_Tuple2"
+      var _p12 = _p11;
+      return $String.isEmpty(_p11.vpcId) ? $Json$Encode.$null : $Json$Encode.object(_U.list([{ctor: "_Tuple2"
                                                                                              ,_0: "subnet-id"
-                                                                                             ,_1: $Json$Encode.string(_p11.subnetId)}
-                                                                                            ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p11.vpcId)}
+                                                                                             ,_1: $Json$Encode.string(_p12.subnetId)}
+                                                                                            ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p12.vpcId)}
                                                                                             ,{ctor: "_Tuple2"
                                                                                              ,_0: "assign-public"
-                                                                                             ,_1: $Json$Encode.bool(_p11.assignPublic)}]));
+                                                                                             ,_1: $Json$Encode.bool(_p12.assignPublic)}]));
    };
    var blockEncoder = function (block) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "volume",_1: $Json$Encode.string(block.volume)}
                                          ,{ctor: "_Tuple2",_0: "device",_1: $Json$Encode.string(block.device)}]));
    };
    var awsVolumeEncoder = function (volume) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2"
-                                          ,_0: "volume-type"
-                                          ,_1: $Json$Encode.string(A2($Maybe.withDefault,"",A2($Dict.get,volume.type$,$Systems$Add$AWS.ebsTypes)))}
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "volume-type",_1: maybeString(A2($Dict.get,volume.type$,$Systems$Add$AWS.ebsTypes))}
                                          ,{ctor: "_Tuple2",_0: "size",_1: $Json$Encode.$int(volume.size)}
                                          ,{ctor: "_Tuple2",_0: "iops",_1: $Json$Encode.$int(A2($Maybe.withDefault,0,volume.iops))}
                                          ,{ctor: "_Tuple2",_0: "device",_1: $Json$Encode.string(volume.device)}
                                          ,{ctor: "_Tuple2",_0: "clear",_1: $Json$Encode.bool(volume.clear)}]));
    };
-   var awsEncoder = function (_p12) {
-      var _p13 = _p12;
-      var _p14 = _p13.aws;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "key-name",_1: $Json$Encode.string(_p14.keyName)}
-                                         ,{ctor: "_Tuple2",_0: "endpoint",_1: $Json$Encode.string(_p14.endpoint)}
-                                         ,{ctor: "_Tuple2",_0: "instance-type",_1: $Json$Encode.string(_p14.instanceType)}
-                                         ,{ctor: "_Tuple2",_0: "ebs-optimized",_1: $Json$Encode.bool(A2($Maybe.withDefault,false,_p14.ebsOptimized))}
-                                         ,{ctor: "_Tuple2",_0: "availability-zone",_1: $Json$Encode.string(A2($Maybe.withDefault,"",_p14.availabilityZone))}
+   var awsEncoder = function (_p13) {
+      var _p14 = _p13;
+      var _p15 = _p14.aws;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "key-name",_1: $Json$Encode.string(_p15.keyName)}
+                                         ,{ctor: "_Tuple2",_0: "endpoint",_1: $Json$Encode.string(_p15.endpoint)}
+                                         ,{ctor: "_Tuple2",_0: "instance-type",_1: $Json$Encode.string(_p15.instanceType)}
+                                         ,{ctor: "_Tuple2",_0: "ebs-optimized",_1: $Json$Encode.bool(A2($Maybe.withDefault,false,_p15.ebsOptimized))}
+                                         ,{ctor: "_Tuple2",_0: "availability-zone",_1: maybeString(_p15.availabilityZone)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "security-groups"
-                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(_p14.securityGroups)))}
-                                         ,{ctor: "_Tuple2",_0: "vpc",_1: vpcEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p14.vpc))}
+                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(_p15.securityGroups)))}
+                                         ,{ctor: "_Tuple2",_0: "vpc",_1: vpcEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p15.vpc))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "block-devices"
-                                          ,_1: $Json$Encode.list(A2($List.map,blockEncoder,$Common$Utils.defaultEmpty(_p14.blockDevices)))}
+                                          ,_1: $Json$Encode.list(A2($List.map,blockEncoder,$Common$Utils.defaultEmpty(_p15.blockDevices)))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "volumes"
-                                          ,_1: $Json$Encode.list(A2($List.map,awsVolumeEncoder,$Common$Utils.defaultEmpty(_p14.volumes)))}]));
+                                          ,_1: $Json$Encode.list(A2($List.map,awsVolumeEncoder,$Common$Utils.defaultEmpty(_p15.volumes)))}]));
    };
    return _elm.Systems.Add.Encoders.values = {_op: _op
                                              ,awsVolumeEncoder: awsVolumeEncoder
@@ -17470,6 +17524,7 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                              ,gceEncoder: gceEncoder
                                              ,digitalEncoder: digitalEncoder
                                              ,openstackVolumeEncoder: openstackVolumeEncoder
+                                             ,maybeString: maybeString
                                              ,openstackEncoder: openstackEncoder
                                              ,machineEncoder: machineEncoder};
 };
@@ -17813,75 +17868,92 @@ Elm.Systems.Add.make = function (_elm) {
       var aws = _p35._0;
       return {ctor: "_Tuple2",_0: A8(Model,General,aws,gce,digital,openstack,general,true,errors),_1: A2($Effects.map,GeneralView,effects)};
    }();
-   var update = F2(function (action,_p36) {
+   var back = F3(function (action,hasPrev,model) {
+      var newModel = _U.update(model,{hasNext: true});
+      return hasPrev ? newModel : _U.update(newModel,{stage: General});
+   });
+   var getBack = F2(function (_p36,hyp) {
       var _p37 = _p36;
-      var _p47 = _p37.openstack;
-      var _p46 = _p37;
-      var _p45 = _p37.general;
-      var _p44 = _p37.gce;
-      var _p43 = _p37.digital;
-      var _p42 = _p37.aws;
-      var _p38 = action;
-      switch (_p38.ctor)
-      {case "Next": var current = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,_p45.environment,_p45.rawEnvironments));
-           var _p39 = _p45.hypervisor;
-           switch (_p39)
-           {case "aws": var newAws = A2($Systems$Add$AWS.update,$Systems$Add$AWS.Next,A2($Systems$Add$AWS.update,$Systems$Add$AWS.Update(current),_p42));
-                return $Common$Utils.none(_U.update(_p46,{stage: AWS,aws: newAws,hasNext: $Systems$Add$AWS.hasNext(newAws)}));
-              case "gce": var newGce = A2($Systems$Add$GCE.update,$Systems$Add$GCE.Next,A2($Systems$Add$GCE.update,$Systems$Add$GCE.Update(current),_p44));
-                return $Common$Utils.none(_U.update(_p46,{stage: GCE,gce: newGce,hasNext: $Systems$Add$GCE.hasNext(newGce)}));
+      var _p42 = _p37.openstack;
+      var _p41 = _p37;
+      var _p40 = _p37.gce;
+      var _p39 = _p37.digital;
+      var _p38 = _p37.aws;
+      var backs = $Dict.fromList(_U.list([{ctor: "_Tuple2"
+                                          ,_0: "aws"
+                                          ,_1: A3(back,
+                                          $Systems$Add$AWS.Back,
+                                          $Systems$Add$AWS.hasPrev(_p38),
+                                          _U.update(_p41,{stage: AWS,aws: A2($Systems$Add$AWS.update,$Systems$Add$AWS.Back,_p38)}))}
+                                         ,{ctor: "_Tuple2"
+                                          ,_0: "gce"
+                                          ,_1: A3(back,
+                                          $Systems$Add$GCE.Back,
+                                          $Systems$Add$GCE.hasPrev(_p40),
+                                          _U.update(_p41,{stage: GCE,gce: A2($Systems$Add$GCE.update,$Systems$Add$GCE.Back,_p40)}))}
+                                         ,{ctor: "_Tuple2"
+                                          ,_0: "openstack"
+                                          ,_1: A3(back,
+                                          $Systems$Add$Openstack.Back,
+                                          $Systems$Add$Openstack.hasPrev(_p42),
+                                          _U.update(_p41,{stage: Openstack,openstack: A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Back,_p42)}))}
+                                         ,{ctor: "_Tuple2"
+                                          ,_0: "digital-ocean"
+                                          ,_1: A3(back,
+                                          $Systems$Add$Digital.Back,
+                                          $Systems$Add$Digital.hasPrev(_p39),
+                                          _U.update(_p41,{stage: Digital,digital: A2($Systems$Add$Digital.update,$Systems$Add$Digital.Back,_p39)}))}]));
+      return A2($Maybe.withDefault,_p41,A2($Dict.get,hyp,backs));
+   });
+   var update = F2(function (action,_p43) {
+      var _p44 = _p43;
+      var _p53 = _p44.openstack;
+      var _p52 = _p44;
+      var _p51 = _p44.general;
+      var _p50 = _p44.gce;
+      var _p49 = _p44.digital;
+      var _p48 = _p44.aws;
+      var _p45 = action;
+      switch (_p45.ctor)
+      {case "Next": var current = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,_p51.environment,_p51.rawEnvironments));
+           var _p46 = _p51.hypervisor;
+           switch (_p46)
+           {case "aws": var newAws = A2($Systems$Add$AWS.update,$Systems$Add$AWS.Next,A2($Systems$Add$AWS.update,$Systems$Add$AWS.Update(current),_p48));
+                return $Common$Utils.none(_U.update(_p52,{stage: AWS,aws: newAws,hasNext: $Systems$Add$AWS.hasNext(newAws)}));
+              case "gce": var newGce = A2($Systems$Add$GCE.update,$Systems$Add$GCE.Next,A2($Systems$Add$GCE.update,$Systems$Add$GCE.Update(current),_p50));
+                return $Common$Utils.none(_U.update(_p52,{stage: GCE,gce: newGce,hasNext: $Systems$Add$GCE.hasNext(newGce)}));
               case "digital-ocean": var newDigital = A2($Systems$Add$Digital.update,
                 $Systems$Add$Digital.Next,
-                A2($Systems$Add$Digital.update,$Systems$Add$Digital.Update(current),_p43));
-                return $Common$Utils.none(_U.update(_p46,{stage: Digital,digital: newDigital,hasNext: $Systems$Add$Digital.hasNext(newDigital)}));
+                A2($Systems$Add$Digital.update,$Systems$Add$Digital.Update(current),_p49));
+                return $Common$Utils.none(_U.update(_p52,{stage: Digital,digital: newDigital,hasNext: $Systems$Add$Digital.hasNext(newDigital)}));
               case "openstack": var newOpenstack = A2($Systems$Add$Openstack.update,
                 $Systems$Add$Openstack.Next,
-                A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Update(current),_p47));
-                return $Common$Utils.none(_U.update(_p46,{stage: Openstack,openstack: newOpenstack,hasNext: $Systems$Add$Openstack.hasNext(newOpenstack)}));
-              default: return {ctor: "_Tuple2",_0: _p46,_1: $Effects.none};}
-         case "Back": var _p40 = _p45.hypervisor;
-           switch (_p40)
-           {case "aws": var newAws = A2($Systems$Add$AWS.update,$Systems$Add$AWS.Back,_p42);
-                return $Systems$Add$AWS.hasPrev(_p42) ? {ctor: "_Tuple2"
-                                                        ,_0: _U.update(_p46,{stage: AWS,aws: newAws,hasNext: true})
-                                                        ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                              ,_0: _U.update(_p46,{stage: General,aws: newAws,hasNext: true})
-                                                                              ,_1: $Effects.none};
-              case "gce": var newGCE = A2($Systems$Add$GCE.update,$Systems$Add$GCE.Back,_p44);
-                return $Systems$Add$GCE.hasPrev(_p44) ? {ctor: "_Tuple2"
-                                                        ,_0: _U.update(_p46,{stage: GCE,gce: newGCE,hasNext: true})
-                                                        ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                              ,_0: _U.update(_p46,{stage: General,gce: newGCE,hasNext: true})
-                                                                              ,_1: $Effects.none};
-              case "digital-ocean": var newDigital = A2($Systems$Add$Digital.update,$Systems$Add$Digital.Back,_p43);
-                return $Systems$Add$Digital.hasPrev(_p43) ? {ctor: "_Tuple2"
-                                                            ,_0: _U.update(_p46,{stage: Digital,digital: newDigital,hasNext: true})
-                                                            ,_1: $Effects.none} : {ctor: "_Tuple2"
-                                                                                  ,_0: _U.update(_p46,{stage: General,digital: newDigital,hasNext: true})
-                                                                                  ,_1: $Effects.none};
-              default: return {ctor: "_Tuple2",_0: _p46,_1: $Effects.none};}
-         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p38._0,_p42);
-           return {ctor: "_Tuple2",_0: _U.update(_p46,{aws: newAws}),_1: $Effects.none};
-         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p38._0,_p44);
-           return {ctor: "_Tuple2",_0: _U.update(_p46,{gce: newGce}),_1: $Effects.none};
-         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p38._0,_p43);
-           return {ctor: "_Tuple2",_0: _U.update(_p46,{digital: newDigital}),_1: $Effects.none};
-         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p38._0,_p47);
-           return {ctor: "_Tuple2",_0: _U.update(_p46,{openstack: newOpenstack}),_1: $Effects.none};
-         case "GeneralView": var newGeneral = A2($Systems$Add$General.update,_p38._0,_p45);
-           return {ctor: "_Tuple2",_0: _U.update(_p46,{general: newGeneral}),_1: $Effects.none};
-         case "Stage": return A2(encodeModel,_p46,Stage);
-         case "Save": return A2(encodeModel,_p46,NoOp);
-         case "Create": return A2(encodeModel,_p46,Create);
-         case "SystemSaved": var success = A2(setSaved,_p38._0,_p46);
-           var _p41 = A5($Common$Redirect.resultHandler,_p38._1,_p46,success,setErrors(_p46),NoOp);
-           var newModel = _p41._0;
-           var saveErrors = _p41._0.saveErrors;
-           var effects = _p41._1;
+                A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Update(current),_p53));
+                return $Common$Utils.none(_U.update(_p52,{stage: Openstack,openstack: newOpenstack,hasNext: $Systems$Add$Openstack.hasNext(newOpenstack)}));
+              default: return {ctor: "_Tuple2",_0: _p52,_1: $Effects.none};}
+         case "Back": return $Common$Utils.none(A2(getBack,_p52,_p51.hypervisor));
+         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p45._0,_p48);
+           return {ctor: "_Tuple2",_0: _U.update(_p52,{aws: newAws}),_1: $Effects.none};
+         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p45._0,_p50);
+           return {ctor: "_Tuple2",_0: _U.update(_p52,{gce: newGce}),_1: $Effects.none};
+         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p45._0,_p49);
+           return {ctor: "_Tuple2",_0: _U.update(_p52,{digital: newDigital}),_1: $Effects.none};
+         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p45._0,_p53);
+           return {ctor: "_Tuple2",_0: _U.update(_p52,{openstack: newOpenstack}),_1: $Effects.none};
+         case "GeneralView": var newGeneral = A2($Systems$Add$General.update,_p45._0,_p51);
+           return {ctor: "_Tuple2",_0: _U.update(_p52,{general: newGeneral}),_1: $Effects.none};
+         case "Stage": return A2(encodeModel,_p52,Stage);
+         case "Save": return A2(encodeModel,_p52,NoOp);
+         case "Create": return A2(encodeModel,_p52,Create);
+         case "SystemSaved": var success = A2(setSaved,_p45._0,_p52);
+           var _p47 = A5($Common$Redirect.resultHandler,_p45._1,_p52,success,setErrors(_p52),NoOp);
+           var newModel = _p47._0;
+           var saveErrors = _p47._0.saveErrors;
+           var effects = _p47._1;
            return $Basics.not($Dict.isEmpty(saveErrors.errors.keyValues)) ? {ctor: "_Tuple2"
                                                                             ,_0: _U.update(newModel,{stage: Error})
-                                                                            ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p46,_1: effects};
-         default: return {ctor: "_Tuple2",_0: _p46,_1: $Effects.none};}
+                                                                            ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p52,_1: effects};
+         default: return {ctor: "_Tuple2",_0: _p52,_1: $Effects.none};}
    });
    return _elm.Systems.Add.values = {_op: _op
                                     ,General: General
@@ -17916,6 +17988,8 @@ Elm.Systems.Add.make = function (_elm) {
                                     ,encodeDigitalModel: encodeDigitalModel
                                     ,encodeOpenstackModel: encodeOpenstackModel
                                     ,encodeModel: encodeModel
+                                    ,back: back
+                                    ,getBack: getBack
                                     ,update: update
                                     ,currentView: currentView
                                     ,saveDropdown: saveDropdown

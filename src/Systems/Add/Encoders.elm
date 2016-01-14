@@ -16,7 +16,7 @@ import String
 awsVolumeEncoder : AWSModel.Volume -> Value
 awsVolumeEncoder volume =
   object [
-      ("volume-type", string (withDefault "" (Dict.get volume.type' ebsTypes)))
+      ("volume-type", maybeString (Dict.get volume.type' ebsTypes))
     , ("size", int volume.size)
     , ("iops", int (withDefault 0 volume.iops))
     , ("device", string volume.device)
@@ -49,7 +49,7 @@ awsEncoder ({aws} as model) =
     , ("endpoint", string aws.endpoint)
     , ("instance-type", string aws.instanceType)
     , ("ebs-optimized", bool (withDefault False aws.ebsOptimized))
-    , ("availability-zone", string (withDefault "" aws.availabilityZone))
+    , ("availability-zone", maybeString aws.availabilityZone)
     , ("security-groups", list (List.map string (defaultEmpty aws.securityGroups)))
     , ("vpc", vpcEncoder (withDefault emptyVpc aws.vpc))
     , ("block-devices", list (List.map blockEncoder (defaultEmpty aws.blockDevices)))
@@ -81,14 +81,24 @@ openstackVolumeEncoder volume =
     , ("clear", bool volume.clear)
   ]
 
+
+maybeString optional = 
+  case optional of 
+    Just value -> 
+      (string value)
+    Nothing -> 
+      null
+
 openstackEncoder : Openstack.Model -> Value
 openstackEncoder ({openstack} as model) =
   object [
       ("flavor", string openstack.flavor)
     , ("tenant", string openstack.tenant)
+    , ("floating-ip", maybeString openstack.floatingIp)
+    , ("floating-ip-pool", maybeString openstack.floatingIpPool)
     , ("key-name", string openstack.keyName)
     , ("security-groups", list (List.map string (defaultEmpty openstack.securityGroups)))
-    , ("networks", list (List.map string (defaultEmpty openstack.securityGroups)))
+    , ("networks", list (List.map string openstack.networks))
     , ("volumes", list (List.map openstackVolumeEncoder (defaultEmpty openstack.volumes)))
   ]
 

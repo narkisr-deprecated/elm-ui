@@ -36,9 +36,9 @@ summarySections ((openstack, machine) as model)=
    , overviewSection "Security"
        ["user", "keypair", "security groups" ]
        [ machine.user, openstack.keyName, (String.join " " (withDefault [] openstack.securityGroups))]
-   , overviewSection "DNS"
-       ["hostname", "domain", "ip" ]
-       [ machine.hostname, machine.domain, withDefault "" machine.ip]
+   , overviewSection "Networking"
+       ["hostname", "domain", "floating ip", "floating ip pool" ]
+       [ machine.hostname, machine.domain, withDefault "" openstack.floatingIp, withDefault "" openstack.floatingIpPool]
    , tablizedSection "Volumes" 
        ["device", "size", "clear"] (withDefault [] openstack.volumes)
        [.device, (toString << .size), (toString << .clear)]

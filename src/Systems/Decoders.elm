@@ -75,13 +75,15 @@ openstackVolumeDecoder =
 
 openstackDecoder: Decoder Openstack
 openstackDecoder = 
-  object6 Openstack
-    ("flavor" := string)
-    ("tenant" := string)
-    ("key-name" := string)
-    (maybe ("security-groups" := list string))
-    ("networks" := list string)
-    (maybe ("volumes" := list openstackVolumeDecoder))
+  map Openstack
+   ("flavor" := string)
+   `apply` ("tenant" := string)
+   `apply` ("key-name" := string)
+   `apply` (maybe ("floating-ip" := string))
+   `apply` (maybe ("floating-ip-pool" := string))
+   `apply` (maybe ("security-groups" := list string))
+   `apply` ("networks" := list string)
+   `apply` (maybe ("volumes" := list openstackVolumeDecoder))
 
 machineDecoder: Decoder Machine
 machineDecoder = 

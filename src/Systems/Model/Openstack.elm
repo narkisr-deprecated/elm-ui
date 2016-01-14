@@ -12,6 +12,8 @@ type alias Openstack =
   { flavor : String
   , tenant : String
   , keyName : String
+  , floatingIp :Maybe String
+  , floatingIpPool :Maybe String
   , securityGroups : Maybe (List String)
   , networks : (List String)
   , volumes : Maybe (List Volume)
@@ -27,5 +29,5 @@ emptyOpenstack =
   let
     justString = Just ""
   in
-    Openstack "" "" "" (Just []) [] (Just [])
+    Openstack "" "" "" Nothing Nothing Nothing [] Nothing
 
