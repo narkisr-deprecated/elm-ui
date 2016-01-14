@@ -16,5 +16,5 @@
                     org.seleniumhq.selenium/selenium-remote-driver]]
    ]
   
-  :plugins  [[lein-exec "0.3.5"]]
+  :plugins  [[lein-exec "0.3.5"] [lein-midje "3.1.3"]]
 )
