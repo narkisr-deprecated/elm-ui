@@ -359,8 +359,8 @@ networking address ({errors, openstack, machine} as model) =
        legend [] [text "Networking"]
      , check "Hostname" (inputText address HostnameInput "" machine.hostname)
      , check "Domain"  (inputText address DomainInput "" machine.domain)
-     , check "Floating IP" (inputText address IPInput "" (withDefault "" openstack.floatingIp))
-     , check "Floating IP Pool" (inputText address IPPoolInput "" (withDefault "" openstack.floatingIpPool))
+     , check "IP" (inputText address IPInput "" (withDefault "" openstack.floatingIp))
+     , check "IP Pool" (inputText address IPPoolInput "" (withDefault "" openstack.floatingIpPool))
      , check "Networks" (inputText address NetworksInput " " networks)
      ]
   ]
