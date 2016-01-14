@@ -83,9 +83,9 @@
          (take-snapshot))
        (finally (quit)))))
 
-(fact "Adding gce system" :gce 
-  (with-driver- (create-phantom)
-     (login)    
+(with-driver- (create-phantom)
+  (login)    
+  (fact "Adding gce system" :gce 
      (add-a-system) 
      (select-hypervisor "gce" "redis") 
      (click-next)
@@ -98,22 +98,26 @@
      (click-next)
      (save)
      (search "hostname=red1")
-     #_(text (find-table-cell "table#systemsListing" [1 1]) => "red1")))
+     #_(text (find-table-cell "table#systemsListing" [1 1]) => "red1"))
 
-(fact "Adding openstack system" :openstack
-  (with-driver- (create-phantom)
-    (login)
-    (add-a-system)
-    (select-hypervisor "openstack" "redis") 
-    (click-next)
-    (wait-until #(exists? {:tag "div" :id "User"}))
-    (input-text (find-element-under "div#User" {:tag :input}) "ubuntu")
-    (input-text (find-element-under "div#Keypair" {:tag :input}) "lepus")
-    (input-text (find-element-under {:tag "div" :id "Security groups"} {:tag :input}) "default")
-    (click-next)
-    (network)
-    (click-next) 
-    (click-next) 
-    (save) 
-    (search "hostname=red1")
-    (text (find-table-cell "table#systemsListing" [1 1])) => "red1"))
+   (fact "Adding openstack system" :openstack
+     (add-a-system)
+     (select-hypervisor "openstack" "redis") 
+     (click-next)
+     (wait-until #(exists? {:tag "div" :id "User"}))
+     (input-text (find-element-under "div#Tenant" {:tag :input}) "admin")
+     (input-text (find-element-under "div#User" {:tag :input}) "ubuntu")
+     (input-text (find-element-under "div#Keypair" {:tag :input}) "lepus")
+     (input-text (find-element-under {:tag "div" :id "Security groups"} {:tag :input}) "default")
+     (click-next)
+     (network)
+     (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
+     (click-next) 
+     ; skipping volumes
+     (click-next) 
+     (save) 
+     (search "hostname=red1")
+     (text (find-table-cell "table#systemsListing" [1 1])) => "red1")
+  )
+
+  
