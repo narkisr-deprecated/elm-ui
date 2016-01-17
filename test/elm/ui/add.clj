@@ -38,7 +38,10 @@
 (defn save []
   (wait-until #(exists? {:tag "span" :class "caret"}))
   (click ".caret") 
-  (click ".SaveOnly"))
+  (click ".SaveOnly")
+  ; let ES do its thing 
+  (Thread/sleep 1000)
+  )
 
 (defn network
   ([] (network "red1"))
@@ -55,7 +58,10 @@
 
 (defn search [query]
   (wait-until #(exists? {:tag "input" :id "systemSearch"}))
-  (input-text "input#systemSearch" query))
+  (input-text "input#systemSearch" query)
+  (Thread/sleep 3000)
+  (wait-until #(visible? (find-element-under "tbody" {:tag :tr})) 1000)
+  )
 
 (System/setProperty "webdriver.chrome.driver" "/usr/bin/chromedriver")
 
@@ -104,9 +110,9 @@
        (click-next)
        (save)
        (search (str "hostname=" hostname))
-       (text (find-table-cell "table#systemsListing" [1 1]) => hostname)))
+       (text (find-element-under "tbody" {:tag :tr})) => (contains hostname)))
 
-   #_(fact "Adding openstack system" :openstack
+  (fact "Adding openstack system" :openstack
      (add-a-system)
      (select-hypervisor "openstack" "redis") 
      (click-next)
@@ -116,14 +122,14 @@
      (input-text (find-element-under "div#Keypair" {:tag :input}) "lepus")
      (input-text (find-element-under {:tag "div" :id "Security groups"} {:tag :input}) "default")
      (click-next)
-     (network)
-     (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
-     (click-next) 
-     ; skipping volumes
-     (click-next) 
-     (save) 
-     (search "hostname=red1")
-     (text (find-table-cell "table#systemsListing" [1 1])) => "red1")
-  )
+     (let [hostname (uuid)] 
+       (network hostname)
+       (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
+       (click-next)
+        ; skipping volumes
+       (click-next) 
+       (save)
+       (search (str "hostname=" hostname))
+       (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
   
