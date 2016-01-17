@@ -49,6 +49,23 @@
     .legend { list-style: none; line-height: 1;}
     .legend li { float: left; margin-right: 20px; }
     .legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
+
+    @keyframes changewidth {
+      from {
+	   width: 10%;
+	 }
+
+      to {
+        width: 80%;
+	}
+    }
+      
+    div.progress-bar#processing {
+     animation-duration: 25s;
+     animation-name: changewidth;
+     animation-iteration-count: infinite;
+     animation-timing-function: ease-in-out;
+    }
    </style>
 </head>
 

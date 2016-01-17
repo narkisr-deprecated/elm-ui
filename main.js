@@ -18409,7 +18409,15 @@ Elm.Jobs.List.make = function (_elm) {
       var _p5 = _p4;
       return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(_p5.id)]))
                      ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p5.type$)]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p5.status)]))]);
+                     ,A2($Html.td,
+                     _U.list([]),
+                     _U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("progress progress-xs")]),
+                     _U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("progress-bar progress-bar-success")
+                             ,$Html$Attributes.id(_p5.status)
+                             ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "0%"}]))]),
+                     _U.list([]))]))]))]);
    });
    var setDoneJobs = F2(function (_p7,_p6) {
       var _p8 = _p7;
@@ -22989,7 +22997,7 @@ Elm.Main.make = function (_elm) {
       var model = _p0._0;
       return A2($Signal.map,function (t) {    return $Application.JobsStats($Jobs$Stats.PollMetrics(t));},$Time.every(model.interval * $Time.second));
    }();
-   var jobsListPolling = A2($Signal.map,function (_p1) {    return $Application.JobsList($Jobs$List.Polling);},$Time.every(5 * $Time.second));
+   var jobsListPolling = A2($Signal.map,function (_p1) {    return $Application.JobsList($Jobs$List.Polling);},$Time.every(1 * $Time.second));
    var menuClick = function (p) {
       return A2($Signal.map,function (job) {    return $Application.SystemsAction($Systems$Core.SystemsLaunch($Systems$Launch.SetupJob(job)));},p);
    };

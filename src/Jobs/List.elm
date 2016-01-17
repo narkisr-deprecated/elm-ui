@@ -2,7 +2,7 @@ module Jobs.List where
 
 -- view
 import Html exposing (..)
-import Html.Attributes exposing (type', class, id, attribute, href)
+import Html.Attributes as Attr exposing (type', class, id, attribute, href, style)
 import Bootstrap.Html exposing (..)
 import Common.Http exposing (getJson)
 
@@ -131,7 +131,14 @@ runningRow tableId {type', status,id } =
  [
    td [] [ text id ]
  , td [] [ text type']
- , td []  [ text status]
+ , td []  [
+      div  [class "progress progress-xs"] [
+         div  [class "progress-bar progress-bar-success", Attr.id status , style [("width", "0%")]] [
+           
+         ]
+      ]
+   
+   ]
  ]
 
 doneRow : String -> DoneJob -> List Html
