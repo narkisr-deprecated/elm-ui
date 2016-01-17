@@ -80,7 +80,7 @@ menuClick p =
 
 jobsListPolling : Signal Application.Action
 jobsListPolling =
-  Signal.map (\_ -> Application.JobsList Polling) (Time.every (5 * second))
+  Signal.map (\_ -> Application.JobsList Polling) (Time.every (1 * second))
  
 jobsStatsPolling : Signal Application.Action
 jobsStatsPolling =
