@@ -64,6 +64,7 @@
   )
 
 (System/setProperty "webdriver.chrome.driver" "/usr/bin/chromedriver")
+(System/setProperty "phantomjs.binary.path" "/usr/bin/phantomjs")
 
 (defn set-view-size [driver]
   (.setSize (.window (.manage driver)) (Dimension. 1920 1080)) driver)

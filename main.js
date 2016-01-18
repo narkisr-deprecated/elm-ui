@@ -23067,3 +23067,294 @@ Elm.Main.make = function (_elm) {
                              ,jobsListPolling: jobsListPolling
                              ,jobsStatsPolling: jobsStatsPolling};
 };
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Add = Elm.Systems.Add || {};
+Elm.Systems.Add.Physical = Elm.Systems.Add.Physical || {};
+Elm.Systems.Add.Physical.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Add = _elm.Systems.Add || {};
+   _elm.Systems.Add.Physical = _elm.Systems.Add.Physical || {};
+   if (_elm.Systems.Add.Physical.values) return _elm.Systems.Add.Physical.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Environments$List = Elm.Environments.List.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Systems$Add$Common = Elm.Systems.Add.Common.make(_elm),
+   $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm),
+   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
+   $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
+   $Systems$View$Digital = Elm.Systems.View.Digital.make(_elm);
+   var _op = {};
+   var withErrors = F3(function (errors,key,widget) {
+      return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
+   });
+   var getOses = function (model) {
+      var hypervisor = A2($Maybe.withDefault,$Environments$List.OSTemplates($Dict.empty),A2($Dict.get,"digital-ocean",model.environment));
+      var _p0 = hypervisor;
+      if (_p0.ctor === "OSTemplates") {
+            return _p0._0;
+         } else {
+            return $Dict.empty;
+         }
+   };
+   var hasPrev = function (model) {    return $Basics.not($List.isEmpty(model.prev));};
+   var hasNext = function (model) {    return $Basics.not($List.isEmpty(model.next));};
+   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
+   var validate = F3(function (step,key,validations) {
+      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
+      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
+   });
+   var validationOf = F4(function (key,validations,value,_p1) {
+      var _p2 = _p1;
+      var _p4 = _p2;
+      var res = A2($List.filter,
+      function (error) {
+         return !_U.eq(error,$Systems$Add$Validations.None);
+      },
+      A2($List.map,function (validation) {    return validation(value(_p4));},validations));
+      var newErrors = A3($Dict.update,key,function (_p3) {    return $Maybe.Just(res);},_p2.errors);
+      return _U.update(_p4,{errors: newErrors});
+   });
+   var setMachine = F2(function (f,_p5) {    var _p6 = _p5;var newMachine = f(_p6.machine);return _U.update(_p6,{machine: newMachine});});
+   var setDigital = F2(function (f,_p7) {    var _p8 = _p7;var newDigital = f(A2($Debug.log,"",_p8.digital));return _U.update(_p8,{digital: newDigital});});
+   var Summary = {ctor: "Summary"};
+   var Instance = {ctor: "Instance"};
+   var stringValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
+   Instance,
+   _U.list([{ctor: "_Tuple2"
+            ,_0: "Hostname"
+            ,_1: A3(validationOf,"Hostname",_U.list([$Systems$Add$Validations.notEmpty]),function (_p9) {    var _p10 = _p9;return _p10.machine.hostname;})}
+           ,{ctor: "_Tuple2"
+            ,_0: "Domain"
+            ,_1: A3(validationOf,"Domain",_U.list([$Systems$Add$Validations.notEmpty]),function (_p11) {    var _p12 = _p11;return _p12.machine.domain;})}
+           ,{ctor: "_Tuple2"
+            ,_0: "User"
+            ,_1: A3(validationOf,"User",_U.list([$Systems$Add$Validations.notEmpty]),function (_p13) {    var _p14 = _p13;return _p14.machine.user;})}]))]));
+   var validateAll = F2(function (step,model) {
+      var stepValues = A2($List.map,
+      function (vs) {
+         return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));
+      },
+      _U.list([stringValidations]));
+      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
+   });
+   var Zero = {ctor: "Zero"};
+   var update = F2(function (action,_p15) {
+      var _p16 = _p15;
+      var _p25 = _p16.step;
+      var _p24 = _p16.prev;
+      var _p23 = _p16.next;
+      var _p22 = _p16;
+      var _p21 = _p16.machine;
+      var _p17 = action;
+      switch (_p17.ctor)
+      {case "Next": var _p18 = A2(validateAll,_p25,_p22);
+           var newModel = _p18;
+           var errors = _p18.errors;
+           var prevSteps = !_U.eq(_p25,Zero) ? A2($List.append,_p24,_U.list([_p25])) : _p24;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p23));
+           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p23));
+           return notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
+         case "Back": var _p19 = A2(validateAll,_p25,_p22);
+           var newModel = _p19;
+           var errors = _p19.errors;
+           var nextSteps = !_U.eq(_p25,Zero) ? A2($List.append,_U.list([_p25]),_p23) : _p23;
+           var prevSteps = A2($List.take,$List.length(_p24) - 1,_p24);
+           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p24)));
+           return notAny(errors) ? _U.update(_p22,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p22;
+         case "Update": var newModel = _U.update(_p22,{environment: _p17._0});
+           var _p20 = $List.head($Dict.keys(getOses(newModel)));
+           if (_p20.ctor === "Just") {
+                 return $String.isEmpty(_p21.os) ? _U.update(newModel,{machine: _U.update(_p21,{os: _p20._0})}) : newModel;
+              } else {
+                 return newModel;
+              }
+         case "SelectSize": return A2(setDigital,function (digital) {    return _U.update(digital,{size: _p17._0});},_p22);
+         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p17._0});},_p22);
+         case "SelectRegion": return A2(setDigital,function (digital) {    return _U.update(digital,{region: _p17._0});},_p22);
+         case "UserInput": return A4(validate,
+           _p25,
+           "User",
+           stringValidations,
+           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p17._0});},_p22));
+         case "HostnameInput": return A4(validate,
+           _p25,
+           "Hostname",
+           stringValidations,
+           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p17._0});},_p22));
+         case "DomainInput": return A4(validate,
+           _p25,
+           "Domain",
+           stringValidations,
+           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p17._0});},_p22));
+         default: return A2(setDigital,function (digital) {    return _U.update(digital,{privateNetworking: $Basics.not(digital.privateNetworking)});},_p22);}
+   });
+   var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
+   var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
+   var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
+   var SelectRegion = function (a) {    return {ctor: "SelectRegion",_0: a};};
+   var PrivateNetworking = {ctor: "PrivateNetworking"};
+   var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
+   var SelectSize = function (a) {    return {ctor: "SelectSize",_0: a};};
+   var instance = F2(function (address,_p26) {
+      var _p27 = _p26;
+      var _p29 = _p27.machine;
+      var _p28 = _p27.digital;
+      var region = A2($Maybe.withDefault,"",$List.head($Systems$Model$Digital.regions));
+      var check = withErrors(_p27.errors);
+      return _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
+      _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
+              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.selector,address,SelectSize,$Systems$Model$Digital.sizes,_p28.size))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p27)),_p29.os))
+              ,A2($Systems$Add$Common.group$,"Region",A4($Systems$Add$Common.selector,address,SelectRegion,$Systems$Model$Digital.regions,_p28.region))
+              ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p29.user))
+              ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p29.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p29.domain))
+              ,A2($Systems$Add$Common.group$,"Private Networking",A3($Systems$Add$Common.checkbox,address,PrivateNetworking,_p28.privateNetworking))]))]);
+   });
+   var stepView = F2(function (address,_p30) {
+      var _p31 = _p30;
+      var _p33 = _p31;
+      var _p32 = _p33.step;
+      switch (_p32.ctor)
+      {case "Instance": return A2(instance,address,_p33);
+         case "Summary": return $Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p31.digital,_1: _p31.machine});
+         default: return A2($Debug.log,$Basics.toString(_p33.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   });
+   var view = F2(function (address,_p34) {
+      var _p35 = _p34;
+      return A2($Common$Components.panelContents,$Basics.toString(_p35.step),A2($Html.form,_U.list([]),A2(stepView,address,_p35)));
+   });
+   var Update = function (a) {    return {ctor: "Update",_0: a};};
+   var Back = {ctor: "Back"};
+   var Next = {ctor: "Next"};
+   var Model = F7(function (a,b,c,d,e,f,g) {    return {step: a,prev: b,next: c,digital: d,machine: e,environment: f,errors: g};});
+   var init = function () {
+      var steps = _U.list([Instance,Summary]);
+      return {ctor: "_Tuple2"
+             ,_0: A7(Model,Zero,_U.list([]),steps,$Systems$Model$Digital.emptyDigital,$Systems$Model$Common.emptyMachine,$Dict.empty,$Dict.empty)
+             ,_1: $Effects.none};
+   }();
+   return _elm.Systems.Add.Physical.values = {_op: _op
+                                             ,Model: Model
+                                             ,init: init
+                                             ,Next: Next
+                                             ,Back: Back
+                                             ,Update: Update
+                                             ,SelectSize: SelectSize
+                                             ,SelectOS: SelectOS
+                                             ,PrivateNetworking: PrivateNetworking
+                                             ,SelectRegion: SelectRegion
+                                             ,UserInput: UserInput
+                                             ,HostnameInput: HostnameInput
+                                             ,DomainInput: DomainInput
+                                             ,Zero: Zero
+                                             ,Instance: Instance
+                                             ,Summary: Summary
+                                             ,setDigital: setDigital
+                                             ,setMachine: setMachine
+                                             ,validationOf: validationOf
+                                             ,stringValidations: stringValidations
+                                             ,validate: validate
+                                             ,validateAll: validateAll
+                                             ,notAny: notAny
+                                             ,update: update
+                                             ,hasNext: hasNext
+                                             ,hasPrev: hasPrev
+                                             ,getOses: getOses
+                                             ,instance: instance
+                                             ,withErrors: withErrors
+                                             ,stepView: stepView
+                                             ,view: view};
+};
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Model = Elm.Systems.Model || {};
+Elm.Systems.Model.Physical = Elm.Systems.Model.Physical || {};
+Elm.Systems.Model.Physical.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Model = _elm.Systems.Model || {};
+   _elm.Systems.Model.Physical = _elm.Systems.Model.Physical || {};
+   if (_elm.Systems.Model.Physical.values) return _elm.Systems.Model.Physical.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var Physical = F2(function (a,b) {    return {mac: a,broadcast: b};});
+   var emptyPhysical = A2(Physical,"","");
+   return _elm.Systems.Model.Physical.values = {_op: _op,Physical: Physical,emptyPhysical: emptyPhysical};
+};
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.View = Elm.Systems.View || {};
+Elm.Systems.View.Physical = Elm.Systems.View.Physical || {};
+Elm.Systems.View.Physical.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.View = _elm.Systems.View || {};
+   _elm.Systems.View.Physical = _elm.Systems.View.Physical || {};
+   if (_elm.Systems.View.Physical.values) return _elm.Systems.View.Physical.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
+   $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm),
+   $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {
+      return A2($Html.div,_U.list([]),A2($Common$Components.panelContents,"System",A2($Html.div,_U.list([]),_U.list([]))));
+   });
+   var summarySections = function (_p0) {
+      var _p1 = _p0;
+      var _p3 = _p1._0;
+      var _p2 = _p1._1;
+      return _U.list([A3($Systems$View$Common.overviewSection,"Instance",_U.list(["os","user"]),_U.list([_p2.os,_p2.user]))
+                     ,A3($Systems$View$Common.overviewSection,
+                     "Networking",
+                     _U.list(["ip","hostname","domain"]),
+                     _U.list([A2($Maybe.withDefault,"",_p2.ip),_p2.hostname,_p2.domain]))
+                     ,A3($Systems$View$Common.overviewSection,"Interface",_U.list(["MAC","Broadcast"]),_U.list([_p3.mac,_p3.broadcast]))]);
+   };
+   var summarize = function (model) {
+      return _U.list([A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("System overview")]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+              A2($List.map,
+              $Bootstrap$Html.row_,
+              A2($List.map,$List.concat,A2($Common$Utils.partition,2,A2($List.map,$Systems$View$Common.summaryPanel,summarySections(model))))))]))]);
+   };
+   var NoOp = {ctor: "NoOp"};
+   var Model = function (a) {    return {id: a};};
+   var init = {ctor: "_Tuple2",_0: Model(0),_1: $Effects.none};
+   return _elm.Systems.View.Physical.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,summarySections: summarySections,summarize: summarize,view: view};
+};
