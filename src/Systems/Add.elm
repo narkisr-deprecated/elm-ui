@@ -143,6 +143,9 @@ encodeOpenstackModel ({openstackModel, general}) =
   , ("machine" , machineEncoder openstackModel.machine)
  ]
 
+blockDevices : Focus { r | blockDevices :a } a
+blockDevices =
+   create .blockDevices (\f r -> { r | blockDevices = f r.blockDevices })
 
 volumes : Focus { r | volumes :a } a
 volumes =
@@ -170,7 +173,8 @@ addDevice vs =
   Just (List.map (\({device} as volume) -> {volume | device = "/dev/"++device}) (withDefault [] vs))
 
 transformers =  Dict.fromList [
-    ("AWS", Focus.update (awsModel => aws => volumes) addDevice)
+    ("AWS", ((Focus.update (awsModel => aws => blockDevices) addDevice) <<
+             (Focus.update (awsModel => aws => volumes) addDevice)))
   , ("Openstack", Focus.update (openstackModel => openstack => volumes) addDevice)
   ]
 
