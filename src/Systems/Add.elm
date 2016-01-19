@@ -7,15 +7,11 @@ import Common.Redirect as Redirect exposing (resultHandler, successHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
-
-
 import Http exposing (Error(BadResponse))
 import Task exposing (Task)
 import Json.Decode exposing (..)
 import Json.Encode as E
-
 import Effects exposing (Effects, batch)
-
 import Dict exposing (Dict)
 import Systems.Add.Common exposing (..)
 import Systems.Add.AWS as AWS exposing (..)
@@ -29,6 +25,7 @@ import Systems.Launch as Launch exposing (runJob, JobResponse)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
+import Focus exposing (Focus, set, (=>), create)
 
 type Stage = 
   General 
@@ -41,10 +38,10 @@ type Stage =
 
 type alias Model = 
   { stage : Stage
-  , aws : AWS.Model
-  , gce : GCE.Model
-  , digital: Digital.Model
-  , openstack : Openstack.Model
+  , awsModel : AWS.Model
+  , gceModel : GCE.Model
+  , digitalModel : Digital.Model
+  , openstackModel : Openstack.Model
   , general : General.Model
   , hasNext : Bool
   , saveErrors : Errors.Model
@@ -95,8 +92,8 @@ encoder stage model =
  let 
    key = (String.toLower (toString stage))
    encoders = Dict.fromList [
-       ("aws" , (\ ({aws}) -> awsEncoder aws))
-     , ("gce" , (\ ({gce}) -> gceEncoder gce))
+       ("aws" , (\ ({awsModel}) -> awsEncoder awsModel))
+     , ("gce" , (\ ({gceModel}) -> gceEncoder gceModel))
    ]
  in
   case (Dict.get key encoders) of
@@ -107,71 +104,96 @@ encoder stage model =
    
 
 encodeAwsModel : Model -> E.Value
-encodeAwsModel ({aws, general} as model) =
+encodeAwsModel ({awsModel, general} as model) =
  E.object [
     ("type" , E.string general.type')
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
   , (encoder AWS model)
-  , ("machine" , machineEncoder aws.machine)
+  , ("machine" , machineEncoder awsModel.machine)
  ]
 
 encodeGceModel : Model -> E.Value
-encodeGceModel ({gce, general} as model) =
+encodeGceModel ({gceModel, general} as model) =
  E.object [
     ("type" , E.string general.type')
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
   , (encoder GCE model)
-  , ("machine" , machineEncoder gce.machine)
+  , ("machine" , machineEncoder gceModel.machine)
  ]
 
 encodeDigitalModel : Model -> E.Value
-encodeDigitalModel ({digital, general}) =
+encodeDigitalModel ({digitalModel, general}) =
  E.object [
     ("type" , E.string general.type')
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
-  , ("digital-ocean" , digitalEncoder digital)
-  , ("machine" , machineEncoder digital.machine)
+  , ("digital-ocean" , digitalEncoder digitalModel)
+  , ("machine" , machineEncoder digitalModel.machine)
  ]
 
 encodeOpenstackModel : Model -> E.Value
-encodeOpenstackModel ({openstack, general}) =
+encodeOpenstackModel ({openstackModel, general}) =
  E.object [
     ("type" , E.string general.type')
   , ("owner" , E.string general.owner)
   , ("env" , E.string general.environment)
-  , ("openstack" , openstackEncoder openstack)
-  , ("machine" , machineEncoder openstack.machine)
+  , ("openstack" , openstackEncoder openstackModel)
+  , ("machine" , machineEncoder openstackModel.machine)
  ]
 
 
+volumes : Focus { r | volumes :a } a
+volumes =
+   create .volumes (\f r -> { r | volumes = f r.volumes })
+
+aws : Focus { r | aws :a } a
+aws =
+   create .aws (\f r -> { r | aws = f r.aws })
+
+awsModel : Focus { r | awsModel :a } a
+awsModel =
+   create .awsModel (\f r -> { r | awsModel = f r.awsModel })
+
+openstack : Focus { r | openstack :a } a
+openstack =
+   create .openstack (\f r -> { r | openstack= f r.openstack })
+
+openstackModel : Focus { r | openstackModel :a } a
+openstackModel =
+   create .openstackModel (\f r -> { r | openstackModel = f r.openstackModel })
+
+
+addDevice : Maybe (List {r | device : String}) -> Maybe (List {r | device : String})
+addDevice vs = 
+  Just (List.map (\({device} as volume) -> {volume | device = "/dev/"++device}) (withDefault [] vs))
+
+transformers =  Dict.fromList [
+    ("AWS", Focus.update (awsModel => aws => volumes) addDevice)
+  , ("Openstack", Focus.update (openstackModel => openstack => volumes) addDevice)
+  ]
+
+encoders =  Dict.fromList [
+    ("AWS", encodeAwsModel)
+  , ("GCE", encodeGceModel)
+  , ("Digital", encodeDigitalModel)
+  , ("Openstack", encodeOpenstackModel)
+  ]
 
 encodeModel : Model -> Action -> (Model , Effects Action)
 encodeModel ({stage} as model) action =
-  case stage of
-    AWS -> 
-      (model, saveSystem (E.encode 0 (encodeAwsModel model)) action)
+  case (Dict.get (toString stage) encoders) of
+     Just encode -> 
+        case (Dict.get (toString stage) transformers) of
+          Just transform -> 
+            (model, saveSystem (E.encode 0 (encode (transform model))) action)
 
-    GCE -> 
-      (model, saveSystem (E.encode 0 (encodeGceModel model)) action)
+          Nothing -> 
+            (model, saveSystem (E.encode 0 (encode model)) action)
 
-    Digital -> 
-      (model, saveSystem (E.encode 0 (encodeDigitalModel model)) action)
-
-    Openstack -> 
-      (model, saveSystem (E.encode 0 (encodeOpenstackModel model)) action)
-
-    Proxmox -> 
-      none model 
-
-    General -> 
-      none model 
-   
-    Error -> 
-      none model
-
+     Nothing -> 
+       none model
 
 back action hasPrev model =
    let
@@ -182,20 +204,20 @@ back action hasPrev model =
      else 
        {newModel | stage = General}
 
-getBack ({aws, gce, digital, openstack} as model) hyp = 
+getBack ({awsModel, gceModel, digitalModel, openstackModel} as model) hyp = 
   let
    backs = Dict.fromList [
-      ("aws", (back AWS.Back (AWS.hasPrev aws) {model | stage = AWS , aws = (AWS.update AWS.Back aws)}))
-    , ("gce", (back GCE.Back (GCE.hasPrev gce) {model | stage = GCE , gce = (GCE.update GCE.Back gce)}))
-    , ("openstack", (back Openstack.Back (Openstack.hasPrev openstack) {model | stage = Openstack , openstack = (Openstack.update Openstack.Back openstack)}))
-    , ("digital-ocean", (back Digital.Back (Digital.hasPrev digital) {model | stage = Digital, digital = (Digital.update Digital.Back digital)}))
+      ("aws", (back AWS.Back (AWS.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.update AWS.Back awsModel)}))
+    , ("gce", (back GCE.Back (GCE.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.update GCE.Back gceModel)}))
+    , ("openstack", (back Openstack.Back (Openstack.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.update Openstack.Back openstackModel)}))
+    , ("digital-ocean", (back Digital.Back (Digital.hasPrev digitalModel) {model | stage = Digital, digitalModel = (Digital.update Digital.Back digitalModel)}))
    ]
   in
    withDefault model (Dict.get hyp backs)
 
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({general, aws, gce, digital, openstack} as model) =
+update action ({general, awsModel, gceModel, digitalModel, openstackModel} as model) =
   case action of
     Next -> 
       let 
@@ -204,36 +226,36 @@ update action ({general, aws, gce, digital, openstack} as model) =
         case general.hypervisor of
           "aws" -> 
              let
-               newAws = aws 
+               newAws = awsModel 
                          |> AWS.update (AWS.Update current) 
                          |> AWS.update AWS.Next
              in
-              none { model | stage = AWS , aws = newAws, hasNext = AWS.hasNext newAws}
+              none { model | stage = AWS , awsModel = newAws, hasNext = AWS.hasNext newAws}
 
           "gce" -> 
              let
-                newGce = gce 
+                newGce = gceModel 
                          |> GCE.update (GCE.Update current) 
                          |> GCE.update GCE.Next
              in
-               none { model | stage = GCE , gce = newGce , hasNext = GCE.hasNext newGce}
+               none { model | stage = GCE , gceModel = newGce , hasNext = GCE.hasNext newGce}
  
           "digital-ocean" -> 
             let
-               newDigital = digital 
+               newDigital = digitalModel 
                                |> Digital.update (Digital.Update current) 
                                |> Digital.update Digital.Next
             in
-              none { model | stage = Digital , digital = newDigital , hasNext = Digital.hasNext newDigital}
+              none { model | stage = Digital , digitalModel = newDigital , hasNext = Digital.hasNext newDigital}
 
 
           "openstack" -> 
             let
-               newOpenstack = openstack 
+               newOpenstack = openstackModel
                                |> Openstack.update (Openstack.Update current) 
                                |> Openstack.update Openstack.Next
             in
-              none { model | stage = Openstack , openstack = newOpenstack , hasNext = Openstack.hasNext newOpenstack}
+              none { model | stage = Openstack , openstackModel = newOpenstack , hasNext = Openstack.hasNext newOpenstack}
 
           _ -> 
             (model, Effects.none)
@@ -243,27 +265,27 @@ update action ({general, aws, gce, digital, openstack} as model) =
 
     AWSView action -> 
       let
-        newAws = AWS.update action aws 
+        newAws = AWS.update action awsModel 
       in
-        ({ model | aws = newAws }, Effects.none)
+        ({ model | awsModel = newAws }, Effects.none)
 
     GCEView action -> 
       let
-        newGce= GCE.update action gce
+        newGce= GCE.update action gceModel
       in
-        ({ model | gce = newGce }, Effects.none)
+        ({ model | gceModel = newGce }, Effects.none)
 
     DigitalView action -> 
       let
-        newDigital= Digital.update action digital
+        newDigital= Digital.update action digitalModel
       in
-        ({ model | digital = newDigital }, Effects.none)
+        ({ model | digitalModel = newDigital }, Effects.none)
 
     OpenstackView action -> 
       let
-        newOpenstack = Openstack.update action openstack
+        newOpenstack = Openstack.update action openstackModel
       in
-        ({ model | openstack = newOpenstack }, Effects.none)
+        ({ model | openstackModel = newOpenstack }, Effects.none)
 
     GeneralView action -> 
       let
@@ -293,25 +315,25 @@ update action ({general, aws, gce, digital, openstack} as model) =
     _ -> (model, Effects.none)
 
 currentView : Signal.Address Action -> Model -> List Html
-currentView address model  =
+currentView address ({awsModel, gceModel, digitalModel, openstackModel, saveErrors, general} as model)=
   case model.stage of 
     General -> 
-      (General.view (Signal.forwardTo address GeneralView) model.general)
+      (General.view (Signal.forwardTo address GeneralView) general)
 
     AWS -> 
-      (AWS.view (Signal.forwardTo address AWSView) model.aws)
+      (AWS.view (Signal.forwardTo address AWSView) awsModel)
 
     GCE -> 
-      (GCE.view (Signal.forwardTo address GCEView) model.gce)
+      (GCE.view (Signal.forwardTo address GCEView) gceModel)
 
     Digital -> 
-      (Digital.view (Signal.forwardTo address DigitalView) model.digital)
+      (Digital.view (Signal.forwardTo address DigitalView) digitalModel)
 
     Openstack -> 
-      (Openstack.view (Signal.forwardTo address OpenstackView) model.openstack)
+      (Openstack.view (Signal.forwardTo address OpenstackView) openstackModel)
 
     Error -> 
-      (Errors.view (Signal.forwardTo address ErrorsView) model.saveErrors)
+      (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
 
     _ -> 
       [div [] []]
