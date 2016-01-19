@@ -360,7 +360,7 @@ networking address ({errors, openstack, machine} as model) =
      , check "Hostname" (inputText address HostnameInput "" machine.hostname)
      , check "Domain"  (inputText address DomainInput "" machine.domain)
      , check "IP" (inputText address IPInput "" (withDefault "" openstack.floatingIp))
-     , check "IP Pool" (inputText address IPPoolInput "" (withDefault "" openstack.floatingIpPool))
+     , check "IP-Pool" (inputText address IPPoolInput "" (withDefault "" openstack.floatingIpPool))
      , check "Networks" (inputText address NetworksInput " " networks)
      ]
   ]

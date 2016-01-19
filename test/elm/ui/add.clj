@@ -110,6 +110,7 @@
    (openstack-instance)
    (let [hostname (uuid)] 
       (network hostname)
+      (input-text (find-element-under "div#IP-Pool" {:tag :input}) "net04_ext")
       (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
       (click-next)
       ))

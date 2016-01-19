@@ -16349,7 +16349,7 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
               ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p58.hostname))
               ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p58.domain))
               ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p59.floatingIp)))
-              ,A2(check,"IP Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p59.floatingIpPool)))
+              ,A2(check,"IP-Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p59.floatingIpPool)))
               ,A2(check,"Networks",A4($Systems$Add$Common.inputText,address,NetworksInput," ",networks))]))]);
    });
    var TenantInput = function (a) {    return {ctor: "TenantInput",_0: a};};
@@ -18488,9 +18488,9 @@ Elm.Jobs.List.make = function (_elm) {
                      ,A2($Html.td,
                      _U.list([]),
                      _U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("progress progress-xs")]),
+                     _U.list([$Html$Attributes.$class("progress progress-xs progress-striped active")]),
                      _U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("progress-bar progress-bar-success")
+                     _U.list([$Html$Attributes.$class("progress-bar progress-bar-primary")
                              ,$Html$Attributes.id(_p5.status)
                              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "0%"}]))]),
                      _U.list([]))]))]))]);
