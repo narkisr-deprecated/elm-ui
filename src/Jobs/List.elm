@@ -132,8 +132,8 @@ runningRow tableId {type', status,id } =
    td [] [ text id ]
  , td [] [ text type']
  , td []  [
-      div  [class "progress progress-xs"] [
-         div  [class "progress-bar progress-bar-success", Attr.id status , style [("width", "0%")]] [
+      div  [class "progress progress-xs progress-striped active"] [
+         div  [class "progress-bar progress-bar-primary", Attr.id status , style [("width", "0%")]] [
            
          ]
       ]
