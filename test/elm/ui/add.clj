@@ -1,18 +1,15 @@
 (ns elm.ui.add
   (:import 
      org.openqa.selenium.Dimension
-    org.openqa.selenium.remote.DesiredCapabilities
-    org.openqa.selenium.phantomjs.PhantomJSDriver
-    org.openqa.selenium.OutputType)
+     org.openqa.selenium.remote.DesiredCapabilities
+     org.openqa.selenium.phantomjs.PhantomJSDriver
+     org.openqa.selenium.OutputType)
   (:use 
      midje.sweet 
      clj-webdriver.taxi
-     clj-webdriver.driver
- )
+     clj-webdriver.driver)
   (:require 
-    [taoensso.timbre :as timbre]
-    ) 
-  )
+    [taoensso.timbre :as timbre]))
 
 (defn take-snapshot []
   (.getScreenshotAs (:webdriver clj-webdriver.taxi/*driver*) OutputType/FILE))
@@ -60,8 +57,7 @@
   (wait-until #(exists? {:tag "input" :id "systemSearch"}))
   (input-text "input#systemSearch" query)
   (Thread/sleep 3000)
-  (wait-until #(visible? (find-element-under "tbody" {:tag :tr})) 1000)
-  )
+  (wait-until #(visible? (find-element-under "tbody" {:tag :tr})) 1000))
 
 (System/setProperty "webdriver.chrome.driver" "/usr/bin/chromedriver")
 (System/setProperty "phantomjs.binary.path" "/usr/bin/phantomjs")
@@ -95,42 +91,67 @@
 
 (defn uuid [] (first (.split (str (java.util.UUID/randomUUID)) "-")))
 
-(with-driver- (create-phantom)
+(defn add [hyp type]
+  (add-a-system) 
+  (select-hypervisor hyp type) 
+  (click-next))
+
+(defn openstack-instance []
+   (wait-until #(exists? {:tag "div" :id "User"}))
+   (input-text (find-element-under "div#Tenant" {:tag :input}) "admin")
+   (input-text (find-element-under "div#User" {:tag :input}) "ubuntu")
+   (input-text (find-element-under "div#Keypair" {:tag :input}) "lepus")
+   (input-text (find-element-under {:tag "div" :id "Security groups"} {:tag :input}) "default")
+   (click-next))
+
+(defn openstack-partial-flow []
+   (set-driver!  {:browser :firefox})
+   (login)    
+   (add "openstack" "redis")
+   (openstack-instance)
+   (let [hostname (uuid)] 
+      (network hostname)
+      (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
+      (click-next)
+      ))
+
+(defn openstack-flow []
+   (add "openstack" "redis")
+   (openstack-instance)
+   (let [hostname (uuid)] 
+      (network hostname)
+      (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
+      (click-next)
+      ; skipping volumes
+      (click-next) 
+      (save)
+      (search (str "hostname=" hostname))
+      hostname
+   ))
+
+(defn gce-flow []
+  (add "gce" "redis")
+  (wait-until #(exists? {:tag "div" :id "Project id"}))
+  (input-text (find-element-under {:tag "div" :id "Project id"} {:tag :input}) "ronen-playground")
+  (input-text (find-element-under "div#User" {:tag :input}) "ronen")
+  (input-text (find-element-under "div#Tags" {:tag :input}) "ssh-enabled")
+  (click-next)
+  (let [hostname (uuid)] 
+    (network hostname)
+    (click-next)
+    (save)
+    (search (str "hostname=" hostname))
+     hostname
+   ))
+  
+#_(with-driver- (create-phantom)
   (login)    
   (fact "Adding gce system" :gce 
-     (add-a-system) 
-     (select-hypervisor "gce" "redis") 
-     (click-next)
-     (wait-until #(exists? {:tag "div" :id "Project id"}))
-     (input-text (find-element-under {:tag "div" :id "Project id"} {:tag :input}) "ronen-playground")
-     (input-text (find-element-under "div#User" {:tag :input}) "ronen")
-     (input-text (find-element-under "div#Tags" {:tag :input}) "ssh-enabled")
-     (click-next)
-     (let [hostname (uuid)] 
-       (network hostname)
-       (click-next)
-       (save)
-       (search (str "hostname=" hostname))
+    (let [hostname (gce-flow)] 
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname)))
 
   (fact "Adding openstack system" :openstack
-     (add-a-system)
-     (select-hypervisor "openstack" "redis") 
-     (click-next)
-     (wait-until #(exists? {:tag "div" :id "User"}))
-     (input-text (find-element-under "div#Tenant" {:tag :input}) "admin")
-     (input-text (find-element-under "div#User" {:tag :input}) "ubuntu")
-     (input-text (find-element-under "div#Keypair" {:tag :input}) "lepus")
-     (input-text (find-element-under {:tag "div" :id "Security groups"} {:tag :input}) "default")
-     (click-next)
-     (let [hostname (uuid)] 
-       (network hostname)
-       (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
-       (click-next)
-        ; skipping volumes
-       (click-next) 
-       (save)
-       (search (str "hostname=" hostname))
+    (let [hostname (openstack-flow)] 
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
-  
+(openstack-partial-flow)
