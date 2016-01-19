@@ -17742,62 +17742,72 @@ Elm.Systems.Add.make = function (_elm) {
    var awsModel = A2($Focus.create,function (_) {    return _.awsModel;},F2(function (f,r) {    return _U.update(r,{awsModel: f(r.awsModel)});}));
    var aws = A2($Focus.create,function (_) {    return _.aws;},F2(function (f,r) {    return _U.update(r,{aws: f(r.aws)});}));
    var volumes = A2($Focus.create,function (_) {    return _.volumes;},F2(function (f,r) {    return _U.update(r,{volumes: f(r.volumes)});}));
+   var blockDevices = A2($Focus.create,
+   function (_) {
+      return _.blockDevices;
+   },
+   F2(function (f,r) {    return _U.update(r,{blockDevices: f(r.blockDevices)});}));
    var transformers = $Dict.fromList(_U.list([{ctor: "_Tuple2"
                                               ,_0: "AWS"
-                                              ,_1: A2($Focus.update,A2($Focus._op["=>"],A2($Focus._op["=>"],awsModel,aws),volumes),addDevice)}
+                                              ,_1: function (_p2) {
+                                                 return A3($Focus.update,
+                                                 A2($Focus._op["=>"],A2($Focus._op["=>"],awsModel,aws),blockDevices),
+                                                 addDevice,
+                                                 A3($Focus.update,A2($Focus._op["=>"],A2($Focus._op["=>"],awsModel,aws),volumes),addDevice,_p2));
+                                              }}
                                              ,{ctor: "_Tuple2"
                                               ,_0: "Openstack"
                                               ,_1: A2($Focus.update,A2($Focus._op["=>"],A2($Focus._op["=>"],openstackModel,openstack),volumes),addDevice)}]));
-   var encodeOpenstackModel = function (_p2) {
-      var _p3 = _p2;
-      var _p5 = _p3.openstackModel;
-      var _p4 = _p3.general;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p4.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p4.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p4.environment)}
-                                         ,{ctor: "_Tuple2",_0: "openstack",_1: $Systems$Add$Encoders.openstackEncoder(_p5)}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p5.machine)}]));
+   var encodeOpenstackModel = function (_p3) {
+      var _p4 = _p3;
+      var _p6 = _p4.openstackModel;
+      var _p5 = _p4.general;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p5.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p5.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p5.environment)}
+                                         ,{ctor: "_Tuple2",_0: "openstack",_1: $Systems$Add$Encoders.openstackEncoder(_p6)}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p6.machine)}]));
    };
-   var encodeDigitalModel = function (_p6) {
-      var _p7 = _p6;
-      var _p9 = _p7.general;
-      var _p8 = _p7.digitalModel;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p9.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p9.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p9.environment)}
-                                         ,{ctor: "_Tuple2",_0: "digital-ocean",_1: $Systems$Add$Encoders.digitalEncoder(_p8)}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p8.machine)}]));
+   var encodeDigitalModel = function (_p7) {
+      var _p8 = _p7;
+      var _p10 = _p8.general;
+      var _p9 = _p8.digitalModel;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p10.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p10.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p10.environment)}
+                                         ,{ctor: "_Tuple2",_0: "digital-ocean",_1: $Systems$Add$Encoders.digitalEncoder(_p9)}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p9.machine)}]));
    };
    var encoder = F2(function (stage,model) {
       var encoders = $Dict.fromList(_U.list([{ctor: "_Tuple2"
                                              ,_0: "aws"
-                                             ,_1: function (_p10) {
-                                                var _p11 = _p10;
-                                                return $Systems$Add$Encoders.awsEncoder(_p11.awsModel);
+                                             ,_1: function (_p11) {
+                                                var _p12 = _p11;
+                                                return $Systems$Add$Encoders.awsEncoder(_p12.awsModel);
                                              }}
                                             ,{ctor: "_Tuple2"
                                              ,_0: "gce"
-                                             ,_1: function (_p12) {
-                                                var _p13 = _p12;
-                                                return $Systems$Add$Encoders.gceEncoder(_p13.gceModel);
+                                             ,_1: function (_p13) {
+                                                var _p14 = _p13;
+                                                return $Systems$Add$Encoders.gceEncoder(_p14.gceModel);
                                              }}]));
       var key = $String.toLower($Basics.toString(stage));
-      var _p14 = A2($Dict.get,key,encoders);
-      if (_p14.ctor === "Just") {
-            return {ctor: "_Tuple2",_0: key,_1: _p14._0(model)};
+      var _p15 = A2($Dict.get,key,encoders);
+      if (_p15.ctor === "Just") {
+            return {ctor: "_Tuple2",_0: key,_1: _p15._0(model)};
          } else {
             return {ctor: "_Tuple2",_0: key,_1: $Json$Encode.$null};
          }
    });
-   var setErrors = F2(function (_p15,es) {
-      var _p16 = _p15;
-      var newErrors = _U.update(_p16.saveErrors,{errors: es});
-      return {ctor: "_Tuple2",_0: _U.update(_p16,{saveErrors: newErrors}),_1: $Effects.none};
+   var setErrors = F2(function (_p16,es) {
+      var _p17 = _p16;
+      var newErrors = _U.update(_p17.saveErrors,{errors: es});
+      return {ctor: "_Tuple2",_0: _U.update(_p17,{saveErrors: newErrors}),_1: $Effects.none};
    });
    var JobLaunched = function (a) {    return {ctor: "JobLaunched",_0: a};};
-   var setSaved = F3(function (next,model,_p17) {
-      var _p18 = _p17;
-      return {ctor: "_Tuple2",_0: model,_1: A3($Systems$Launch.runJob,$Basics.toString(_p18.id),$String.toLower($Basics.toString(next)),JobLaunched)};
+   var setSaved = F3(function (next,model,_p18) {
+      var _p19 = _p18;
+      return {ctor: "_Tuple2",_0: model,_1: A3($Systems$Launch.runJob,$Basics.toString(_p19.id),$String.toLower($Basics.toString(next)),JobLaunched)};
    });
    var SystemSaved = F2(function (a,b) {    return {ctor: "SystemSaved",_0: a,_1: b};});
    var saveSystem = F2(function (model,next) {
@@ -17809,16 +17819,16 @@ Elm.Systems.Add.make = function (_elm) {
    var DigitalView = function (a) {    return {ctor: "DigitalView",_0: a};};
    var GCEView = function (a) {    return {ctor: "GCEView",_0: a};};
    var AWSView = function (a) {    return {ctor: "AWSView",_0: a};};
-   var currentView = F2(function (address,_p19) {
-      var _p20 = _p19;
-      var _p21 = _p20.stage;
-      switch (_p21.ctor)
-      {case "General": return A2($Systems$Add$General.view,A2($Signal.forwardTo,address,GeneralView),_p20.general);
-         case "AWS": return A2($Systems$Add$AWS.view,A2($Signal.forwardTo,address,AWSView),_p20.awsModel);
-         case "GCE": return A2($Systems$Add$GCE.view,A2($Signal.forwardTo,address,GCEView),_p20.gceModel);
-         case "Digital": return A2($Systems$Add$Digital.view,A2($Signal.forwardTo,address,DigitalView),_p20.digitalModel);
-         case "Openstack": return A2($Systems$Add$Openstack.view,A2($Signal.forwardTo,address,OpenstackView),_p20.openstackModel);
-         case "Error": return A2($Systems$Add$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p20.saveErrors);
+   var currentView = F2(function (address,_p20) {
+      var _p21 = _p20;
+      var _p22 = _p21.stage;
+      switch (_p22.ctor)
+      {case "General": return A2($Systems$Add$General.view,A2($Signal.forwardTo,address,GeneralView),_p21.general);
+         case "AWS": return A2($Systems$Add$AWS.view,A2($Signal.forwardTo,address,AWSView),_p21.awsModel);
+         case "GCE": return A2($Systems$Add$GCE.view,A2($Signal.forwardTo,address,GCEView),_p21.gceModel);
+         case "Digital": return A2($Systems$Add$Digital.view,A2($Signal.forwardTo,address,DigitalView),_p21.digitalModel);
+         case "Openstack": return A2($Systems$Add$Openstack.view,A2($Signal.forwardTo,address,OpenstackView),_p21.openstackModel);
+         case "Error": return A2($Systems$Add$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p21.saveErrors);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);}
    });
    var NoOp = {ctor: "NoOp"};
@@ -17842,14 +17852,14 @@ Elm.Systems.Add.make = function (_elm) {
               _U.list([$Html.text("Create System")]))]))]));
    };
    var Next = {ctor: "Next"};
-   var buttons = F2(function (address,_p22) {
-      var _p23 = _p22;
+   var buttons = F2(function (address,_p23) {
+      var _p24 = _p23;
       var click = $Html$Events.onClick(address);
       var margin = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "30%"}]));
       return _U.list([A2($Html.button,
                      _U.list([$Html$Attributes.id("Back"),$Html$Attributes.$class("btn btn-primary"),margin,click(Back)]),
                      _U.list([$Html.text("<< Back")]))
-                     ,_p23.hasNext ? A2($Html.div,
+                     ,_p24.hasNext ? A2($Html.div,
                      _U.list([$Html$Attributes.$class("btn-group"),margin]),
                      _U.list([A2($Html.button,
                      _U.list([$Html$Attributes.id("Next"),$Html$Attributes.$class("btn btn-primary"),click(Next)]),
@@ -17878,154 +17888,154 @@ Elm.Systems.Add.make = function (_elm) {
    });
    var Digital = {ctor: "Digital"};
    var GCE = {ctor: "GCE"};
-   var encodeGceModel = function (_p24) {
-      var _p25 = _p24;
-      var _p26 = _p25.general;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p26.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p26.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p26.environment)}
-                                         ,A2(encoder,GCE,_p25)
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p25.gceModel.machine)}]));
+   var encodeGceModel = function (_p25) {
+      var _p26 = _p25;
+      var _p27 = _p26.general;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p27.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p27.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p27.environment)}
+                                         ,A2(encoder,GCE,_p26)
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p26.gceModel.machine)}]));
    };
    var Openstack = {ctor: "Openstack"};
    var AWS = {ctor: "AWS"};
-   var encodeAwsModel = function (_p27) {
-      var _p28 = _p27;
-      var _p29 = _p28.general;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p29.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p29.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p29.environment)}
-                                         ,A2(encoder,AWS,_p28)
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p28.awsModel.machine)}]));
+   var encodeAwsModel = function (_p28) {
+      var _p29 = _p28;
+      var _p30 = _p29.general;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p30.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p30.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p30.environment)}
+                                         ,A2(encoder,AWS,_p29)
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p29.awsModel.machine)}]));
    };
    var encoders = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "AWS",_1: encodeAwsModel}
                                          ,{ctor: "_Tuple2",_0: "GCE",_1: encodeGceModel}
                                          ,{ctor: "_Tuple2",_0: "Digital",_1: encodeDigitalModel}
                                          ,{ctor: "_Tuple2",_0: "Openstack",_1: encodeOpenstackModel}]));
-   var encodeModel = F2(function (_p30,action) {
-      var _p31 = _p30;
-      var _p36 = _p31.stage;
-      var _p35 = _p31;
-      var _p32 = A2($Dict.get,$Basics.toString(_p36),encoders);
-      if (_p32.ctor === "Just") {
-            var _p34 = _p32._0;
-            var _p33 = A2($Dict.get,$Basics.toString(_p36),transformers);
-            if (_p33.ctor === "Just") {
-                  return {ctor: "_Tuple2",_0: _p35,_1: A2(saveSystem,A2($Json$Encode.encode,0,_p34(_p33._0(_p35))),action)};
+   var encodeModel = F2(function (_p31,action) {
+      var _p32 = _p31;
+      var _p37 = _p32.stage;
+      var _p36 = _p32;
+      var _p33 = A2($Dict.get,$Basics.toString(_p37),encoders);
+      if (_p33.ctor === "Just") {
+            var _p35 = _p33._0;
+            var _p34 = A2($Dict.get,$Basics.toString(_p37),transformers);
+            if (_p34.ctor === "Just") {
+                  return {ctor: "_Tuple2",_0: _p36,_1: A2(saveSystem,A2($Json$Encode.encode,0,_p35(_p34._0(_p36))),action)};
                } else {
-                  return {ctor: "_Tuple2",_0: _p35,_1: A2(saveSystem,A2($Json$Encode.encode,0,_p34(_p35)),action)};
+                  return {ctor: "_Tuple2",_0: _p36,_1: A2(saveSystem,A2($Json$Encode.encode,0,_p35(_p36)),action)};
                }
          } else {
-            return $Common$Utils.none(_p35);
+            return $Common$Utils.none(_p36);
          }
    });
    var Proxmox = {ctor: "Proxmox"};
    var Error = {ctor: "Error"};
    var General = {ctor: "General"};
    var init = function () {
-      var _p37 = $Systems$Add$General.init;
-      var general = _p37._0;
-      var effects = _p37._1;
-      var _p38 = $Systems$Add$Errors.init;
-      var errors = _p38._0;
-      var _p39 = $Systems$Add$Digital.init;
-      var digital = _p39._0;
-      var _p40 = $Systems$Add$GCE.init;
-      var gce = _p40._0;
-      var _p41 = $Systems$Add$Openstack.init;
-      var openstack = _p41._0;
-      var _p42 = $Systems$Add$AWS.init;
-      var aws = _p42._0;
+      var _p38 = $Systems$Add$General.init;
+      var general = _p38._0;
+      var effects = _p38._1;
+      var _p39 = $Systems$Add$Errors.init;
+      var errors = _p39._0;
+      var _p40 = $Systems$Add$Digital.init;
+      var digital = _p40._0;
+      var _p41 = $Systems$Add$GCE.init;
+      var gce = _p41._0;
+      var _p42 = $Systems$Add$Openstack.init;
+      var openstack = _p42._0;
+      var _p43 = $Systems$Add$AWS.init;
+      var aws = _p43._0;
       return {ctor: "_Tuple2",_0: A8(Model,General,aws,gce,digital,openstack,general,true,errors),_1: A2($Effects.map,GeneralView,effects)};
    }();
    var back = F3(function (action,hasPrev,model) {
       var newModel = _U.update(model,{hasNext: true});
       return hasPrev ? newModel : _U.update(newModel,{stage: General});
    });
-   var getBack = F2(function (_p43,hyp) {
-      var _p44 = _p43;
-      var _p49 = _p44.openstackModel;
-      var _p48 = _p44;
-      var _p47 = _p44.gceModel;
-      var _p46 = _p44.digitalModel;
-      var _p45 = _p44.awsModel;
+   var getBack = F2(function (_p44,hyp) {
+      var _p45 = _p44;
+      var _p50 = _p45.openstackModel;
+      var _p49 = _p45;
+      var _p48 = _p45.gceModel;
+      var _p47 = _p45.digitalModel;
+      var _p46 = _p45.awsModel;
       var backs = $Dict.fromList(_U.list([{ctor: "_Tuple2"
                                           ,_0: "aws"
                                           ,_1: A3(back,
                                           $Systems$Add$AWS.Back,
-                                          $Systems$Add$AWS.hasPrev(_p45),
-                                          _U.update(_p48,{stage: AWS,awsModel: A2($Systems$Add$AWS.update,$Systems$Add$AWS.Back,_p45)}))}
+                                          $Systems$Add$AWS.hasPrev(_p46),
+                                          _U.update(_p49,{stage: AWS,awsModel: A2($Systems$Add$AWS.update,$Systems$Add$AWS.Back,_p46)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "gce"
                                           ,_1: A3(back,
                                           $Systems$Add$GCE.Back,
-                                          $Systems$Add$GCE.hasPrev(_p47),
-                                          _U.update(_p48,{stage: GCE,gceModel: A2($Systems$Add$GCE.update,$Systems$Add$GCE.Back,_p47)}))}
+                                          $Systems$Add$GCE.hasPrev(_p48),
+                                          _U.update(_p49,{stage: GCE,gceModel: A2($Systems$Add$GCE.update,$Systems$Add$GCE.Back,_p48)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "openstack"
                                           ,_1: A3(back,
                                           $Systems$Add$Openstack.Back,
-                                          $Systems$Add$Openstack.hasPrev(_p49),
-                                          _U.update(_p48,
-                                          {stage: Openstack,openstackModel: A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Back,_p49)}))}
+                                          $Systems$Add$Openstack.hasPrev(_p50),
+                                          _U.update(_p49,
+                                          {stage: Openstack,openstackModel: A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Back,_p50)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "digital-ocean"
                                           ,_1: A3(back,
                                           $Systems$Add$Digital.Back,
-                                          $Systems$Add$Digital.hasPrev(_p46),
-                                          _U.update(_p48,{stage: Digital,digitalModel: A2($Systems$Add$Digital.update,$Systems$Add$Digital.Back,_p46)}))}]));
-      return A2($Maybe.withDefault,_p48,A2($Dict.get,hyp,backs));
+                                          $Systems$Add$Digital.hasPrev(_p47),
+                                          _U.update(_p49,{stage: Digital,digitalModel: A2($Systems$Add$Digital.update,$Systems$Add$Digital.Back,_p47)}))}]));
+      return A2($Maybe.withDefault,_p49,A2($Dict.get,hyp,backs));
    });
-   var update = F2(function (action,_p50) {
-      var _p51 = _p50;
-      var _p60 = _p51.openstackModel;
-      var _p59 = _p51;
-      var _p58 = _p51.general;
-      var _p57 = _p51.gceModel;
-      var _p56 = _p51.digitalModel;
-      var _p55 = _p51.awsModel;
-      var _p52 = action;
-      switch (_p52.ctor)
-      {case "Next": var current = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,_p58.environment,_p58.rawEnvironments));
-           var _p53 = _p58.hypervisor;
-           switch (_p53)
-           {case "aws": var newAws = A2($Systems$Add$AWS.update,$Systems$Add$AWS.Next,A2($Systems$Add$AWS.update,$Systems$Add$AWS.Update(current),_p55));
-                return $Common$Utils.none(_U.update(_p59,{stage: AWS,awsModel: newAws,hasNext: $Systems$Add$AWS.hasNext(newAws)}));
-              case "gce": var newGce = A2($Systems$Add$GCE.update,$Systems$Add$GCE.Next,A2($Systems$Add$GCE.update,$Systems$Add$GCE.Update(current),_p57));
-                return $Common$Utils.none(_U.update(_p59,{stage: GCE,gceModel: newGce,hasNext: $Systems$Add$GCE.hasNext(newGce)}));
+   var update = F2(function (action,_p51) {
+      var _p52 = _p51;
+      var _p61 = _p52.openstackModel;
+      var _p60 = _p52;
+      var _p59 = _p52.general;
+      var _p58 = _p52.gceModel;
+      var _p57 = _p52.digitalModel;
+      var _p56 = _p52.awsModel;
+      var _p53 = action;
+      switch (_p53.ctor)
+      {case "Next": var current = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,_p59.environment,_p59.rawEnvironments));
+           var _p54 = _p59.hypervisor;
+           switch (_p54)
+           {case "aws": var newAws = A2($Systems$Add$AWS.update,$Systems$Add$AWS.Next,A2($Systems$Add$AWS.update,$Systems$Add$AWS.Update(current),_p56));
+                return $Common$Utils.none(_U.update(_p60,{stage: AWS,awsModel: newAws,hasNext: $Systems$Add$AWS.hasNext(newAws)}));
+              case "gce": var newGce = A2($Systems$Add$GCE.update,$Systems$Add$GCE.Next,A2($Systems$Add$GCE.update,$Systems$Add$GCE.Update(current),_p58));
+                return $Common$Utils.none(_U.update(_p60,{stage: GCE,gceModel: newGce,hasNext: $Systems$Add$GCE.hasNext(newGce)}));
               case "digital-ocean": var newDigital = A2($Systems$Add$Digital.update,
                 $Systems$Add$Digital.Next,
-                A2($Systems$Add$Digital.update,$Systems$Add$Digital.Update(current),_p56));
-                return $Common$Utils.none(_U.update(_p59,{stage: Digital,digitalModel: newDigital,hasNext: $Systems$Add$Digital.hasNext(newDigital)}));
+                A2($Systems$Add$Digital.update,$Systems$Add$Digital.Update(current),_p57));
+                return $Common$Utils.none(_U.update(_p60,{stage: Digital,digitalModel: newDigital,hasNext: $Systems$Add$Digital.hasNext(newDigital)}));
               case "openstack": var newOpenstack = A2($Systems$Add$Openstack.update,
                 $Systems$Add$Openstack.Next,
-                A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Update(current),_p60));
-                return $Common$Utils.none(_U.update(_p59,
+                A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Update(current),_p61));
+                return $Common$Utils.none(_U.update(_p60,
                 {stage: Openstack,openstackModel: newOpenstack,hasNext: $Systems$Add$Openstack.hasNext(newOpenstack)}));
-              default: return {ctor: "_Tuple2",_0: _p59,_1: $Effects.none};}
-         case "Back": return $Common$Utils.none(A2(getBack,_p59,_p58.hypervisor));
-         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p52._0,_p55);
-           return {ctor: "_Tuple2",_0: _U.update(_p59,{awsModel: newAws}),_1: $Effects.none};
-         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p52._0,_p57);
-           return {ctor: "_Tuple2",_0: _U.update(_p59,{gceModel: newGce}),_1: $Effects.none};
-         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p52._0,_p56);
-           return {ctor: "_Tuple2",_0: _U.update(_p59,{digitalModel: newDigital}),_1: $Effects.none};
-         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p52._0,_p60);
-           return {ctor: "_Tuple2",_0: _U.update(_p59,{openstackModel: newOpenstack}),_1: $Effects.none};
-         case "GeneralView": var newGeneral = A2($Systems$Add$General.update,_p52._0,_p58);
-           return {ctor: "_Tuple2",_0: _U.update(_p59,{general: newGeneral}),_1: $Effects.none};
-         case "Stage": return A2(encodeModel,_p59,Stage);
-         case "Save": return A2(encodeModel,_p59,NoOp);
-         case "Create": return A2(encodeModel,_p59,Create);
-         case "SystemSaved": var success = A2(setSaved,_p52._0,_p59);
-           var _p54 = A5($Common$Redirect.resultHandler,_p52._1,_p59,success,setErrors(_p59),NoOp);
-           var newModel = _p54._0;
-           var saveErrors = _p54._0.saveErrors;
-           var effects = _p54._1;
+              default: return {ctor: "_Tuple2",_0: _p60,_1: $Effects.none};}
+         case "Back": return $Common$Utils.none(A2(getBack,_p60,_p59.hypervisor));
+         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p53._0,_p56);
+           return {ctor: "_Tuple2",_0: _U.update(_p60,{awsModel: newAws}),_1: $Effects.none};
+         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p53._0,_p58);
+           return {ctor: "_Tuple2",_0: _U.update(_p60,{gceModel: newGce}),_1: $Effects.none};
+         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p53._0,_p57);
+           return {ctor: "_Tuple2",_0: _U.update(_p60,{digitalModel: newDigital}),_1: $Effects.none};
+         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p53._0,_p61);
+           return {ctor: "_Tuple2",_0: _U.update(_p60,{openstackModel: newOpenstack}),_1: $Effects.none};
+         case "GeneralView": var newGeneral = A2($Systems$Add$General.update,_p53._0,_p59);
+           return {ctor: "_Tuple2",_0: _U.update(_p60,{general: newGeneral}),_1: $Effects.none};
+         case "Stage": return A2(encodeModel,_p60,Stage);
+         case "Save": return A2(encodeModel,_p60,NoOp);
+         case "Create": return A2(encodeModel,_p60,Create);
+         case "SystemSaved": var success = A2(setSaved,_p53._0,_p60);
+           var _p55 = A5($Common$Redirect.resultHandler,_p53._1,_p60,success,setErrors(_p60),NoOp);
+           var newModel = _p55._0;
+           var saveErrors = _p55._0.saveErrors;
+           var effects = _p55._1;
            return $Basics.not($Dict.isEmpty(saveErrors.errors.keyValues)) ? {ctor: "_Tuple2"
                                                                             ,_0: _U.update(newModel,{stage: Error})
-                                                                            ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p59,_1: effects};
-         default: return {ctor: "_Tuple2",_0: _p59,_1: $Effects.none};}
+                                                                            ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p60,_1: effects};
+         default: return {ctor: "_Tuple2",_0: _p60,_1: $Effects.none};}
    });
    return _elm.Systems.Add.values = {_op: _op
                                     ,General: General
@@ -18059,6 +18069,7 @@ Elm.Systems.Add.make = function (_elm) {
                                     ,encodeGceModel: encodeGceModel
                                     ,encodeDigitalModel: encodeDigitalModel
                                     ,encodeOpenstackModel: encodeOpenstackModel
+                                    ,blockDevices: blockDevices
                                     ,volumes: volumes
                                     ,aws: aws
                                     ,awsModel: awsModel
