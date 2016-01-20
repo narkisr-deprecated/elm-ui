@@ -20,7 +20,7 @@
 (watch-dir run-facts (clojure.java.io/file "./test/elm/"))
 
 (go-loop []
-   (let [x (<! (async/merge [(timeout 2000) c] (dropping-buffer 1)))]
+   (let [x (<! (async/merge [(timeout 1000) c] (dropping-buffer 1)))]
      (try 
        (timbre/info "Starting to run suite")
        (timbre/info (:out (sh "lein" "midje" "elm.ui.add")))
