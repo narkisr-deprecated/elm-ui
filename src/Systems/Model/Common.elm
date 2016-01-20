@@ -25,7 +25,7 @@ type alias System =
   , openstack : Maybe Openstack
   -- template
   , name : Maybe String
-  , defaults : Maybe (Dict String)
+  , defaults : Maybe String
   }
 
 emptyMachine : Machine

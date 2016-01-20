@@ -97,15 +97,18 @@ machineDecoder =
     
 systemDecoder : Decoder System
 systemDecoder = 
-  object8 System 
+   map System 
     ("owner" := string )
-    ("env" := string )
-    ("type" := string )
-    ("machine" := machineDecoder)
-    (maybe ("aws" := awsDecoder))
-    (maybe ("gce" := gceDecoder))
-    (maybe ("digital-ocean" := digitalDecoder))
-    (maybe ("openstack" := openstackDecoder))
+    `apply` ("env" := string )
+    `apply` ("type" := string )
+    `apply` ("machine" := machineDecoder)
+    `apply` (maybe ("aws" := awsDecoder))
+    `apply` (maybe ("gce" := gceDecoder))
+    `apply` (maybe ("digital-ocean" := digitalDecoder))
+    `apply` (maybe ("openstack" := openstackDecoder))
+    `apply` (maybe ("name" := string))
+    `apply` (maybe ("defaults" := string))
+ 
 
 
 
