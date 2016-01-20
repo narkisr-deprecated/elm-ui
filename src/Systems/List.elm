@@ -13,7 +13,7 @@ import Json.Decode as Json exposing (..)
 import Task exposing (Task)
 import Dict exposing (Dict)
 import Debug
-import Systems.Model.Common exposing (Machine, System)
+import Systems.Model.Common exposing (Machine, System, emptySystem)
 import Systems.Model.AWS exposing (emptyAws)
 import Systems.Decoders exposing (..)
 import Common.Redirect exposing (successHandler)
@@ -47,7 +47,6 @@ type alias Model =
 init : (Model, Effects Action)
 init =
  let 
-   emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing Nothing Nothing
    systems = (Dict.empty, [("", emptySystem)])
    table = Table.init "systemsListing" True ["#","Hostname", "Type", "Env","Owner"] systemRow "Systems"
    search = Search.init

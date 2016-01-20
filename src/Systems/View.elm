@@ -1,7 +1,7 @@
 module Systems.View where
 
 import Effects exposing (Effects)
-import Systems.Model.Common exposing (System, Machine)
+import Systems.Model.Common exposing (System, Machine, emptySystem)
 import Systems.Model.AWS exposing (emptyAws)
 import Common.Http exposing (getJson)
 
@@ -29,10 +29,7 @@ type alias Model =
 
 init : (Model , Effects Action)
 init =
-  let
-    emptySystem = System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing Nothing Nothing
-  in
-   (Model emptySystem, Effects.none)
+  (Model emptySystem, Effects.none)
 
 -- Update
 type Action = 
