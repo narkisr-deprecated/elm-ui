@@ -26,7 +26,7 @@ import Systems.Launch as Launch exposing (runJob, JobResponse)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
-import Focus exposing (Focus, set, (=>), create)
+import Systems.Add.Persistency exposing (persistModel)
 
 type Stage = 
   General 
@@ -52,9 +52,9 @@ type alias Model =
 
 type Action = 
   Next
-  | Save
+  | SaveSystem
+  | SaveTemplate
   | Create
-  | Templatize
   | Stage
   | Back
   | NoOp
@@ -65,7 +65,7 @@ type Action =
   | OpenstackView Openstack.Action
   | GeneralView General.Action
   | ErrorsView Errors.Action
-  | SystemSaved Action (Result Http.Error SaveResponse)
+  | Saved Action (Result Http.Error SaveResponse)
   | JobLaunched (Result Http.Error JobResponse)
 
 init : (Model, Effects Action)
@@ -92,127 +92,6 @@ setErrors ({saveErrors} as model) es =
 setSaved : Action -> Model -> SaveResponse -> (Model, Effects Action)
 setSaved next model {id} =
   (model, runJob (toString id) (toLower (toString next)) JobLaunched)
-
-encoder stage model =
- let 
-   key = (String.toLower (toString stage))
-   encoders = Dict.fromList [
-       ("aws" , (\ ({awsModel}) -> awsEncoder awsModel))
-     , ("gce" , (\ ({gceModel}) -> gceEncoder gceModel))
-   ]
- in
-  case (Dict.get key encoders) of
-    Just  enc -> 
-       (key, (enc model))
-    Nothing -> 
-       (key, E.null)
-   
-
-encodeAwsModel : Model -> E.Value
-encodeAwsModel ({awsModel, general} as model) =
- E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , (encoder AWS model)
-  , ("machine" , machineEncoder awsModel.machine)
- ]
-
-encodeGceModel : Model -> E.Value
-encodeGceModel ({gceModel, general} as model) =
- E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , (encoder GCE model)
-  , ("machine" , machineEncoder gceModel.machine)
- ]
-
-encodeDigitalModel : Model -> E.Value
-encodeDigitalModel ({digitalModel, general}) =
- E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , ("digital-ocean" , digitalEncoder digitalModel)
-  , ("machine" , machineEncoder digitalModel.machine)
- ]
-
-encodePhysicalModel : Model -> E.Value
-encodePhysicalModel ({physicalModel, general}) =
- E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , ("physical" , physicalEncoder physicalModel)
-  , ("machine" , machineEncoder physicalModel.machine)
- ]
-encodeOpenstackModel : Model -> E.Value
-encodeOpenstackModel ({openstackModel, general}) =
- E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , ("openstack" , openstackEncoder openstackModel)
-  , ("machine" , machineEncoder openstackModel.machine)
- ]
-
-blockDevices : Focus { r | blockDevices :a } a
-blockDevices =
-   create .blockDevices (\f r -> { r | blockDevices = f r.blockDevices })
-
-volumes : Focus { r | volumes :a } a
-volumes =
-   create .volumes (\f r -> { r | volumes = f r.volumes })
-
-aws : Focus { r | aws :a } a
-aws =
-   create .aws (\f r -> { r | aws = f r.aws })
-
-awsModel : Focus { r | awsModel :a } a
-awsModel =
-   create .awsModel (\f r -> { r | awsModel = f r.awsModel })
-
-openstack : Focus { r | openstack :a } a
-openstack =
-   create .openstack (\f r -> { r | openstack= f r.openstack })
-
-openstackModel : Focus { r | openstackModel :a } a
-openstackModel =
-   create .openstackModel (\f r -> { r | openstackModel = f r.openstackModel })
-
-
-addDevice : Maybe (List {r | device : String}) -> Maybe (List {r | device : String})
-addDevice vs = 
-  Just (List.map (\({device} as volume) -> {volume | device = "/dev/"++device}) (withDefault [] vs))
-
-transformers =  Dict.fromList [
-    ("AWS", ((Focus.update (awsModel => aws => blockDevices) addDevice) <<
-             (Focus.update (awsModel => aws => volumes) addDevice)))
-  , ("Openstack", Focus.update (openstackModel => openstack => volumes) addDevice)
-  ]
-
-encoders =  Dict.fromList [
-    ("AWS", encodeAwsModel)
-  , ("GCE", encodeGceModel)
-  , ("Digital", encodeDigitalModel)
-  , ("Openstack", encodeOpenstackModel)
-  , ("Physical", encodePhysicalModel)
-  ]
-
-encodeModel : Model -> Action -> (Model , Effects Action)
-encodeModel ({stage} as model) action =
-  case (Dict.get (toString stage) encoders) of
-     Just encode -> 
-        case (Dict.get (toString stage) transformers) of
-          Just transform -> 
-            (model, saveSystem (E.encode 0 (encode (transform model))) action)
-
-          Nothing -> 
-            (model, saveSystem (E.encode 0 (encode model)) action)
-
-     Nothing -> 
-       none model
 
 back action hasPrev model =
    let
@@ -288,54 +167,57 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
             (model, Effects.none)
 
     Back -> 
-     none  (getBack model general.hypervisor)
+     none (getBack model general.hypervisor)
 
     AWSView action -> 
       let
         newAws = AWS.update action awsModel 
       in
-        ({ model | awsModel = newAws }, Effects.none)
+        none { model | awsModel = newAws }
 
     GCEView action -> 
       let
         newGce= GCE.update action gceModel
       in
-        ({ model | gceModel = newGce }, Effects.none)
+        none { model | gceModel = newGce }
 
     DigitalView action -> 
       let
         newDigital= Digital.update action digitalModel
       in
-        ({ model | digitalModel = newDigital }, Effects.none)
+        none { model | digitalModel = newDigital }
 
     PhysicalView action -> 
       let
         newPhysical= Physical.update action physicalModel
       in
-        ({ model | physicalModel = newPhysical }, Effects.none)
+        none { model | physicalModel = newPhysical }
 
     OpenstackView action -> 
       let
         newOpenstack = Openstack.update action openstackModel
       in
-        ({ model | openstackModel = newOpenstack }, Effects.none)
+        none { model | openstackModel = newOpenstack }
 
     GeneralView action -> 
       let
         newGeneral= General.update action general
       in
-        ({ model | general = newGeneral }, Effects.none)
+        none { model | general = newGeneral }
 
     Stage -> 
-       encodeModel model Stage
+       persistModel saveSystem model Stage
 
-    Save -> 
-       encodeModel model NoOp
+    SaveSystem -> 
+       persistModel saveSystem model NoOp
+
+    SaveTemplate -> 
+      none model
 
     Create -> 
-      encodeModel model Create
+      persistModel saveSystem model Create
 
-    SystemSaved next result -> 
+    Saved next result -> 
       let
         success = (setSaved next model)
         (({saveErrors} as newModel), effects) = resultHandler result model success (setErrors model) NoOp
@@ -377,7 +259,8 @@ currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstack
 saveDropdown : Signal.Address Action -> Html 
 saveDropdown address =
   ul [class "dropdown-menu"] [
-    li [] [a [class "SaveOnly", href "#", onClick address Save ] [text "Save only"]]
+    li [] [a [class "SaveSystem", href "#", onClick address SaveSystem ] [text "Save system"]]
+  , li [] [a [class "SaveTemplate", href "#", onClick address SaveTemplate ] [text "Save as template"]]
   , li [] [a [class "Create", href "#", onClick address Create ] [text "Create System"]]
   ]
     
@@ -430,7 +313,7 @@ saveSystem : String -> Action -> Effects Action
 saveSystem model next = 
   postJson (Http.string model) saveResponse "/systems"  
     |> Task.toResult
-    |> Task.map (SystemSaved next)
+    |> Task.map (Saved next)
     |> Effects.task
 
 
