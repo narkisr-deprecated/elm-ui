@@ -8,7 +8,8 @@ import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
 import Common.Utils exposing (none)
 import Types.Core as Types
-import Nav.Side as NavSide exposing (Active(Types, Systems, Jobs), Section(Stats, Launch, Add, List, View))
+import Templates.Core as Templates
+import Nav.Side as NavSide exposing (Active(Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Nav.Header as NavHeader
 
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
@@ -22,6 +23,7 @@ init =
     (jobsStat, jobsStatAction) = Jobs.Stats.init
     (navHeaderModel, navHeaderAction) = NavHeader.init
     (types, typesAction) = Types.init
+    (templates, templatesAction) = Templates.init
     (systems, systemsAction) = Systems.init
     effects = [ 
                 Effects.map TypesAction typesAction
@@ -31,7 +33,7 @@ init =
               , Effects.map JobsStats jobsStatAction
               ]
   in
-    (Model systems jobsList jobsStat types NavSide.init navHeaderModel, Effects.batch effects) 
+    (Model systems jobsList jobsStat types templates NavSide.init navHeaderModel, Effects.batch effects) 
 
 type alias Model = 
   { 
@@ -39,6 +41,7 @@ type alias Model =
   , jobsList : Jobs.List.Model
   , jobsStats : Jobs.Stats.Model
   , types : Types.Model
+  , templates : Templates.Model
   , navSide : NavSide.Model 
   , navHeader : NavHeader.Model 
   }
@@ -51,6 +54,7 @@ type Action =
     | NavSideAction NavSide.Action
     | NavHeaderAction NavHeader.Action
     | TypesAction Types.Action
+    | TemplatesAction Templates.Action
 
 -- Navigation changes
 jobListing : Model -> (Model , Effects Action)
@@ -66,7 +70,7 @@ goto active section ({navSide} as model)  =
 
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({navSide, types, jobsList, jobsStats, systems} as model) =
+update action ({navSide, types, jobsList, jobsStats, systems, templates} as model) =
   case action of 
     JobsList jobAction -> 
       if jobAction == Polling && navSide.active /= Jobs then
@@ -102,6 +106,12 @@ update action ({navSide, types, jobsList, jobsStats, systems} as model) =
       in
        ({ model | types = newTypes}, Effects.map TypesAction effects) 
 
+    TemplatesAction action -> 
+      let 
+       (newTemplates, effects) = Templates.update action templates
+      in
+       ({ model | templates = newTemplates}, Effects.map TemplatesAction effects) 
+
     SystemsAction action -> 
       let 
        (newSystems, effects) = Systems.update action systems
@@ -118,10 +128,11 @@ update action ({navSide, types, jobsList, jobsStats, systems} as model) =
           Just (Systems, section) -> 
              (goto Systems section newModel , newEffects)
 
+          Just (Templates, section) -> 
+             (goto Templates section newModel , newEffects)
+
           _ -> 
             (newModel, newEffects)
-
-          
 
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats} as model) =
@@ -132,6 +143,9 @@ activeView address ({jobsList, jobsStats} as model) =
    Types -> 
      Types.view (Signal.forwardTo address TypesAction) model.types model.navSide.section
 
+   Templates -> 
+     Templates.view (Signal.forwardTo address TemplatesAction) model.templates model.navSide.section
+  
    Jobs -> 
      case model.navSide.section of
        List ->

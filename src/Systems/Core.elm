@@ -4,7 +4,7 @@ import Systems.List as List exposing (Error(NoSystemSelected, NoError))
 import Systems.Add as Add
 import Systems.View as View
 import Systems.Launch as Launch exposing (Action(Cancel, SetupJob, Run))
-import Nav.Side as NavSide exposing (Active(Systems, Jobs), Section(Stats, Launch, Add, List, View))
+import Nav.Side as NavSide exposing (Active(Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Html exposing (..)
 import Effects exposing (Effects, batch, map)
 import Common.Utils exposing (none)
@@ -28,7 +28,8 @@ init =
      (systemsAdd, systemsAddAction ) = Add.init 
      (systemsLaunch, _) = Launch.init 
      effects = [ Effects.map SystemsListing systemsListAction 
-               , Effects.map SystemsAdd systemsAddAction ]
+               , Effects.map SystemsAdd systemsAddAction 
+               ]
   in
     (Model systemsList systemsAdd systemsView systemsLaunch Nothing, Effects.batch effects)
 
@@ -82,6 +83,9 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
       case systemsAction of
         Add.JobLaunched _ -> 
           none {model | navChange =  Just (Jobs, List)}
+
+        Add.SaveTemplate -> 
+          none {model | navChange =  Just (Templates, Add)}
 
         Add.Saved next result -> 
           let

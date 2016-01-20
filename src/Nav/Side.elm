@@ -12,6 +12,7 @@ type Active =
   Systems 
     | Types 
     | Jobs
+    | Templates
 
 type Section = 
   Add 
@@ -62,7 +63,7 @@ drop address active actions =
 
 menus : Signal.Address Action -> List Html
 menus address =
-   [ drop address Systems [List, Add]
+   [ drop address Systems [List, Add, Launch]
    , drop address Types [List, Add]
    , drop address Jobs [List, Stats]
    ]
