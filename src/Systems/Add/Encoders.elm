@@ -8,6 +8,7 @@ import Systems.Add.AWS as AWS exposing (ebsTypes)
 import Systems.Add.GCE as GCE 
 import Systems.Add.Openstack as Openstack
 import Systems.Add.Digital as Digital
+import Systems.Add.Physical as Physical
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
@@ -73,6 +74,22 @@ digitalEncoder ({digital} as model) =
     , ("private-networking", bool digital.privateNetworking)
   ]
 
+optional : (a -> Value) -> Maybe a -> Value
+optional enc value =
+  case value of
+    Just v -> 
+      enc v
+    Nothing -> 
+       null
+
+physicalEncoder : Physical.Model -> Value
+physicalEncoder ({physical} as model) =
+  object [
+      ("mac", optional string physical.mac)
+    , ("broadcast", optional string physical.broadcast)
+  ]
+
+
 openstackVolumeEncoder : OpenstackModel.Volume -> Value
 openstackVolumeEncoder volume =
   object [
@@ -107,6 +124,7 @@ machineEncoder machine =
   object [
       ("domain", string machine.domain)
     , ("hostname", string machine.hostname)
+    , ("ip", optional string machine.ip)
     , ("os", string machine.os)
     , ("user", string machine.user)
   ]

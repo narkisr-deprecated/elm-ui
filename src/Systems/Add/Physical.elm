@@ -6,12 +6,12 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Systems.Add.Common exposing (..)
-import Systems.View.Digital exposing (summarize)
+import Systems.View.Physical exposing (summarize)
 import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
 import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, emptyMachine)
-import Systems.Model.Digital exposing (..)
+import Systems.Model.Physical exposing (..)
 import Effects exposing (Effects, batch)
 import Common.Components exposing (panelContents)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
@@ -25,7 +25,7 @@ type alias Model =
   { step : Step
   , prev : List Step
   , next : List Step
-  , digital : Digital
+  , physical : Physical
   , machine : Machine
   , environment : Environment
   , errors : Dict String (List Error)
@@ -36,19 +36,19 @@ init =
   let 
     steps = [ Instance, Summary ]
   in 
-  (Model Zero [] steps (emptyDigital) (emptyMachine) Dict.empty Dict.empty, Effects.none)
+  (Model Zero [] steps (emptyPhysical) (emptyMachine) Dict.empty Dict.empty, Effects.none)
 
 type Action = 
   Next 
   | Back 
   | Update Environment
-  | SelectSize String
   | SelectOS String
-  | PrivateNetworking
-  | SelectRegion String
   | UserInput String
   | HostnameInput String
   | DomainInput String
+  | MacInput String
+  | BroadcastInput String
+  | IPInput String
 
 type Step = 
   Zero
@@ -57,12 +57,12 @@ type Step =
 
 -- Update
 
-setDigital : (Digital -> Digital) -> Model -> Model
-setDigital f ({digital, errors} as model) =
+setPhysical : (Physical -> Physical) -> Model -> Model
+setPhysical f ({physical, errors} as model) =
   let
-    newDigital = f (Debug.log "" digital)
+    newPhysical = f physical
   in
-   { model | digital = newDigital}
+   { model | physical = newPhysical}
 
 setMachine: (Machine-> Machine) -> Model -> Model
 setMachine f ({machine} as model) =
@@ -85,6 +85,7 @@ stringValidations = Dict.fromList [
         ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
       , ("Domain", validationOf "Domain" [notEmpty] (\({machine} as model) -> machine.domain))
       , ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user))
+      , ("IP", validationOf "IP" [validIp, notEmpty] (\({machine} as model) -> withDefault "" machine.ip))
     ]
  ]
 
@@ -108,7 +109,7 @@ notAny errors =
   List.isEmpty (List.filter (\e -> not (List.isEmpty e)) (Dict.values errors))
 
 update : Action -> Model-> Model
-update action ({next, prev, step, digital, machine} as model) =
+update action ({next, prev, step, physical, machine} as model) =
   case action of
     Next -> 
       let
@@ -147,14 +148,8 @@ update action ({next, prev, step, digital, machine} as model) =
              Nothing -> 
                newModel
 
-    SelectSize size -> 
-      setDigital (\digital-> {digital | size = size }) model
-
     SelectOS newOS -> 
       setMachine (\machine -> {machine | os = newOS }) model
-
-    SelectRegion region -> 
-      setDigital (\digital-> {digital | region = region }) model 
 
     UserInput user -> 
        model 
@@ -172,9 +167,16 @@ update action ({next, prev, step, digital, machine} as model) =
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate step "Domain" stringValidations
 
-    PrivateNetworking -> 
-       setDigital (\digital -> {digital | privateNetworking = (not (digital.privateNetworking))}) model
+    MacInput mac -> 
+      setPhysical (\physical -> {physical| mac = Just mac}) model 
 
+    BroadcastInput ip -> 
+      setPhysical (\physical -> {physical| broadcast = Just ip}) model 
+
+    IPInput ip -> 
+      model 
+        |> setMachine (\machine -> {machine | ip = Just ip })
+        |> validate step "IP" stringValidations
 
 
 hasNext : Model -> Bool
@@ -188,7 +190,7 @@ hasPrev model =
 getOses : Model -> Dict String Template
 getOses model =
   let 
-    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "digital-ocean" model.environment)
+    hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "physical" model.environment)
   in 
     case hypervisor of
       OSTemplates oses -> 
@@ -197,22 +199,21 @@ getOses model =
         Dict.empty
 
 instance : Signal.Address Action -> Model -> List Html
-instance address ({digital, machine, errors} as model) =
+instance address ({physical, machine, errors} as model) =
   let
     check = withErrors errors
-    region = withDefault "" (List.head regions)
   in
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
-         legend [] [text "Properties"]
-       , group' "Size" (selector address SelectSize sizes digital.size)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os) , group' "Region" (selector address SelectRegion regions digital.region)
-       , legend [] [text "Security"]
+         legend [] [text "Security"]
        , check "User" (inputText address UserInput "" machine.user) 
        , legend [] [text "Networking"]
+       , check "IP"  (inputText address IPInput "" (withDefault "" machine.ip))
        , check "Hostname" (inputText address HostnameInput "" machine.hostname)
        , check "Domain"  (inputText address DomainInput "" machine.domain)
-       , group' "Private Networking" (checkbox address PrivateNetworking digital.privateNetworking)
+       , legend [] [text "WOL"]
+       , check "Mac"  (inputText address MacInput "" (withDefault "" physical.mac))
+       , check "Broadcast"  (inputText address BroadcastInput "" (withDefault "" physical.broadcast))
        ]
     ]
 
@@ -222,13 +223,13 @@ withErrors errors key widget =
 
 
 stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({digital, machine} as model) =
+stepView address ({physical, machine} as model) =
   case model.step of
     Instance -> 
       instance address model 
 
     Summary -> 
-      summarize (digital, machine)
+      summarize (physical, machine)
 
     _ -> 
       Debug.log (toString model.step) [div [] []]

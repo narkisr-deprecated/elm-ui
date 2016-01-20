@@ -145,7 +145,7 @@
      hostname
    ))
   
-#_(with-driver- (create-phantom)
+(with-driver- (create-phantom)
   (login)    
   (fact "Adding gce system" :gce 
     (let [hostname (gce-flow)] 
@@ -155,4 +155,4 @@
     (let [hostname (openstack-flow)] 
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
-(openstack-partial-flow)
+;; (openstack-partial-flow)

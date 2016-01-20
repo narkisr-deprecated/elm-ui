@@ -15,6 +15,7 @@ import Effects exposing (Effects, batch)
 import Dict exposing (Dict)
 import Systems.Add.Common exposing (..)
 import Systems.Add.AWS as AWS exposing (..)
+import Systems.Add.Physical as Physical exposing (..)
 import Systems.Add.Openstack as Openstack exposing (..)
 import Systems.Add.GCE as GCE exposing (..)
 import Systems.Add.Digital as Digital exposing (..)
@@ -35,11 +36,13 @@ type Stage =
     | Openstack
     | GCE
     | Digital
+    | Physical
 
 type alias Model = 
   { stage : Stage
   , awsModel : AWS.Model
   , gceModel : GCE.Model
+  , physicalModel : Physical.Model
   , digitalModel : Digital.Model
   , openstackModel : Openstack.Model
   , general : General.Model
@@ -57,6 +60,7 @@ type Action =
   | NoOp
   | AWSView AWS.Action
   | GCEView GCE.Action
+  | PhysicalView Physical.Action
   | DigitalView Digital.Action
   | OpenstackView Openstack.Action
   | GeneralView General.Action
@@ -70,11 +74,12 @@ init =
     (aws, _) = AWS.init 
     (openstack, _) = Openstack.init 
     (gce, _) = GCE.init 
+    (physical, _) = Physical.init 
     (digital, _) = Digital.init 
     (errors, _) = Errors.init
     (general, effects) = General.init 
   in 
-   (Model General aws gce digital openstack general True errors, Effects.map GeneralView effects)
+   (Model General aws gce physical digital openstack general True errors, Effects.map GeneralView effects)
 
 
 setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
@@ -133,6 +138,15 @@ encodeDigitalModel ({digitalModel, general}) =
   , ("machine" , machineEncoder digitalModel.machine)
  ]
 
+encodePhysicalModel : Model -> E.Value
+encodePhysicalModel ({physicalModel, general}) =
+ E.object [
+    ("type" , E.string general.type')
+  , ("owner" , E.string general.owner)
+  , ("env" , E.string general.environment)
+  , ("physical" , physicalEncoder physicalModel)
+  , ("machine" , machineEncoder physicalModel.machine)
+ ]
 encodeOpenstackModel : Model -> E.Value
 encodeOpenstackModel ({openstackModel, general}) =
  E.object [
@@ -183,6 +197,7 @@ encoders =  Dict.fromList [
   , ("GCE", encodeGceModel)
   , ("Digital", encodeDigitalModel)
   , ("Openstack", encodeOpenstackModel)
+  , ("Physical", encodePhysicalModel)
   ]
 
 encodeModel : Model -> Action -> (Model , Effects Action)
@@ -208,20 +223,21 @@ back action hasPrev model =
      else 
        {newModel | stage = General}
 
-getBack ({awsModel, gceModel, digitalModel, openstackModel} as model) hyp = 
+getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) hyp = 
   let
    backs = Dict.fromList [
       ("aws", (back AWS.Back (AWS.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.update AWS.Back awsModel)}))
     , ("gce", (back GCE.Back (GCE.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.update GCE.Back gceModel)}))
     , ("openstack", (back Openstack.Back (Openstack.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.update Openstack.Back openstackModel)}))
     , ("digital-ocean", (back Digital.Back (Digital.hasPrev digitalModel) {model | stage = Digital, digitalModel = (Digital.update Digital.Back digitalModel)}))
+    , ("physical", (back Physical.Back (Physical.hasPrev physicalModel) {model | stage = Physical, physicalModel = (Physical.update Physical.Back physicalModel)}))
    ]
   in
    withDefault model (Dict.get hyp backs)
 
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({general, awsModel, gceModel, digitalModel, openstackModel} as model) =
+update action ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) =
   case action of
     Next -> 
       let 
@@ -252,6 +268,13 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel} as mo
             in
               none { model | stage = Digital , digitalModel = newDigital , hasNext = Digital.hasNext newDigital}
 
+          "physical" -> 
+            let
+               newPhysical = physicalModel 
+                               |> Physical.update (Physical.Update current) 
+                               |> Physical.update Physical.Next
+            in
+              none { model | stage = Physical , physicalModel = newPhysical , hasNext = Physical.hasNext newPhysical}
 
           "openstack" -> 
             let
@@ -284,6 +307,14 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel} as mo
         newDigital= Digital.update action digitalModel
       in
         ({ model | digitalModel = newDigital }, Effects.none)
+
+
+    PhysicalView action -> 
+      let
+        newPhysical= Physical.update action physicalModel
+      in
+        ({ model | physicalModel = newPhysical }, Effects.none)
+
 
     OpenstackView action -> 
       let
@@ -319,7 +350,7 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel} as mo
     _ -> (model, Effects.none)
 
 currentView : Signal.Address Action -> Model -> List Html
-currentView address ({awsModel, gceModel, digitalModel, openstackModel, saveErrors, general} as model)=
+currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, saveErrors, general} as model)=
   case model.stage of 
     General -> 
       (General.view (Signal.forwardTo address GeneralView) general)
@@ -332,6 +363,9 @@ currentView address ({awsModel, gceModel, digitalModel, openstackModel, saveErro
 
     Digital -> 
       (Digital.view (Signal.forwardTo address DigitalView) digitalModel)
+
+    Physical -> 
+      (Physical.view (Signal.forwardTo address PhysicalView) physicalModel)
 
     Openstack -> 
       (Openstack.view (Signal.forwardTo address OpenstackView) openstackModel)

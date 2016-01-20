@@ -101,19 +101,11 @@ validationOf key validations value ({errors} as model) =
    in
      {model | errors = newErrors}
 
-extractIp : Model -> String
-extractIp {openstack} =
-  case openstack.floatingIp of
-    Just ip ->
-      ip
-    Nothing -> 
-      ""
-  
 stringValidations = Dict.fromList [
     vpair Networking [
         ("Hostname", validationOf "Hostname" [notEmpty] (\{machine} -> machine.hostname))
       , ("Domain", validationOf "Domain" [notEmpty] (\{machine} -> machine.domain))
-      , ("IP", validationOf "IP" [validIp] extractIp)
+      , ("IP", validationOf "IP" [validIp]  (\{openstack} -> withDefault "" openstack.floatingIp))
     ]
   , vpair Instance [
         ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user))

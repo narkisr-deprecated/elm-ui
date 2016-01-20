@@ -1,12 +1,14 @@
 module Systems.Model.Physical where
 
+import Maybe 
+
 type alias Physical = 
   { 
-    mac : String,
-    broadcast : String
+    mac : Maybe String,
+    broadcast : Maybe String
   }
 
 emptyPhysical: Physical
 emptyPhysical = 
-   Physical "" ""
+   Physical Nothing Nothing
 

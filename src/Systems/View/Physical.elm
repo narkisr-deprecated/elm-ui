@@ -35,7 +35,7 @@ summarySections ((physical, machine) as model) =
        [machine.os, machine.user]
    , overviewSection "Networking" ["ip", "hostname", "domain" ] 
       [ withDefault "" machine.ip, machine.hostname, machine.domain ]
-   , overviewSection "Interface" ["MAC", "Broadcast"] [ physical.mac, physical.broadcast]
+   , overviewSection "Interface" ["MAC", "Broadcast"] [ withDefault "" physical.mac, withDefault "" physical.broadcast]
    ]
 
 summarize: (Physical, Machine) -> List Html
