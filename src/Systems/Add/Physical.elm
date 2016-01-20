@@ -1,7 +1,6 @@
 module Systems.Add.Physical where
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
