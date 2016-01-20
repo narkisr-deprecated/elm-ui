@@ -308,13 +308,11 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
       in
         ({ model | digitalModel = newDigital }, Effects.none)
 
-
     PhysicalView action -> 
       let
         newPhysical= Physical.update action physicalModel
       in
         ({ model | physicalModel = newPhysical }, Effects.none)
-
 
     OpenstackView action -> 
       let
