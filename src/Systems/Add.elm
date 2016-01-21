@@ -122,11 +122,11 @@ machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalMod
             ("aws", awsModel.machine)
           , ("gce", gceModel.machine)
           , ("openstack", openstackModel.machine)
-          , ("digital-ocean", digitalModel.machine)
+          , ("digitalocean", digitalModel.machine)
           , ("physical", physicalModel.machine)
       ]
   in
-    withDefault emptyMachine (Dict.get stage machines)
+    withDefault emptyMachine (Dict.get (String.toLower stage) machines)
 
   
 intoSystem : Model -> Stage -> System
