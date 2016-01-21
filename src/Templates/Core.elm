@@ -5,8 +5,8 @@ import Common.Utils exposing (none)
 import Effects exposing (Effects)
 import Html exposing (..)
 import Templates.Add as Add
-import Systems.Add as SystemsAdd
 import Nav.Side as NavSide exposing (Section(Stats, Launch, Add, List, View))
+import Systems.Model.Common exposing (System)
 
 type alias Model = 
   { 
@@ -23,14 +23,16 @@ init =
 type Action = 
   TemplatesAdd Add.Action
     | NoOp
-    | SetSystem SystemsAdd.Model
 
 update : Action ->  Model-> (Model , Effects Action)
 update action model =
   case action of 
-    -- SetSystem system -> 
-    --   (Add.update Add.SetSystem system)
-    --
+    TemplatesAdd action -> 
+      let 
+       (newAdd, effects) = (Add.update action model.add)
+      in
+       ({ model | add = newAdd }, Effects.map TemplatesAdd effects)
+
     _ -> 
       none model 
 
