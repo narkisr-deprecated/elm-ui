@@ -27,6 +27,7 @@ import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
 import Systems.Add.Persistency exposing (persistModel)
+import Systems.Model.Common exposing (System, Machine, emptyMachine)
 
 type Stage = 
   General 
@@ -114,9 +115,31 @@ getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as mo
   in
    withDefault model (Dict.get hyp backs)
 
+machineFrom : String -> Model -> Machine
+machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalModel} =
+  let 
+    machines =  Dict.fromList [
+            ("aws", awsModel.machine)
+          , ("gce", gceModel.machine)
+          , ("openstack", openstackModel.machine)
+          , ("digital-ocean", digitalModel.machine)
+          , ("physical", physicalModel.machine)
+      ]
+  in
+    withDefault emptyMachine (Dict.get stage machines)
 
+  
+intoSystem : Model -> Stage -> System
+intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) stage = 
+  let
+    {owner, type', environment} =  general
+    baseSystem = System owner environment type' (machineFrom (toString stage) model)
+    system = baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical)
+  in 
+    system Nothing Nothing
+  
 update : Action ->  Model-> (Model , Effects Action)
-update action ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) =
+update action ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, stage} as model) =
   case action of
     Next -> 
       let 
@@ -206,16 +229,16 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
         none { model | general = newGeneral }
 
     Stage -> 
-       persistModel saveSystem model Stage
+       (model, persistModel (saveSystem Stage) (intoSystem model stage) (toString stage))
 
     SaveSystem -> 
-       persistModel saveSystem model NoOp
+       (model, persistModel (saveSystem NoOp) (intoSystem model stage) (toString stage))
+
+    Create -> 
+      (model, persistModel (saveSystem Create) (intoSystem model stage) (toString stage))
 
     SaveTemplate -> 
       none model
-
-    Create -> 
-      persistModel saveSystem model Create
 
     Saved next result -> 
       let
@@ -309,9 +332,9 @@ saveResponse =
     ("message" := string) 
     ("id" := int)
 
-saveSystem : String -> Action -> Effects Action
-saveSystem model next = 
-  postJson (Http.string model) saveResponse "/systems"  
+saveSystem : Action -> String -> Effects Action
+saveSystem next json  = 
+  postJson (Http.string json) saveResponse "/systems"  
     |> Task.toResult
     |> Task.map (Saved next)
     |> Effects.task

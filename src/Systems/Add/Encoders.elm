@@ -2,19 +2,20 @@ module Systems.Add.Encoders where
 
 import Json.Encode exposing (..)
 import Systems.Model.Common exposing (..)
-import Systems.Model.AWS as AWSModel exposing (..)
-import Systems.Model.Openstack as OpenstackModel exposing (..)
-import Systems.Add.AWS as AWS exposing (ebsTypes)
-import Systems.Add.GCE as GCE 
-import Systems.Add.Openstack as Openstack
-import Systems.Add.Digital as Digital
-import Systems.Add.Physical as Physical
+
+import Systems.Model.AWS as AWS exposing (AWS, emptyVpc)
+import Systems.Model.Openstack as Openstack exposing (Openstack)
+import Systems.Model.GCE exposing (GCE)
+import Systems.Model.Digital exposing (Digital)
+import Systems.Model.Physical exposing (Physical)
+
+import Systems.Add.AWS exposing (ebsTypes)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
 import String
 
-awsVolumeEncoder : AWSModel.Volume -> Value
+awsVolumeEncoder : AWS.Volume -> Value
 awsVolumeEncoder volume =
   object [
       ("volume-type", maybeString (Dict.get volume.type' ebsTypes))
@@ -25,14 +26,14 @@ awsVolumeEncoder volume =
   ]
 
 
-blockEncoder : Block -> Value
+blockEncoder : AWS.Block -> Value
 blockEncoder block =
   object [
       ("volume", string block.volume)
     , ("device", string block.device)
   ]
 
-vpcEncoder : VPC -> Value
+vpcEncoder : AWS.VPC -> Value
 vpcEncoder ({vpcId} as vpc) =
   if String.isEmpty vpcId then
     null
@@ -43,8 +44,8 @@ vpcEncoder ({vpcId} as vpc) =
       , ("assign-public", bool vpc.assignPublic)
     ]
 
-awsEncoder : AWS.Model -> Value
-awsEncoder ({aws} as model) =
+awsEncoder : AWS -> Value
+awsEncoder aws =
   object [
       ("key-name", string aws.keyName)
     , ("endpoint", string aws.endpoint)
@@ -57,8 +58,8 @@ awsEncoder ({aws} as model) =
     , ("volumes", list (List.map awsVolumeEncoder (defaultEmpty aws.volumes)))
   ]
 
-gceEncoder : GCE.Model -> Value
-gceEncoder ({gce} as model) =
+gceEncoder : GCE -> Value
+gceEncoder gce =
   object [
       ("machine-type", string gce.machineType)
     , ("zone", string gce.zone)
@@ -66,8 +67,8 @@ gceEncoder ({gce} as model) =
     , ("project-id", string gce.projectId)
   ]
 
-digitalEncoder : Digital.Model -> Value
-digitalEncoder ({digital} as model) =
+digitalEncoder : Digital -> Value
+digitalEncoder digital =
   object [
       ("size", string digital.size)
     , ("region", string digital.region)
@@ -82,15 +83,15 @@ optional enc value =
     Nothing -> 
        null
 
-physicalEncoder : Physical.Model -> Value
-physicalEncoder ({physical} as model) =
+physicalEncoder : Physical -> Value
+physicalEncoder physical =
   object [
       ("mac", optional string physical.mac)
     , ("broadcast", optional string physical.broadcast)
   ]
 
 
-openstackVolumeEncoder : OpenstackModel.Volume -> Value
+openstackVolumeEncoder : Openstack.Volume -> Value
 openstackVolumeEncoder volume =
   object [
       ("device", string volume.device)
@@ -106,8 +107,8 @@ maybeString optional =
     Nothing -> 
       null
 
-openstackEncoder : Openstack.Model -> Value
-openstackEncoder ({openstack} as model) =
+openstackEncoder : Openstack -> Value
+openstackEncoder openstack =
   object [
       ("flavor", string openstack.flavor)
     , ("tenant", string openstack.tenant)

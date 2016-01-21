@@ -1,11 +1,6 @@
 module Systems.Add.Persistency where
 
-import Systems.Add.General as General exposing (..)
-import Systems.Add.AWS as AWS exposing (..)
-import Systems.Add.Physical as Physical exposing (..)
-import Systems.Add.Openstack as Openstack exposing (..)
-import Systems.Add.GCE as GCE exposing (..)
-import Systems.Add.Digital as Digital exposing (..)
+import Effects exposing (Effects, batch)
 import Systems.Add.Encoders exposing (..)
 import Json.Encode as E
 import Dict exposing (Dict)
@@ -13,89 +8,70 @@ import String
 import Focus exposing (Focus, set, (=>), create)
 import Common.Utils exposing (none)
 import Maybe exposing (withDefault)
+import Systems.Model.AWS exposing (emptyAws)
+import Systems.Model.GCE exposing (emptyGce)
+import Systems.Model.Digital exposing (emptyDigital)
+import Systems.Model.Openstack exposing (emptyOpenstack)
+import Systems.Model.Physical exposing (emptyPhysical)
+import Systems.Model.Common exposing (System, emptyMachine)
 
-encoder key model =
- let 
-   encoders = Dict.fromList [
-       ("aws" , (\ ({awsModel}) -> awsEncoder awsModel))
-     , ("gce" , (\ ({gceModel}) -> gceEncoder gceModel))
-   ]
- in
-  case (Dict.get key encoders) of
-    Just  enc -> 
-       (key, (enc model))
-    Nothing -> 
-       (key, E.null)
-   
-
-encodeAwsModel ({awsModel, general} as model) =
+encodeAws : System -> E.Value
+encodeAws ({owner, env, type', aws, machine} as model) =
  E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , (encoder "aws" model)
-  , ("machine" , machineEncoder awsModel.machine)
+    ("type" , E.string type')
+  , ("owner" , E.string owner)
+  , ("env" , E.string env)
+  , ("aws", awsEncoder (withDefault emptyAws aws))
+  , ("machine" , machineEncoder machine)
  ]
 
-encodeGceModel ({gceModel, general} as model) =
+encodeGce : System -> E.Value
+encodeGce {owner, env, type', gce, machine} =
  E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , (encoder "gce" model)
-  , ("machine" , machineEncoder gceModel.machine)
+    ("type" , E.string type')
+  , ("owner" , E.string owner)
+  , ("env" , E.string env)
+  , ("gce" , gceEncoder (withDefault emptyGce gce))
+  , ("machine" , machineEncoder machine)
  ]
 
-encodeDigitalModel ({digitalModel, general}) =
+encodeDigital : System -> E.Value
+encodeDigital {owner, env, type', digital, machine} =
  E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , ("digital-ocean" , digitalEncoder digitalModel)
-  , ("machine" , machineEncoder digitalModel.machine)
+    ("type" , E.string type')
+  , ("owner" , E.string owner)
+  , ("env" , E.string env)
+  , ("digital-ocean" , digitalEncoder (withDefault emptyDigital digital))
+  , ("machine" , machineEncoder machine)
  ]
 
-encodePhysicalModel ({physicalModel, general}) =
+encodePhysical : System -> E.Value
+encodePhysical {owner, env, type', physical, machine} =
  E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , ("physical" , physicalEncoder physicalModel)
-  , ("machine" , machineEncoder physicalModel.machine)
+    ("type" , E.string type')
+  , ("owner" , E.string owner)
+  , ("env" , E.string env)
+  , ("physical" , physicalEncoder (withDefault emptyPhysical physical))
+  , ("machine" , machineEncoder machine)
  ]
 
-encodeOpenstackModel ({openstackModel, general}) =
+encodeOpenstack : System -> E.Value
+encodeOpenstack {owner, env, type', openstack, machine} =
  E.object [
-    ("type" , E.string general.type')
-  , ("owner" , E.string general.owner)
-  , ("env" , E.string general.environment)
-  , ("openstack" , openstackEncoder openstackModel)
-  , ("machine" , machineEncoder openstackModel.machine)
+    ("type" , E.string type')
+  , ("owner" , E.string owner)
+  , ("env" , E.string env)
+  , ("openstack" , openstackEncoder (withDefault emptyOpenstack openstack))
+  , ("machine" , machineEncoder machine)
  ]
-
-encoders =  Dict.fromList [
-    ("AWS", encodeAwsModel)
-  , ("GCE", encodeGceModel)
-  , ("Digital", encodeDigitalModel)
-  , ("Openstack", encodeOpenstackModel)
-  , ("Physical", encodePhysicalModel)
-  ]
 
 aws : Focus { r | aws :a } a
 aws =
    create .aws (\f r -> { r | aws = f r.aws })
 
-awsModel : Focus { r | awsModel :a } a
-awsModel =
-   create .awsModel (\f r -> { r | awsModel = f r.awsModel })
-
 openstack : Focus { r | openstack :a } a
 openstack =
-   create .openstack (\f r -> { r | openstack= f r.openstack })
-
-openstackModel : Focus { r | openstackModel :a } a
-openstackModel =
-   create .openstackModel (\f r -> { r | openstackModel = f r.openstackModel })
+   create .openstack (\f r -> { r | openstack = f r.openstack })
 
 blockDevices : Focus { r | blockDevices :a } a
 blockDevices =
@@ -109,23 +85,32 @@ addDevice : Maybe (List {r | device : String}) -> Maybe (List {r | device : Stri
 addDevice vs = 
   Just (List.map (\({device} as volume) -> {volume | device = "/dev/"++device}) (withDefault [] vs))
 
-transformers =  Dict.fromList [
-    ("AWS", ((Focus.update (awsModel => aws => blockDevices) addDevice) <<
-             (Focus.update (awsModel => aws => volumes) addDevice)))
-  , ("Openstack", Focus.update (openstackModel => openstack => volumes) addDevice)
+encoders =  Dict.fromList [
+    ("AWS", encodeAws)
+  , ("GCE", encodeGce)
+  , ("Digital", encodeDigital)
+  , ("Openstack", encodeOpenstack)
+  , ("Physical", encodePhysical)
   ]
 
-persistModel f ({stage} as model) action =
-  case (Dict.get (toString stage) encoders) of
+transformers =  Dict.fromList [
+    ("AWS", ((Focus.update (aws => blockDevices) addDevice) <<
+             (Focus.update (aws => volumes) addDevice)))
+  , ("Openstack", Focus.update (openstack => volumes) addDevice)
+  ]
+
+
+persistModel : (String -> Effects a) -> System -> String -> Effects a
+persistModel f system stage =
+  case (Dict.get stage encoders) of
      Just encode -> 
-        case (Dict.get (toString stage) transformers) of
+        case (Dict.get stage transformers) of
           Just transform -> 
-            (model, f (E.encode 0 (encode (transform model))) action)
+            (f (E.encode 0 (encode system)))
 
           Nothing -> 
-            (model, f (E.encode 0 (encode model)) action)
+            (f (E.encode 0 (encode system)))
 
      Nothing -> 
-       none model
-
+        Effects.none
 

@@ -4,6 +4,7 @@ import Systems.Model.AWS exposing (AWS)
 import Systems.Model.GCE exposing (GCE)
 import Systems.Model.Digital exposing (Digital)
 import Systems.Model.Openstack exposing (Openstack)
+import Systems.Model.Physical exposing (Physical)
 import Dict exposing (Dict)
 
 type alias Machine = 
@@ -23,6 +24,7 @@ type alias System =
   , gce : Maybe GCE
   , digital : Maybe Digital
   , openstack : Maybe Openstack
+  , physical : Maybe Physical
   -- template
   , name : Maybe String
   , defaults : Maybe String
@@ -34,4 +36,7 @@ emptyMachine =
 
 emptySystem : System
 emptySystem =
-  System "" "" "" (Machine  "" "" "" (Just "") "") Nothing Nothing Nothing Nothing Nothing Nothing
+  let
+   base = System "" "" ""
+  in 
+   base emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing Nothing

@@ -4,6 +4,7 @@ import Systems.Model.Common exposing (..)
 import Systems.Model.AWS as AWS exposing (..)
 import Systems.Model.GCE exposing (..)
 import Systems.Model.Digital exposing (..)
+import Systems.Model.Physical exposing (..)
 import Systems.Model.Openstack as Openstack exposing (..)
 import Json.Decode as Json exposing (..)
 
@@ -65,6 +66,13 @@ digitalDecoder =
     ("region" := string)
     ("private-networking" := bool)
 
+physicalDecoder: Decoder Physical
+physicalDecoder = 
+  object2 Physical
+    (maybe ("mac" := string))
+    (maybe ("broadcast" := string))
+
+
 openstackVolumeDecoder : Decoder Openstack.Volume
 openstackVolumeDecoder = 
   object3 Openstack.Volume 
@@ -106,6 +114,7 @@ systemDecoder =
     `apply` (maybe ("gce" := gceDecoder))
     `apply` (maybe ("digital-ocean" := digitalDecoder))
     `apply` (maybe ("openstack" := openstackDecoder))
+    `apply` (maybe ("physical" := physicalDecoder))
     `apply` (maybe ("name" := string))
     `apply` (maybe ("defaults" := string))
  
