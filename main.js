@@ -23163,18 +23163,22 @@ Elm.Templates.Add.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $Systems$Add$Common = Elm.Systems.Add.Common.make(_elm),
+   $Systems$Add$Persistency = Elm.Systems.Add.Persistency.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
@@ -23183,27 +23187,71 @@ Elm.Templates.Add.make = function (_elm) {
    SaveResponse,
    A2($Json$Decode._op[":="],"message",$Json$Decode.string),
    A2($Json$Decode._op[":="],"id",$Json$Decode.$int));
-   var view = F2(function (address,model) {
-      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
-      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("panel panel-default")]),_U.list([$Html.text("add a template")]))]))]))]);
-   });
+   var DefaultsInput = function (a) {    return {ctor: "DefaultsInput",_0: a};};
+   var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
    var SetSystem = function (a) {    return {ctor: "SetSystem",_0: a};};
    var TemplateSaved = function (a) {    return {ctor: "TemplateSaved",_0: a};};
-   var saveTemplate = F2(function (model,next) {
-      return $Effects.task(A2($Task.map,TemplateSaved,$Task.toResult(A3($Common$Http.postJson,$Http.string(model),saveResponse,"/templates"))));
+   var saveTemplate = function (json) {
+      return $Effects.task(A2($Task.map,TemplateSaved,$Task.toResult(A3($Common$Http.postJson,$Http.string(json),saveResponse,"/templates"))));
+   };
+   var update = F2(function (action,_p0) {
+      var _p1 = _p0;
+      var _p3 = _p1;
+      var _p2 = action;
+      if (_p2.ctor === "SaveTemplate") {
+            return {ctor: "_Tuple2",_0: _p3,_1: A3($Systems$Add$Persistency.persistModel,saveTemplate,_p1.system,_p1.stage)};
+         } else {
+            return {ctor: "_Tuple2",_0: _p3,_1: $Effects.none};
+         }
    });
+   var Cancel = {ctor: "Cancel"};
    var NoOp = {ctor: "NoOp"};
    var SaveTemplate = {ctor: "SaveTemplate"};
+   var buttons = F2(function (address,model) {
+      var click = $Html$Events.onClick(address);
+      var margin = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "30%"}]));
+      return _U.list([A2($Html.button,
+                     _U.list([$Html$Attributes.id("Cancel"),$Html$Attributes.$class("btn btn-primary"),margin,click(Cancel)]),
+                     _U.list([$Html.text("Cancel")]))
+                     ,A2($Html.button,
+                     _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),margin,click(SaveTemplate)]),
+                     _U.list([$Html.text("Save")]))]);
+   });
+   var view = F2(function (address,_p4) {
+      var _p5 = _p4;
+      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
+                     _U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("panel panel-default")]),
+                     A2($Common$Components.panelContents,
+                     "New Template",
+                     A2($Html.form,
+                     _U.list([]),
+                     _U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
+                     _U.list([A2($Systems$Add$Common.group$,
+                             "Name",
+                             A4($Systems$Add$Common.inputText,address,NameInput," ",A2($Maybe.withDefault,"",_p5.system.name)))
+                             ,A2($Html.div,
+                             _U.list([$Html$Attributes.id("jsoneditor")
+                                     ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "400px"},{ctor: "_Tuple2",_0: "height",_1: "400px"}]))]),
+                             _U.list([]))]))]))))]))]))
+                     ,$Bootstrap$Html.row_(A2(buttons,address,_p5))]);
+   });
    var Model = F2(function (a,b) {    return {system: a,stage: b};});
    var init = $Common$Utils.none(A2(Model,$Systems$Model$Common.emptySystem,""));
    return _elm.Templates.Add.values = {_op: _op
                                       ,Model: Model
                                       ,SaveTemplate: SaveTemplate
                                       ,NoOp: NoOp
+                                      ,Cancel: Cancel
                                       ,TemplateSaved: TemplateSaved
                                       ,SetSystem: SetSystem
+                                      ,NameInput: NameInput
+                                      ,DefaultsInput: DefaultsInput
                                       ,init: init
+                                      ,update: update
+                                      ,buttons: buttons
                                       ,view: view
                                       ,SaveResponse: SaveResponse
                                       ,saveResponse: saveResponse
@@ -23227,24 +23275,32 @@ Elm.Templates.Core.make = function (_elm) {
    $Nav$Side = Elm.Nav.Side.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Systems$Add = Elm.Systems.Add.make(_elm),
    $Templates$Add = Elm.Templates.Add.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    var _p0 = action;return $Common$Utils.none(model);});
-   var SetSystem = function (a) {    return {ctor: "SetSystem",_0: a};};
    var NoOp = {ctor: "NoOp"};
    var TemplatesAdd = function (a) {    return {ctor: "TemplatesAdd",_0: a};};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "TemplatesAdd") {
+            var _p1 = A2($Templates$Add.update,_p0._0,model.add);
+            var newAdd = _p1._0;
+            var effects = _p1._1;
+            return {ctor: "_Tuple2",_0: _U.update(model,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};
+         } else {
+            return $Common$Utils.none(model);
+         }
+   });
    var view = F3(function (address,model,section) {
-      var _p1 = section;
-      if (_p1.ctor === "Add") {
+      var _p2 = section;
+      if (_p2.ctor === "Add") {
             return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),model.add);
          } else {
             return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
          }
    });
    var Model = function (a) {    return {add: a};};
-   var init = function () {    var _p2 = $Templates$Add.init;var add = _p2._0;return $Common$Utils.none(Model(add));}();
-   return _elm.Templates.Core.values = {_op: _op,Model: Model,init: init,TemplatesAdd: TemplatesAdd,NoOp: NoOp,SetSystem: SetSystem,update: update,view: view};
+   var init = function () {    var _p3 = $Templates$Add.init;var add = _p3._0;return $Common$Utils.none(Model(add));}();
+   return _elm.Templates.Core.values = {_op: _op,Model: Model,init: init,TemplatesAdd: TemplatesAdd,NoOp: NoOp,update: update,view: view};
 };
 Elm.Users = Elm.Users || {};
 Elm.Users.Session = Elm.Users.Session || {};
