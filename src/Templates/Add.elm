@@ -17,7 +17,10 @@ import Systems.Model.Common exposing (System, emptySystem)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
--- Add models
+import Systems.Add.Persistency exposing (persistModel)
+import Common.Components exposing (panelContents)
+import Systems.Add.Common exposing (..)
+
 
 type alias Model = 
   {
@@ -28,39 +31,61 @@ type alias Model =
 type Action = 
   SaveTemplate
   | NoOp
+  | Cancel
   | TemplateSaved (Result Http.Error SaveResponse)
   | SetSystem System
+  | NameInput String
+  | DefaultsInput String
 
 init =
   none (Model emptySystem "")   
 
--- update : Action ->  Model-> (Model , Effects Action)
--- update action ({system} as model) =
---   case action of
---
---     SaveTemplate -> 
---        persistModel saveTemplate model NoOp
---
---     TemplateSaved result -> 
---       let
---         success = (setSaved next model)
---         (({saveErrors} as newModel), effects) = resultHandler result model success (setErrors model) NoOp
---       in
---          if not (Dict.isEmpty saveErrors.errors.keyValues) then
---            ({newModel | stage = Error} , Effects.none)
---          else
---            (model, effects)
---
---     _ -> (model, Effects.none)
---
+update : Action ->  Model-> (Model , Effects Action)
+update action ({system, stage} as model) =
+  case action of
+    SaveTemplate -> 
+      (model, persistModel saveTemplate system stage)
 
+    -- TemplateSaved result -> 
+    --   let
+    --     success = (setSaved next model)
+    --     (({saveErrors} as newModel), effects) = resultHandler result model success (setErrors model) NoOp
+    --   in
+    --      if not (Dict.isEmpty saveErrors.errors.keyValues) then
+    --        ({newModel | stage = Error} , Effects.none)
+    --      else
+    --        (model, effects)
+    --
+    _ -> (model, Effects.none)
+
+    
+buttons : Signal.Address Action -> Model -> List Html
+buttons address model =
+  let
+    margin = style [("margin-left", "30%")]
+    click = onClick address
+  in 
+    [ 
+      button [id "Cancel", class "btn btn-primary", margin, click Cancel] [text "Cancel"]
+    , button [id "Save", class "btn btn-primary", margin, click SaveTemplate] [text "Save"]
+    ]
+ 
 view : Signal.Address Action -> Model -> List Html
-view address model =
+view address ({system} as model) =
  [ row_ [
      div [class "col-md-offset-2 col-md-8"] [
-       div [class "panel panel-default"] [text "add a template"]
+       div [class "panel panel-default"]
+         (panelContents "New Template" 
+           (Html.form [] [
+             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
+                  group' "Name" (inputText address NameInput " " (withDefault "" system.name))
+                , div [id "jsoneditor", style [("width", "400px"), ("height", "400px")]] []
+                ]
+                 
+           ]))
      ]
    ]
+ , row_ (buttons address model)
  ]
 
 -- Effects
@@ -74,9 +99,9 @@ saveResponse =
     ("message" := string) 
     ("id" := int)
 
-saveTemplate: String -> Action -> Effects Action
-saveTemplate model next = 
-  postJson (Http.string model) saveResponse "/templates"  
+saveTemplate: String -> Effects Action
+saveTemplate json = 
+  postJson (Http.string json) saveResponse "/templates"  
     |> Task.toResult
     |> Task.map TemplateSaved
     |> Effects.task
