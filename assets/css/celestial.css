@@ -46,6 +46,10 @@ div.jsoneditor-menu {
   background-color: #7B879B;
 }
 
+div.jsoneditor-poweredBy {
+  visibility : hidden
+}
+
 /* .navbar-custom-menu>.navbar-nav>li>.dropdown-menu { */
 /*  position: absolute; */
 /*  right: 0; */

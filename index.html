@@ -61,8 +61,12 @@
 
   main.ports.editorPort.subscribe(function(event) {
       var container = document.getElementById('jsoneditor');
+	var options = {
+	  mode : 'code',
+	  modes: ['code', 'tree'], // allowed modes
+	};
 	if(editor === undefined) {
-	   editor = new JSONEditor(container, {mode: 'code'}, JSON.parse(event));
+	   editor = new JSONEditor(container, options , JSON.parse(event));
 	}
   });
 
