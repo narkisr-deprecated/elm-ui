@@ -36,6 +36,9 @@ update action model =
     _ -> 
       none model 
 
+add system = 
+  TemplatesAdd (Add.SetSystem system)
+
 view : Signal.Address Action -> Model -> Section -> List Html
 view address model section =
   case section of

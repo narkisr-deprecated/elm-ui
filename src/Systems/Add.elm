@@ -129,8 +129,8 @@ machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalMod
     withDefault emptyMachine (Dict.get (String.toLower stage) machines)
 
   
-intoSystem : Model -> Stage -> System
-intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) stage = 
+intoSystem : Model -> System
+intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, stage} as model) = 
   let
     {owner, type', environment} =  general
     baseSystem = System owner environment type' (machineFrom (toString stage) model)
@@ -229,13 +229,13 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
         none { model | general = newGeneral }
 
     Stage -> 
-       (model, persistModel (saveSystem Stage) (intoSystem model stage) (toString stage))
+       (model, persistModel (saveSystem Stage) (intoSystem model) (toString stage))
 
     SaveSystem -> 
-       (model, persistModel (saveSystem NoOp) (intoSystem model stage) (toString stage))
+       (model, persistModel (saveSystem NoOp) (intoSystem model) (toString stage))
 
     Create -> 
-      (model, persistModel (saveSystem Create) (intoSystem model stage) (toString stage))
+      (model, persistModel (saveSystem Create) (intoSystem model) (toString stage))
 
     SaveTemplate -> 
       none model

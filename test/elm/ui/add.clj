@@ -32,13 +32,14 @@
   (select-by-text (find-element-under "div#Type" {:tag :select}) type)
   (select-by-text (find-element-under "div#Hypervisor" {:tag :select}) hypervisor))
 
-(defn save []
-  (wait-until #(exists? {:tag "span" :class "caret"}))
-  (click ".caret") 
-  (click ".SaveSystem")
-  ; let ES do its thing 
-  (Thread/sleep 1000)
-  )
+(defn save 
+  ([] (save "System")) 
+  ([target] 
+     (wait-until #(exists? {:tag "span" :class "caret"}))
+     (click ".caret") 
+     (click (str ".Save" target))
+     ; let ES do its thing 
+     (Thread/sleep 1000)))
 
 (defn network
   ([] (network "red1"))
@@ -104,7 +105,7 @@
    (input-text (find-element-under {:tag "div" :id "Security groups"} {:tag :input}) "default")
    (click-next))
 
-(defn openstack-partial-flow []
+(defn openstack-partial-save []
    (set-driver!  {:browser :firefox})
    (login)    
    (add "openstack" "redis")
@@ -114,6 +115,23 @@
       (input-text (find-element-under "div#IP-Pool" {:tag :input}) "net04_ext")
       (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
       (click-next)
+      ; skipping volumes
+      (click-next) 
+      ))
+
+(defn openstack-partial-template []
+   (set-driver!  {:browser :firefox})
+   (login)    
+   (add "openstack" "redis")
+   (openstack-instance)
+   (let [hostname (uuid)] 
+      (network hostname)
+      (input-text (find-element-under "div#IP-Pool" {:tag :input}) "net04_ext")
+      (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
+      (click-next)
+      ; skipping volumes
+      (click-next) 
+      (save "Template")
       ))
 
 (defn openstack-flow []
@@ -130,6 +148,7 @@
       hostname
    ))
 
+
 (defn gce-flow []
   (add "gce" "redis")
   (wait-until #(exists? {:tag "div" :id "Project id"}))
@@ -140,8 +159,7 @@
   (let [hostname (uuid)] 
     (network hostname)
     (click-next)
-    (save)
-    (search (str "hostname=" hostname))
+    (save) (search (str "hostname=" hostname))
      hostname
    ))
   
@@ -155,4 +173,5 @@
     (let [hostname (openstack-flow)] 
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
-(openstack-partial-flow)
+(openstack-partial-template)
+;; (openstack-partial-save)

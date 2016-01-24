@@ -32,48 +32,11 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="bower_components/admin-lte/dist/css/AdminLTE.min.css">
   <link rel="stylesheet" href="bower_components/admin-lte/dist/css/skins/skin-black.min.css">
-  <style>
-    .navbar-custom-menu>.navbar-nav>li>.dropdown-menu {
-    position: absolute;
-    right: 0;
-    left: auto;
-   }
-    #systemsListing tr:hover {
-      background-color: #e7e7e7;
-    }
-    #runningJobs tbody>tr:hover {
-      background-color: #e7e7e7;
-    }
-    #doneJobs tbody>tr:hover {
-      background-color: #e7e7e7;
-    }
-    /* Job stats legend */
-    .legend { list-style: none; line-height: 1;}
-    .legend li { float: left; margin-right: 20px; }
-    .legend span { border: 1px solid #ccc; float: left; width: 12px; height: 12px; margin: 2px; }
-
-    @keyframes changewidth {
-      from {
-	   width: 10%;
-	 }
-
-      to {
-        width: 80%;
-	}
-    }
-      
-    div.progress-bar#processing {
-     animation-duration: 60s;
-     animation-name: changewidth;
-     animation-iteration-count: infinite;
-     animation-timing-function: ease-in-out;
-    }
-   </style>
+  <link rel="stylesheet" href="assets/css/celestial.css">
 </head>
 
 <body class="hold-transition skin-black sidebar-mini">
   <div id="elmui"></div>
-</div>
 </body>
 
 <script type="text/javascript">
@@ -94,6 +57,14 @@
     redirectWindow.location;
   });
 
+  var editor = undefined;
+
+  main.ports.editorPort.subscribe(function(event) {
+      var container = document.getElementById('jsoneditor');
+	if(editor === undefined) {
+	   editor = new JSONEditor(container, {mode: 'code'}, JSON.parse(event));
+	}
+  });
 
   main.ports.parserPort.subscribe(function(event) {
    try { 

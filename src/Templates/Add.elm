@@ -20,31 +20,47 @@ import Common.Utils exposing (none)
 import Systems.Add.Persistency exposing (persistModel)
 import Common.Components exposing (panelContents)
 import Systems.Add.Common exposing (..)
+import Common.Editor exposing (loadEditor)
+import Debug
 
 
 type alias Model = 
   {
     system : System
-  , stage : String 
+  , stage : String
+  , editDefaults : Bool
   }
 
 type Action = 
   SaveTemplate
   | NoOp
   | Cancel
+  | LoadEditor
   | TemplateSaved (Result Http.Error SaveResponse)
   | SetSystem System
   | NameInput String
   | DefaultsInput String
 
 init =
-  none (Model emptySystem "")   
+  none (Model emptySystem "" False)   
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({system, stage} as model) =
   case action of
     SaveTemplate -> 
       (model, persistModel saveTemplate system stage)
+
+    SetSystem newSystem -> 
+      none (Debug.log (toString newSystem) {model | system = newSystem })
+
+    LoadEditor -> 
+      (model, loadEditor NoOp "{\"defaults\":{\"openstack\":{\"networks\":[]}}}")
+    
+    NameInput name -> 
+      let 
+        newSystem = { system | name = Just name }
+      in 
+        none { model | system = newSystem} 
 
     -- TemplateSaved result -> 
     --   let
@@ -56,7 +72,9 @@ update action ({system, stage} as model) =
     --      else
     --        (model, effects)
     --
-    _ -> (model, Effects.none)
+
+    _ -> 
+      (model, Effects.none)
 
     
 buttons : Signal.Address Action -> Model -> List Html
@@ -71,7 +89,7 @@ buttons address model =
     ]
  
 view : Signal.Address Action -> Model -> List Html
-view address ({system} as model) =
+view address ({system, editDefaults} as model) =
  [ row_ [
      div [class "col-md-offset-2 col-md-8"] [
        div [class "panel panel-default"]
@@ -79,7 +97,8 @@ view address ({system} as model) =
            (Html.form [] [
              div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
                   group' "Name" (inputText address NameInput " " (withDefault "" system.name))
-                , div [id "jsoneditor", style [("width", "400px"), ("height", "400px")]] []
+                , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
+                , div [id "jsoneditor", style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
                 ]
                  
            ]))

@@ -114,6 +114,7 @@ update action ({running, done, pager} as model) =
          (_, job) = Maybe.withDefault (tid, emptyRow) (List.head (List.filter (\(_,job) -> job.tid == tid ) done.rows))
        in
          (model, (newtab NoOp job.tid_link))
+
     LoadRunning (Select tid) ->
        let
          emptyRow = RunningJob "" "" "" "" "" "" ""

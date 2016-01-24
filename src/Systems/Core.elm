@@ -20,6 +20,9 @@ type alias Model =
   }
 
   
+addedSystem model = 
+  Add.intoSystem model.systemsAdd
+
 init : (Model , Effects Action)
 init =
   let

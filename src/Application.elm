@@ -129,8 +129,10 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
              (goto Systems section newModel , newEffects)
 
           Just (Templates, section) -> 
-             (goto Templates section newModel , newEffects)
-
+            let
+             (newTemplates, effects) = Templates.update (Templates.add (Systems.addedSystem newModel.systems)) model.templates 
+            in
+             (goto Templates section {newModel | templates = newTemplates} , Effects.map TemplatesAction effects)
           _ -> 
             (newModel, newEffects)
 

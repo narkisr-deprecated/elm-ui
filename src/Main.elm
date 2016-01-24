@@ -4,6 +4,7 @@ import Task
 import Signal exposing (map, filter)
 import Common.Redirect as Redirect exposing (redirectActions)
 import Common.NewTab as NewTab exposing (newtabActions)
+import Common.Editor as Editor exposing (editorActions)
 import Search exposing (searchActions)
 import Application exposing (init, view, update)
 import Systems.List
@@ -55,11 +56,26 @@ port newtabPort =
      |> map toUrl
 
 
+toJson action = 
+  case action of 
+    Editor.Load s -> 
+      s
+    _ -> ""
+
+
+port editorPort : Signal String
+port editorPort =
+   editorActions.signal
+      |> filter (\s -> s /= Editor.NoOp ) Editor.NoOp
+      |> map toJson
+
+
 toQuery : (Search.Action -> String)
 toQuery action =
    case action of
      Search.Parse query -> 
        query
+
      _ -> ""
 
 port parserPort : Signal String
@@ -90,3 +106,4 @@ jobsStatsPolling =
   Signal.map (\t -> Application.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
  
 port menuPort : Signal String
+
