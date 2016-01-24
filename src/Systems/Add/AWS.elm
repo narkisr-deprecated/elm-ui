@@ -88,13 +88,6 @@ setAWS f ({aws, errors} as model) =
   in
    { model | aws = newAws }
 
-setMachine: (Machine-> Machine) -> Model -> Model
-setMachine f ({machine} as model) =
-  let
-    newMachine = f machine
-  in
-   { model | machine = newMachine }
-
 setVolume : (Volume -> Volume) -> Model -> Model
 setVolume f ({volume} as model) =
   let
@@ -109,29 +102,11 @@ setBlock f ({block} as model) =
   in
     { model | block = newBlock }  
 
-
-
-validationOf : String -> List (a -> Error) -> (Model -> a) -> Model -> Model
-validationOf key validations value ({errors} as model) =
-   let
-     res = List.filter (\error -> error /= None) (List.map (\validation -> (validation (value model))) validations)
-     newErrors = Dict.update key (\_ -> Just res) errors
-   in
-     {model | errors = newErrors}
-
-extractIp : Model -> String
-extractIp ({machine} as model) =
-  case machine.ip of
-    Just ip ->
-      ip
-    Nothing -> 
-      ""
-  
 stringValidations = Dict.fromList [
     vpair Networking [
         ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
       , ("Domain", validationOf "Domain" [notEmpty] (\({machine} as model) -> machine.domain))
-      , ("IP", validationOf "IP" [validIp] extractIp)
+      , ("IP", validationOf "IP" [validIp] (\{machine} -> withDefault "" machine.ip))
       , ("VPC Id", validationOf "VPC Id" [validId 12 "vpc-" True] (\{aws} -> withDefaultProp aws.vpc "" .vpcId))
       , ("Subnet Id", validationOf "Subnet Id" [validId 15 "subnet-" True] (\{aws} -> withDefaultProp aws.vpc "" .subnetId))
     ]
@@ -159,26 +134,7 @@ tupleValidations = Dict.fromList [
   ]
  ]
 
-validate : Step -> String -> Dict String (Dict String (Model -> Model)) -> (Model -> Model)
-validate step key validations =
-  let
-    stepValidations =  withDefault Dict.empty (Dict.get (toString step) validations)
-  in
-    withDefault identity (Dict.get key stepValidations)
-
-
-validateAll : Step -> Model -> Model
-validateAll step model =
-  let
-    validations = [listValidations, stringValidations]
-    stepValues = (List.map (\vs -> withDefault Dict.empty (Dict.get (toString step) vs)) validations)
-  in
-    List.foldl (\v m -> (v m)) model (List.concat (List.map Dict.values stepValues))
-
-
-notAny:  Dict String (List Error) -> Bool
-notAny errors =
-  List.isEmpty (List.filter (\e -> not (List.isEmpty e)) (Dict.values errors))
+validateAWS = validateAll [listValidations, stringValidations]
 
 ignoreDevices: Model-> Model
 ignoreDevices ({errors} as model) =
@@ -189,6 +145,7 @@ ignoreDevices ({errors} as model) =
   in 
     { model | errors =  ignored }
 
+
 update : Action -> Model-> Model
 update action ({next, prev, step, aws, machine, volume, block} as model) =
   case action of
@@ -197,7 +154,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         nextStep = withDefault Instance (List.head next)
         nextSteps = defaultEmpty (List.tail next)
         prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = ignoreDevices (validateAll step model)
+        ({errors} as newModel) = ignoreDevices (validateAWS step model)
       in
         if notAny errors then
           {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
@@ -209,7 +166,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
         prevStep = withDefault Zero (List.head (List.reverse prev))
         prevSteps = List.take ((List.length prev) - 1) prev
         nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = ignoreDevices (validateAll step model)
+        ({errors} as newModel) = ignoreDevices (validateAWS step model)
       in
         if notAny errors then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}

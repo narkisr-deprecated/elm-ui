@@ -67,34 +67,11 @@ setGCE f ({gce, errors} as model) =
   in
    { model | gce = newGce }
 
-setMachine: (Machine-> Machine) -> Model -> Model
-setMachine f ({machine} as model) =
-  let
-    newMachine = f machine
-  in
-   { model | machine = newMachine }
-
-validationOf : String -> List (a -> Error) -> (Model -> a) -> Model -> Model
-validationOf key validations value ({errors} as model) =
-   let
-     res = List.filter (\error -> error /= None) (List.map (\validation -> (validation (value model))) validations)
-     newErrors = Dict.update key (\_ -> Just res) errors
-   in
-     {model | errors = newErrors}
-
-extractIp : Model -> String
-extractIp ({gce} as model) =
-  case gce.staticIp of
-    Just ip ->
-      ip
-    Nothing -> 
-      ""
-  
 stringValidations = Dict.fromList [
     vpair Networking [
         ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
       , ("Domain", validationOf "Domain" [notEmpty] (\({machine} as model) -> machine.domain))
-      , ("IP", validationOf "IP" [validIp] extractIp)
+      , ("IP", validationOf "IP" [validIp] (\{gce} -> withDefault "" gce.staticIp))
     ],
     vpair Instance [
         ("User", validationOf "User" [notEmpty] (\({machine} as model) -> machine.user)),
@@ -102,33 +79,13 @@ stringValidations = Dict.fromList [
     ]
  ]
 
-  
 listValidations = Dict.fromList [
     vpair Instance [
       ("Tags", validationOf "Tags" [hasItems] (\({gce} as model) -> (defaultEmpty gce.tags)))
     ]
  ]
 
-
-validate : Step -> String -> Dict String (Dict String (Model -> Model)) -> (Model -> Model)
-validate step key validations =
-  let
-    stepValidations =  withDefault Dict.empty (Dict.get (toString step) validations)
-  in
-    withDefault identity (Dict.get key stepValidations)
-
-
-validateAll : Step -> Model -> Model
-validateAll step model =
-  let
-    validations = [listValidations, stringValidations]
-    stepValues = (List.map (\vs -> withDefault Dict.empty (Dict.get (toString step) vs)) validations)
-  in
-    List.foldl (\v m -> (v m)) model (List.concat (List.map Dict.values stepValues))
-
-notAny:  Dict String (List Error) -> Bool
-notAny errors =
-  List.isEmpty (List.filter (\e -> not (List.isEmpty e)) (Dict.values errors))
+validateGce = validateAll [listValidations, stringValidations]
 
 update : Action -> Model-> Model
 update action ({next, prev, step, gce, machine} as model) =
@@ -138,7 +95,7 @@ update action ({next, prev, step, gce, machine} as model) =
         nextStep = withDefault Instance (List.head next)
         nextSteps = defaultEmpty (List.tail next)
         prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = (validateAll step model)
+        ({errors} as newModel) = (validateGce step model)
       in
         if notAny errors then
           {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
@@ -150,7 +107,7 @@ update action ({next, prev, step, gce, machine} as model) =
         prevStep = withDefault Zero (List.head (List.reverse prev))
         prevSteps = List.take ((List.length prev) - 1) prev
         nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = (validateAll step model)
+        ({errors} as newModel) = (validateGce step model)
       in
         if notAny errors then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}

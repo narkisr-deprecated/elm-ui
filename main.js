@@ -14919,6 +14919,15 @@ Elm.Systems.Add.Validations.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm);
    var _op = {};
+   var validate = F3(function (step,key,validations) {
+      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
+      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
+   });
+   var validateAll = F3(function (validations,step,model) {
+      var stepValues = A2($List.map,function (vs) {    return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));},validations);
+      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
+   });
+   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
    var vpair = F2(function (step,validations) {    return {ctor: "_Tuple2",_0: $Basics.toString(step),_1: $Dict.fromList(validations)};});
    var Invalid = function (a) {    return {ctor: "Invalid",_0: a};};
    var None = {ctor: "None"};
@@ -14945,6 +14954,17 @@ Elm.Systems.Add.Validations.make = function (_elm) {
       "Id should have ",
       A2($Basics._op["++"],$Basics.toString(length)," characthers"))) : None;
    });
+   var validationOf = F4(function (key,validations,value,_p4) {
+      var _p5 = _p4;
+      var _p7 = _p5;
+      var res = A2($List.filter,
+      function (error) {
+         return !_U.eq(error,None);
+      },
+      A2($List.map,function (validation) {    return validation(value(_p7));},validations));
+      var newErrors = A3($Dict.update,key,function (_p6) {    return $Maybe.Just(res);},_p5.errors);
+      return _U.update(_p7,{errors: newErrors});
+   });
    return _elm.Systems.Add.Validations.values = {_op: _op
                                                 ,None: None
                                                 ,Invalid: Invalid
@@ -14953,7 +14973,11 @@ Elm.Systems.Add.Validations.make = function (_elm) {
                                                 ,notContained: notContained
                                                 ,validIp: validIp
                                                 ,validId: validId
-                                                ,vpair: vpair};
+                                                ,vpair: vpair
+                                                ,notAny: notAny
+                                                ,validateAll: validateAll
+                                                ,validate: validate
+                                                ,validationOf: validationOf};
 };
 Elm.Environments = Elm.Environments || {};
 Elm.Environments.List = Elm.Environments.List || {};
@@ -15035,23 +15059,24 @@ Elm.Systems.Add.Common.make = function (_elm) {
    $String = Elm.String.make(_elm),
    $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm);
    var _op = {};
+   var setMachine = F2(function (f,_p0) {    var _p1 = _p0;var newMachine = f(_p1.machine);return _U.update(_p1,{machine: newMachine});});
    var getOses = F2(function (hyp,model) {
       var hypervisor = A2($Maybe.withDefault,$Environments$List.Empty,A2($Dict.get,hyp,model.environment));
-      var _p0 = hypervisor;
-      switch (_p0.ctor)
-      {case "OSTemplates": return _p0._0;
-         case "Openstack": return _p0._1;
+      var _p2 = hypervisor;
+      switch (_p2.ctor)
+      {case "OSTemplates": return _p2._0;
+         case "Openstack": return _p2._1;
          default: return $Dict.empty;}
    });
-   var setDefaultOS = F2(function (hyp,_p1) {
-      var _p2 = _p1;
-      var _p5 = _p2;
-      var _p4 = _p2.machine;
-      var _p3 = $List.head($Dict.keys(A2(getOses,hyp,_p5)));
-      if (_p3.ctor === "Just") {
-            return $String.isEmpty(_p4.os) ? _U.update(_p5,{machine: _U.update(_p4,{os: _p3._0})}) : _p5;
+   var setDefaultOS = F2(function (hyp,_p3) {
+      var _p4 = _p3;
+      var _p7 = _p4;
+      var _p6 = _p4.machine;
+      var _p5 = $List.head($Dict.keys(A2(getOses,hyp,_p7)));
+      if (_p5.ctor === "Just") {
+            return $String.isEmpty(_p6.os) ? _U.update(_p7,{machine: _U.update(_p6,{os: _p5._0})}) : _p7;
          } else {
-            return _p5;
+            return _p7;
          }
    });
    var checkbox = F3(function (address,action,currentValue) {
@@ -15067,8 +15092,8 @@ Elm.Systems.Add.Common.make = function (_elm) {
       return A3($Html$Events.on,
       "input",
       A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
-      function (_p6) {
-         return A2($Signal.message,address,action(_p6));
+      function (_p8) {
+         return A2($Signal.message,address,action(_p8));
       });
    });
    var typedInput = F5(function (address,action,place,currentValue,typed) {
@@ -15086,8 +15111,8 @@ Elm.Systems.Add.Common.make = function (_elm) {
       return A3($Html$Events.on,
       "change",
       A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
-      function (_p7) {
-         return A2($Signal.message,address,action(_p7));
+      function (_p9) {
+         return A2($Signal.message,address,action(_p9));
       });
    });
    var selected = F2(function (value,$default) {    return _U.eq(value,$default) ? _U.list([A2($Html$Attributes.attribute,"selected","true")]) : _U.list([]);});
@@ -15097,9 +15122,9 @@ Elm.Systems.Add.Common.make = function (_elm) {
       A2($List.map,function (opt) {    return A2($Html.option,A2(selected,opt,$default),_U.list([$Html.text(opt)]));},options));
    });
    var toHtml = function (error) {
-      var _p8 = error;
-      if (_p8.ctor === "Invalid") {
-            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([$Html.text(_p8._0)]));
+      var _p10 = error;
+      if (_p10.ctor === "Invalid") {
+            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([$Html.text(_p10._0)]));
          } else {
             return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([]));
          }
@@ -15134,7 +15159,8 @@ Elm.Systems.Add.Common.make = function (_elm) {
                                            ,inputText: inputText
                                            ,checkbox: checkbox
                                            ,getOses: getOses
-                                           ,setDefaultOS: setDefaultOS};
+                                           ,setDefaultOS: setDefaultOS
+                                           ,setMachine: setMachine};
 };
 Elm.Common = Elm.Common || {};
 Elm.Common.Utils = Elm.Common.Utils || {};
@@ -15402,27 +15428,9 @@ Elm.Systems.Add.AWS.make = function (_elm) {
       var ignored = A2($Dict.remove,"Volume",A2($Dict.remove,"Instance Device",A2($Dict.remove,"EBS Device",_p1.errors)));
       return _U.update(_p1,{errors: ignored});
    };
-   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
-   var validate = F3(function (step,key,validations) {
-      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
-      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
-   });
-   var extractIp = function (_p2) {    var _p3 = _p2;var _p4 = _p3.machine.ip;if (_p4.ctor === "Just") {    return _p4._0;} else {    return "";}};
-   var validationOf = F4(function (key,validations,value,_p5) {
-      var _p6 = _p5;
-      var _p8 = _p6;
-      var res = A2($List.filter,
-      function (error) {
-         return !_U.eq(error,$Systems$Add$Validations.None);
-      },
-      A2($List.map,function (validation) {    return validation(value(_p8));},validations));
-      var newErrors = A3($Dict.update,key,function (_p7) {    return $Maybe.Just(res);},_p6.errors);
-      return _U.update(_p8,{errors: newErrors});
-   });
-   var setBlock = F2(function (f,_p9) {    var _p10 = _p9;var newBlock = f(_p10.block);return _U.update(_p10,{block: newBlock});});
-   var setVolume = F2(function (f,_p11) {    var _p12 = _p11;var newVolume = f(_p12.volume);return _U.update(_p12,{volume: newVolume});});
-   var setMachine = F2(function (f,_p13) {    var _p14 = _p13;var newMachine = f(_p14.machine);return _U.update(_p14,{machine: newMachine});});
-   var setAWS = F2(function (f,_p15) {    var _p16 = _p15;var newAws = f(_p16.aws);return _U.update(_p16,{aws: newAws});});
+   var setBlock = F2(function (f,_p2) {    var _p3 = _p2;var newBlock = f(_p3.block);return _U.update(_p3,{block: newBlock});});
+   var setVolume = F2(function (f,_p4) {    var _p5 = _p4;var newVolume = f(_p5.volume);return _U.update(_p5,{volume: newVolume});});
+   var setAWS = F2(function (f,_p6) {    var _p7 = _p6;var newAws = f(_p7.aws);return _U.update(_p7,{aws: newAws});});
    var Summary = {ctor: "Summary"};
    var Store = {ctor: "Store"};
    var EBS = {ctor: "EBS"};
@@ -15430,50 +15438,50 @@ Elm.Systems.Add.AWS.make = function (_elm) {
                                                  EBS,
                                                  _U.list([{ctor: "_Tuple2"
                                                           ,_0: "EBS Device"
-                                                          ,_1: A3(validationOf,
+                                                          ,_1: A3($Systems$Add$Validations.validationOf,
                                                           "EBS Device",
                                                           _U.list([$Systems$Add$Validations.notContained]),
-                                                          function (_p17) {
-                                                             var _p18 = _p17;
+                                                          function (_p8) {
+                                                             var _p9 = _p8;
                                                              return {ctor: "_Tuple2"
-                                                                    ,_0: _p18.volume.device
+                                                                    ,_0: _p9.volume.device
                                                                     ,_1: A2($List.map,
                                                                     function (_) {
                                                                        return _.device;
                                                                     },
-                                                                    $Common$Utils.defaultEmpty(_p18.aws.volumes))};
+                                                                    $Common$Utils.defaultEmpty(_p9.aws.volumes))};
                                                           })}]))
                                                  ,A2($Systems$Add$Validations.vpair,
                                                  Store,
                                                  _U.list([{ctor: "_Tuple2"
                                                           ,_0: "Instance Device"
-                                                          ,_1: A3(validationOf,
+                                                          ,_1: A3($Systems$Add$Validations.validationOf,
                                                           "Instance Device",
                                                           _U.list([$Systems$Add$Validations.notContained]),
-                                                          function (_p19) {
-                                                             var _p20 = _p19;
+                                                          function (_p10) {
+                                                             var _p11 = _p10;
                                                              return {ctor: "_Tuple2"
-                                                                    ,_0: _p20.block.device
+                                                                    ,_0: _p11.block.device
                                                                     ,_1: A2($List.map,
                                                                     function (_) {
                                                                        return _.device;
                                                                     },
-                                                                    $Common$Utils.defaultEmpty(_p20.aws.blockDevices))};
+                                                                    $Common$Utils.defaultEmpty(_p11.aws.blockDevices))};
                                                           })}
                                                          ,{ctor: "_Tuple2"
                                                           ,_0: "Volume"
-                                                          ,_1: A3(validationOf,
+                                                          ,_1: A3($Systems$Add$Validations.validationOf,
                                                           "Volume",
                                                           _U.list([$Systems$Add$Validations.notContained]),
-                                                          function (_p21) {
-                                                             var _p22 = _p21;
+                                                          function (_p12) {
+                                                             var _p13 = _p12;
                                                              return {ctor: "_Tuple2"
-                                                                    ,_0: _p22.block.volume
+                                                                    ,_0: _p13.block.volume
                                                                     ,_1: A2($List.map,
                                                                     function (_) {
                                                                        return _.volume;
                                                                     },
-                                                                    A2($Maybe.withDefault,_U.list([]),_p22.aws.blockDevices))};
+                                                                    A2($Maybe.withDefault,_U.list([]),_p13.aws.blockDevices))};
                                                           })}]))]));
    var Networking = {ctor: "Networking"};
    var Instance = {ctor: "Instance"};
@@ -15481,231 +15489,239 @@ Elm.Systems.Add.AWS.make = function (_elm) {
                                                   Networking,
                                                   _U.list([{ctor: "_Tuple2"
                                                            ,_0: "Hostname"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Hostname",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p23) {
-                                                              var _p24 = _p23;
-                                                              return _p24.machine.hostname;
+                                                           function (_p14) {
+                                                              var _p15 = _p14;
+                                                              return _p15.machine.hostname;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Domain"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Domain",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p25) {
-                                                              var _p26 = _p25;
-                                                              return _p26.machine.domain;
+                                                           function (_p16) {
+                                                              var _p17 = _p16;
+                                                              return _p17.machine.domain;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "IP"
-                                                           ,_1: A3(validationOf,"IP",_U.list([$Systems$Add$Validations.validIp]),extractIp)}
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
+                                                           "IP",
+                                                           _U.list([$Systems$Add$Validations.validIp]),
+                                                           function (_p18) {
+                                                              var _p19 = _p18;
+                                                              return A2($Maybe.withDefault,"",_p19.machine.ip);
+                                                           })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "VPC Id"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "VPC Id",
                                                            _U.list([A3($Systems$Add$Validations.validId,12,"vpc-",true)]),
-                                                           function (_p27) {
-                                                              var _p28 = _p27;
-                                                              return A3($Common$Utils.withDefaultProp,_p28.aws.vpc,"",function (_) {    return _.vpcId;});
+                                                           function (_p20) {
+                                                              var _p21 = _p20;
+                                                              return A3($Common$Utils.withDefaultProp,_p21.aws.vpc,"",function (_) {    return _.vpcId;});
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Subnet Id"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Subnet Id",
                                                            _U.list([A3($Systems$Add$Validations.validId,15,"subnet-",true)]),
-                                                           function (_p29) {
-                                                              var _p30 = _p29;
-                                                              return A3($Common$Utils.withDefaultProp,_p30.aws.vpc,"",function (_) {    return _.subnetId;});
+                                                           function (_p22) {
+                                                              var _p23 = _p22;
+                                                              return A3($Common$Utils.withDefaultProp,_p23.aws.vpc,"",function (_) {    return _.subnetId;});
                                                            })}]))
                                                   ,A2($Systems$Add$Validations.vpair,
                                                   Instance,
                                                   _U.list([{ctor: "_Tuple2"
                                                            ,_0: "User"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "User",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p31) {
-                                                              var _p32 = _p31;
-                                                              return _p32.machine.user;
+                                                           function (_p24) {
+                                                              var _p25 = _p24;
+                                                              return _p25.machine.user;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Keypair"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Keypair",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p33) {
-                                                              var _p34 = _p33;
-                                                              return _p34.aws.keyName;
+                                                           function (_p26) {
+                                                              var _p27 = _p26;
+                                                              return _p27.aws.keyName;
                                                            })}]))]));
    var listValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
    Instance,
    _U.list([{ctor: "_Tuple2"
             ,_0: "Security groups"
-            ,_1: A3(validationOf,
+            ,_1: A3($Systems$Add$Validations.validationOf,
             "Security groups",
             _U.list([$Systems$Add$Validations.hasItems]),
-            function (_p35) {
-               var _p36 = _p35;
-               return $Common$Utils.defaultEmpty(_p36.aws.securityGroups);
+            function (_p28) {
+               var _p29 = _p28;
+               return $Common$Utils.defaultEmpty(_p29.aws.securityGroups);
             })}]))]));
-   var validateAll = F2(function (step,model) {
-      var validations = _U.list([listValidations,stringValidations]);
-      var stepValues = A2($List.map,function (vs) {    return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));},validations);
-      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
-   });
+   var validateAWS = $Systems$Add$Validations.validateAll(_U.list([listValidations,stringValidations]));
    var Zero = {ctor: "Zero"};
-   var update = F2(function (action,_p37) {
-      var _p38 = _p37;
-      var _p53 = _p38.step;
-      var _p52 = _p38.prev;
-      var _p51 = _p38.next;
-      var _p50 = _p38;
-      var _p49 = _p38.aws;
-      var _p39 = action;
-      switch (_p39.ctor)
-      {case "Next": var _p40 = ignoreDevices(A2(validateAll,_p53,_p50));
-           var newModel = _p40;
-           var errors = _p40.errors;
-           var prevSteps = !_U.eq(_p53,Zero) ? A2($List.append,_p52,_U.list([_p53])) : _p52;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p51));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p51));
-           return notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p41 = ignoreDevices(A2(validateAll,_p53,_p50));
-           var newModel = _p41;
-           var errors = _p41.errors;
-           var nextSteps = !_U.eq(_p53,Zero) ? A2($List.append,_U.list([_p53]),_p51) : _p51;
-           var prevSteps = A2($List.take,$List.length(_p52) - 1,_p52);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p52)));
-           return notAny(errors) ? _U.update(_p50,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p50;
-         case "Update": return A2($Systems$Add$Common.setDefaultOS,"aws",_U.update(_p50,{environment: _p39._0}));
-         case "SelectInstanceType": return A2(setAWS,function (aws) {    return _U.update(aws,{instanceType: _p39._0});},_p50);
-         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p39._0});},_p50);
-         case "SelectEndpoint": var _p42 = A2($Maybe.withDefault,
+   var update = F2(function (action,_p30) {
+      var _p31 = _p30;
+      var _p46 = _p31.step;
+      var _p45 = _p31.prev;
+      var _p44 = _p31.next;
+      var _p43 = _p31;
+      var _p42 = _p31.aws;
+      var _p32 = action;
+      switch (_p32.ctor)
+      {case "Next": var _p33 = ignoreDevices(A2(validateAWS,_p46,_p43));
+           var newModel = _p33;
+           var errors = _p33.errors;
+           var prevSteps = !_U.eq(_p46,Zero) ? A2($List.append,_p45,_U.list([_p46])) : _p45;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p44));
+           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p44));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
+         case "Back": var _p34 = ignoreDevices(A2(validateAWS,_p46,_p43));
+           var newModel = _p34;
+           var errors = _p34.errors;
+           var nextSteps = !_U.eq(_p46,Zero) ? A2($List.append,_U.list([_p46]),_p44) : _p44;
+           var prevSteps = A2($List.take,$List.length(_p45) - 1,_p45);
+           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p45)));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p43,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p43;
+         case "Update": return A2($Systems$Add$Common.setDefaultOS,"aws",_U.update(_p43,{environment: _p32._0}));
+         case "SelectInstanceType": return A2(setAWS,function (aws) {    return _U.update(aws,{instanceType: _p32._0});},_p43);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p32._0});},_p43);
+         case "SelectEndpoint": var _p35 = A2($Maybe.withDefault,
            {ctor: "_Tuple3",_0: "",_1: "",_2: _U.list([])},
-           $List.head(A2($List.filter,function (_p43) {    var _p44 = _p43;return _U.eq(_p44._0,_p39._0);},$Dict.values($Systems$Model$AWS.endpoints))));
-           var url = _p42._1;
-           return A2(setAWS,function (aws) {    return _U.update(aws,{endpoint: url});},_p50);
-         case "SelectZone": return A2(setAWS,function (aws) {    return _U.update(aws,{availabilityZone: $Maybe.Just(_p39._0)});},_p50);
-         case "KeyPairInput": return A4(validate,
-           _p53,
+           $List.head(A2($List.filter,function (_p36) {    var _p37 = _p36;return _U.eq(_p37._0,_p32._0);},$Dict.values($Systems$Model$AWS.endpoints))));
+           var url = _p35._1;
+           return A2(setAWS,function (aws) {    return _U.update(aws,{endpoint: url});},_p43);
+         case "SelectZone": return A2(setAWS,function (aws) {    return _U.update(aws,{availabilityZone: $Maybe.Just(_p32._0)});},_p43);
+         case "KeyPairInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "Keypair",
            stringValidations,
-           A2(setAWS,function (aws) {    return _U.update(aws,{keyName: _p39._0});},_p50));
-         case "SecurityGroupsInput": var splited = A2($String.split," ",_p39._0);
-           return A4(validate,
-           _p53,
+           A2(setAWS,function (aws) {    return _U.update(aws,{keyName: _p32._0});},_p43));
+         case "SecurityGroupsInput": var splited = A2($String.split," ",_p32._0);
+           return A4($Systems$Add$Validations.validate,
+           _p46,
            "Security groups",
            listValidations,
-           A2(setAWS,function (aws) {    return _U.update(aws,{securityGroups: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});},_p50));
-         case "UserInput": return A4(validate,
-           _p53,
+           A2(setAWS,function (aws) {    return _U.update(aws,{securityGroups: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});},_p43));
+         case "UserInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "User",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p39._0});},_p50));
-         case "HostnameInput": return A4(validate,
-           _p53,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p32._0});},_p43));
+         case "HostnameInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "Hostname",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p39._0});},_p50));
-         case "DomainInput": return A4(validate,
-           _p53,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p32._0});},_p43));
+         case "DomainInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "Domain",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p39._0});},_p50));
-         case "IPInput": return A4(validate,
-           _p53,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p32._0});},_p43));
+         case "IPInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "IP",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{ip: $Maybe.Just(_p39._0)});},_p50));
-         case "VPCIdInput": var newVpc = A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p49.vpc);
-           return A4(validate,
-           _p53,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{ip: $Maybe.Just(_p32._0)});},_p43));
+         case "VPCIdInput": var newVpc = A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p42.vpc);
+           return A4($Systems$Add$Validations.validate,
+           _p46,
            "VPC Id",
            stringValidations,
-           A2(setAWS,function (aws) {    return _U.update(aws,{vpc: $Maybe.Just(_U.update(newVpc,{vpcId: _p39._0}))});},_p50));
-         case "SubnetIdInput": var newVpc = A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p49.vpc);
-           return A4(validate,
-           _p53,
+           A2(setAWS,function (aws) {    return _U.update(aws,{vpc: $Maybe.Just(_U.update(newVpc,{vpcId: _p32._0}))});},_p43));
+         case "SubnetIdInput": var newVpc = A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p42.vpc);
+           return A4($Systems$Add$Validations.validate,
+           _p46,
            "Subnet Id",
            stringValidations,
-           A2(setAWS,function (aws) {    return _U.update(aws,{vpc: $Maybe.Just(_U.update(newVpc,{subnetId: _p39._0}))});},_p50));
-         case "AssignIp": var newVpc = A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p49.vpc);
+           A2(setAWS,function (aws) {    return _U.update(aws,{vpc: $Maybe.Just(_U.update(newVpc,{subnetId: _p32._0}))});},_p43));
+         case "AssignIp": var newVpc = A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,_p42.vpc);
            return A2(setAWS,
            function (aws) {
               return _U.update(aws,{vpc: $Maybe.Just(_U.update(newVpc,{assignPublic: $Basics.not(newVpc.assignPublic)}))});
            },
-           _p50);
-         case "SelectEBSType": return A2(setVolume,function (volume) {    return _U.update(volume,{type$: _p39._0});},_p50);
-         case "EBSSizeInput": var _p45 = $String.toInt(_p39._0);
-           if (_p45.ctor === "Ok") {
-                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p45._0});},_p50);
+           _p43);
+         case "SelectEBSType": return A2(setVolume,function (volume) {    return _U.update(volume,{type$: _p32._0});},_p43);
+         case "EBSSizeInput": var _p38 = $String.toInt(_p32._0);
+           if (_p38.ctor === "Ok") {
+                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p38._0});},_p43);
               } else {
-                 return _p50;
+                 return _p43;
               }
-         case "EBSIOPSInput": var _p46 = $String.toInt(_p39._0);
-           if (_p46.ctor === "Ok") {
-                 return A2(setVolume,function (volume) {    return _U.update(volume,{iops: $Maybe.Just(_p46._0)});},_p50);
+         case "EBSIOPSInput": var _p39 = $String.toInt(_p32._0);
+           if (_p39.ctor === "Ok") {
+                 return A2(setVolume,function (volume) {    return _U.update(volume,{iops: $Maybe.Just(_p39._0)});},_p43);
               } else {
-                 return _p50;
+                 return _p43;
               }
-         case "EBSDeviceInput": return A4(validate,
-           _p53,
+         case "EBSDeviceInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "EBS Device",
            tupleValidations,
-           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p39._0});},_p50));
+           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p32._0});},_p43));
          case "EBSOptimized": return A2(setAWS,
            function (aws) {
               return _U.update(aws,{ebsOptimized: $Maybe.Just($Basics.not(A2($Maybe.withDefault,false,aws.ebsOptimized)))});
            },
-           _p50);
-         case "EBSClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p50);
-         case "VolumeAdd": var newAws = _U.update(_p49,
-           {volumes: $Maybe.Just(A2($List.append,_U.list([_p38.volume]),$Common$Utils.defaultEmpty(_p49.volumes)))});
-           var _p47 = A4(validate,_p53,"EBS Device",tupleValidations,_p50);
-           var newModel = _p47;
-           var errors = _p47.errors;
-           return notAny(errors) ? _U.update(newModel,{volume: $Systems$Model$AWS.emptyVolume,aws: newAws}) : _U.update(newModel,{aws: _p49});
-         case "InstanceDeviceInput": return A4(validate,
-           _p53,
+           _p43);
+         case "EBSClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p43);
+         case "VolumeAdd": var newAws = _U.update(_p42,
+           {volumes: $Maybe.Just(A2($List.append,_U.list([_p31.volume]),$Common$Utils.defaultEmpty(_p42.volumes)))});
+           var _p40 = A4($Systems$Add$Validations.validate,_p46,"EBS Device",tupleValidations,_p43);
+           var newModel = _p40;
+           var errors = _p40.errors;
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{volume: $Systems$Model$AWS.emptyVolume,aws: newAws}) : _U.update(newModel,
+           {aws: _p42});
+         case "InstanceDeviceInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "Instance Device",
            tupleValidations,
-           A2(setBlock,function (block) {    return _U.update(block,{device: _p39._0});},_p50));
-         case "InstanceVolumeInput": return A4(validate,
-           _p53,
+           A2(setBlock,function (block) {    return _U.update(block,{device: _p32._0});},_p43));
+         case "InstanceVolumeInput": return A4($Systems$Add$Validations.validate,
+           _p46,
            "Volume",
            tupleValidations,
-           A2(setBlock,function (block) {    return _U.update(block,{volume: _p39._0});},_p50));
-         case "BlockAdd": var newAws = _U.update(_p49,
-           {blockDevices: $Maybe.Just(A2($List.append,_U.list([_p38.block]),$Common$Utils.defaultEmpty(_p49.blockDevices)))});
-           var _p48 = A4(validate,_p53,"Volume",tupleValidations,A4(validate,_p53,"Instance Device",tupleValidations,_p50));
-           var newModel = _p48;
-           var errors = _p48.errors;
-           return notAny(errors) ? _U.update(newModel,{block: $Systems$Model$AWS.emptyBlock,aws: newAws}) : _U.update(newModel,{aws: _p49});
+           A2(setBlock,function (block) {    return _U.update(block,{volume: _p32._0});},_p43));
+         case "BlockAdd": var newAws = _U.update(_p42,
+           {blockDevices: $Maybe.Just(A2($List.append,_U.list([_p31.block]),$Common$Utils.defaultEmpty(_p42.blockDevices)))});
+           var _p41 = A4($Systems$Add$Validations.validate,
+           _p46,
+           "Volume",
+           tupleValidations,
+           A4($Systems$Add$Validations.validate,_p46,"Instance Device",tupleValidations,_p43));
+           var newModel = _p41;
+           var errors = _p41.errors;
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{block: $Systems$Model$AWS.emptyBlock,aws: newAws}) : _U.update(newModel,
+           {aws: _p42});
          case "VolumeRemove": var newVolumes = A2($List.filter,
            function (volume) {
-              return !_U.eq(volume.device,_p39._0);
+              return !_U.eq(volume.device,_p32._0);
            },
-           $Common$Utils.defaultEmpty(_p49.volumes));
-           var newAws = _U.update(_p49,{volumes: $Maybe.Just(newVolumes)});
-           return _U.update(_p50,{aws: newAws});
-         default: var newBlocks = A2($List.filter,function (block) {    return !_U.eq(block.device,_p39._0);},$Common$Utils.defaultEmpty(_p49.blockDevices));
-           var newAws = _U.update(_p49,{blockDevices: $Maybe.Just(newBlocks)});
-           return _U.update(_p50,{aws: newAws});}
+           $Common$Utils.defaultEmpty(_p42.volumes));
+           var newAws = _U.update(_p42,{volumes: $Maybe.Just(newVolumes)});
+           return _U.update(_p43,{aws: newAws});
+         default: var newBlocks = A2($List.filter,function (block) {    return !_U.eq(block.device,_p32._0);},$Common$Utils.defaultEmpty(_p42.blockDevices));
+           var newAws = _U.update(_p42,{blockDevices: $Maybe.Just(newBlocks)});
+           return _U.update(_p43,{aws: newAws});}
    });
    var BlockRemove = function (a) {    return {ctor: "BlockRemove",_0: a};};
-   var blockRow = F2(function (address,_p54) {
-      var _p55 = _p54;
+   var blockRow = F2(function (address,_p47) {
+      var _p48 = _p47;
       var props = _U.list([function (_) {    return _.device;},function (_) {    return _.volume;}]);
       var remove = A2($Html.span,
       _U.list([$Html$Attributes.$class("glyphicon glyphicon-remove")
               ,A2($Html$Attributes.attribute,"aria-hidden","true")
               ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "top",_1: "5px"}]))
-              ,A2($Html$Events.onClick,address,BlockRemove(_p55.device))]),
+              ,A2($Html$Events.onClick,address,BlockRemove(_p48.device))]),
       _U.list([]));
       return A2($Html.tr,
       _U.list([]),
-      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p55))]));},props),_U.list([remove])));
+      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p48))]));},props),_U.list([remove])));
    });
    var blocks = F2(function (address,bs) {
       return A2($Html.div,
@@ -15720,19 +15736,19 @@ Elm.Systems.Add.AWS.make = function (_elm) {
    var BlockAdd = {ctor: "BlockAdd"};
    var InstanceVolumeInput = function (a) {    return {ctor: "InstanceVolumeInput",_0: a};};
    var InstanceDeviceInput = function (a) {    return {ctor: "InstanceDeviceInput",_0: a};};
-   var store = F2(function (address,_p56) {
-      var _p57 = _p56;
-      var _p58 = _p57.block;
-      var check = withErrors(_p57.errors);
+   var store = F2(function (address,_p49) {
+      var _p50 = _p49;
+      var _p51 = _p50.block;
+      var check = withErrors(_p50.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Instance Store")]))
-              ,A2(check,"Instance Device",A4($Systems$Add$Common.inputText,address,InstanceDeviceInput,"sdb",_p58.device))
-              ,A2(check,"Volume",A4($Systems$Add$Common.inputText,address,InstanceVolumeInput,"ephemeral0",_p58.volume))
+              ,A2(check,"Instance Device",A4($Systems$Add$Common.inputText,address,InstanceDeviceInput,"sdb",_p51.device))
+              ,A2(check,"Volume",A4($Systems$Add$Common.inputText,address,InstanceVolumeInput,"ephemeral0",_p51.volume))
               ,A2($Systems$Add$Common.group$,
               "",
               A2($Html.button,_U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,BlockAdd)]),_U.list([$Html.text("Add")])))
-              ,A2(blocks,address,$Common$Utils.defaultEmpty(_p57.aws.blockDevices))]))]);
+              ,A2(blocks,address,$Common$Utils.defaultEmpty(_p50.aws.blockDevices))]))]);
    });
    var AssignIp = {ctor: "AssignIp"};
    var SubnetIdInput = function (a) {    return {ctor: "SubnetIdInput",_0: a};};
@@ -15740,29 +15756,29 @@ Elm.Systems.Add.AWS.make = function (_elm) {
    var EBSClear = {ctor: "EBSClear"};
    var EBSOptimized = {ctor: "EBSOptimized"};
    var VolumeRemove = function (a) {    return {ctor: "VolumeRemove",_0: a};};
-   var volumeRow = F2(function (address,_p59) {
-      var _p60 = _p59;
+   var volumeRow = F2(function (address,_p52) {
+      var _p53 = _p52;
       var props = _U.list([function (_) {
                              return _.device;
                           }
-                          ,function (_p61) {
-                             return $Basics.toString(function (_) {    return _.size;}(_p61));
+                          ,function (_p54) {
+                             return $Basics.toString(function (_) {    return _.size;}(_p54));
                           }
                           ,function (_) {
                              return _.type$;
                           }
-                          ,function (_p62) {
-                             return $Basics.toString(function (_) {    return _.clear;}(_p62));
+                          ,function (_p55) {
+                             return $Basics.toString(function (_) {    return _.clear;}(_p55));
                           }]);
       var remove = A2($Html.span,
       _U.list([$Html$Attributes.$class("glyphicon glyphicon-remove")
               ,A2($Html$Attributes.attribute,"aria-hidden","true")
               ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "top",_1: "5px"}]))
-              ,A2($Html$Events.onClick,address,VolumeRemove(_p60.device))]),
+              ,A2($Html$Events.onClick,address,VolumeRemove(_p53.device))]),
       _U.list([]));
       return A2($Html.tr,
       _U.list([]),
-      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p60))]));},props),_U.list([remove])));
+      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p53))]));},props),_U.list([remove])));
    });
    var volumes = F2(function (address,vs) {
       return A2($Html.div,
@@ -15781,62 +15797,62 @@ Elm.Systems.Add.AWS.make = function (_elm) {
    var EBSIOPSInput = function (a) {    return {ctor: "EBSIOPSInput",_0: a};};
    var EBSSizeInput = function (a) {    return {ctor: "EBSSizeInput",_0: a};};
    var SelectEBSType = function (a) {    return {ctor: "SelectEBSType",_0: a};};
-   var ebs = F2(function (address,_p63) {
-      var _p64 = _p63;
-      var _p66 = _p64.volume;
-      var _p65 = _p64.aws;
-      var check = withErrors(_p64.errors);
+   var ebs = F2(function (address,_p56) {
+      var _p57 = _p56;
+      var _p59 = _p57.volume;
+      var _p58 = _p57.aws;
+      var check = withErrors(_p57.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Global")]))
               ,A2($Systems$Add$Common.group$,
               "EBS Optimized",
-              A3($Systems$Add$Common.checkbox,address,EBSOptimized,A2($Maybe.withDefault,false,_p65.ebsOptimized)))
+              A3($Systems$Add$Common.checkbox,address,EBSOptimized,A2($Maybe.withDefault,false,_p58.ebsOptimized)))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Devices")]))
-              ,A2(check,"EBS Device",A4($Systems$Add$Common.inputText,address,EBSDeviceInput,"sdh",_p66.device))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,EBSSizeInput,"",$Basics.toString(_p66.size)))
-              ,A2($Systems$Add$Common.group$,"Type",A4($Systems$Add$Common.selector,address,SelectEBSType,$Dict.keys(ebsTypes),_p66.type$))
-              ,_U.eq(_p66.type$,"Provisioned IOPS (SSD)") ? A2($Systems$Add$Common.group$,
+              ,A2(check,"EBS Device",A4($Systems$Add$Common.inputText,address,EBSDeviceInput,"sdh",_p59.device))
+              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,EBSSizeInput,"",$Basics.toString(_p59.size)))
+              ,A2($Systems$Add$Common.group$,"Type",A4($Systems$Add$Common.selector,address,SelectEBSType,$Dict.keys(ebsTypes),_p59.type$))
+              ,_U.eq(_p59.type$,"Provisioned IOPS (SSD)") ? A2($Systems$Add$Common.group$,
               "IOPS",
-              A4($Systems$Add$Common.inputNumber,address,EBSIOPSInput,"50",$Basics.toString(A2($Maybe.withDefault,50,_p66.iops)))) : A2($Html.div,
+              A4($Systems$Add$Common.inputNumber,address,EBSIOPSInput,"50",$Basics.toString(A2($Maybe.withDefault,50,_p59.iops)))) : A2($Html.div,
               _U.list([]),
               _U.list([]))
-              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,EBSClear,_p66.clear))
+              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,EBSClear,_p59.clear))
               ,A2($Systems$Add$Common.group$,
               "",
               A2($Html.button,
               _U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,VolumeAdd)]),
               _U.list([$Html.text("Add")])))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Volumes")]))
-              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p65.volumes))]))]);
+              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p58.volumes))]))]);
    });
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
-   var networking = F2(function (address,_p67) {
-      var _p68 = _p67;
-      var _p70 = _p68.machine;
-      var _p69 = _p68.aws;
-      var check = withErrors(_p68.errors);
+   var networking = F2(function (address,_p60) {
+      var _p61 = _p60;
+      var _p63 = _p61.machine;
+      var _p62 = _p61.aws;
+      var check = withErrors(_p61.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("DNS")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p70.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p70.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p70.ip)))
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p63.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p63.domain))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p63.ip)))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("VPC")]))
               ,A2(check,
               "VPC Id",
-              A4($Systems$Add$Common.inputText,address,VPCIdInput,"",A3($Common$Utils.withDefaultProp,_p69.vpc,"",function (_) {    return _.vpcId;})))
+              A4($Systems$Add$Common.inputText,address,VPCIdInput,"",A3($Common$Utils.withDefaultProp,_p62.vpc,"",function (_) {    return _.vpcId;})))
               ,A2(check,
               "Subnet Id",
-              A4($Systems$Add$Common.inputText,address,SubnetIdInput,"",A3($Common$Utils.withDefaultProp,_p69.vpc,"",function (_) {    return _.subnetId;})))
+              A4($Systems$Add$Common.inputText,address,SubnetIdInput,"",A3($Common$Utils.withDefaultProp,_p62.vpc,"",function (_) {    return _.subnetId;})))
               ,A2($Systems$Add$Common.group$,
               "Assign public IP",
               A3($Systems$Add$Common.checkbox,
               address,
               AssignIp,
-              A3($Common$Utils.withDefaultProp,_p69.vpc,false,function (_) {    return _.assignPublic;})))]))]);
+              A3($Common$Utils.withDefaultProp,_p62.vpc,false,function (_) {    return _.assignPublic;})))]))]);
    });
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
    var SecurityGroupsInput = function (a) {    return {ctor: "SecurityGroupsInput",_0: a};};
@@ -15845,53 +15861,53 @@ Elm.Systems.Add.AWS.make = function (_elm) {
    var SelectEndpoint = function (a) {    return {ctor: "SelectEndpoint",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectInstanceType = function (a) {    return {ctor: "SelectInstanceType",_0: a};};
-   var instance = F2(function (address,_p71) {
-      var _p72 = _p71;
-      var _p79 = _p72;
-      var _p78 = _p72.aws;
+   var instance = F2(function (address,_p64) {
+      var _p65 = _p64;
+      var _p72 = _p65;
+      var _p71 = _p65.aws;
       var zone = A2($Maybe.withDefault,
       "",
-      $List.head($Dict.keys(A2($Dict.filter,F2(function (k,_p73) {    var _p74 = _p73;return _U.eq(_p74._1,_p78.endpoint);}),$Systems$Model$AWS.endpoints))));
-      var _p75 = A2($Maybe.withDefault,{ctor: "_Tuple3",_0: "",_1: "",_2: _U.list([])},A2($Dict.get,zone,$Systems$Model$AWS.endpoints));
-      var name = _p75._0;
-      var zones = _p75._2;
+      $List.head($Dict.keys(A2($Dict.filter,F2(function (k,_p66) {    var _p67 = _p66;return _U.eq(_p67._1,_p71.endpoint);}),$Systems$Model$AWS.endpoints))));
+      var _p68 = A2($Maybe.withDefault,{ctor: "_Tuple3",_0: "",_1: "",_2: _U.list([])},A2($Dict.get,zone,$Systems$Model$AWS.endpoints));
+      var name = _p68._0;
+      var zones = _p68._2;
       var zoneOptions = A2($List.append,_U.list([""]),A2($List.map,function (k) {    return A2($Basics._op["++"],zone,k);},zones));
-      var points = A2($List.map,function (_p76) {    var _p77 = _p76;return _p77._0;},$Dict.values($Systems$Model$AWS.endpoints));
-      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p78.securityGroups));
-      var check = withErrors(_p72.errors);
+      var points = A2($List.map,function (_p69) {    var _p70 = _p69;return _p70._0;},$Dict.values($Systems$Model$AWS.endpoints));
+      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p71.securityGroups));
+      var check = withErrors(_p65.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
               ,A2($Systems$Add$Common.group$,
               "Instance type",
-              A4($Systems$Add$Common.selector,address,SelectInstanceType,$Systems$Model$AWS.instanceTypes,_p78.instanceType))
+              A4($Systems$Add$Common.selector,address,SelectInstanceType,$Systems$Model$AWS.instanceTypes,_p71.instanceType))
               ,A2($Systems$Add$Common.group$,
               "OS",
-              A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(A2($Systems$Add$Common.getOses,"aws",_p79)),_p72.machine.os))
+              A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(A2($Systems$Add$Common.getOses,"aws",_p72)),_p65.machine.os))
               ,A2($Systems$Add$Common.group$,"Endpoint",A4($Systems$Add$Common.selector,address,SelectEndpoint,points,name))
               ,A2($Systems$Add$Common.group$,
               "Availability Zone",
-              A4($Systems$Add$Common.selector,address,SelectZone,zoneOptions,A2($Maybe.withDefault,"",_p78.availabilityZone)))
+              A4($Systems$Add$Common.selector,address,SelectZone,zoneOptions,A2($Maybe.withDefault,"",_p71.availabilityZone)))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p79.machine.user))
-              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p78.keyName))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p72.machine.user))
+              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p71.keyName))
               ,A2(check,"Security groups",A4($Systems$Add$Common.inputText,address,SecurityGroupsInput," ",groups))]))]);
    });
-   var stepView = F2(function (address,_p80) {
-      var _p81 = _p80;
-      var _p83 = _p81;
-      var _p82 = _p83.step;
-      switch (_p82.ctor)
-      {case "Instance": return A2(instance,address,_p83);
-         case "Networking": return A2(networking,address,_p83);
-         case "EBS": return A2(ebs,address,_p83);
-         case "Store": return A2(store,address,_p83);
-         case "Summary": return $Systems$View$AWS.summarize({ctor: "_Tuple2",_0: _p81.aws,_1: _p81.machine});
-         default: return A2($Debug.log,$Basics.toString(_p83.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p73) {
+      var _p74 = _p73;
+      var _p76 = _p74;
+      var _p75 = _p76.step;
+      switch (_p75.ctor)
+      {case "Instance": return A2(instance,address,_p76);
+         case "Networking": return A2(networking,address,_p76);
+         case "EBS": return A2(ebs,address,_p76);
+         case "Store": return A2(store,address,_p76);
+         case "Summary": return $Systems$View$AWS.summarize({ctor: "_Tuple2",_0: _p74.aws,_1: _p74.machine});
+         default: return A2($Debug.log,$Basics.toString(_p76.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p84) {
-      var _p85 = _p84;
-      return A2($Common$Components.panelContents,$Basics.toString(_p85.step),A2($Html.form,_U.list([]),A2(stepView,address,_p85)));
+   var view = F2(function (address,_p77) {
+      var _p78 = _p77;
+      return A2($Common$Components.panelContents,$Basics.toString(_p78.step),A2($Html.form,_U.list([]),A2(stepView,address,_p78)));
    });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var Back = {ctor: "Back"};
@@ -15950,17 +15966,12 @@ Elm.Systems.Add.AWS.make = function (_elm) {
                                         ,Store: Store
                                         ,Summary: Summary
                                         ,setAWS: setAWS
-                                        ,setMachine: setMachine
                                         ,setVolume: setVolume
                                         ,setBlock: setBlock
-                                        ,validationOf: validationOf
-                                        ,extractIp: extractIp
                                         ,stringValidations: stringValidations
                                         ,listValidations: listValidations
                                         ,tupleValidations: tupleValidations
-                                        ,validate: validate
-                                        ,validateAll: validateAll
-                                        ,notAny: notAny
+                                        ,validateAWS: validateAWS
                                         ,ignoreDevices: ignoreDevices
                                         ,update: update
                                         ,hasNext: hasNext
@@ -16080,108 +16091,102 @@ Elm.Systems.Add.Physical.make = function (_elm) {
    };
    var hasPrev = function (model) {    return $Basics.not($List.isEmpty(model.prev));};
    var hasNext = function (model) {    return $Basics.not($List.isEmpty(model.next));};
-   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
-   var validate = F3(function (step,key,validations) {
-      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
-      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
-   });
-   var validationOf = F4(function (key,validations,value,_p1) {
-      var _p2 = _p1;
-      var _p4 = _p2;
-      var res = A2($List.filter,
-      function (error) {
-         return !_U.eq(error,$Systems$Add$Validations.None);
-      },
-      A2($List.map,function (validation) {    return validation(value(_p4));},validations));
-      var newErrors = A3($Dict.update,key,function (_p3) {    return $Maybe.Just(res);},_p2.errors);
-      return _U.update(_p4,{errors: newErrors});
-   });
-   var setMachine = F2(function (f,_p5) {    var _p6 = _p5;var newMachine = f(_p6.machine);return _U.update(_p6,{machine: newMachine});});
-   var setPhysical = F2(function (f,_p7) {    var _p8 = _p7;var newPhysical = f(_p8.physical);return _U.update(_p8,{physical: newPhysical});});
+   var setPhysical = F2(function (f,_p1) {    var _p2 = _p1;var newPhysical = f(_p2.physical);return _U.update(_p2,{physical: newPhysical});});
    var Summary = {ctor: "Summary"};
    var Instance = {ctor: "Instance"};
    var stringValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
    Instance,
    _U.list([{ctor: "_Tuple2"
             ,_0: "Hostname"
-            ,_1: A3(validationOf,"Hostname",_U.list([$Systems$Add$Validations.notEmpty]),function (_p9) {    var _p10 = _p9;return _p10.machine.hostname;})}
+            ,_1: A3($Systems$Add$Validations.validationOf,
+            "Hostname",
+            _U.list([$Systems$Add$Validations.notEmpty]),
+            function (_p3) {
+               var _p4 = _p3;
+               return _p4.machine.hostname;
+            })}
            ,{ctor: "_Tuple2"
             ,_0: "Domain"
-            ,_1: A3(validationOf,"Domain",_U.list([$Systems$Add$Validations.notEmpty]),function (_p11) {    var _p12 = _p11;return _p12.machine.domain;})}
+            ,_1: A3($Systems$Add$Validations.validationOf,
+            "Domain",
+            _U.list([$Systems$Add$Validations.notEmpty]),
+            function (_p5) {
+               var _p6 = _p5;
+               return _p6.machine.domain;
+            })}
            ,{ctor: "_Tuple2"
             ,_0: "User"
-            ,_1: A3(validationOf,"User",_U.list([$Systems$Add$Validations.notEmpty]),function (_p13) {    var _p14 = _p13;return _p14.machine.user;})}
+            ,_1: A3($Systems$Add$Validations.validationOf,
+            "User",
+            _U.list([$Systems$Add$Validations.notEmpty]),
+            function (_p7) {
+               var _p8 = _p7;
+               return _p8.machine.user;
+            })}
            ,{ctor: "_Tuple2"
             ,_0: "IP"
-            ,_1: A3(validationOf,
+            ,_1: A3($Systems$Add$Validations.validationOf,
             "IP",
             _U.list([$Systems$Add$Validations.validIp,$Systems$Add$Validations.notEmpty]),
-            function (_p15) {
-               var _p16 = _p15;
-               return A2($Maybe.withDefault,"",_p16.machine.ip);
+            function (_p9) {
+               var _p10 = _p9;
+               return A2($Maybe.withDefault,"",_p10.machine.ip);
             })}]))]));
-   var validateAll = F2(function (step,model) {
-      var stepValues = A2($List.map,
-      function (vs) {
-         return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));
-      },
-      _U.list([stringValidations]));
-      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
-   });
+   var validatePhysical = $Systems$Add$Validations.validateAll(_U.list([stringValidations]));
    var Zero = {ctor: "Zero"};
-   var update = F2(function (action,_p17) {
-      var _p18 = _p17;
-      var _p27 = _p18.step;
-      var _p26 = _p18.prev;
-      var _p25 = _p18.next;
-      var _p24 = _p18;
-      var _p23 = _p18.machine;
-      var _p19 = action;
-      switch (_p19.ctor)
-      {case "Next": var _p20 = A2(validateAll,_p27,_p24);
-           var newModel = _p20;
-           var errors = _p20.errors;
-           var prevSteps = !_U.eq(_p27,Zero) ? A2($List.append,_p26,_U.list([_p27])) : _p26;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p25));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p25));
-           return notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p21 = A2(validateAll,_p27,_p24);
-           var newModel = _p21;
-           var errors = _p21.errors;
-           var nextSteps = !_U.eq(_p27,Zero) ? A2($List.append,_U.list([_p27]),_p25) : _p25;
-           var prevSteps = A2($List.take,$List.length(_p26) - 1,_p26);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p26)));
-           return notAny(errors) ? _U.update(_p24,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p24;
-         case "Update": var newModel = _U.update(_p24,{environment: _p19._0});
-           var _p22 = $List.head($Dict.keys(getOses(newModel)));
-           if (_p22.ctor === "Just") {
-                 return $String.isEmpty(_p23.os) ? _U.update(newModel,{machine: _U.update(_p23,{os: _p22._0})}) : newModel;
+   var update = F2(function (action,_p11) {
+      var _p12 = _p11;
+      var _p21 = _p12.step;
+      var _p20 = _p12.prev;
+      var _p19 = _p12.next;
+      var _p18 = _p12;
+      var _p17 = _p12.machine;
+      var _p13 = action;
+      switch (_p13.ctor)
+      {case "Next": var _p14 = A2(validatePhysical,_p21,_p18);
+           var newModel = _p14;
+           var errors = _p14.errors;
+           var prevSteps = !_U.eq(_p21,Zero) ? A2($List.append,_p20,_U.list([_p21])) : _p20;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p19));
+           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p19));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
+         case "Back": var _p15 = A2(validatePhysical,_p21,_p18);
+           var newModel = _p15;
+           var errors = _p15.errors;
+           var nextSteps = !_U.eq(_p21,Zero) ? A2($List.append,_U.list([_p21]),_p19) : _p19;
+           var prevSteps = A2($List.take,$List.length(_p20) - 1,_p20);
+           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p20)));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p18,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p18;
+         case "Update": var newModel = _U.update(_p18,{environment: _p13._0});
+           var _p16 = $List.head($Dict.keys(getOses(newModel)));
+           if (_p16.ctor === "Just") {
+                 return $String.isEmpty(_p17.os) ? _U.update(newModel,{machine: _U.update(_p17,{os: _p16._0})}) : newModel;
               } else {
                  return newModel;
               }
-         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p19._0});},_p24);
-         case "UserInput": return A4(validate,
-           _p27,
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p13._0});},_p18);
+         case "UserInput": return A4($Systems$Add$Validations.validate,
+           _p21,
            "User",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p19._0});},_p24));
-         case "HostnameInput": return A4(validate,
-           _p27,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p13._0});},_p18));
+         case "HostnameInput": return A4($Systems$Add$Validations.validate,
+           _p21,
            "Hostname",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p19._0});},_p24));
-         case "DomainInput": return A4(validate,
-           _p27,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p13._0});},_p18));
+         case "DomainInput": return A4($Systems$Add$Validations.validate,
+           _p21,
            "Domain",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p19._0});},_p24));
-         case "MacInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{mac: $Maybe.Just(_p19._0)});},_p24);
-         case "BroadcastInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{broadcast: $Maybe.Just(_p19._0)});},_p24);
-         default: return A4(validate,
-           _p27,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p13._0});},_p18));
+         case "MacInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{mac: $Maybe.Just(_p13._0)});},_p18);
+         case "BroadcastInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{broadcast: $Maybe.Just(_p13._0)});},_p18);
+         default: return A4($Systems$Add$Validations.validate,
+           _p21,
            "IP",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{ip: $Maybe.Just(_p19._0)});},_p24));}
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{ip: $Maybe.Just(_p13._0)});},_p18));}
    });
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var BroadcastInput = function (a) {    return {ctor: "BroadcastInput",_0: a};};
@@ -16189,35 +16194,35 @@ Elm.Systems.Add.Physical.make = function (_elm) {
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
-   var instance = F2(function (address,_p28) {
-      var _p29 = _p28;
-      var _p31 = _p29.physical;
-      var _p30 = _p29.machine;
-      var check = withErrors(_p29.errors);
+   var instance = F2(function (address,_p22) {
+      var _p23 = _p22;
+      var _p25 = _p23.physical;
+      var _p24 = _p23.machine;
+      var check = withErrors(_p23.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p30.user))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p24.user))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p30.ip)))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p30.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p30.domain))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p24.ip)))
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p24.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p24.domain))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("WOL")]))
-              ,A2(check,"Mac",A4($Systems$Add$Common.inputText,address,MacInput,"",A2($Maybe.withDefault,"",_p31.mac)))
-              ,A2(check,"Broadcast",A4($Systems$Add$Common.inputText,address,BroadcastInput,"",A2($Maybe.withDefault,"",_p31.broadcast)))]))]);
+              ,A2(check,"Mac",A4($Systems$Add$Common.inputText,address,MacInput,"",A2($Maybe.withDefault,"",_p25.mac)))
+              ,A2(check,"Broadcast",A4($Systems$Add$Common.inputText,address,BroadcastInput,"",A2($Maybe.withDefault,"",_p25.broadcast)))]))]);
    });
-   var stepView = F2(function (address,_p32) {
-      var _p33 = _p32;
-      var _p35 = _p33;
-      var _p34 = _p35.step;
-      switch (_p34.ctor)
-      {case "Instance": return A2(instance,address,_p35);
-         case "Summary": return $Systems$View$Physical.summarize({ctor: "_Tuple2",_0: _p33.physical,_1: _p33.machine});
-         default: return A2($Debug.log,$Basics.toString(_p35.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p26) {
+      var _p27 = _p26;
+      var _p29 = _p27;
+      var _p28 = _p29.step;
+      switch (_p28.ctor)
+      {case "Instance": return A2(instance,address,_p29);
+         case "Summary": return $Systems$View$Physical.summarize({ctor: "_Tuple2",_0: _p27.physical,_1: _p27.machine});
+         default: return A2($Debug.log,$Basics.toString(_p29.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p36) {
-      var _p37 = _p36;
-      return A2($Common$Components.panelContents,$Basics.toString(_p37.step),A2($Html.form,_U.list([]),A2(stepView,address,_p37)));
+   var view = F2(function (address,_p30) {
+      var _p31 = _p30;
+      return A2($Common$Components.panelContents,$Basics.toString(_p31.step),A2($Html.form,_U.list([]),A2(stepView,address,_p31)));
    });
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var Update = function (a) {    return {ctor: "Update",_0: a};};
@@ -16247,12 +16252,8 @@ Elm.Systems.Add.Physical.make = function (_elm) {
                                              ,Instance: Instance
                                              ,Summary: Summary
                                              ,setPhysical: setPhysical
-                                             ,setMachine: setMachine
-                                             ,validationOf: validationOf
                                              ,stringValidations: stringValidations
-                                             ,validate: validate
-                                             ,validateAll: validateAll
-                                             ,notAny: notAny
+                                             ,validatePhysical: validatePhysical
                                              ,update: update
                                              ,hasNext: hasNext
                                              ,hasPrev: hasPrev
@@ -16403,39 +16404,22 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
       var ignored = A2($Dict.remove,"Volume",A2($Dict.remove,"Instance Device",A2($Dict.remove,"Cinder Device",_p7.errors)));
       return _U.update(_p7,{errors: ignored});
    };
-   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
-   var validate = F3(function (step,key,validations) {
-      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
-      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
-   });
-   var validationOf = F4(function (key,validations,value,_p8) {
-      var _p9 = _p8;
-      var _p11 = _p9;
-      var res = A2($List.filter,
-      function (error) {
-         return !_U.eq(error,$Systems$Add$Validations.None);
-      },
-      A2($List.map,function (validation) {    return validation(value(_p11));},validations));
-      var newErrors = A3($Dict.update,key,function (_p10) {    return $Maybe.Just(res);},_p9.errors);
-      return _U.update(_p11,{errors: newErrors});
-   });
-   var setVolume = F2(function (f,_p12) {    var _p13 = _p12;var newVolume = f(_p13.volume);return _U.update(_p13,{volume: newVolume});});
-   var setMachine = F2(function (f,_p14) {    var _p15 = _p14;var newMachine = f(_p15.machine);return _U.update(_p15,{machine: newMachine});});
-   var setOpenstack = F2(function (f,_p16) {    var _p17 = _p16;var newOpenstack = f(_p17.openstack);return _U.update(_p17,{openstack: newOpenstack});});
+   var setVolume = F2(function (f,_p8) {    var _p9 = _p8;var newVolume = f(_p9.volume);return _U.update(_p9,{volume: newVolume});});
+   var setOpenstack = F2(function (f,_p10) {    var _p11 = _p10;var newOpenstack = f(_p11.openstack);return _U.update(_p11,{openstack: newOpenstack});});
    var Summary = {ctor: "Summary"};
    var Cinder = {ctor: "Cinder"};
    var tupleValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
    Cinder,
    _U.list([{ctor: "_Tuple2"
             ,_0: "Cinder Device"
-            ,_1: A3(validationOf,
+            ,_1: A3($Systems$Add$Validations.validationOf,
             "Cinder Device",
             _U.list([$Systems$Add$Validations.notContained]),
-            function (_p18) {
-               var _p19 = _p18;
+            function (_p12) {
+               var _p13 = _p12;
                return {ctor: "_Tuple2"
-                      ,_0: _p19.volume.device
-                      ,_1: A2($List.map,function (_) {    return _.device;},$Common$Utils.defaultEmpty(_p19.openstack.volumes))};
+                      ,_0: _p13.volume.device
+                      ,_1: A2($List.map,function (_) {    return _.device;},$Common$Utils.defaultEmpty(_p13.openstack.volumes))};
             })}]))]));
    var Networking = {ctor: "Networking"};
    var Instance = {ctor: "Instance"};
@@ -16443,205 +16427,201 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                                   Networking,
                                                   _U.list([{ctor: "_Tuple2"
                                                            ,_0: "Hostname"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Hostname",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p20) {
-                                                              var _p21 = _p20;
-                                                              return _p21.machine.hostname;
+                                                           function (_p14) {
+                                                              var _p15 = _p14;
+                                                              return _p15.machine.hostname;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Domain"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Domain",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p22) {
-                                                              var _p23 = _p22;
-                                                              return _p23.machine.domain;
+                                                           function (_p16) {
+                                                              var _p17 = _p16;
+                                                              return _p17.machine.domain;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "IP"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "IP",
                                                            _U.list([$Systems$Add$Validations.validIp]),
-                                                           function (_p24) {
-                                                              var _p25 = _p24;
-                                                              return A2($Maybe.withDefault,"",_p25.openstack.floatingIp);
+                                                           function (_p18) {
+                                                              var _p19 = _p18;
+                                                              return A2($Maybe.withDefault,"",_p19.openstack.floatingIp);
                                                            })}]))
                                                   ,A2($Systems$Add$Validations.vpair,
                                                   Instance,
                                                   _U.list([{ctor: "_Tuple2"
                                                            ,_0: "User"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "User",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p26) {
-                                                              var _p27 = _p26;
-                                                              return _p27.machine.user;
+                                                           function (_p20) {
+                                                              var _p21 = _p20;
+                                                              return _p21.machine.user;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Keypair"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Keypair",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p28) {
-                                                              var _p29 = _p28;
-                                                              return _p29.openstack.keyName;
+                                                           function (_p22) {
+                                                              var _p23 = _p22;
+                                                              return _p23.openstack.keyName;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Tenant"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Tenant",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p30) {
-                                                              var _p31 = _p30;
-                                                              return _p31.openstack.tenant;
+                                                           function (_p24) {
+                                                              var _p25 = _p24;
+                                                              return _p25.openstack.tenant;
                                                            })}]))]));
    var listValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
                                                 Instance,
                                                 _U.list([{ctor: "_Tuple2"
                                                          ,_0: "Security groups"
-                                                         ,_1: A3(validationOf,
+                                                         ,_1: A3($Systems$Add$Validations.validationOf,
                                                          "Security groups",
                                                          _U.list([$Systems$Add$Validations.hasItems]),
-                                                         function (_p32) {
-                                                            var _p33 = _p32;
-                                                            return $Common$Utils.defaultEmpty(_p33.openstack.securityGroups);
+                                                         function (_p26) {
+                                                            var _p27 = _p26;
+                                                            return $Common$Utils.defaultEmpty(_p27.openstack.securityGroups);
                                                          })}]))
                                                 ,A2($Systems$Add$Validations.vpair,
                                                 Networking,
                                                 _U.list([{ctor: "_Tuple2"
                                                          ,_0: "Networks"
-                                                         ,_1: A3(validationOf,
+                                                         ,_1: A3($Systems$Add$Validations.validationOf,
                                                          "Networks",
                                                          _U.list([$Systems$Add$Validations.hasItems]),
-                                                         function (_p34) {
-                                                            var _p35 = _p34;
-                                                            return _p35.openstack.networks;
+                                                         function (_p28) {
+                                                            var _p29 = _p28;
+                                                            return _p29.openstack.networks;
                                                          })}]))]));
-   var validateAll = F2(function (step,model) {
-      var validations = _U.list([listValidations,stringValidations]);
-      var stepValues = A2($List.map,function (vs) {    return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));},validations);
-      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
-   });
+   var validateOpenstack = $Systems$Add$Validations.validateAll(_U.list([stringValidations,listValidations]));
    var Zero = {ctor: "Zero"};
-   var update = F2(function (action,_p36) {
-      var _p37 = _p36;
-      var _p47 = _p37.step;
-      var _p46 = _p37.prev;
-      var _p45 = _p37.openstack;
-      var _p44 = _p37.next;
-      var _p43 = _p37;
-      var _p38 = action;
-      switch (_p38.ctor)
-      {case "Next": var _p39 = ignoreDevices(A2(validateAll,_p47,_p43));
-           var newModel = _p39;
-           var errors = _p39.errors;
-           var prevSteps = !_U.eq(_p47,Zero) ? A2($List.append,_p46,_U.list([_p47])) : _p46;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p44));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p44));
-           return notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p40 = ignoreDevices(A2(validateAll,_p47,_p43));
-           var newModel = _p40;
-           var errors = _p40.errors;
-           var nextSteps = !_U.eq(_p47,Zero) ? A2($List.append,_U.list([_p47]),_p44) : _p44;
-           var prevSteps = A2($List.take,$List.length(_p46) - 1,_p46);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p46)));
-           return notAny(errors) ? _U.update(_p43,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p43;
-         case "Update": return A2(setDefaultFlavor,_p43,A2($Systems$Add$Common.setDefaultOS,"openstack",_U.update(_p43,{environment: _p38._0})));
-         case "SelectFlavor": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{flavor: _p38._0});},_p43);
-         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p38._0});},_p43);
-         case "TenantInput": return A4(validate,
-           _p47,
+   var update = F2(function (action,_p30) {
+      var _p31 = _p30;
+      var _p41 = _p31.step;
+      var _p40 = _p31.prev;
+      var _p39 = _p31.openstack;
+      var _p38 = _p31.next;
+      var _p37 = _p31;
+      var _p32 = action;
+      switch (_p32.ctor)
+      {case "Next": var _p33 = ignoreDevices(A2(validateOpenstack,_p41,_p37));
+           var newModel = _p33;
+           var errors = _p33.errors;
+           var prevSteps = !_U.eq(_p41,Zero) ? A2($List.append,_p40,_U.list([_p41])) : _p40;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p38));
+           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p38));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
+         case "Back": var _p34 = ignoreDevices(A2(validateOpenstack,_p41,_p37));
+           var newModel = _p34;
+           var errors = _p34.errors;
+           var nextSteps = !_U.eq(_p41,Zero) ? A2($List.append,_U.list([_p41]),_p38) : _p38;
+           var prevSteps = A2($List.take,$List.length(_p40) - 1,_p40);
+           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p40)));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p37,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p37;
+         case "Update": return A2(setDefaultFlavor,_p37,A2($Systems$Add$Common.setDefaultOS,"openstack",_U.update(_p37,{environment: _p32._0})));
+         case "SelectFlavor": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{flavor: _p32._0});},_p37);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p32._0});},_p37);
+         case "TenantInput": return A4($Systems$Add$Validations.validate,
+           _p41,
            "Tenant",
            stringValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{tenant: _p38._0});},_p43));
-         case "KeyPairInput": return A4(validate,
-           _p47,
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{tenant: _p32._0});},_p37));
+         case "KeyPairInput": return A4($Systems$Add$Validations.validate,
+           _p41,
            "Keypair",
            stringValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{keyName: _p38._0});},_p43));
-         case "SecurityGroupsInput": var splited = A2($String.split," ",_p38._0);
-           return A4(validate,
-           _p47,
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{keyName: _p32._0});},_p37));
+         case "SecurityGroupsInput": var splited = A2($String.split," ",_p32._0);
+           return A4($Systems$Add$Validations.validate,
+           _p41,
            "Security groups",
            listValidations,
            A2(setOpenstack,
            function (openstack) {
               return _U.update(openstack,{securityGroups: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});
            },
-           _p43));
-         case "NetworksInput": var splited = A2($String.split," ",_p38._0);
-           return A4(validate,
-           _p47,
+           _p37));
+         case "NetworksInput": var splited = A2($String.split," ",_p32._0);
+           return A4($Systems$Add$Validations.validate,
+           _p41,
            "Networks",
            listValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{networks: splited});},_p43));
-         case "UserInput": return A4(validate,
-           _p47,
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{networks: splited});},_p37));
+         case "UserInput": return A4($Systems$Add$Validations.validate,
+           _p41,
            "User",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p38._0});},_p43));
-         case "HostnameInput": return A4(validate,
-           _p47,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p32._0});},_p37));
+         case "HostnameInput": return A4($Systems$Add$Validations.validate,
+           _p41,
            "Hostname",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p38._0});},_p43));
-         case "DomainInput": return A4(validate,
-           _p47,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p32._0});},_p37));
+         case "DomainInput": return A4($Systems$Add$Validations.validate,
+           _p41,
            "Domain",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p38._0});},_p43));
-         case "IPInput": return A4(validate,
-           _p47,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p32._0});},_p37));
+         case "IPInput": return A4($Systems$Add$Validations.validate,
+           _p41,
            "IP",
            stringValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIp: $Maybe.Just(_p38._0)});},_p43));
-         case "IPPoolInput": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIpPool: $Maybe.Just(_p38._0)});},_p43);
-         case "CinderSizeInput": var _p41 = $String.toInt(_p38._0);
-           if (_p41.ctor === "Ok") {
-                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p41._0});},_p43);
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIp: $Maybe.Just(_p32._0)});},_p37));
+         case "IPPoolInput": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIpPool: $Maybe.Just(_p32._0)});},_p37);
+         case "CinderSizeInput": var _p35 = $String.toInt(_p32._0);
+           if (_p35.ctor === "Ok") {
+                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p35._0});},_p37);
               } else {
-                 return _p43;
+                 return _p37;
               }
-         case "CinderDeviceInput": return A4(validate,
-           _p47,
+         case "CinderDeviceInput": return A4($Systems$Add$Validations.validate,
+           _p41,
            "Cinder Device",
            tupleValidations,
-           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p38._0});},_p43));
-         case "CinderClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p43);
-         case "VolumeAdd": var newOpenstack = _U.update(_p45,
-           {volumes: $Maybe.Just(A2($List.append,_U.list([_p37.volume]),$Common$Utils.defaultEmpty(_p45.volumes)))});
-           var _p42 = A4(validate,_p47,"Cinder Device",tupleValidations,_p43);
-           var newModel = _p42;
-           var errors = _p42.errors;
-           return notAny(errors) ? _U.update(newModel,{volume: $Systems$Model$Openstack.emptyVolume,openstack: newOpenstack}) : _U.update(newModel,
-           {openstack: _p45});
-         default: var newVolumes = A2($List.filter,function (volume) {    return !_U.eq(volume.device,_p38._0);},$Common$Utils.defaultEmpty(_p45.volumes));
-           var newOpenstack = _U.update(_p45,{volumes: $Maybe.Just(newVolumes)});
-           return _U.update(_p43,{openstack: newOpenstack});}
+           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p32._0});},_p37));
+         case "CinderClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p37);
+         case "VolumeAdd": var newOpenstack = _U.update(_p39,
+           {volumes: $Maybe.Just(A2($List.append,_U.list([_p31.volume]),$Common$Utils.defaultEmpty(_p39.volumes)))});
+           var _p36 = A4($Systems$Add$Validations.validate,_p41,"Cinder Device",tupleValidations,_p37);
+           var newModel = _p36;
+           var errors = _p36.errors;
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,
+           {volume: $Systems$Model$Openstack.emptyVolume,openstack: newOpenstack}) : _U.update(newModel,{openstack: _p39});
+         default: var newVolumes = A2($List.filter,function (volume) {    return !_U.eq(volume.device,_p32._0);},$Common$Utils.defaultEmpty(_p39.volumes));
+           var newOpenstack = _U.update(_p39,{volumes: $Maybe.Just(newVolumes)});
+           return _U.update(_p37,{openstack: newOpenstack});}
    });
    var VolumeRemove = function (a) {    return {ctor: "VolumeRemove",_0: a};};
-   var volumeRow = F2(function (address,_p48) {
-      var _p49 = _p48;
+   var volumeRow = F2(function (address,_p42) {
+      var _p43 = _p42;
       var props = _U.list([function (_) {
                              return _.device;
                           }
-                          ,function (_p50) {
-                             return $Basics.toString(function (_) {    return _.size;}(_p50));
+                          ,function (_p44) {
+                             return $Basics.toString(function (_) {    return _.size;}(_p44));
                           }
-                          ,function (_p51) {
-                             return $Basics.toString(function (_) {    return _.clear;}(_p51));
+                          ,function (_p45) {
+                             return $Basics.toString(function (_) {    return _.clear;}(_p45));
                           }]);
       var remove = A2($Html.span,
       _U.list([$Html$Attributes.$class("glyphicon glyphicon-remove")
               ,A2($Html$Attributes.attribute,"aria-hidden","true")
               ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "top",_1: "5px"}]))
-              ,A2($Html$Events.onClick,address,VolumeRemove(_p49.device))]),
+              ,A2($Html$Events.onClick,address,VolumeRemove(_p43.device))]),
       _U.list([]));
       return A2($Html.tr,
       _U.list([]),
-      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p49))]));},props),_U.list([remove])));
+      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p43))]));},props),_U.list([remove])));
    });
    var volumes = F2(function (address,vs) {
       return A2($Html.div,
@@ -16659,42 +16639,42 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    var CinderClear = {ctor: "CinderClear"};
    var CinderDeviceInput = function (a) {    return {ctor: "CinderDeviceInput",_0: a};};
    var CinderSizeInput = function (a) {    return {ctor: "CinderSizeInput",_0: a};};
-   var cinder = F2(function (address,_p52) {
-      var _p53 = _p52;
-      var _p54 = _p53.volume;
-      var check = withErrors(_p53.errors);
+   var cinder = F2(function (address,_p46) {
+      var _p47 = _p46;
+      var _p48 = _p47.volume;
+      var check = withErrors(_p47.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Devices")]))
-              ,A2(check,"Cinder Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p54.device))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p54.size)))
-              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p54.clear))
+              ,A2(check,"Cinder Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p48.device))
+              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p48.size)))
+              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p48.clear))
               ,A2($Systems$Add$Common.group$,
               "",
               A2($Html.button,
               _U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,VolumeAdd)]),
               _U.list([$Html.text("Add")])))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Volumes")]))
-              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p53.openstack.volumes))]))]);
+              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p47.openstack.volumes))]))]);
    });
    var NetworksInput = function (a) {    return {ctor: "NetworksInput",_0: a};};
    var IPPoolInput = function (a) {    return {ctor: "IPPoolInput",_0: a};};
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
-   var networking = F2(function (address,_p55) {
-      var _p56 = _p55;
-      var _p58 = _p56.openstack;
-      var _p57 = _p56.machine;
-      var networks = A2($String.join," ",_p58.networks);
-      var check = withErrors(_p56.errors);
+   var networking = F2(function (address,_p49) {
+      var _p50 = _p49;
+      var _p52 = _p50.openstack;
+      var _p51 = _p50.machine;
+      var networks = A2($String.join," ",_p52.networks);
+      var check = withErrors(_p50.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p57.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p57.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p58.floatingIp)))
-              ,A2(check,"IP-Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p58.floatingIpPool)))
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p51.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p51.domain))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p52.floatingIp)))
+              ,A2(check,"IP-Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p52.floatingIpPool)))
               ,A2(check,"Networks",A4($Systems$Add$Common.inputText,address,NetworksInput," ",networks))]))]);
    });
    var TenantInput = function (a) {    return {ctor: "TenantInput",_0: a};};
@@ -16703,39 +16683,39 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    var KeyPairInput = function (a) {    return {ctor: "KeyPairInput",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectFlavor = function (a) {    return {ctor: "SelectFlavor",_0: a};};
-   var instance = F2(function (address,_p59) {
-      var _p60 = _p59;
-      var _p62 = _p60.openstack;
-      var _p61 = _p60;
-      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"openstack",_p61));
-      var flavors = $Dict.keys(getFlavors(_p61));
-      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p62.securityGroups));
-      var check = withErrors(_p60.errors);
+   var instance = F2(function (address,_p53) {
+      var _p54 = _p53;
+      var _p56 = _p54.openstack;
+      var _p55 = _p54;
+      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"openstack",_p55));
+      var flavors = $Dict.keys(getFlavors(_p55));
+      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p56.securityGroups));
+      var check = withErrors(_p54.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,"Flavor",A4($Systems$Add$Common.selector,address,SelectFlavor,flavors,_p62.flavor))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,oses,_p60.machine.os))
-              ,A2(check,"Tenant",A4($Systems$Add$Common.inputText,address,TenantInput,"",_p62.tenant))
+              ,A2($Systems$Add$Common.group$,"Flavor",A4($Systems$Add$Common.selector,address,SelectFlavor,flavors,_p56.flavor))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,oses,_p54.machine.os))
+              ,A2(check,"Tenant",A4($Systems$Add$Common.inputText,address,TenantInput,"",_p56.tenant))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p61.machine.user))
-              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p62.keyName))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p55.machine.user))
+              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p56.keyName))
               ,A2(check,"Security groups",A4($Systems$Add$Common.inputText,address,SecurityGroupsInput," ",groups))]))]);
    });
-   var stepView = F2(function (address,_p63) {
-      var _p64 = _p63;
-      var _p66 = _p64;
-      var _p65 = _p66.step;
-      switch (_p65.ctor)
-      {case "Instance": return A2(instance,address,_p66);
-         case "Networking": return A2(networking,address,_p66);
-         case "Cinder": return A2(cinder,address,_p66);
-         case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p64.openstack,_1: _p64.machine});
-         default: return A2($Debug.log,$Basics.toString(_p66.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p57) {
+      var _p58 = _p57;
+      var _p60 = _p58;
+      var _p59 = _p60.step;
+      switch (_p59.ctor)
+      {case "Instance": return A2(instance,address,_p60);
+         case "Networking": return A2(networking,address,_p60);
+         case "Cinder": return A2(cinder,address,_p60);
+         case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p58.openstack,_1: _p58.machine});
+         default: return A2($Debug.log,$Basics.toString(_p60.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p67) {
-      var _p68 = _p67;
-      return A2($Common$Components.panelContents,$Basics.toString(_p68.step),A2($Html.form,_U.list([]),A2(stepView,address,_p68)));
+   var view = F2(function (address,_p61) {
+      var _p62 = _p61;
+      return A2($Common$Components.panelContents,$Basics.toString(_p62.step),A2($Html.form,_U.list([]),A2(stepView,address,_p62)));
    });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var Back = {ctor: "Back"};
@@ -16783,18 +16763,14 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                               ,Cinder: Cinder
                                               ,Summary: Summary
                                               ,setOpenstack: setOpenstack
-                                              ,setMachine: setMachine
                                               ,setVolume: setVolume
-                                              ,validationOf: validationOf
                                               ,stringValidations: stringValidations
                                               ,listValidations: listValidations
                                               ,tupleValidations: tupleValidations
-                                              ,validate: validate
-                                              ,validateAll: validateAll
-                                              ,notAny: notAny
                                               ,ignoreDevices: ignoreDevices
                                               ,getFlavors: getFlavors
                                               ,setDefaultFlavor: setDefaultFlavor
+                                              ,validateOpenstack: validateOpenstack
                                               ,update: update
                                               ,hasNext: hasNext
                                               ,hasPrev: hasPrev
@@ -16917,25 +16893,7 @@ Elm.Systems.Add.GCE.make = function (_elm) {
    };
    var hasPrev = function (model) {    return $Basics.not($List.isEmpty(model.prev));};
    var hasNext = function (model) {    return $Basics.not($List.isEmpty(model.next));};
-   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
-   var validate = F3(function (step,key,validations) {
-      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
-      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
-   });
-   var extractIp = function (_p1) {    var _p2 = _p1;var _p3 = _p2.gce.staticIp;if (_p3.ctor === "Just") {    return _p3._0;} else {    return "";}};
-   var validationOf = F4(function (key,validations,value,_p4) {
-      var _p5 = _p4;
-      var _p7 = _p5;
-      var res = A2($List.filter,
-      function (error) {
-         return !_U.eq(error,$Systems$Add$Validations.None);
-      },
-      A2($List.map,function (validation) {    return validation(value(_p7));},validations));
-      var newErrors = A3($Dict.update,key,function (_p6) {    return $Maybe.Just(res);},_p5.errors);
-      return _U.update(_p7,{errors: newErrors});
-   });
-   var setMachine = F2(function (f,_p8) {    var _p9 = _p8;var newMachine = f(_p9.machine);return _U.update(_p9,{machine: newMachine});});
-   var setGCE = F2(function (f,_p10) {    var _p11 = _p10;var newGce = f(_p11.gce);return _U.update(_p11,{gce: newGce});});
+   var setGCE = F2(function (f,_p1) {    var _p2 = _p1;var newGce = f(_p2.gce);return _U.update(_p2,{gce: newGce});});
    var Summary = {ctor: "Summary"};
    var Networking = {ctor: "Networking"};
    var Instance = {ctor: "Instance"};
@@ -16943,136 +16901,142 @@ Elm.Systems.Add.GCE.make = function (_elm) {
                                                   Networking,
                                                   _U.list([{ctor: "_Tuple2"
                                                            ,_0: "Hostname"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Hostname",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p12) {
-                                                              var _p13 = _p12;
-                                                              return _p13.machine.hostname;
+                                                           function (_p3) {
+                                                              var _p4 = _p3;
+                                                              return _p4.machine.hostname;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Domain"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Domain",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p14) {
-                                                              var _p15 = _p14;
-                                                              return _p15.machine.domain;
+                                                           function (_p5) {
+                                                              var _p6 = _p5;
+                                                              return _p6.machine.domain;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "IP"
-                                                           ,_1: A3(validationOf,"IP",_U.list([$Systems$Add$Validations.validIp]),extractIp)}]))
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
+                                                           "IP",
+                                                           _U.list([$Systems$Add$Validations.validIp]),
+                                                           function (_p7) {
+                                                              var _p8 = _p7;
+                                                              return A2($Maybe.withDefault,"",_p8.gce.staticIp);
+                                                           })}]))
                                                   ,A2($Systems$Add$Validations.vpair,
                                                   Instance,
                                                   _U.list([{ctor: "_Tuple2"
                                                            ,_0: "User"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "User",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p16) {
-                                                              var _p17 = _p16;
-                                                              return _p17.machine.user;
+                                                           function (_p9) {
+                                                              var _p10 = _p9;
+                                                              return _p10.machine.user;
                                                            })}
                                                           ,{ctor: "_Tuple2"
                                                            ,_0: "Project id"
-                                                           ,_1: A3(validationOf,
+                                                           ,_1: A3($Systems$Add$Validations.validationOf,
                                                            "Project id",
                                                            _U.list([$Systems$Add$Validations.notEmpty]),
-                                                           function (_p18) {
-                                                              var _p19 = _p18;
-                                                              return _p19.gce.projectId;
+                                                           function (_p11) {
+                                                              var _p12 = _p11;
+                                                              return _p12.gce.projectId;
                                                            })}]))]));
    var listValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
    Instance,
    _U.list([{ctor: "_Tuple2"
             ,_0: "Tags"
-            ,_1: A3(validationOf,
+            ,_1: A3($Systems$Add$Validations.validationOf,
             "Tags",
             _U.list([$Systems$Add$Validations.hasItems]),
-            function (_p20) {
-               var _p21 = _p20;
-               return $Common$Utils.defaultEmpty(_p21.gce.tags);
+            function (_p13) {
+               var _p14 = _p13;
+               return $Common$Utils.defaultEmpty(_p14.gce.tags);
             })}]))]));
-   var validateAll = F2(function (step,model) {
-      var validations = _U.list([listValidations,stringValidations]);
-      var stepValues = A2($List.map,function (vs) {    return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));},validations);
-      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
-   });
+   var validateGce = $Systems$Add$Validations.validateAll(_U.list([listValidations,stringValidations]));
    var Zero = {ctor: "Zero"};
-   var update = F2(function (action,_p22) {
-      var _p23 = _p22;
-      var _p32 = _p23.step;
-      var _p31 = _p23.prev;
-      var _p30 = _p23.next;
-      var _p29 = _p23;
-      var _p28 = _p23.machine;
-      var _p24 = action;
-      switch (_p24.ctor)
-      {case "Next": var _p25 = A2(validateAll,_p32,_p29);
-           var newModel = _p25;
-           var errors = _p25.errors;
-           var prevSteps = !_U.eq(_p32,Zero) ? A2($List.append,_p31,_U.list([_p32])) : _p31;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p30));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p30));
-           return notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p26 = A2(validateAll,_p32,_p29);
-           var newModel = _p26;
-           var errors = _p26.errors;
-           var nextSteps = !_U.eq(_p32,Zero) ? A2($List.append,_U.list([_p32]),_p30) : _p30;
-           var prevSteps = A2($List.take,$List.length(_p31) - 1,_p31);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p31)));
-           return notAny(errors) ? _U.update(_p29,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p29;
-         case "Update": var newModel = _U.update(_p29,{environment: _p24._0});
-           var _p27 = $List.head($Dict.keys(getOses(newModel)));
-           if (_p27.ctor === "Just") {
-                 return $String.isEmpty(_p28.os) ? _U.update(newModel,{machine: _U.update(_p28,{os: _p27._0})}) : newModel;
+   var update = F2(function (action,_p15) {
+      var _p16 = _p15;
+      var _p25 = _p16.step;
+      var _p24 = _p16.prev;
+      var _p23 = _p16.next;
+      var _p22 = _p16;
+      var _p21 = _p16.machine;
+      var _p17 = action;
+      switch (_p17.ctor)
+      {case "Next": var _p18 = A2(validateGce,_p25,_p22);
+           var newModel = _p18;
+           var errors = _p18.errors;
+           var prevSteps = !_U.eq(_p25,Zero) ? A2($List.append,_p24,_U.list([_p25])) : _p24;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p23));
+           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p23));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
+         case "Back": var _p19 = A2(validateGce,_p25,_p22);
+           var newModel = _p19;
+           var errors = _p19.errors;
+           var nextSteps = !_U.eq(_p25,Zero) ? A2($List.append,_U.list([_p25]),_p23) : _p23;
+           var prevSteps = A2($List.take,$List.length(_p24) - 1,_p24);
+           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p24)));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p22,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p22;
+         case "Update": var newModel = _U.update(_p22,{environment: _p17._0});
+           var _p20 = $List.head($Dict.keys(getOses(newModel)));
+           if (_p20.ctor === "Just") {
+                 return $String.isEmpty(_p21.os) ? _U.update(newModel,{machine: _U.update(_p21,{os: _p20._0})}) : newModel;
               } else {
                  return newModel;
               }
-         case "SelectMachineType": return A2(setGCE,function (gce) {    return _U.update(gce,{machineType: _p24._0});},_p29);
-         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p24._0});},_p29);
-         case "SelectZone": return A2(setGCE,function (gce) {    return _U.update(gce,{zone: _p24._0});},_p29);
-         case "UserInput": return A4(validate,
-           _p32,
+         case "SelectMachineType": return A2(setGCE,function (gce) {    return _U.update(gce,{machineType: _p17._0});},_p22);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p17._0});},_p22);
+         case "SelectZone": return A2(setGCE,function (gce) {    return _U.update(gce,{zone: _p17._0});},_p22);
+         case "UserInput": return A4($Systems$Add$Validations.validate,
+           _p25,
            "User",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p24._0});},_p29));
-         case "HostnameInput": return A4(validate,
-           _p32,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p17._0});},_p22));
+         case "HostnameInput": return A4($Systems$Add$Validations.validate,
+           _p25,
            "Hostname",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p24._0});},_p29));
-         case "ProjectIdInput": return A4(validate,
-           _p32,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p17._0});},_p22));
+         case "ProjectIdInput": return A4($Systems$Add$Validations.validate,
+           _p25,
            "Project id",
            stringValidations,
-           A2(setGCE,function (gce) {    return _U.update(gce,{projectId: _p24._0});},_p29));
-         case "TagsInput": var splited = A2($String.split," ",_p24._0);
-           return A4(validate,
-           _p32,
+           A2(setGCE,function (gce) {    return _U.update(gce,{projectId: _p17._0});},_p22));
+         case "TagsInput": var splited = A2($String.split," ",_p17._0);
+           return A4($Systems$Add$Validations.validate,
+           _p25,
            "Tags",
            listValidations,
-           A2(setGCE,function (gce) {    return _U.update(gce,{tags: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});},_p29));
-         case "DomainInput": return A4(validate,
-           _p32,
+           A2(setGCE,function (gce) {    return _U.update(gce,{tags: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});},_p22));
+         case "DomainInput": return A4($Systems$Add$Validations.validate,
+           _p25,
            "Domain",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p24._0});},_p29));
-         default: return A4(validate,_p32,"IP",stringValidations,A2(setGCE,function (gce) {    return _U.update(gce,{staticIp: $Maybe.Just(_p24._0)});},_p29));}
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p17._0});},_p22));
+         default: return A4($Systems$Add$Validations.validate,
+           _p25,
+           "IP",
+           stringValidations,
+           A2(setGCE,function (gce) {    return _U.update(gce,{staticIp: $Maybe.Just(_p17._0)});},_p22));}
    });
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
-   var networking = F2(function (address,_p33) {
-      var _p34 = _p33;
-      var _p35 = _p34.machine;
-      var check = withErrors(_p34.errors);
+   var networking = F2(function (address,_p26) {
+      var _p27 = _p26;
+      var _p28 = _p27.machine;
+      var check = withErrors(_p27.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("DNS")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p35.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p35.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p34.gce.staticIp)))]))]);
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p28.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p28.domain))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p27.gce.staticIp)))]))]);
    });
    var TagsInput = function (a) {    return {ctor: "TagsInput",_0: a};};
    var ProjectIdInput = function (a) {    return {ctor: "ProjectIdInput",_0: a};};
@@ -17080,39 +17044,39 @@ Elm.Systems.Add.GCE.make = function (_elm) {
    var SelectZone = function (a) {    return {ctor: "SelectZone",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectMachineType = function (a) {    return {ctor: "SelectMachineType",_0: a};};
-   var instance = F2(function (address,_p36) {
-      var _p37 = _p36;
-      var _p39 = _p37;
-      var _p38 = _p37.gce;
+   var instance = F2(function (address,_p29) {
+      var _p30 = _p29;
+      var _p32 = _p30;
+      var _p31 = _p30.gce;
       var zone = A2($Maybe.withDefault,"",$List.head($Systems$Model$GCE.zones));
-      var tags = A2($String.join," ",$Common$Utils.defaultEmpty(_p38.tags));
-      var check = withErrors(_p37.errors);
+      var tags = A2($String.join," ",$Common$Utils.defaultEmpty(_p31.tags));
+      var check = withErrors(_p30.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
               ,A2($Systems$Add$Common.group$,
               "Machine type",
-              A4($Systems$Add$Common.selector,address,SelectMachineType,$Systems$Model$GCE.machineTypes,_p38.machineType))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p39)),_p37.machine.os))
-              ,A2($Systems$Add$Common.group$,"Zone",A4($Systems$Add$Common.selector,address,SelectZone,$Systems$Model$GCE.zones,_p38.zone))
-              ,A2(check,"Project id",A4($Systems$Add$Common.inputText,address,ProjectIdInput,"",_p38.projectId))
+              A4($Systems$Add$Common.selector,address,SelectMachineType,$Systems$Model$GCE.machineTypes,_p31.machineType))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p32)),_p30.machine.os))
+              ,A2($Systems$Add$Common.group$,"Zone",A4($Systems$Add$Common.selector,address,SelectZone,$Systems$Model$GCE.zones,_p31.zone))
+              ,A2(check,"Project id",A4($Systems$Add$Common.inputText,address,ProjectIdInput,"",_p31.projectId))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p39.machine.user))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p32.machine.user))
               ,A2(check,"Tags",A4($Systems$Add$Common.inputText,address,TagsInput," ",tags))]))]);
    });
-   var stepView = F2(function (address,_p40) {
-      var _p41 = _p40;
-      var _p43 = _p41;
-      var _p42 = _p43.step;
-      switch (_p42.ctor)
-      {case "Instance": return A2(instance,address,_p43);
-         case "Networking": return A2(networking,address,_p43);
-         case "Summary": return $Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p41.gce,_1: _p41.machine});
-         default: return A2($Debug.log,$Basics.toString(_p43.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p33) {
+      var _p34 = _p33;
+      var _p36 = _p34;
+      var _p35 = _p36.step;
+      switch (_p35.ctor)
+      {case "Instance": return A2(instance,address,_p36);
+         case "Networking": return A2(networking,address,_p36);
+         case "Summary": return $Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p34.gce,_1: _p34.machine});
+         default: return A2($Debug.log,$Basics.toString(_p36.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p44) {
-      var _p45 = _p44;
-      return A2($Common$Components.panelContents,$Basics.toString(_p45.step),A2($Html.form,_U.list([]),A2(stepView,address,_p45)));
+   var view = F2(function (address,_p37) {
+      var _p38 = _p37;
+      return A2($Common$Components.panelContents,$Basics.toString(_p38.step),A2($Html.form,_U.list([]),A2(stepView,address,_p38)));
    });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var Back = {ctor: "Back"};
@@ -17144,14 +17108,9 @@ Elm.Systems.Add.GCE.make = function (_elm) {
                                         ,Networking: Networking
                                         ,Summary: Summary
                                         ,setGCE: setGCE
-                                        ,setMachine: setMachine
-                                        ,validationOf: validationOf
-                                        ,extractIp: extractIp
                                         ,stringValidations: stringValidations
                                         ,listValidations: listValidations
-                                        ,validate: validate
-                                        ,validateAll: validateAll
-                                        ,notAny: notAny
+                                        ,validateGce: validateGce
                                         ,update: update
                                         ,hasNext: hasNext
                                         ,hasPrev: hasPrev
@@ -17261,95 +17220,89 @@ Elm.Systems.Add.Digital.make = function (_elm) {
    };
    var hasPrev = function (model) {    return $Basics.not($List.isEmpty(model.prev));};
    var hasNext = function (model) {    return $Basics.not($List.isEmpty(model.next));};
-   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
-   var validate = F3(function (step,key,validations) {
-      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
-      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
-   });
-   var validationOf = F4(function (key,validations,value,_p1) {
-      var _p2 = _p1;
-      var _p4 = _p2;
-      var res = A2($List.filter,
-      function (error) {
-         return !_U.eq(error,$Systems$Add$Validations.None);
-      },
-      A2($List.map,function (validation) {    return validation(value(_p4));},validations));
-      var newErrors = A3($Dict.update,key,function (_p3) {    return $Maybe.Just(res);},_p2.errors);
-      return _U.update(_p4,{errors: newErrors});
-   });
-   var setMachine = F2(function (f,_p5) {    var _p6 = _p5;var newMachine = f(_p6.machine);return _U.update(_p6,{machine: newMachine});});
-   var setDigital = F2(function (f,_p7) {    var _p8 = _p7;var newDigital = f(A2($Debug.log,"",_p8.digital));return _U.update(_p8,{digital: newDigital});});
+   var setDigital = F2(function (f,_p1) {    var _p2 = _p1;var newDigital = f(A2($Debug.log,"",_p2.digital));return _U.update(_p2,{digital: newDigital});});
    var Summary = {ctor: "Summary"};
    var Instance = {ctor: "Instance"};
    var stringValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
    Instance,
    _U.list([{ctor: "_Tuple2"
             ,_0: "Hostname"
-            ,_1: A3(validationOf,"Hostname",_U.list([$Systems$Add$Validations.notEmpty]),function (_p9) {    var _p10 = _p9;return _p10.machine.hostname;})}
+            ,_1: A3($Systems$Add$Validations.validationOf,
+            "Hostname",
+            _U.list([$Systems$Add$Validations.notEmpty]),
+            function (_p3) {
+               var _p4 = _p3;
+               return _p4.machine.hostname;
+            })}
            ,{ctor: "_Tuple2"
             ,_0: "Domain"
-            ,_1: A3(validationOf,"Domain",_U.list([$Systems$Add$Validations.notEmpty]),function (_p11) {    var _p12 = _p11;return _p12.machine.domain;})}
+            ,_1: A3($Systems$Add$Validations.validationOf,
+            "Domain",
+            _U.list([$Systems$Add$Validations.notEmpty]),
+            function (_p5) {
+               var _p6 = _p5;
+               return _p6.machine.domain;
+            })}
            ,{ctor: "_Tuple2"
             ,_0: "User"
-            ,_1: A3(validationOf,"User",_U.list([$Systems$Add$Validations.notEmpty]),function (_p13) {    var _p14 = _p13;return _p14.machine.user;})}]))]));
-   var validateAll = F2(function (step,model) {
-      var stepValues = A2($List.map,
-      function (vs) {
-         return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));
-      },
-      _U.list([stringValidations]));
-      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
-   });
+            ,_1: A3($Systems$Add$Validations.validationOf,
+            "User",
+            _U.list([$Systems$Add$Validations.notEmpty]),
+            function (_p7) {
+               var _p8 = _p7;
+               return _p8.machine.user;
+            })}]))]));
+   var validateDigital = $Systems$Add$Validations.validateAll(_U.list([stringValidations]));
    var Zero = {ctor: "Zero"};
-   var update = F2(function (action,_p15) {
-      var _p16 = _p15;
-      var _p25 = _p16.step;
-      var _p24 = _p16.prev;
-      var _p23 = _p16.next;
-      var _p22 = _p16;
-      var _p21 = _p16.machine;
-      var _p17 = action;
-      switch (_p17.ctor)
-      {case "Next": var _p18 = A2(validateAll,_p25,_p22);
-           var newModel = _p18;
-           var errors = _p18.errors;
-           var prevSteps = !_U.eq(_p25,Zero) ? A2($List.append,_p24,_U.list([_p25])) : _p24;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p23));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p23));
-           return notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p19 = A2(validateAll,_p25,_p22);
-           var newModel = _p19;
-           var errors = _p19.errors;
-           var nextSteps = !_U.eq(_p25,Zero) ? A2($List.append,_U.list([_p25]),_p23) : _p23;
-           var prevSteps = A2($List.take,$List.length(_p24) - 1,_p24);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p24)));
-           return notAny(errors) ? _U.update(_p22,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p22;
-         case "Update": var newModel = _U.update(_p22,{environment: _p17._0});
-           var _p20 = $List.head($Dict.keys(getOses(newModel)));
-           if (_p20.ctor === "Just") {
-                 return $String.isEmpty(_p21.os) ? _U.update(newModel,{machine: _U.update(_p21,{os: _p20._0})}) : newModel;
+   var update = F2(function (action,_p9) {
+      var _p10 = _p9;
+      var _p19 = _p10.step;
+      var _p18 = _p10.prev;
+      var _p17 = _p10.next;
+      var _p16 = _p10;
+      var _p15 = _p10.machine;
+      var _p11 = action;
+      switch (_p11.ctor)
+      {case "Next": var _p12 = A2(validateDigital,_p19,_p16);
+           var newModel = _p12;
+           var errors = _p12.errors;
+           var prevSteps = !_U.eq(_p19,Zero) ? A2($List.append,_p18,_U.list([_p19])) : _p18;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p17));
+           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p17));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
+         case "Back": var _p13 = A2(validateDigital,_p19,_p16);
+           var newModel = _p13;
+           var errors = _p13.errors;
+           var nextSteps = !_U.eq(_p19,Zero) ? A2($List.append,_U.list([_p19]),_p17) : _p17;
+           var prevSteps = A2($List.take,$List.length(_p18) - 1,_p18);
+           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p18)));
+           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p16,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p16;
+         case "Update": var newModel = _U.update(_p16,{environment: _p11._0});
+           var _p14 = $List.head($Dict.keys(getOses(newModel)));
+           if (_p14.ctor === "Just") {
+                 return $String.isEmpty(_p15.os) ? _U.update(newModel,{machine: _U.update(_p15,{os: _p14._0})}) : newModel;
               } else {
                  return newModel;
               }
-         case "SelectSize": return A2(setDigital,function (digital) {    return _U.update(digital,{size: _p17._0});},_p22);
-         case "SelectOS": return A2(setMachine,function (machine) {    return _U.update(machine,{os: _p17._0});},_p22);
-         case "SelectRegion": return A2(setDigital,function (digital) {    return _U.update(digital,{region: _p17._0});},_p22);
-         case "UserInput": return A4(validate,
-           _p25,
+         case "SelectSize": return A2(setDigital,function (digital) {    return _U.update(digital,{size: _p11._0});},_p16);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p11._0});},_p16);
+         case "SelectRegion": return A2(setDigital,function (digital) {    return _U.update(digital,{region: _p11._0});},_p16);
+         case "UserInput": return A4($Systems$Add$Validations.validate,
+           _p19,
            "User",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{user: _p17._0});},_p22));
-         case "HostnameInput": return A4(validate,
-           _p25,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p11._0});},_p16));
+         case "HostnameInput": return A4($Systems$Add$Validations.validate,
+           _p19,
            "Hostname",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{hostname: _p17._0});},_p22));
-         case "DomainInput": return A4(validate,
-           _p25,
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p11._0});},_p16));
+         case "DomainInput": return A4($Systems$Add$Validations.validate,
+           _p19,
            "Domain",
            stringValidations,
-           A2(setMachine,function (machine) {    return _U.update(machine,{domain: _p17._0});},_p22));
-         default: return A2(setDigital,function (digital) {    return _U.update(digital,{privateNetworking: $Basics.not(digital.privateNetworking)});},_p22);}
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p11._0});},_p16));
+         default: return A2(setDigital,function (digital) {    return _U.update(digital,{privateNetworking: $Basics.not(digital.privateNetworking)});},_p16);}
    });
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
@@ -17358,37 +17311,37 @@ Elm.Systems.Add.Digital.make = function (_elm) {
    var PrivateNetworking = {ctor: "PrivateNetworking"};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectSize = function (a) {    return {ctor: "SelectSize",_0: a};};
-   var instance = F2(function (address,_p26) {
-      var _p27 = _p26;
-      var _p29 = _p27.machine;
-      var _p28 = _p27.digital;
+   var instance = F2(function (address,_p20) {
+      var _p21 = _p20;
+      var _p23 = _p21.machine;
+      var _p22 = _p21.digital;
       var region = A2($Maybe.withDefault,"",$List.head($Systems$Model$Digital.regions));
-      var check = withErrors(_p27.errors);
+      var check = withErrors(_p21.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.selector,address,SelectSize,$Systems$Model$Digital.sizes,_p28.size))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p27)),_p29.os))
-              ,A2($Systems$Add$Common.group$,"Region",A4($Systems$Add$Common.selector,address,SelectRegion,$Systems$Model$Digital.regions,_p28.region))
+              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.selector,address,SelectSize,$Systems$Model$Digital.sizes,_p22.size))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p21)),_p23.os))
+              ,A2($Systems$Add$Common.group$,"Region",A4($Systems$Add$Common.selector,address,SelectRegion,$Systems$Model$Digital.regions,_p22.region))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p29.user))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p23.user))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p29.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p29.domain))
-              ,A2($Systems$Add$Common.group$,"Private Networking",A3($Systems$Add$Common.checkbox,address,PrivateNetworking,_p28.privateNetworking))]))]);
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p23.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p23.domain))
+              ,A2($Systems$Add$Common.group$,"Private Networking",A3($Systems$Add$Common.checkbox,address,PrivateNetworking,_p22.privateNetworking))]))]);
    });
-   var stepView = F2(function (address,_p30) {
-      var _p31 = _p30;
-      var _p33 = _p31;
-      var _p32 = _p33.step;
-      switch (_p32.ctor)
-      {case "Instance": return A2(instance,address,_p33);
-         case "Summary": return $Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p31.digital,_1: _p31.machine});
-         default: return A2($Debug.log,$Basics.toString(_p33.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p24) {
+      var _p25 = _p24;
+      var _p27 = _p25;
+      var _p26 = _p27.step;
+      switch (_p26.ctor)
+      {case "Instance": return A2(instance,address,_p27);
+         case "Summary": return $Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p25.digital,_1: _p25.machine});
+         default: return A2($Debug.log,$Basics.toString(_p27.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p34) {
-      var _p35 = _p34;
-      return A2($Common$Components.panelContents,$Basics.toString(_p35.step),A2($Html.form,_U.list([]),A2(stepView,address,_p35)));
+   var view = F2(function (address,_p28) {
+      var _p29 = _p28;
+      return A2($Common$Components.panelContents,$Basics.toString(_p29.step),A2($Html.form,_U.list([]),A2(stepView,address,_p29)));
    });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var Back = {ctor: "Back"};
@@ -17417,12 +17370,8 @@ Elm.Systems.Add.Digital.make = function (_elm) {
                                             ,Instance: Instance
                                             ,Summary: Summary
                                             ,setDigital: setDigital
-                                            ,setMachine: setMachine
-                                            ,validationOf: validationOf
                                             ,stringValidations: stringValidations
-                                            ,validate: validate
-                                            ,validateAll: validateAll
-                                            ,notAny: notAny
+                                            ,validateDigital: validateDigital
                                             ,update: update
                                             ,hasNext: hasNext
                                             ,hasPrev: hasPrev

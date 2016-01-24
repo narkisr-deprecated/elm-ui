@@ -77,29 +77,12 @@ setOpenstack f ({openstack, errors} as model) =
   in
    { model | openstack = newOpenstack }
 
-setMachine: (Machine-> Machine) -> Model -> Model
-setMachine f ({machine} as model) =
-  let
-    newMachine = f machine
-  in
-   { model | machine = newMachine }
-
 setVolume : (Volume -> Volume) -> Model -> Model
 setVolume f ({volume} as model) =
   let
     newVolume = f volume
   in
     { model | volume = newVolume }  
-
-
-
-validationOf : String -> List (a -> Error) -> (Model -> a) -> Model -> Model
-validationOf key validations value ({errors} as model) =
-   let
-     res = List.filter (\error -> error /= None) (List.map (\validation -> (validation (value model))) validations)
-     newErrors = Dict.update key (\_ -> Just res) errors
-   in
-     {model | errors = newErrors}
 
 stringValidations = Dict.fromList [
     vpair Networking [
@@ -114,7 +97,6 @@ stringValidations = Dict.fromList [
     ]
  ]
 
-  
 listValidations = Dict.fromList [
     vpair Instance [
       ("Security groups", validationOf "Security groups" [hasItems] (\({openstack} as model) -> (defaultEmpty openstack.securityGroups)))
@@ -129,27 +111,6 @@ tupleValidations = Dict.fromList [
     ("Cinder Device", validationOf "Cinder Device" [notContained] (\{volume, openstack} -> (volume.device, (List.map .device (defaultEmpty openstack.volumes)))))
   ]
  ]
-
-validate : Step -> String -> Dict String (Dict String (Model -> Model)) -> (Model -> Model)
-validate step key validations =
-  let
-    stepValidations =  withDefault Dict.empty (Dict.get (toString step) validations)
-  in
-    withDefault identity (Dict.get key stepValidations)
-
-
-validateAll : Step -> Model -> Model
-validateAll step model =
-  let
-    validations = [listValidations, stringValidations]
-    stepValues = (List.map (\vs -> withDefault Dict.empty (Dict.get (toString step) vs)) validations)
-  in
-    List.foldl (\v m -> (v m)) model (List.concat (List.map Dict.values stepValues))
-
-
-notAny:  Dict String (List Error) -> Bool
-notAny errors =
-  List.isEmpty (List.filter (\e -> not (List.isEmpty e)) (Dict.values errors))
 
 ignoreDevices: Model-> Model
 ignoreDevices ({errors} as model) =
@@ -182,6 +143,7 @@ setDefaultFlavor hyp ({openstack} as model) =
      Nothing -> 
        model
 
+validateOpenstack = validateAll [stringValidations, listValidations]
 
 update : Action -> Model-> Model
 update action ({next, prev, step, openstack, machine, volume} as model) =
@@ -191,7 +153,7 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
         nextStep = withDefault Instance (List.head next)
         nextSteps = defaultEmpty (List.tail next)
         prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = ignoreDevices (validateAll step model)
+        ({errors} as newModel) = ignoreDevices (validateOpenstack step model)
       in
         if notAny errors then
           {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
@@ -203,7 +165,7 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
         prevStep = withDefault Zero (List.head (List.reverse prev))
         prevSteps = List.take ((List.length prev) - 1) prev
         nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = ignoreDevices (validateAll step model)
+        ({errors} as newModel) = ignoreDevices (validateOpenstack step model)
       in
         if notAny errors then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}

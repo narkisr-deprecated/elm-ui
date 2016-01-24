@@ -117,4 +117,10 @@ setDefaultOS hyp ({machine} as model) =
      Nothing -> 
        model
 
+setMachine f ({machine} as model) =
+  let
+    newMachine = f machine
+  in
+   { model | machine = newMachine }
+
 

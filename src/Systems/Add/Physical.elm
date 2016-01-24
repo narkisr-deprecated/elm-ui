@@ -63,22 +63,6 @@ setPhysical f ({physical, errors} as model) =
   in
    { model | physical = newPhysical}
 
-setMachine: (Machine-> Machine) -> Model -> Model
-setMachine f ({machine} as model) =
-  let
-    newMachine = f machine
-  in
-   { model | machine = newMachine }
-
-validationOf : String -> List (a -> Error) -> (Model -> a) -> Model -> Model
-validationOf key validations value ({errors} as model) =
-   let
-     res = List.filter (\error -> error /= None) (List.map (\validation -> (validation (value model))) validations)
-     newErrors = Dict.update key (\_ -> Just res) errors
-   in
-     {model | errors = newErrors}
-
- 
 stringValidations = Dict.fromList [
     vpair Instance [
         ("Hostname", validationOf "Hostname" [notEmpty] (\({machine} as model) -> machine.hostname))
@@ -88,24 +72,7 @@ stringValidations = Dict.fromList [
     ]
  ]
 
-validate : Step -> String -> Dict String (Dict String (Model -> Model)) -> (Model -> Model)
-validate step key validations =
-  let
-    stepValidations =  withDefault Dict.empty (Dict.get (toString step) validations)
-  in
-    withDefault identity (Dict.get key stepValidations)
-
-
-validateAll : Step -> Model -> Model
-validateAll step model =
-  let
-    stepValues = (List.map (\vs -> withDefault Dict.empty (Dict.get (toString step) vs)) [stringValidations])
-  in
-    List.foldl (\v m -> (v m)) model (List.concat (List.map Dict.values stepValues))
-
-notAny:  Dict String (List Error) -> Bool
-notAny errors =
-  List.isEmpty (List.filter (\e -> not (List.isEmpty e)) (Dict.values errors))
+validatePhysical = validateAll [stringValidations]
 
 update : Action -> Model-> Model
 update action ({next, prev, step, physical, machine} as model) =
@@ -115,7 +82,7 @@ update action ({next, prev, step, physical, machine} as model) =
         nextStep = withDefault Instance (List.head next)
         nextSteps = defaultEmpty (List.tail next)
         prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = (validateAll step model)
+        ({errors} as newModel) = (validatePhysical step model)
       in
         if notAny errors then
            {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
@@ -127,7 +94,7 @@ update action ({next, prev, step, physical, machine} as model) =
         prevStep = withDefault Zero (List.head (List.reverse prev))
         prevSteps = List.take ((List.length prev) - 1) prev
         nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = (validateAll step model)
+        ({errors} as newModel) = (validatePhysical step model)
       in
         if notAny errors then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}
