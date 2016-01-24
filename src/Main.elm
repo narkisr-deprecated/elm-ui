@@ -10,6 +10,8 @@ import Application exposing (init, view, update)
 import Systems.List
 import Systems.Launch as SystemsLaunch
 import Systems.Core as SystemsCore
+import Templates.Add as TemplatesAdd
+import Templates.Core as TemplatesCore
 
 import Time exposing (every, second)
 import Jobs.List exposing (Action(Polling))
@@ -24,6 +26,7 @@ app =
         parsingInput (Search.Result True) parsingOk , 
         parsingInput (Search.Result False) parsingErr,
         menuClick menuPort,
+        editorValue editorInPort,
         jobsListPolling,
         jobsStatsPolling
       ]
@@ -63,8 +66,14 @@ toJson action =
     _ -> ""
 
 
-port editorPort : Signal String
-port editorPort =
+port editorInPort : Signal String
+
+editorValue p =
+ Signal.map (\json -> Application.TemplatesAction (TemplatesCore.TemplatesAdd (TemplatesAdd.SetDefaults json))) p
+
+
+port editorOutPort : Signal String
+port editorOutPort =
    editorActions.signal
       |> filter (\s -> s /= Editor.NoOp ) Editor.NoOp
       |> map toJson
@@ -91,9 +100,6 @@ parsingInput action p =
 
 port parsingErr : Signal Search.ParseResult
 
-menuClick p =
- Signal.map (\job -> Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))) p
-
 jobsListPolling : Signal Application.Action
 jobsListPolling =
   Signal.map (\_ -> Application.JobsList Polling) (Time.every (1 * second))
@@ -106,4 +112,8 @@ jobsStatsPolling =
   Signal.map (\t -> Application.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
  
 port menuPort : Signal String
+
+menuClick p =
+ Signal.map (\job -> Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))) p
+
 

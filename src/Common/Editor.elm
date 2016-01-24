@@ -19,4 +19,10 @@ loadEditor noop json =
      |> Task.map (always noop)
      |> Effects.task 
 
+getEditor : a -> Effects a
+getEditor noop = 
+  (Signal.send editorActions.address (Load "get"))
+     |> Task.map (always noop)
+     |> Effects.task 
+
 

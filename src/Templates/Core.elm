@@ -34,7 +34,7 @@ update action model =
        ({ model | add = newAdd }, Effects.map TemplatesAdd effects)
 
     _ -> 
-      none model 
+      none model
 
 add system = 
   TemplatesAdd (Add.SetSystem system)

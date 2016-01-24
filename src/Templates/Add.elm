@@ -20,7 +20,7 @@ import Common.Utils exposing (none)
 import Systems.Add.Persistency exposing (persistModel)
 import Common.Components exposing (panelContents)
 import Systems.Add.Common exposing (..)
-import Common.Editor exposing (loadEditor)
+import Common.Editor exposing (loadEditor, getEditor)
 import Debug
 
 
@@ -36,6 +36,7 @@ type Action =
   | NoOp
   | Cancel
   | LoadEditor
+  | SetDefaults String
   | TemplateSaved (Result Http.Error SaveResponse)
   | SetSystem System
   | NameInput String
@@ -45,22 +46,33 @@ init =
   none (Model emptySystem "" False)   
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({system, stage} as model) =
+update action ({system, stage, editDefaults} as model) =
   case action of
     SaveTemplate -> 
-      (model, persistModel saveTemplate system stage)
+      if editDefaults == False then
+        (model, persistModel saveTemplate system stage)
+      else
+        (model, getEditor NoOp)
+
 
     SetSystem newSystem -> 
-      none (Debug.log (toString newSystem) {model | system = newSystem })
+      none {model | system = newSystem }
 
     LoadEditor -> 
-      (model, loadEditor NoOp "{\"defaults\":{\"openstack\":{\"networks\":[]}}}")
+      ({ model | editDefaults = not editDefaults}, loadEditor NoOp "{\"defaults\":{\"openstack\":{\"networks\":[]}}}")
     
     NameInput name -> 
       let 
         newSystem = { system | name = Just name }
       in 
         none { model | system = newSystem} 
+
+    SetDefaults json -> 
+      let 
+        newSystem = { system | defaults = Just json }
+      in 
+        none (Debug.log json { model | system = newSystem} )
+
 
     -- TemplateSaved result -> 
     --   let
@@ -83,10 +95,10 @@ buttons address model =
     margin = style [("margin-left", "30%")]
     click = onClick address
   in 
-    [ 
+   [ 
       button [id "Cancel", class "btn btn-primary", margin, click Cancel] [text "Cancel"]
     , button [id "Save", class "btn btn-primary", margin, click SaveTemplate] [text "Save"]
-    ]
+   ]
  
 view : Signal.Address Action -> Model -> List Html
 view address ({system, editDefaults} as model) =

@@ -23125,7 +23125,8 @@ Elm.Common.Editor.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    var editorActions = $Signal.mailbox(NoOp);
    var loadEditor = F2(function (noop,json) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load(json))));});
-   return _elm.Common.Editor.values = {_op: _op,NoOp: NoOp,Load: Load,editorActions: editorActions,loadEditor: loadEditor};
+   var getEditor = function (noop) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load("get"))));};
+   return _elm.Common.Editor.values = {_op: _op,NoOp: NoOp,Load: Load,editorActions: editorActions,loadEditor: loadEditor,getEditor: getEditor};
 };
 Elm.Templates = Elm.Templates || {};
 Elm.Templates.Add = Elm.Templates.Add || {};
@@ -23169,22 +23170,32 @@ Elm.Templates.Add.make = function (_elm) {
    var saveTemplate = function (json) {
       return $Effects.task(A2($Task.map,TemplateSaved,$Task.toResult(A3($Common$Http.postJson,$Http.string(json),saveResponse,"/templates"))));
    };
+   var SetDefaults = function (a) {    return {ctor: "SetDefaults",_0: a};};
    var LoadEditor = {ctor: "LoadEditor"};
    var Cancel = {ctor: "Cancel"};
    var NoOp = {ctor: "NoOp"};
    var update = F2(function (action,_p0) {
       var _p1 = _p0;
-      var _p5 = _p1.system;
-      var _p4 = _p1;
+      var _p6 = _p1.system;
+      var _p5 = _p1;
+      var _p4 = _p1.editDefaults;
       var _p2 = action;
       switch (_p2.ctor)
-      {case "SaveTemplate": return {ctor: "_Tuple2",_0: _p4,_1: A3($Systems$Add$Persistency.persistModel,saveTemplate,_p5,_p1.stage)};
-         case "SetSystem": var _p3 = _p2._0;
-           return $Common$Utils.none(A2($Debug.log,$Basics.toString(_p3),_U.update(_p4,{system: _p3})));
-         case "LoadEditor": return {ctor: "_Tuple2",_0: _p4,_1: A2($Common$Editor.loadEditor,NoOp,"{\"defaults\":{\"openstack\":{\"networks\":[]}}}")};
-         case "NameInput": var newSystem = _U.update(_p5,{name: $Maybe.Just(_p2._0)});
-           return $Common$Utils.none(_U.update(_p4,{system: newSystem}));
-         default: return {ctor: "_Tuple2",_0: _p4,_1: $Effects.none};}
+      {case "SaveTemplate": return _U.eq(_p4,false) ? {ctor: "_Tuple2"
+                                                      ,_0: _p5
+                                                      ,_1: A3($Systems$Add$Persistency.persistModel,saveTemplate,_p6,_p1.stage)} : {ctor: "_Tuple2"
+                                                                                                                                   ,_0: _p5
+                                                                                                                                   ,_1: $Common$Editor.getEditor(NoOp)};
+         case "SetSystem": return $Common$Utils.none(_U.update(_p5,{system: _p2._0}));
+         case "LoadEditor": return {ctor: "_Tuple2"
+                                   ,_0: _U.update(_p5,{editDefaults: $Basics.not(_p4)})
+                                   ,_1: A2($Common$Editor.loadEditor,NoOp,"{\"defaults\":{\"openstack\":{\"networks\":[]}}}")};
+         case "NameInput": var newSystem = _U.update(_p6,{name: $Maybe.Just(_p2._0)});
+           return $Common$Utils.none(_U.update(_p5,{system: newSystem}));
+         case "SetDefaults": var _p3 = _p2._0;
+           var newSystem = _U.update(_p6,{defaults: $Maybe.Just(_p3)});
+           return $Common$Utils.none(A2($Debug.log,_p3,_U.update(_p5,{system: newSystem})));
+         default: return {ctor: "_Tuple2",_0: _p5,_1: $Effects.none};}
    });
    var SaveTemplate = {ctor: "SaveTemplate"};
    var buttons = F2(function (address,model) {
@@ -23197,8 +23208,8 @@ Elm.Templates.Add.make = function (_elm) {
                      _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),margin,click(SaveTemplate)]),
                      _U.list([$Html.text("Save")]))]);
    });
-   var view = F2(function (address,_p6) {
-      var _p7 = _p6;
+   var view = F2(function (address,_p7) {
+      var _p8 = _p7;
       return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
                      _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
                      _U.list([A2($Html.div,
@@ -23211,15 +23222,15 @@ Elm.Templates.Add.make = function (_elm) {
                      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
                      _U.list([A2($Systems$Add$Common.group$,
                              "Name",
-                             A4($Systems$Add$Common.inputText,address,NameInput," ",A2($Maybe.withDefault,"",_p7.system.name)))
-                             ,A2($Systems$Add$Common.group$,"Edit defaults",A3($Systems$Add$Common.checkbox,address,LoadEditor,_p7.editDefaults))
+                             A4($Systems$Add$Common.inputText,address,NameInput," ",A2($Maybe.withDefault,"",_p8.system.name)))
+                             ,A2($Systems$Add$Common.group$,"Edit defaults",A3($Systems$Add$Common.checkbox,address,LoadEditor,_p8.editDefaults))
                              ,A2($Html.div,
                              _U.list([$Html$Attributes.id("jsoneditor")
                                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "550px"}
                                                                      ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
                                                                      ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
                              _U.list([]))]))]))))]))]))
-                     ,$Bootstrap$Html.row_(A2(buttons,address,_p7))]);
+                     ,$Bootstrap$Html.row_(A2(buttons,address,_p8))]);
    });
    var Model = F3(function (a,b,c) {    return {system: a,stage: b,editDefaults: c};});
    var init = $Common$Utils.none(A3(Model,$Systems$Model$Common.emptySystem,"",false));
@@ -23229,6 +23240,7 @@ Elm.Templates.Add.make = function (_elm) {
                                       ,NoOp: NoOp
                                       ,Cancel: Cancel
                                       ,LoadEditor: LoadEditor
+                                      ,SetDefaults: SetDefaults
                                       ,TemplateSaved: TemplateSaved
                                       ,SetSystem: SetSystem
                                       ,NameInput: NameInput
@@ -23635,8 +23647,13 @@ Elm.Main.make = function (_elm) {
    $Systems$Launch = Elm.Systems.Launch.make(_elm),
    $Systems$List = Elm.Systems.List.make(_elm),
    $Task = Elm.Task.make(_elm),
+   $Templates$Add = Elm.Templates.Add.make(_elm),
+   $Templates$Core = Elm.Templates.Core.make(_elm),
    $Time = Elm.Time.make(_elm);
    var _op = {};
+   var menuClick = function (p) {
+      return A2($Signal.map,function (job) {    return $Application.SystemsAction($Systems$Core.SystemsLaunch($Systems$Launch.SetupJob(job)));},p);
+   };
    var menuPort = Elm.Native.Port.make(_elm).inboundSignal("menuPort",
    "String",
    function (v) {
@@ -23648,9 +23665,6 @@ Elm.Main.make = function (_elm) {
       return A2($Signal.map,function (t) {    return $Application.JobsStats($Jobs$Stats.PollMetrics(t));},$Time.every(model.interval * $Time.second));
    }();
    var jobsListPolling = A2($Signal.map,function (_p1) {    return $Application.JobsList($Jobs$List.Polling);},$Time.every(1 * $Time.second));
-   var menuClick = function (p) {
-      return A2($Signal.map,function (job) {    return $Application.SystemsAction($Systems$Core.SystemsLaunch($Systems$Launch.SetupJob(job)));},p);
-   };
    var parsingErr = Elm.Native.Port.make(_elm).inboundSignal("parsingErr",
    "Search.ParseResult",
    function (v) {
@@ -23684,8 +23698,16 @@ Elm.Main.make = function (_elm) {
       return v;
    },
    A2($Signal.map,toQuery,A3($Signal.filter,function (s) {    return !_U.eq(s,$Search.NoOp);},$Search.NoOp,$Search.searchActions.signal)));
+   var editorValue = function (p) {
+      return A2($Signal.map,function (json) {    return $Application.TemplatesAction($Templates$Core.TemplatesAdd($Templates$Add.SetDefaults(json)));},p);
+   };
+   var editorInPort = Elm.Native.Port.make(_elm).inboundSignal("editorInPort",
+   "String",
+   function (v) {
+      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+   });
    var toJson = function (action) {    var _p3 = action;if (_p3.ctor === "Load") {    return _p3._0;} else {    return "";}};
-   var editorPort = Elm.Native.Port.make(_elm).outboundSignal("editorPort",
+   var editorOutPort = Elm.Native.Port.make(_elm).outboundSignal("editorOutPort",
    function (v) {
       return v;
    },
@@ -23709,6 +23731,7 @@ Elm.Main.make = function (_elm) {
                              ,inputs: _U.list([A2(parsingInput,$Search.Result(true),parsingOk)
                                               ,A2(parsingInput,$Search.Result(false),parsingErr)
                                               ,menuClick(menuPort)
+                                              ,editorValue(editorInPort)
                                               ,jobsListPolling
                                               ,jobsStatsPolling])});
    var main = app.html;
@@ -23718,9 +23741,10 @@ Elm.Main.make = function (_elm) {
                              ,main: main
                              ,toUrl: toUrl
                              ,toJson: toJson
+                             ,editorValue: editorValue
                              ,toQuery: toQuery
                              ,parsingInput: parsingInput
-                             ,menuClick: menuClick
                              ,jobsListPolling: jobsListPolling
-                             ,jobsStatsPolling: jobsStatsPolling};
+                             ,jobsStatsPolling: jobsStatsPolling
+                             ,menuClick: menuClick};
 };

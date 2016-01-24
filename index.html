@@ -42,7 +42,13 @@
 <script type="text/javascript">
   var elmDiv = document.getElementById('elmui');
   var empty = { "result" : "", "source" : "", "message":"" };
-  var main = Elm.embed(Elm.Main, elmDiv, {parsingOk : empty, parsingErr : empty, menuPort : ""});
+  var outPorts = {
+    parsingOk: empty,
+    parsingErr: empty,
+    menuPort: "",
+    editorInPort: ""
+  }
+  var main = Elm.embed(Elm.Main, elmDiv, outPorts);
 
   main.ports.redirectPort.subscribe(function(event) {
     var url = window.location.href;
@@ -59,14 +65,20 @@
 
   var editor = undefined;
 
-  main.ports.editorPort.subscribe(function(event) {
-      var container = document.getElementById('jsoneditor');
-	var options = {
-	  mode : 'code',
-	  modes: ['code', 'tree'], // allowed modes
-	};
-	if(editor === undefined) {
-	   editor = new JSONEditor(container, options , JSON.parse(event));
+  main.ports.editorOutPort.subscribe(function(event) {
+	console.log(event);
+	if(event === "get") {
+	 console.log(editor.get());
+       main.ports.editorInPort.send(JSON.stringify(editor.get()));
+	} else {
+        var container = document.getElementById('jsoneditor');
+	  var options = {
+	    mode : 'code',
+	    modes: ['code', 'tree'], // allowed modes
+	  };
+	  if(editor === undefined) {
+	   editor = new JSONEditor(container, options, JSON.parse(event));
+	  }
 	}
   });
 

@@ -23,6 +23,11 @@
    (let [x (<! (async/merge [(timeout 1000) c] (dropping-buffer 1)))]
      (try 
        (timbre/info "Starting to run suite")
-       (timbre/info (:out (sh "lein" "midje" "elm.ui.add")))
+       (let [{:keys [out err exit]} (sh "lein" "midje" "elm.ui.add")]
+         (if-not (= exit 0)
+            (timbre/error err)
+            (timbre/info out)
+           )
+        )
      (catch Exception e (timbre/error e))))
    (recur))
