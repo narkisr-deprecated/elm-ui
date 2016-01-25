@@ -65,22 +65,6 @@ encodeOpenstack {owner, env, type', openstack, machine} =
   , ("machine" , machineEncoder machine)
  ]
 
-aws : Focus { r | aws :a } a
-aws =
-   create .aws (\f r -> { r | aws = f r.aws })
-
-openstack : Focus { r | openstack :a } a
-openstack =
-   create .openstack (\f r -> { r | openstack = f r.openstack })
-
-blockDevices : Focus { r | blockDevices :a } a
-blockDevices =
-   create .blockDevices (\f r -> { r | blockDevices = f r.blockDevices })
-
-volumes : Focus { r | volumes :a } a
-volumes =
-   create .volumes (\f r -> { r | volumes = f r.volumes })
-
 addDevice : Maybe (List {r | device : String}) -> Maybe (List {r | device : String})
 addDevice vs = 
   Just (List.map (\({device} as volume) -> {volume | device = "/dev/"++device}) (withDefault [] vs))
@@ -93,23 +77,32 @@ encoders =  Dict.fromList [
   , ("Physical", encodePhysical)
   ]
 
-transformers =  Dict.fromList [
-    ("AWS", ((Focus.update (aws => blockDevices) addDevice) <<
-             (Focus.update (aws => volumes) addDevice)))
-  , ("Openstack", Focus.update (openstack => volumes) addDevice)
-  ]
 
+transform : System -> String -> System
+transform ({aws, openstack} as system) stage =
+  case stage of
+    "AWS" -> 
+      let
+        justAws = withDefault emptyAws aws
+        newAws = {justAws | blockDevices = addDevice justAws.blockDevices, volumes = addDevice justAws.volumes}
+      in
+       {system | aws = Just newAws}
+
+    "Openstack" -> 
+      let
+        justStack = withDefault emptyOpenstack openstack
+        newStack = {justStack | volumes = addDevice justStack.volumes}
+      in
+       {system | openstack = Just newStack}
+
+    _ -> 
+       system
 
 persistModel : (String -> Effects a) -> System -> String -> Effects a
 persistModel f system stage =
   case (Dict.get stage encoders) of
      Just encode -> 
-        case (Dict.get stage transformers) of
-          Just transform -> 
-            (f (E.encode 0 (encode system)))
-
-          Nothing -> 
-            (f (E.encode 0 (encode system)))
+        (f (E.encode 0 (encode (transform system stage))))
 
      Nothing -> 
         Effects.none

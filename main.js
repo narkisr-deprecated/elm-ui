@@ -17989,7 +17989,6 @@ Elm.Systems.Add.Persistency.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
-   $Focus = Elm.Focus.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -18011,74 +18010,70 @@ Elm.Systems.Add.Persistency.make = function (_elm) {
       },
       A2($Maybe.withDefault,_U.list([]),vs)));
    };
-   var volumes = A2($Focus.create,function (_) {    return _.volumes;},F2(function (f,r) {    return _U.update(r,{volumes: f(r.volumes)});}));
-   var blockDevices = A2($Focus.create,
-   function (_) {
-      return _.blockDevices;
-   },
-   F2(function (f,r) {    return _U.update(r,{blockDevices: f(r.blockDevices)});}));
-   var openstack = A2($Focus.create,function (_) {    return _.openstack;},F2(function (f,r) {    return _U.update(r,{openstack: f(r.openstack)});}));
-   var aws = A2($Focus.create,function (_) {    return _.aws;},F2(function (f,r) {    return _U.update(r,{aws: f(r.aws)});}));
-   var transformers = $Dict.fromList(_U.list([{ctor: "_Tuple2"
-                                              ,_0: "AWS"
-                                              ,_1: function (_p2) {
-                                                 return A3($Focus.update,
-                                                 A2($Focus._op["=>"],aws,blockDevices),
-                                                 addDevice,
-                                                 A3($Focus.update,A2($Focus._op["=>"],aws,volumes),addDevice,_p2));
-                                              }}
-                                             ,{ctor: "_Tuple2",_0: "Openstack",_1: A2($Focus.update,A2($Focus._op["=>"],openstack,volumes),addDevice)}]));
-   var encodeOpenstack = function (_p3) {
-      var _p4 = _p3;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p4.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p4.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p4.env)}
+   var transform = F2(function (_p2,stage) {
+      var _p3 = _p2;
+      var _p5 = _p3;
+      var _p4 = stage;
+      switch (_p4)
+      {case "AWS": var justAws = A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p3.aws);
+           var newAws = _U.update(justAws,{blockDevices: addDevice(justAws.blockDevices),volumes: addDevice(justAws.volumes)});
+           return _U.update(_p5,{aws: $Maybe.Just(newAws)});
+         case "Openstack": var justStack = A2($Maybe.withDefault,$Systems$Model$Openstack.emptyOpenstack,_p3.openstack);
+           var newStack = _U.update(justStack,{volumes: addDevice(justStack.volumes)});
+           return _U.update(_p5,{openstack: $Maybe.Just(newStack)});
+         default: return _p5;}
+   });
+   var encodeOpenstack = function (_p6) {
+      var _p7 = _p6;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p7.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p7.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p7.env)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "openstack"
                                           ,_1: $Systems$Add$Encoders.openstackEncoder(A2($Maybe.withDefault,
                                           $Systems$Model$Openstack.emptyOpenstack,
-                                          _p4.openstack))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p4.machine)}]));
+                                          _p7.openstack))}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p7.machine)}]));
    };
-   var encodePhysical = function (_p5) {
-      var _p6 = _p5;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p6.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p6.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p6.env)}
+   var encodePhysical = function (_p8) {
+      var _p9 = _p8;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p9.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p9.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p9.env)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "physical"
-                                          ,_1: $Systems$Add$Encoders.physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p6.physical))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p6.machine)}]));
+                                          ,_1: $Systems$Add$Encoders.physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p9.physical))}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p9.machine)}]));
    };
-   var encodeDigital = function (_p7) {
-      var _p8 = _p7;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p8.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p8.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p8.env)}
+   var encodeDigital = function (_p10) {
+      var _p11 = _p10;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p11.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p11.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p11.env)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "digital-ocean"
-                                          ,_1: $Systems$Add$Encoders.digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p8.digital))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p8.machine)}]));
+                                          ,_1: $Systems$Add$Encoders.digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p11.digital))}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p11.machine)}]));
    };
-   var encodeGce = function (_p9) {
-      var _p10 = _p9;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p10.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p10.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p10.env)}
+   var encodeGce = function (_p12) {
+      var _p13 = _p12;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p13.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p13.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p13.env)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "gce"
-                                          ,_1: $Systems$Add$Encoders.gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p10.gce))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p10.machine)}]));
+                                          ,_1: $Systems$Add$Encoders.gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p13.gce))}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p13.machine)}]));
    };
-   var encodeAws = function (_p11) {
-      var _p12 = _p11;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p12.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p12.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p12.env)}
+   var encodeAws = function (_p14) {
+      var _p15 = _p14;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p15.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p15.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p15.env)}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "aws"
-                                          ,_1: $Systems$Add$Encoders.awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p12.aws))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p12.machine)}]));
+                                          ,_1: $Systems$Add$Encoders.awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p15.aws))}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p15.machine)}]));
    };
    var encoders = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "AWS",_1: encodeAws}
                                          ,{ctor: "_Tuple2",_0: "GCE",_1: encodeGce}
@@ -18086,15 +18081,9 @@ Elm.Systems.Add.Persistency.make = function (_elm) {
                                          ,{ctor: "_Tuple2",_0: "Openstack",_1: encodeOpenstack}
                                          ,{ctor: "_Tuple2",_0: "Physical",_1: encodePhysical}]));
    var persistModel = F3(function (f,system,stage) {
-      var _p13 = A2($Dict.get,stage,encoders);
-      if (_p13.ctor === "Just") {
-            var _p15 = _p13._0;
-            var _p14 = A2($Dict.get,stage,transformers);
-            if (_p14.ctor === "Just") {
-                  return f(A2($Json$Encode.encode,0,_p15(system)));
-               } else {
-                  return f(A2($Json$Encode.encode,0,_p15(system)));
-               }
+      var _p16 = A2($Dict.get,stage,encoders);
+      if (_p16.ctor === "Just") {
+            return f(A2($Json$Encode.encode,0,_p16._0(A2(transform,system,stage))));
          } else {
             return $Effects.none;
          }
@@ -18105,13 +18094,9 @@ Elm.Systems.Add.Persistency.make = function (_elm) {
                                                 ,encodeDigital: encodeDigital
                                                 ,encodePhysical: encodePhysical
                                                 ,encodeOpenstack: encodeOpenstack
-                                                ,aws: aws
-                                                ,openstack: openstack
-                                                ,blockDevices: blockDevices
-                                                ,volumes: volumes
                                                 ,addDevice: addDevice
                                                 ,encoders: encoders
-                                                ,transformers: transformers
+                                                ,transform: transform
                                                 ,persistModel: persistModel};
 };
 Elm.Systems = Elm.Systems || {};
