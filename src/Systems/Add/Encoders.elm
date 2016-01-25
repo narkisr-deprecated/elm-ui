@@ -1,13 +1,13 @@
 module Systems.Add.Encoders where
 
-import Json.Encode exposing (..)
+import Json.Encode as E exposing (..)
 import Systems.Model.Common exposing (..)
 
-import Systems.Model.AWS as AWS exposing (AWS, emptyVpc)
-import Systems.Model.Openstack as Openstack exposing (Openstack)
-import Systems.Model.GCE exposing (GCE)
-import Systems.Model.Digital exposing (Digital)
-import Systems.Model.Physical exposing (Physical)
+import Systems.Model.AWS as AWS exposing (AWS, emptyVpc, emptyAws)
+import Systems.Model.Openstack as Openstack exposing (Openstack, OpenstackDefaults, emptyOpenstack, emptyOpenstackDefaults)
+import Systems.Model.GCE exposing (GCE, emptyGce)
+import Systems.Model.Digital exposing (Digital, emptyDigital)
+import Systems.Model.Physical exposing (Physical, emptyPhysical)
 
 import Systems.Add.AWS exposing (ebsTypes)
 import Dict exposing (Dict)
@@ -120,6 +120,12 @@ openstackEncoder openstack =
     , ("volumes", list (List.map openstackVolumeEncoder (defaultEmpty openstack.volumes)))
   ]
 
+openstackDefaultsEncoder : OpenstackDefaults -> Value
+openstackDefaultsEncoder openstack =
+  object [
+     ("networks", list (List.map string (withDefault [] openstack.networks)))
+  ]
+
 machineEncoder : Machine -> Value
 machineEncoder machine =
   object [
@@ -129,4 +135,58 @@ machineEncoder machine =
     , ("os", string machine.os)
     , ("user", string machine.user)
   ]
+
+encoder {openstack, physical, aws, digital, gce} stage =
+  case stage of 
+    "AWS" -> 
+       ("aws", awsEncoder (withDefault emptyAws aws))
+
+    "GCE" -> 
+       ("gce" , gceEncoder (withDefault emptyGce gce))
+
+    "Digital" -> 
+       ("digital-ocean" , digitalEncoder (withDefault emptyDigital digital))
+   
+    "Physical" -> 
+       ("physical" , physicalEncoder (withDefault emptyPhysical physical))
+
+    "Openstack" -> 
+      ("openstack" , openstackEncoder (withDefault emptyOpenstack openstack))
+
+    _ -> 
+
+     ("",null)
+
+defaultsEncoder {openstack} stage = 
+  if stage == "Openstack" then
+    object [
+      ("openstack" , openstackDefaultsEncoder (withDefault emptyOpenstackDefaults openstack))
+    ]
+  else 
+    null
+
+encodeDefaults defaults stage =
+  E.encode 0 (defaultsEncoder defaults stage)
+
+template {name, defaults} stage = 
+  case name of
+    Just value -> 
+      [ ("name" , string value )
+      , ("defaults", defaultsEncoder (withDefault emptyDefaults defaults) stage)
+      ]
+
+    Nothing -> 
+      []
+
+encode: System -> String -> Value
+encode ({owner, env, type', machine} as system) stage =
+ object 
+  (List.append (template system stage) [
+    ("type" , string type')
+  , ("owner" , string owner)
+  , ("env" , string env)
+  , (encoder system stage)
+  , ("machine" , machineEncoder machine)
+ ]) 
+
 

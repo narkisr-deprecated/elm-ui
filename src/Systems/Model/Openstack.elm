@@ -20,14 +20,19 @@ type alias Openstack =
   }
 
 
+type alias OpenstackDefaults = 
+  {
+   networks : Maybe (List String)
+  }
+
+emptyOpenstackDefaults = 
+    OpenstackDefaults (Just [])
+
 emptyVolume : Volume
 emptyVolume =
   Volume "" 0 False
 
 emptyOpenstack : Openstack 
 emptyOpenstack = 
-  let
-    justString = Just ""
-  in
-    Openstack "" "" "" Nothing Nothing Nothing [] Nothing
+  Openstack "" "" "" Nothing Nothing Nothing [] Nothing
 

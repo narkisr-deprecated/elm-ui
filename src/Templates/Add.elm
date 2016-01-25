@@ -13,7 +13,7 @@ import Json.Decode exposing (..)
 import Json.Encode as E
 import Effects exposing (Effects, batch)
 import Dict exposing (Dict)
-import Systems.Model.Common exposing (System, emptySystem)
+import Systems.Model.Common exposing (System, emptySystem, emptyDefaults)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
@@ -21,6 +21,9 @@ import Systems.Add.Persistency exposing (persistModel)
 import Common.Components exposing (panelContents)
 import Systems.Add.Common exposing (..)
 import Common.Editor exposing (loadEditor, getEditor)
+import Systems.Add.Errors as Errors exposing (..)
+import Templates.Defaults exposing (decodeDefaults)
+import Systems.Add.Encoders exposing (encodeDefaults)
 import Debug
 
 
@@ -29,7 +32,13 @@ type alias Model =
     system : System
   , stage : String
   , editDefaults : Bool
+  , saveErrors : Errors.Model
   }
+
+type Stage = 
+  Template
+    | Error
+
 
 type Action = 
   SaveTemplate
@@ -43,7 +52,17 @@ type Action =
   | DefaultsInput String
 
 init =
-  none (Model emptySystem "" False)   
+  let
+    (errorsModel, _ ) = Errors.init
+  in
+  none (Model emptySystem "" False errorsModel)   
+
+setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
+setErrors ({saveErrors} as model) es =
+  let
+    newErrors = {saveErrors | errors = es}  
+  in 
+    ({model | saveErrors = newErrors}, Effects.none)
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({system, stage, editDefaults} as model) =
@@ -54,12 +73,11 @@ update action ({system, stage, editDefaults} as model) =
       else
         (model, getEditor NoOp)
 
-
     SetSystem newSystem -> 
       none {model | system = newSystem }
 
     LoadEditor -> 
-      ({ model | editDefaults = not editDefaults}, loadEditor NoOp "{\"defaults\":{\"openstack\":{\"networks\":[]}}}")
+      ({ model | editDefaults = not editDefaults}, loadEditor NoOp (encodeDefaults emptyDefaults stage))
     
     NameInput name -> 
       let 
@@ -69,21 +87,12 @@ update action ({system, stage, editDefaults} as model) =
 
     SetDefaults json -> 
       let 
-        newSystem = { system | defaults = Just json }
+        newSystem = { system | defaults = Just (decodeDefaults json) }
       in 
-        none (Debug.log json { model | system = newSystem} )
+        ({ model | system = newSystem}, persistModel saveTemplate system stage)
 
-
-    -- TemplateSaved result -> 
-    --   let
-    --     success = (setSaved next model)
-    --     (({saveErrors} as newModel), effects) = resultHandler result model success (setErrors model) NoOp
-    --   in
-    --      if not (Dict.isEmpty saveErrors.errors.keyValues) then
-    --        ({newModel | stage = Error} , Effects.none)
-    --      else
-    --        (model, effects)
-    --
+    TemplateSaved result -> 
+      Debug.log (toString result) (none model)
 
     _ -> 
       (model, Effects.none)

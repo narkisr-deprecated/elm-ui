@@ -66,9 +66,7 @@
   var editor = undefined;
 
   main.ports.editorOutPort.subscribe(function(event) {
-	console.log(event);
 	if(event === "get") {
-	 console.log(editor.get());
        main.ports.editorInPort.send(JSON.stringify(editor.get()));
 	} else {
         var container = document.getElementById('jsoneditor');

@@ -14117,16 +14117,21 @@ Elm.Systems.Model.Openstack.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var OpenstackDefaults = function (a) {    return {networks: a};};
+   var emptyOpenstackDefaults = OpenstackDefaults($Maybe.Just(_U.list([])));
    var Openstack = F8(function (a,b,c,d,e,f,g,h) {
       return {flavor: a,tenant: b,keyName: c,floatingIp: d,floatingIpPool: e,securityGroups: f,networks: g,volumes: h};
    });
-   var emptyOpenstack = function () {
-      var justString = $Maybe.Just("");
-      return A8(Openstack,"","","",$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,_U.list([]),$Maybe.Nothing);
-   }();
+   var emptyOpenstack = A8(Openstack,"","","",$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,_U.list([]),$Maybe.Nothing);
    var Volume = F3(function (a,b,c) {    return {device: a,size: b,clear: c};});
    var emptyVolume = A3(Volume,"",0,false);
-   return _elm.Systems.Model.Openstack.values = {_op: _op,Volume: Volume,Openstack: Openstack,emptyVolume: emptyVolume,emptyOpenstack: emptyOpenstack};
+   return _elm.Systems.Model.Openstack.values = {_op: _op
+                                                ,Volume: Volume
+                                                ,Openstack: Openstack
+                                                ,OpenstackDefaults: OpenstackDefaults
+                                                ,emptyOpenstackDefaults: emptyOpenstackDefaults
+                                                ,emptyVolume: emptyVolume
+                                                ,emptyOpenstack: emptyOpenstack};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Model = Elm.Systems.Model || {};
@@ -14171,6 +14176,8 @@ Elm.Systems.Model.Common.make = function (_elm) {
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm);
    var _op = {};
+   var Defaults = function (a) {    return {openstack: a};};
+   var emptyDefaults = Defaults($Maybe.Nothing);
    var System = function (a) {
       return function (b) {
          return function (c) {
@@ -14200,7 +14207,13 @@ Elm.Systems.Model.Common.make = function (_elm) {
       var base = A3(System,"","","");
       return A8(base,emptyMachine,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing);
    }();
-   return _elm.Systems.Model.Common.values = {_op: _op,Machine: Machine,System: System,emptyMachine: emptyMachine,emptySystem: emptySystem};
+   return _elm.Systems.Model.Common.values = {_op: _op
+                                             ,Machine: Machine
+                                             ,System: System
+                                             ,Defaults: Defaults
+                                             ,emptyDefaults: emptyDefaults
+                                             ,emptyMachine: emptyMachine
+                                             ,emptySystem: emptySystem};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Decoders = Elm.Systems.Decoders || {};
@@ -17751,10 +17764,36 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm);
    var _op = {};
+   var openstackDefaultsEncoder = function (openstack) {
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2"
+                                          ,_0: "networks"
+                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,A2($Maybe.withDefault,_U.list([]),openstack.networks)))}]));
+   };
+   var defaultsEncoder = F2(function (_p0,stage) {
+      var _p1 = _p0;
+      return _U.eq(stage,"Openstack") ? $Json$Encode.object(_U.list([{ctor: "_Tuple2"
+                                                                     ,_0: "openstack"
+                                                                     ,_1: openstackDefaultsEncoder(A2($Maybe.withDefault,
+                                                                     $Systems$Model$Openstack.emptyOpenstackDefaults,
+                                                                     _p1.openstack))}])) : $Json$Encode.$null;
+   });
+   var encodeDefaults = F2(function (defaults,stage) {    return A2($Json$Encode.encode,0,A2(defaultsEncoder,defaults,stage));});
+   var template = F2(function (_p2,stage) {
+      var _p3 = _p2;
+      var _p4 = _p3.name;
+      if (_p4.ctor === "Just") {
+            return _U.list([{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(_p4._0)}
+                           ,{ctor: "_Tuple2"
+                            ,_0: "defaults"
+                            ,_1: A2(defaultsEncoder,A2($Maybe.withDefault,$Systems$Model$Common.emptyDefaults,_p3.defaults),stage)}]);
+         } else {
+            return _U.list([]);
+         }
+   });
    var maybeString = function (optional) {
-      var _p0 = optional;
-      if (_p0.ctor === "Just") {
-            return $Json$Encode.string(_p0._0);
+      var _p5 = optional;
+      if (_p5.ctor === "Just") {
+            return $Json$Encode.string(_p5._0);
          } else {
             return $Json$Encode.$null;
          }
@@ -17778,7 +17817,7 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                           ,_0: "volumes"
                                           ,_1: $Json$Encode.list(A2($List.map,openstackVolumeEncoder,$Common$Utils.defaultEmpty(openstack.volumes)))}]));
    };
-   var optional = F2(function (enc,value) {    var _p1 = value;if (_p1.ctor === "Just") {    return enc(_p1._0);} else {    return $Json$Encode.$null;}});
+   var optional = F2(function (enc,value) {    var _p6 = value;if (_p6.ctor === "Just") {    return enc(_p6._0);} else {    return $Json$Encode.$null;}});
    var physicalEncoder = function (physical) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "mac",_1: A2(optional,$Json$Encode.string,physical.mac)}
                                          ,{ctor: "_Tuple2",_0: "broadcast",_1: A2(optional,$Json$Encode.string,physical.broadcast)}]));
@@ -17803,16 +17842,16 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                           ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(gce.tags)))}
                                          ,{ctor: "_Tuple2",_0: "project-id",_1: $Json$Encode.string(gce.projectId)}]));
    };
-   var vpcEncoder = function (_p2) {
-      var _p3 = _p2;
-      var _p4 = _p3;
-      return $String.isEmpty(_p3.vpcId) ? $Json$Encode.$null : $Json$Encode.object(_U.list([{ctor: "_Tuple2"
+   var vpcEncoder = function (_p7) {
+      var _p8 = _p7;
+      var _p9 = _p8;
+      return $String.isEmpty(_p8.vpcId) ? $Json$Encode.$null : $Json$Encode.object(_U.list([{ctor: "_Tuple2"
                                                                                             ,_0: "subnet-id"
-                                                                                            ,_1: $Json$Encode.string(_p4.subnetId)}
-                                                                                           ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p4.vpcId)}
+                                                                                            ,_1: $Json$Encode.string(_p9.subnetId)}
+                                                                                           ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p9.vpcId)}
                                                                                            ,{ctor: "_Tuple2"
                                                                                             ,_0: "assign-public"
-                                                                                            ,_1: $Json$Encode.bool(_p4.assignPublic)}]));
+                                                                                            ,_1: $Json$Encode.bool(_p9.assignPublic)}]));
    };
    var blockEncoder = function (block) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "volume",_1: $Json$Encode.string(block.volume)}
@@ -17842,6 +17881,34 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                           ,_0: "volumes"
                                           ,_1: $Json$Encode.list(A2($List.map,awsVolumeEncoder,$Common$Utils.defaultEmpty(aws.volumes)))}]));
    };
+   var encoder = F2(function (_p10,stage) {
+      var _p11 = _p10;
+      var _p12 = stage;
+      switch (_p12)
+      {case "AWS": return {ctor: "_Tuple2",_0: "aws",_1: awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p11.aws))};
+         case "GCE": return {ctor: "_Tuple2",_0: "gce",_1: gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p11.gce))};
+         case "Digital": return {ctor: "_Tuple2"
+                                ,_0: "digital-ocean"
+                                ,_1: digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p11.digital))};
+         case "Physical": return {ctor: "_Tuple2"
+                                 ,_0: "physical"
+                                 ,_1: physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p11.physical))};
+         case "Openstack": return {ctor: "_Tuple2"
+                                  ,_0: "openstack"
+                                  ,_1: openstackEncoder(A2($Maybe.withDefault,$Systems$Model$Openstack.emptyOpenstack,_p11.openstack))};
+         default: return {ctor: "_Tuple2",_0: "",_1: $Json$Encode.$null};}
+   });
+   var encode = F2(function (_p13,stage) {
+      var _p14 = _p13;
+      var _p15 = _p14;
+      return $Json$Encode.object(A2($List.append,
+      A2(template,_p15,stage),
+      _U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p14.type$)}
+              ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p14.owner)}
+              ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p14.env)}
+              ,A2(encoder,_p15,stage)
+              ,{ctor: "_Tuple2",_0: "machine",_1: machineEncoder(_p14.machine)}])));
+   });
    return _elm.Systems.Add.Encoders.values = {_op: _op
                                              ,awsVolumeEncoder: awsVolumeEncoder
                                              ,blockEncoder: blockEncoder
@@ -17854,7 +17921,13 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                              ,openstackVolumeEncoder: openstackVolumeEncoder
                                              ,maybeString: maybeString
                                              ,openstackEncoder: openstackEncoder
-                                             ,machineEncoder: machineEncoder};
+                                             ,openstackDefaultsEncoder: openstackDefaultsEncoder
+                                             ,machineEncoder: machineEncoder
+                                             ,encoder: encoder
+                                             ,defaultsEncoder: defaultsEncoder
+                                             ,encodeDefaults: encodeDefaults
+                                             ,template: template
+                                             ,encode: encode};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Launch = Elm.Systems.Launch || {};
@@ -17987,7 +18060,6 @@ Elm.Systems.Add.Persistency.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Json$Encode = Elm.Json.Encode.make(_elm),
    $List = Elm.List.make(_elm),
@@ -17997,10 +18069,7 @@ Elm.Systems.Add.Persistency.make = function (_elm) {
    $Systems$Add$Encoders = Elm.Systems.Add.Encoders.make(_elm),
    $Systems$Model$AWS = Elm.Systems.Model.AWS.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
-   $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
-   $Systems$Model$GCE = Elm.Systems.Model.GCE.make(_elm),
-   $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
-   $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm);
+   $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm);
    var _op = {};
    var addDevice = function (vs) {
       return $Maybe.Just(A2($List.map,
@@ -18023,81 +18092,10 @@ Elm.Systems.Add.Persistency.make = function (_elm) {
            return _U.update(_p5,{openstack: $Maybe.Just(newStack)});
          default: return _p5;}
    });
-   var encodeOpenstack = function (_p6) {
-      var _p7 = _p6;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p7.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p7.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p7.env)}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "openstack"
-                                          ,_1: $Systems$Add$Encoders.openstackEncoder(A2($Maybe.withDefault,
-                                          $Systems$Model$Openstack.emptyOpenstack,
-                                          _p7.openstack))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p7.machine)}]));
-   };
-   var encodePhysical = function (_p8) {
-      var _p9 = _p8;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p9.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p9.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p9.env)}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "physical"
-                                          ,_1: $Systems$Add$Encoders.physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p9.physical))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p9.machine)}]));
-   };
-   var encodeDigital = function (_p10) {
-      var _p11 = _p10;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p11.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p11.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p11.env)}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "digital-ocean"
-                                          ,_1: $Systems$Add$Encoders.digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p11.digital))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p11.machine)}]));
-   };
-   var encodeGce = function (_p12) {
-      var _p13 = _p12;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p13.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p13.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p13.env)}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "gce"
-                                          ,_1: $Systems$Add$Encoders.gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p13.gce))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p13.machine)}]));
-   };
-   var encodeAws = function (_p14) {
-      var _p15 = _p14;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p15.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p15.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p15.env)}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "aws"
-                                          ,_1: $Systems$Add$Encoders.awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p15.aws))}
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p15.machine)}]));
-   };
-   var encoders = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "AWS",_1: encodeAws}
-                                         ,{ctor: "_Tuple2",_0: "GCE",_1: encodeGce}
-                                         ,{ctor: "_Tuple2",_0: "Digital",_1: encodeDigital}
-                                         ,{ctor: "_Tuple2",_0: "Openstack",_1: encodeOpenstack}
-                                         ,{ctor: "_Tuple2",_0: "Physical",_1: encodePhysical}]));
    var persistModel = F3(function (f,system,stage) {
-      var _p16 = A2($Dict.get,stage,encoders);
-      if (_p16.ctor === "Just") {
-            return f(A2($Json$Encode.encode,0,_p16._0(A2(transform,system,stage))));
-         } else {
-            return $Effects.none;
-         }
+      return f(A2($Json$Encode.encode,0,A2($Systems$Add$Encoders.encode,A2(transform,system,stage),stage)));
    });
-   return _elm.Systems.Add.Persistency.values = {_op: _op
-                                                ,encodeAws: encodeAws
-                                                ,encodeGce: encodeGce
-                                                ,encodeDigital: encodeDigital
-                                                ,encodePhysical: encodePhysical
-                                                ,encodeOpenstack: encodeOpenstack
-                                                ,addDevice: addDevice
-                                                ,encoders: encoders
-                                                ,transform: transform
-                                                ,persistModel: persistModel};
+   return _elm.Systems.Add.Persistency.values = {_op: _op,addDevice: addDevice,transform: transform,persistModel: persistModel};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
@@ -23114,6 +23112,38 @@ Elm.Common.Editor.make = function (_elm) {
    return _elm.Common.Editor.values = {_op: _op,NoOp: NoOp,Load: Load,editorActions: editorActions,loadEditor: loadEditor,getEditor: getEditor};
 };
 Elm.Templates = Elm.Templates || {};
+Elm.Templates.Defaults = Elm.Templates.Defaults || {};
+Elm.Templates.Defaults.make = function (_elm) {
+   "use strict";
+   _elm.Templates = _elm.Templates || {};
+   _elm.Templates.Defaults = _elm.Templates.Defaults || {};
+   if (_elm.Templates.Defaults.values) return _elm.Templates.Defaults.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
+   $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm);
+   var _op = {};
+   var openstackDefaults = A2($Json$Decode.object1,
+   $Systems$Model$Openstack.OpenstackDefaults,
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"networks",$Json$Decode.list($Json$Decode.string))));
+   var defaultsDecoder = A2($Json$Decode.object1,$Systems$Model$Common.Defaults,$Json$Decode.maybe(A2($Json$Decode._op[":="],"openstack",openstackDefaults)));
+   var decodeDefaults = function (json) {
+      var _p0 = A2($Json$Decode.decodeString,defaultsDecoder,json);
+      if (_p0.ctor === "Ok") {
+            return _p0._0;
+         } else {
+            return A2($Debug.log,_p0._0,$Systems$Model$Common.emptyDefaults);
+         }
+   };
+   return _elm.Templates.Defaults.values = {_op: _op,openstackDefaults: openstackDefaults,defaultsDecoder: defaultsDecoder,decodeDefaults: decodeDefaults};
+};
+Elm.Templates = Elm.Templates || {};
 Elm.Templates.Add = Elm.Templates.Add || {};
 Elm.Templates.Add.make = function (_elm) {
    "use strict";
@@ -23126,6 +23156,7 @@ Elm.Templates.Add.make = function (_elm) {
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Editor = Elm.Common.Editor.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -23139,15 +23170,23 @@ Elm.Templates.Add.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Systems$Add$Common = Elm.Systems.Add.Common.make(_elm),
+   $Systems$Add$Encoders = Elm.Systems.Add.Encoders.make(_elm),
+   $Systems$Add$Errors = Elm.Systems.Add.Errors.make(_elm),
    $Systems$Add$Persistency = Elm.Systems.Add.Persistency.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
-   $Task = Elm.Task.make(_elm);
+   $Task = Elm.Task.make(_elm),
+   $Templates$Defaults = Elm.Templates.Defaults.make(_elm);
    var _op = {};
    var SaveResponse = F2(function (a,b) {    return {message: a,id: b};});
    var saveResponse = A3($Json$Decode.object2,
    SaveResponse,
    A2($Json$Decode._op[":="],"message",$Json$Decode.string),
    A2($Json$Decode._op[":="],"id",$Json$Decode.$int));
+   var setErrors = F2(function (_p0,es) {
+      var _p1 = _p0;
+      var newErrors = _U.update(_p1.saveErrors,{errors: es});
+      return {ctor: "_Tuple2",_0: _U.update(_p1,{saveErrors: newErrors}),_1: $Effects.none};
+   });
    var DefaultsInput = function (a) {    return {ctor: "DefaultsInput",_0: a};};
    var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
    var SetSystem = function (a) {    return {ctor: "SetSystem",_0: a};};
@@ -23159,28 +23198,29 @@ Elm.Templates.Add.make = function (_elm) {
    var LoadEditor = {ctor: "LoadEditor"};
    var Cancel = {ctor: "Cancel"};
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p0) {
-      var _p1 = _p0;
-      var _p6 = _p1.system;
-      var _p5 = _p1;
-      var _p4 = _p1.editDefaults;
-      var _p2 = action;
-      switch (_p2.ctor)
-      {case "SaveTemplate": return _U.eq(_p4,false) ? {ctor: "_Tuple2"
-                                                      ,_0: _p5
-                                                      ,_1: A3($Systems$Add$Persistency.persistModel,saveTemplate,_p6,_p1.stage)} : {ctor: "_Tuple2"
-                                                                                                                                   ,_0: _p5
-                                                                                                                                   ,_1: $Common$Editor.getEditor(NoOp)};
-         case "SetSystem": return $Common$Utils.none(_U.update(_p5,{system: _p2._0}));
+   var update = F2(function (action,_p2) {
+      var _p3 = _p2;
+      var _p8 = _p3.system;
+      var _p7 = _p3.stage;
+      var _p6 = _p3;
+      var _p5 = _p3.editDefaults;
+      var _p4 = action;
+      switch (_p4.ctor)
+      {case "SaveTemplate": return _U.eq(_p5,false) ? {ctor: "_Tuple2"
+                                                      ,_0: _p6
+                                                      ,_1: A3($Systems$Add$Persistency.persistModel,saveTemplate,_p8,_p7)} : {ctor: "_Tuple2"
+                                                                                                                             ,_0: _p6
+                                                                                                                             ,_1: $Common$Editor.getEditor(NoOp)};
+         case "SetSystem": return $Common$Utils.none(_U.update(_p6,{system: _p4._0}));
          case "LoadEditor": return {ctor: "_Tuple2"
-                                   ,_0: _U.update(_p5,{editDefaults: $Basics.not(_p4)})
-                                   ,_1: A2($Common$Editor.loadEditor,NoOp,"{\"defaults\":{\"openstack\":{\"networks\":[]}}}")};
-         case "NameInput": var newSystem = _U.update(_p6,{name: $Maybe.Just(_p2._0)});
-           return $Common$Utils.none(_U.update(_p5,{system: newSystem}));
-         case "SetDefaults": var _p3 = _p2._0;
-           var newSystem = _U.update(_p6,{defaults: $Maybe.Just(_p3)});
-           return $Common$Utils.none(A2($Debug.log,_p3,_U.update(_p5,{system: newSystem})));
-         default: return {ctor: "_Tuple2",_0: _p5,_1: $Effects.none};}
+                                   ,_0: _U.update(_p6,{editDefaults: $Basics.not(_p5)})
+                                   ,_1: A2($Common$Editor.loadEditor,NoOp,A2($Systems$Add$Encoders.encodeDefaults,$Systems$Model$Common.emptyDefaults,_p7))};
+         case "NameInput": var newSystem = _U.update(_p8,{name: $Maybe.Just(_p4._0)});
+           return $Common$Utils.none(_U.update(_p6,{system: newSystem}));
+         case "SetDefaults": var newSystem = _U.update(_p8,{defaults: $Maybe.Just($Templates$Defaults.decodeDefaults(_p4._0))});
+           return {ctor: "_Tuple2",_0: _U.update(_p6,{system: newSystem}),_1: A3($Systems$Add$Persistency.persistModel,saveTemplate,_p8,_p7)};
+         case "TemplateSaved": return A2($Debug.log,$Basics.toString(_p4._0),$Common$Utils.none(_p6));
+         default: return {ctor: "_Tuple2",_0: _p6,_1: $Effects.none};}
    });
    var SaveTemplate = {ctor: "SaveTemplate"};
    var buttons = F2(function (address,model) {
@@ -23193,8 +23233,8 @@ Elm.Templates.Add.make = function (_elm) {
                      _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),margin,click(SaveTemplate)]),
                      _U.list([$Html.text("Save")]))]);
    });
-   var view = F2(function (address,_p7) {
-      var _p8 = _p7;
+   var view = F2(function (address,_p9) {
+      var _p10 = _p9;
       return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
                      _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
                      _U.list([A2($Html.div,
@@ -23207,20 +23247,28 @@ Elm.Templates.Add.make = function (_elm) {
                      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
                      _U.list([A2($Systems$Add$Common.group$,
                              "Name",
-                             A4($Systems$Add$Common.inputText,address,NameInput," ",A2($Maybe.withDefault,"",_p8.system.name)))
-                             ,A2($Systems$Add$Common.group$,"Edit defaults",A3($Systems$Add$Common.checkbox,address,LoadEditor,_p8.editDefaults))
+                             A4($Systems$Add$Common.inputText,address,NameInput," ",A2($Maybe.withDefault,"",_p10.system.name)))
+                             ,A2($Systems$Add$Common.group$,"Edit defaults",A3($Systems$Add$Common.checkbox,address,LoadEditor,_p10.editDefaults))
                              ,A2($Html.div,
                              _U.list([$Html$Attributes.id("jsoneditor")
                                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "550px"}
                                                                      ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
                                                                      ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
                              _U.list([]))]))]))))]))]))
-                     ,$Bootstrap$Html.row_(A2(buttons,address,_p8))]);
+                     ,$Bootstrap$Html.row_(A2(buttons,address,_p10))]);
    });
-   var Model = F3(function (a,b,c) {    return {system: a,stage: b,editDefaults: c};});
-   var init = $Common$Utils.none(A3(Model,$Systems$Model$Common.emptySystem,"",false));
+   var Error = {ctor: "Error"};
+   var Template = {ctor: "Template"};
+   var Model = F4(function (a,b,c,d) {    return {system: a,stage: b,editDefaults: c,saveErrors: d};});
+   var init = function () {
+      var _p11 = $Systems$Add$Errors.init;
+      var errorsModel = _p11._0;
+      return $Common$Utils.none(A4(Model,$Systems$Model$Common.emptySystem,"",false,errorsModel));
+   }();
    return _elm.Templates.Add.values = {_op: _op
                                       ,Model: Model
+                                      ,Template: Template
+                                      ,Error: Error
                                       ,SaveTemplate: SaveTemplate
                                       ,NoOp: NoOp
                                       ,Cancel: Cancel
@@ -23231,6 +23279,7 @@ Elm.Templates.Add.make = function (_elm) {
                                       ,NameInput: NameInput
                                       ,DefaultsInput: DefaultsInput
                                       ,init: init
+                                      ,setErrors: setErrors
                                       ,update: update
                                       ,buttons: buttons
                                       ,view: view
