@@ -120,12 +120,6 @@ openstackEncoder openstack =
     , ("volumes", list (List.map openstackVolumeEncoder (defaultEmpty openstack.volumes)))
   ]
 
-openstackDefaultsEncoder : OpenstackDefaults -> Value
-openstackDefaultsEncoder openstack =
-  object [
-     ("networks", list (List.map string (withDefault [] openstack.networks)))
-  ]
-
 machineEncoder : Machine -> Value
 machineEncoder machine =
   object [
@@ -136,7 +130,7 @@ machineEncoder machine =
     , ("user", string machine.user)
   ]
 
-encoder {openstack, physical, aws, digital, gce} stage =
+encoderOf {openstack, physical, aws, digital, gce} stage =
   case stage of 
     "AWS" -> 
        ("aws", awsEncoder (withDefault emptyAws aws))
@@ -157,36 +151,14 @@ encoder {openstack, physical, aws, digital, gce} stage =
 
      ("",null)
 
-defaultsEncoder {openstack} stage = 
-  if stage == "Openstack" then
-    object [
-      ("openstack" , openstackDefaultsEncoder (withDefault emptyOpenstackDefaults openstack))
-    ]
-  else 
-    null
-
-encodeDefaults defaults stage =
-  E.encode 0 (defaultsEncoder defaults stage)
-
-template {name, defaults} stage = 
-  case name of
-    Just value -> 
-      [ ("name" , string value )
-      , ("defaults", defaultsEncoder (withDefault emptyDefaults defaults) stage)
-      ]
-
-    Nothing -> 
-      []
-
 encode: System -> String -> Value
 encode ({owner, env, type', machine} as system) stage =
- object 
-  (List.append (template system stage) [
+ object [
     ("type" , string type')
   , ("owner" , string owner)
   , ("env" , string env)
-  , (encoder system stage)
+  , (encoderOf system stage)
   , ("machine" , machineEncoder machine)
- ]) 
+ ] 
 
 

@@ -115,8 +115,6 @@ systemDecoder =
     `apply` (maybe ("digital-ocean" := digitalDecoder))
     `apply` (maybe ("openstack" := openstackDecoder))
     `apply` (maybe ("physical" := physicalDecoder))
-    `apply` (maybe ("name" := string))
-    `apply` (maybe ("defaults" := string))
  
 
 

@@ -25,19 +25,7 @@ type alias System =
   , digital : Maybe Digital
   , openstack : Maybe Openstack
   , physical : Maybe Physical
-  -- template
-  , name : Maybe String
-  , defaults : Maybe Defaults
   }
-
-type alias Defaults = 
-  {
-    openstack : Maybe OpenstackDefaults
-  }
-
-
-emptyDefaults = 
-  Defaults Nothing
 
 emptyMachine : Machine
 emptyMachine =
@@ -48,4 +36,4 @@ emptySystem =
   let
    base = System "" "" ""
   in 
-   base emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing Nothing
+   base emptyMachine Nothing Nothing Nothing Nothing Nothing

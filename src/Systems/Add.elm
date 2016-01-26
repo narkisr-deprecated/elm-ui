@@ -134,9 +134,8 @@ intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, physical
   let
     {owner, type', environment} =  general
     baseSystem = System owner environment type' (machineFrom (toString stage) model)
-    system = baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical)
   in 
-    system Nothing Nothing
+    baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical)
   
 update : Action ->  Model-> (Model , Effects Action)
 update action ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, stage} as model) =

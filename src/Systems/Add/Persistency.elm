@@ -8,8 +8,8 @@ import String
 import Focus exposing (Focus, set, (=>), create)
 import Common.Utils exposing (none)
 import Maybe exposing (withDefault)
-import Systems.Model.AWS exposing (emptyAws)
-import Systems.Model.Openstack exposing (emptyOpenstack)
+import Systems.Model.AWS as AWS exposing (emptyAws)
+import Systems.Model.Openstack as Openstack exposing (emptyOpenstack)
 import Systems.Model.Common exposing (System)
 
 
@@ -17,7 +17,6 @@ addDevice : Maybe (List {r | device : String}) -> Maybe (List {r | device : Stri
 addDevice vs = 
   Just (List.map (\({device} as volume) -> {volume | device = "/dev/"++device}) (withDefault [] vs))
 
-transform : System -> String -> System
 transform ({aws, openstack} as system) stage =
   case stage of
     "AWS" -> 

@@ -13,23 +13,22 @@ import Json.Decode exposing (..)
 import Json.Encode as E
 import Effects exposing (Effects, batch)
 import Dict exposing (Dict)
-import Systems.Model.Common exposing (System, emptySystem, emptyDefaults)
+import Systems.Model.Common exposing (System)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
-import Systems.Add.Persistency exposing (persistModel)
+import Templates.Persistency exposing (persistModel, encodeDefaults)
 import Common.Components exposing (panelContents)
 import Systems.Add.Common exposing (..)
 import Common.Editor exposing (loadEditor, getEditor)
 import Systems.Add.Errors as Errors exposing (..)
-import Templates.Defaults exposing (decodeDefaults)
-import Systems.Add.Encoders exposing (encodeDefaults)
+import Templates.Model.Common exposing (decodeDefaults, emptyDefaults, emptyTemplate, Template)
 import Debug
 
 
 type alias Model = 
   {
-    system : System
+    template : Template
   , stage : String
   , editDefaults : Bool
   , saveErrors : Errors.Model
@@ -55,7 +54,7 @@ init =
   let
     (errorsModel, _ ) = Errors.init
   in
-  none (Model emptySystem "" False errorsModel)   
+    none (Model emptyTemplate "" False errorsModel)   
 
 setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
 setErrors ({saveErrors} as model) es =
@@ -64,33 +63,39 @@ setErrors ({saveErrors} as model) es =
   in 
     ({model | saveErrors = newErrors}, Effects.none)
 
+intoTemplate ({template} as model) {openstack, physical, aws, digital, gce} = 
+    let 
+      newTemplate = {template | openstack = openstack, physical = physical, aws = aws, digital = digital, gce = gce} 
+    in 
+      {model | template = newTemplate}
+
 update : Action ->  Model-> (Model , Effects Action)
-update action ({system, stage, editDefaults} as model) =
+update action ({template, stage, editDefaults} as model) =
   case action of
     SaveTemplate -> 
       if editDefaults == False then
-        (model, persistModel saveTemplate system stage)
+        (model, persistModel saveTemplate template stage)
       else
         (model, getEditor NoOp)
 
-    SetSystem newSystem -> 
-      none {model | system = newSystem }
+    SetSystem system -> 
+      none (intoTemplate model system)
 
     LoadEditor -> 
       ({ model | editDefaults = not editDefaults}, loadEditor NoOp (encodeDefaults emptyDefaults stage))
     
     NameInput name -> 
       let 
-        newSystem = { system | name = Just name }
+        newTemplate = { template | name = name }
       in 
-        none { model | system = newSystem} 
+        none { model | template = newTemplate} 
 
     SetDefaults json -> 
-      let 
-        newSystem = { system | defaults = Just (decodeDefaults json) }
-      in 
-        ({ model | system = newSystem}, persistModel saveTemplate system stage)
-
+       let 
+         newTemplate = { template | defaults = Just (decodeDefaults json) }
+       in 
+         ({ model | template = newTemplate}, persistModel saveTemplate template stage)
+    
     TemplateSaved result -> 
       Debug.log (toString result) (none model)
 
@@ -110,14 +115,14 @@ buttons address model =
    ]
  
 view : Signal.Address Action -> Model -> List Html
-view address ({system, editDefaults} as model) =
+view address ({template, editDefaults} as model) =
  [ row_ [
      div [class "col-md-offset-2 col-md-8"] [
        div [class "panel panel-default"]
          (panelContents "New Template" 
            (Html.form [] [
              div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-                  group' "Name" (inputText address NameInput " " (withDefault "" system.name))
+                  group' "Name" (inputText address NameInput " "  template.name)
                 , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
                 , div [id "jsoneditor", style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
                 ]
