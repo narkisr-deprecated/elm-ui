@@ -3,7 +3,7 @@ module Templates.Add where
 import Html.Shorthand exposing (..)
 import Bootstrap.Html exposing (..)
 import Common.Http exposing (postJson)
-import Common.Redirect as Redirect exposing (resultHandler, successHandler)
+import Common.Redirect as Redirect exposing (errorsHandler, successHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -21,7 +21,7 @@ import Templates.Persistency exposing (persistModel, encodeDefaults)
 import Common.Components exposing (panelContents)
 import Systems.Add.Common exposing (..)
 import Common.Editor exposing (loadEditor, getEditor)
-import Systems.Add.Errors as Errors exposing (..)
+import Common.Errors as Errors exposing (..)
 import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
 import Environments.List exposing (Environments, getEnvironments)
 import Debug
@@ -34,10 +34,11 @@ type alias Model =
   , editDefaults : Bool
   , saveErrors : Errors.Model
   , environments : List String
+  , stage : Stage
   }
 
 type Stage = 
-  Template
+  Editing
     | Error
 
 type Action = 
@@ -46,32 +47,25 @@ type Action =
   | Cancel
   | LoadEditor
   | SetDefaults String
-  | TemplateSaved (Result Http.Error SaveResponse)
+  | Saved (Result Http.Error SaveResponse)
   | SetSystem String System
   | NameInput String
   | DefaultsInput String
   | SetEnvironments (Result Http.Error Environments)
+  | ErrorsView Errors.Action
 
 init =
   let
     (errorsModel, _ ) = Errors.init
   in
-    (Model emptyTemplate "" False errorsModel [], getEnvironments SetEnvironments)   
-
-setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
-setErrors ({saveErrors} as model) es =
-  let
-    newErrors = {saveErrors | errors = es}  
-  in 
-    ({model | saveErrors = newErrors}, Effects.none)
+    (Model emptyTemplate "" False errorsModel [] Editing, getEnvironments SetEnvironments)   
 
 intoTemplate ({template} as model) {type', machine, openstack, physical, aws, digital, gce} hyp = 
     let 
       withHyp = {template | openstack = openstack, physical = physical, aws = aws, digital = digital, gce = gce} 
       newTemplate = {withHyp | name = machine.hostname, type' = type', machine = machine}
-
     in 
-      {model | template = newTemplate, hyp = hyp}
+      {model | template = newTemplate, hyp = hyp, stage = Editing}
 
 setEnvironments : Model -> Environments -> (Model, Effects Action)
 setEnvironments model es =
@@ -108,8 +102,14 @@ update action ({template, hyp, editDefaults, environments} as model) =
        in 
          ({ model | template = newTemplate}, persistModel saveTemplate template hyp)
     
-    TemplateSaved result -> 
-      Debug.log (toString result) (none model)
+    Saved result -> 
+      let
+        (({saveErrors} as newModel), effects) = errorsHandler result model NoOp
+      in
+         if not (Dict.isEmpty saveErrors.errors.keyValues) then
+           ({newModel | stage = Error} , Effects.none)
+         else
+           (model, effects)
 
     SetEnvironments result ->
        (successHandler result model (setEnvironments model) NoOp)
@@ -117,7 +117,18 @@ update action ({template, hyp, editDefaults, environments} as model) =
     _ -> 
       (model, Effects.none)
 
-    
+-- View
+
+currentView : Signal.Address Action -> Model -> List Html
+currentView address ({stage, saveErrors} as model)=
+  case stage of 
+    Editing -> 
+      editing model address
+
+    Error -> 
+      (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+
+   
 buttons : Signal.Address Action -> Model -> List Html
 buttons address model =
   let
@@ -129,20 +140,23 @@ buttons address model =
     , button [id "Save", class "btn btn-primary", margin, click SaveTemplate] [text "Save"]
    ]
  
+
+editing ({template, editDefaults} as model) address  =
+  panelContents "New Template" 
+    (Html.form [] [
+       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
+         group' "Name" (inputText address NameInput " "  template.name)
+       , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
+       , div [id "jsoneditor", style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
+       ]
+        
+  ])
+
 view : Signal.Address Action -> Model -> List Html
-view address ({template, editDefaults} as model) =
+view address  model =
  [ row_ [
      div [class "col-md-offset-2 col-md-8"] [
-       div [class "panel panel-default"]
-         (panelContents "New Template" 
-           (Html.form [] [
-             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-                  group' "Name" (inputText address NameInput " "  template.name)
-                , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
-                , div [id "jsoneditor", style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
-                ]
-                 
-           ]))
+       div [class "panel panel-default"] (currentView address model)
      ]
    ]
  , row_ (buttons address model)
@@ -151,19 +165,18 @@ view address ({template, editDefaults} as model) =
 -- Effects
 
 type alias SaveResponse = 
-  { message : String , id : Int } 
+  { message : String } 
 
 saveResponse : Decoder SaveResponse
 saveResponse = 
-  object2 SaveResponse
+  object1 SaveResponse
     ("message" := string) 
-    ("id" := int)
 
 saveTemplate: String -> Effects Action
 saveTemplate json = 
   postJson (Http.string json) saveResponse "/templates"  
     |> Task.toResult
-    |> Task.map TemplateSaved
+    |> Task.map Saved
     |> Effects.task
 
 

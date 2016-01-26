@@ -1,4 +1,4 @@
-module Systems.Add.Errors where
+module Common.Errors where
 
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
@@ -68,3 +68,5 @@ view address ({errors} as model) =
              (Dict.values (Dict.map (\k v -> li [] [toText k v] ) errors.keyValues))
       ] 
     )
+
+

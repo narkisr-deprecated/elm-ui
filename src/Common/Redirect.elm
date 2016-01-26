@@ -85,3 +85,16 @@ successHandler result model success noop =
 failHandler : Result Http.Error r -> m -> (Errors -> (m, Effects a)) -> a -> (m, Effects a)
 failHandler result model fail noop = 
   resultHandler result model (identitySuccess model) fail noop
+
+errorsHandler : Result Http.Error r -> {m | saveErrors : {errors : Errors }} -> a -> ({m | saveErrors : {errors : Errors } }, Effects a)
+errorsHandler result model noop = 
+  resultHandler result model (identitySuccess model) (setErrors model) noop
+
+setErrors : {r | saveErrors : {errors : Errors } } -> Errors -> ({r | saveErrors : {errors : Errors } }, Effects a)
+setErrors ({saveErrors} as model) es =
+  let
+    newErrors = {saveErrors | errors = es}  
+  in 
+    ({model | saveErrors = newErrors}, Effects.none)
+
+

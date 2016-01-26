@@ -3,7 +3,7 @@ module Systems.Add where
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
 import Common.Http exposing (postJson)
-import Common.Redirect as Redirect exposing (resultHandler, successHandler)
+import Common.Redirect as Redirect exposing (resultHandler, successHandler, errorsHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -20,7 +20,7 @@ import Systems.Add.Openstack as Openstack exposing (..)
 import Systems.Add.GCE as GCE exposing (..)
 import Systems.Add.Digital as Digital exposing (..)
 import Systems.Add.General as General exposing (..)
-import Systems.Add.Errors as Errors exposing (..)
+import Common.Errors as Errors exposing (..)
 import Systems.Add.Encoders exposing (..)
 import Systems.Launch as Launch exposing (runJob, JobResponse)
 import String exposing (toLower)
@@ -82,13 +82,6 @@ init =
   in 
    (Model General aws gce physical digital openstack general True errors, Effects.map GeneralView effects)
 
-
-setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
-setErrors ({saveErrors} as model) es =
-  let
-    newErrors = {saveErrors | errors = es}  
-  in 
-    ({model | saveErrors = newErrors}, Effects.none)
 
 setSaved : Action -> Model -> SaveResponse -> (Model, Effects Action)
 setSaved next model {id} =
@@ -242,7 +235,7 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
     Saved next result -> 
       let
         success = (setSaved next model)
-        (({saveErrors} as newModel), effects) = resultHandler result model success (setErrors model) NoOp
+        (({saveErrors} as newModel), effects) = errorsHandler result model NoOp
       in
          if not (Dict.isEmpty saveErrors.errors.keyValues) then
            ({newModel | stage = Error} , Effects.none)

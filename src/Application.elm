@@ -109,9 +109,15 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
 
     TemplatesAction action -> 
       let 
-       (newTemplates, effects) = Templates.update action templates
+         (newTemplates, effects) = Templates.update action templates
+         newModel = { model | templates = newTemplates }
       in
-       ({ model | templates = newTemplates}, Effects.map TemplatesAction effects) 
+        case newTemplates.navChange of
+          Just (Templates, List) -> 
+            (goto Templates List newModel , Effects.map TemplatesAction effects)
+
+          _ -> 
+            (newModel , Effects.map TemplatesAction effects) 
 
     SystemsAction action -> 
       let 
