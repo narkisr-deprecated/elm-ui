@@ -16,9 +16,9 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let
-    (add, _) = Add.init
+    (add, effects) = Add.init
   in
-    none (Model add)
+    (Model add, Effects.map TemplatesAdd effects)
 
 type Action = 
   TemplatesAdd Add.Action
@@ -36,8 +36,8 @@ update action model =
     _ -> 
       none model
 
-add system = 
-  TemplatesAdd (Add.SetSystem system)
+add hyp system = 
+  TemplatesAdd (Add.SetSystem hyp system)
 
 view : Signal.Address Action -> Model -> Section -> List Html
 view address model section =

@@ -18640,7 +18640,9 @@ Elm.Systems.Core.make = function (_elm) {
          case "View": return A2($Systems$View.view,A2($Signal.forwardTo,address,SystemsView),model.systemsView);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
-   var addedSystem = function (model) {    return $Systems$Add.intoSystem(model.systemsAdd);};
+   var addedSystem = function (model) {
+      return {ctor: "_Tuple2",_0: $Basics.toString(model.systemsAdd.stage),_1: $Systems$Add.intoSystem(model.systemsAdd)};
+   };
    var Model = F5(function (a,b,c,d,e) {    return {systemsList: a,systemsAdd: b,systemsView: c,systemsLaunch: d,navChange: e};});
    var init = function () {
       var _p27 = $Systems$Launch.init;
@@ -23051,6 +23053,9 @@ Elm.Templates.Model.Common.make = function (_elm) {
    $Maybe.Nothing);
    var OpenstackDefaults = function (a) {    return {networks: a};};
    var emptyOpenstackDefaults = OpenstackDefaults($Maybe.Just(_U.list([])));
+   var defaultsByEnv = function (envs) {
+      return $Dict.fromList(A2($List.map,function (env) {    return {ctor: "_Tuple2",_0: env,_1: {openstack: $Maybe.Just(emptyOpenstackDefaults)}};},envs));
+   };
    var openstackDefaults = A2($Json$Decode.object1,
    OpenstackDefaults,
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"networks",$Json$Decode.list($Json$Decode.string))));
@@ -23071,6 +23076,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
                                                ,emptyTemplate: emptyTemplate
                                                ,Defaults: Defaults
                                                ,emptyDefaults: emptyDefaults
+                                               ,defaultsByEnv: defaultsByEnv
                                                ,openstackDefaults: openstackDefaults
                                                ,defaultsDecoder: defaultsDecoder
                                                ,defaultsDictDecoder: defaultsDictDecoder
@@ -23175,7 +23181,9 @@ Elm.Templates.Add.make = function (_elm) {
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
+   $Environments$List = Elm.Environments.List.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
@@ -23197,20 +23205,24 @@ Elm.Templates.Add.make = function (_elm) {
    SaveResponse,
    A2($Json$Decode._op[":="],"message",$Json$Decode.string),
    A2($Json$Decode._op[":="],"id",$Json$Decode.$int));
-   var intoTemplate = F2(function (_p1,_p0) {
+   var setEnvironments = F2(function (model,es) {    return $Common$Utils.none(_U.update(model,{environments: $Dict.keys(es)}));});
+   var intoTemplate = F3(function (_p1,_p0,hyp) {
       var _p2 = _p1;
       var _p3 = _p0;
-      var newTemplate = _U.update(_p2.template,{openstack: _p3.openstack,physical: _p3.physical,aws: _p3.aws,digital: _p3.digital,gce: _p3.gce});
-      return _U.update(_p2,{template: newTemplate});
+      var _p4 = _p3.machine;
+      var withHyp = _U.update(_p2.template,{openstack: _p3.openstack,physical: _p3.physical,aws: _p3.aws,digital: _p3.digital,gce: _p3.gce});
+      var newTemplate = _U.update(withHyp,{name: _p4.hostname,type$: _p3.type$,machine: _p4});
+      return _U.update(_p2,{template: newTemplate,hyp: hyp});
    });
-   var setErrors = F2(function (_p4,es) {
-      var _p5 = _p4;
-      var newErrors = _U.update(_p5.saveErrors,{errors: es});
-      return {ctor: "_Tuple2",_0: _U.update(_p5,{saveErrors: newErrors}),_1: $Effects.none};
+   var setErrors = F2(function (_p5,es) {
+      var _p6 = _p5;
+      var newErrors = _U.update(_p6.saveErrors,{errors: es});
+      return {ctor: "_Tuple2",_0: _U.update(_p6,{saveErrors: newErrors}),_1: $Effects.none};
    });
+   var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
    var DefaultsInput = function (a) {    return {ctor: "DefaultsInput",_0: a};};
    var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
-   var SetSystem = function (a) {    return {ctor: "SetSystem",_0: a};};
+   var SetSystem = F2(function (a,b) {    return {ctor: "SetSystem",_0: a,_1: b};});
    var TemplateSaved = function (a) {    return {ctor: "TemplateSaved",_0: a};};
    var saveTemplate = function (json) {
       return $Effects.task(A2($Task.map,TemplateSaved,$Task.toResult(A3($Common$Http.postJson,$Http.string(json),saveResponse,"/templates"))));
@@ -23219,31 +23231,29 @@ Elm.Templates.Add.make = function (_elm) {
    var LoadEditor = {ctor: "LoadEditor"};
    var Cancel = {ctor: "Cancel"};
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p6) {
-      var _p7 = _p6;
-      var _p12 = _p7.template;
-      var _p11 = _p7.stage;
-      var _p10 = _p7;
-      var _p9 = _p7.editDefaults;
-      var _p8 = action;
-      switch (_p8.ctor)
-      {case "SaveTemplate": return _U.eq(_p9,false) ? {ctor: "_Tuple2"
-                                                      ,_0: _p10
-                                                      ,_1: A3($Templates$Persistency.persistModel,saveTemplate,_p12,_p11)} : {ctor: "_Tuple2"
-                                                                                                                             ,_0: _p10
-                                                                                                                             ,_1: $Common$Editor.getEditor(NoOp)};
-         case "SetSystem": return $Common$Utils.none(A2(intoTemplate,_p10,_p8._0));
-         case "LoadEditor": return {ctor: "_Tuple2"
-                                   ,_0: _U.update(_p10,{editDefaults: $Basics.not(_p9)})
-                                   ,_1: A2($Common$Editor.loadEditor,
-                                   NoOp,
-                                   A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.emptyDefaults,_p11))};
-         case "NameInput": var newTemplate = _U.update(_p12,{name: _p8._0});
-           return $Common$Utils.none(_U.update(_p10,{template: newTemplate}));
-         case "SetDefaults": var newTemplate = _U.update(_p12,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p8._0))});
-           return {ctor: "_Tuple2",_0: _U.update(_p10,{template: newTemplate}),_1: A3($Templates$Persistency.persistModel,saveTemplate,_p12,_p11)};
-         case "TemplateSaved": return A2($Debug.log,$Basics.toString(_p8._0),$Common$Utils.none(_p10));
-         default: return {ctor: "_Tuple2",_0: _p10,_1: $Effects.none};}
+   var update = F2(function (action,_p7) {
+      var _p8 = _p7;
+      var _p13 = _p8.template;
+      var _p12 = _p8;
+      var _p11 = _p8.hyp;
+      var _p10 = _p8.editDefaults;
+      var _p9 = action;
+      switch (_p9.ctor)
+      {case "SaveTemplate": return _U.eq(_p10,false) ? {ctor: "_Tuple2"
+                                                       ,_0: _p12
+                                                       ,_1: A3($Templates$Persistency.persistModel,saveTemplate,_p13,_p11)} : {ctor: "_Tuple2"
+                                                                                                                              ,_0: _p12
+                                                                                                                              ,_1: $Common$Editor.getEditor(NoOp)};
+         case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p12,_p9._1,_p9._0));
+         case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p8.environments),_p11);
+           return {ctor: "_Tuple2",_0: _U.update(_p12,{editDefaults: $Basics.not(_p10)}),_1: A2($Common$Editor.loadEditor,NoOp,encoded)};
+         case "NameInput": var newTemplate = _U.update(_p13,{name: _p9._0});
+           return $Common$Utils.none(_U.update(_p12,{template: newTemplate}));
+         case "SetDefaults": var newTemplate = _U.update(_p13,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p9._0))});
+           return {ctor: "_Tuple2",_0: _U.update(_p12,{template: newTemplate}),_1: A3($Templates$Persistency.persistModel,saveTemplate,_p13,_p11)};
+         case "TemplateSaved": return A2($Debug.log,$Basics.toString(_p9._0),$Common$Utils.none(_p12));
+         case "SetEnvironments": return A4($Common$Redirect.successHandler,_p9._0,_p12,setEnvironments(_p12),NoOp);
+         default: return {ctor: "_Tuple2",_0: _p12,_1: $Effects.none};}
    });
    var SaveTemplate = {ctor: "SaveTemplate"};
    var buttons = F2(function (address,model) {
@@ -23256,8 +23266,8 @@ Elm.Templates.Add.make = function (_elm) {
                      _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),margin,click(SaveTemplate)]),
                      _U.list([$Html.text("Save")]))]);
    });
-   var view = F2(function (address,_p13) {
-      var _p14 = _p13;
+   var view = F2(function (address,_p14) {
+      var _p15 = _p14;
       return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
                      _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
                      _U.list([A2($Html.div,
@@ -23268,23 +23278,25 @@ Elm.Templates.Add.make = function (_elm) {
                      _U.list([]),
                      _U.list([A2($Html.div,
                      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-                     _U.list([A2($Systems$Add$Common.group$,"Name",A4($Systems$Add$Common.inputText,address,NameInput," ",_p14.template.name))
-                             ,A2($Systems$Add$Common.group$,"Edit defaults",A3($Systems$Add$Common.checkbox,address,LoadEditor,_p14.editDefaults))
+                     _U.list([A2($Systems$Add$Common.group$,"Name",A4($Systems$Add$Common.inputText,address,NameInput," ",_p15.template.name))
+                             ,A2($Systems$Add$Common.group$,"Edit defaults",A3($Systems$Add$Common.checkbox,address,LoadEditor,_p15.editDefaults))
                              ,A2($Html.div,
                              _U.list([$Html$Attributes.id("jsoneditor")
                                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "550px"}
                                                                      ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
                                                                      ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
                              _U.list([]))]))]))))]))]))
-                     ,$Bootstrap$Html.row_(A2(buttons,address,_p14))]);
+                     ,$Bootstrap$Html.row_(A2(buttons,address,_p15))]);
    });
    var Error = {ctor: "Error"};
    var Template = {ctor: "Template"};
-   var Model = F4(function (a,b,c,d) {    return {template: a,stage: b,editDefaults: c,saveErrors: d};});
+   var Model = F5(function (a,b,c,d,e) {    return {template: a,hyp: b,editDefaults: c,saveErrors: d,environments: e};});
    var init = function () {
-      var _p15 = $Systems$Add$Errors.init;
-      var errorsModel = _p15._0;
-      return $Common$Utils.none(A4(Model,$Templates$Model$Common.emptyTemplate,"",false,errorsModel));
+      var _p16 = $Systems$Add$Errors.init;
+      var errorsModel = _p16._0;
+      return {ctor: "_Tuple2"
+             ,_0: A5(Model,$Templates$Model$Common.emptyTemplate,"",false,errorsModel,_U.list([]))
+             ,_1: $Environments$List.getEnvironments(SetEnvironments)};
    }();
    return _elm.Templates.Add.values = {_op: _op
                                       ,Model: Model
@@ -23299,9 +23311,11 @@ Elm.Templates.Add.make = function (_elm) {
                                       ,SetSystem: SetSystem
                                       ,NameInput: NameInput
                                       ,DefaultsInput: DefaultsInput
+                                      ,SetEnvironments: SetEnvironments
                                       ,init: init
                                       ,setErrors: setErrors
                                       ,intoTemplate: intoTemplate
+                                      ,setEnvironments: setEnvironments
                                       ,update: update
                                       ,buttons: buttons
                                       ,view: view
@@ -23342,7 +23356,7 @@ Elm.Templates.Core.make = function (_elm) {
             return $Common$Utils.none(model);
          }
    });
-   var add = function (system) {    return TemplatesAdd($Templates$Add.SetSystem(system));};
+   var add = F2(function (hyp,system) {    return TemplatesAdd(A2($Templates$Add.SetSystem,hyp,system));});
    var view = F3(function (address,model,section) {
       var _p2 = section;
       if (_p2.ctor === "Add") {
@@ -23352,7 +23366,12 @@ Elm.Templates.Core.make = function (_elm) {
          }
    });
    var Model = function (a) {    return {add: a};};
-   var init = function () {    var _p3 = $Templates$Add.init;var add = _p3._0;return $Common$Utils.none(Model(add));}();
+   var init = function () {
+      var _p3 = $Templates$Add.init;
+      var add = _p3._0;
+      var effects = _p3._1;
+      return {ctor: "_Tuple2",_0: Model(add),_1: A2($Effects.map,TemplatesAdd,effects)};
+   }();
    return _elm.Templates.Core.values = {_op: _op,Model: Model,init: init,TemplatesAdd: TemplatesAdd,NoOp: NoOp,update: update,add: add,view: view};
 };
 Elm.Users = Elm.Users || {};
@@ -23590,7 +23609,8 @@ Elm.Application.make = function (_elm) {
       var _p15 = $Jobs$List.init;
       var jobsList = _p15._0;
       var jobsListAction = _p15._1;
-      var effects = _U.list([A2($Effects.map,TypesAction,typesAction)
+      var effects = _U.list([A2($Effects.map,TemplatesAction,templatesAction)
+                            ,A2($Effects.map,TypesAction,typesAction)
                             ,A2($Effects.map,SystemsAction,systemsAction)
                             ,A2($Effects.map,NavHeaderAction,navHeaderAction)
                             ,A2($Effects.map,JobsList,jobsListAction)
@@ -23599,42 +23619,42 @@ Elm.Application.make = function (_elm) {
    }();
    var update = F2(function (action,_p16) {
       var _p17 = _p16;
-      var _p31 = _p17;
-      var _p30 = _p17.jobsStats;
+      var _p32 = _p17;
+      var _p31 = _p17.jobsStats;
       var _p18 = action;
       switch (_p18.ctor)
       {case "JobsList": var _p20 = _p18._0;
-           if (_U.eq(_p20,$Jobs$List.Polling) && !_U.eq(_p17.navSide.active,$Nav$Side.Jobs)) return {ctor: "_Tuple2",_0: _p31,_1: $Effects.none}; else {
+           if (_U.eq(_p20,$Jobs$List.Polling) && !_U.eq(_p17.navSide.active,$Nav$Side.Jobs)) return {ctor: "_Tuple2",_0: _p32,_1: $Effects.none}; else {
                  var _p19 = A2($Jobs$List.update,_p20,_p17.jobsList);
                  var newJobList = _p19._0;
                  var effects = _p19._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p31,{jobsList: newJobList}),_1: A2($Effects.map,JobsList,effects)};
+                 return {ctor: "_Tuple2",_0: _U.update(_p32,{jobsList: newJobList}),_1: A2($Effects.map,JobsList,effects)};
               }
-         case "JobsStats": var _p21 = A2($Jobs$Stats.update,_p18._0,_p30);
+         case "JobsStats": var _p21 = A2($Jobs$Stats.update,_p18._0,_p31);
            var newJobsStats = _p21._0;
            var effects = _p21._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p31,{jobsStats: newJobsStats}),_1: A2($Effects.map,JobsStats,effects)};
+           return {ctor: "_Tuple2",_0: _U.update(_p32,{jobsStats: newJobsStats}),_1: A2($Effects.map,JobsStats,effects)};
          case "NavSideAction": var _p22 = init;
            var newModel = _p22._0;
            var effects = _p22._1;
-           var newNavSide = A2($Nav$Side.update,_p18._0,_p31.navSide);
-           return {ctor: "_Tuple2",_0: _U.update(newModel,{jobsStats: _p30,navSide: newNavSide}),_1: effects};
-         case "NavHeaderAction": var _p23 = A2($Nav$Header.update,_p18._0,_p31.navHeader);
+           var newNavSide = A2($Nav$Side.update,_p18._0,_p32.navSide);
+           return {ctor: "_Tuple2",_0: _U.update(newModel,{jobsStats: _p31,navSide: newNavSide}),_1: effects};
+         case "NavHeaderAction": var _p23 = A2($Nav$Header.update,_p18._0,_p32.navHeader);
            var newNavHeader = _p23._0;
            var effects = _p23._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p31,{navHeader: newNavHeader}),_1: A2($Effects.map,NavHeaderAction,effects)};
+           return {ctor: "_Tuple2",_0: _U.update(_p32,{navHeader: newNavHeader}),_1: A2($Effects.map,NavHeaderAction,effects)};
          case "TypesAction": var _p24 = A2($Types$Core.update,_p18._0,_p17.types);
            var newTypes = _p24._0;
            var effects = _p24._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p31,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
+           return {ctor: "_Tuple2",_0: _U.update(_p32,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
          case "TemplatesAction": var _p25 = A2($Templates$Core.update,_p18._0,_p17.templates);
            var newTemplates = _p25._0;
            var effects = _p25._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p31,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
+           return {ctor: "_Tuple2",_0: _U.update(_p32,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
          default: var _p26 = A2($Systems$Core.update,_p18._0,_p17.systems);
            var newSystems = _p26._0;
            var effects = _p26._1;
-           var newModel = _U.update(_p31,{systems: newSystems});
+           var newModel = _U.update(_p32,{systems: newSystems});
            var newEffects = A2($Effects.map,SystemsAction,effects);
            var _p27 = newSystems.navChange;
            _v7_3: do {
@@ -23649,9 +23669,13 @@ Elm.Application.make = function (_elm) {
                                break _v7_3;
                             }
                        case "Systems": return {ctor: "_Tuple2",_0: A3($goto,$Nav$Side.Systems,_p27._0._1,newModel),_1: newEffects};
-                       case "Templates": var _p29 = A2($Templates$Core.update,$Templates$Core.add($Systems$Core.addedSystem(newModel.systems)),_p31.templates);
-                         var newTemplates = _p29._0;
-                         var effects = _p29._1;
+                       case "Templates": var _p29 = $Systems$Core.addedSystem(newModel.systems);
+                         var hyp = _p29._0;
+                         var system = _p29._1;
+                         var add = A2($Templates$Core.add,hyp,system);
+                         var _p30 = A2($Templates$Core.update,add,_p32.templates);
+                         var newTemplates = _p30._0;
+                         var effects = _p30._1;
                          return {ctor: "_Tuple2"
                                 ,_0: A3($goto,$Nav$Side.Templates,_p27._0._1,_U.update(newModel,{templates: newTemplates}))
                                 ,_1: A2($Effects.map,TemplatesAction,effects)};

@@ -22,22 +22,23 @@ import Common.Components exposing (panelContents)
 import Systems.Add.Common exposing (..)
 import Common.Editor exposing (loadEditor, getEditor)
 import Systems.Add.Errors as Errors exposing (..)
-import Templates.Model.Common exposing (decodeDefaults, emptyDefaults, emptyTemplate, Template)
+import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
+import Environments.List exposing (Environments, getEnvironments)
 import Debug
 
 
 type alias Model = 
   {
     template : Template
-  , stage : String
+  , hyp : String
   , editDefaults : Bool
   , saveErrors : Errors.Model
+  , environments : List String
   }
 
 type Stage = 
   Template
     | Error
-
 
 type Action = 
   SaveTemplate
@@ -46,15 +47,16 @@ type Action =
   | LoadEditor
   | SetDefaults String
   | TemplateSaved (Result Http.Error SaveResponse)
-  | SetSystem System
+  | SetSystem String System
   | NameInput String
   | DefaultsInput String
+  | SetEnvironments (Result Http.Error Environments)
 
 init =
   let
     (errorsModel, _ ) = Errors.init
   in
-    none (Model emptyTemplate "" False errorsModel)   
+    (Model emptyTemplate "" False errorsModel [], getEnvironments SetEnvironments)   
 
 setErrors : Model -> Redirect.Errors -> (Model, Effects Action)
 setErrors ({saveErrors} as model) es =
@@ -63,26 +65,36 @@ setErrors ({saveErrors} as model) es =
   in 
     ({model | saveErrors = newErrors}, Effects.none)
 
-intoTemplate ({template} as model) {openstack, physical, aws, digital, gce} = 
+intoTemplate ({template} as model) {type', machine, openstack, physical, aws, digital, gce} hyp = 
     let 
-      newTemplate = {template | openstack = openstack, physical = physical, aws = aws, digital = digital, gce = gce} 
+      withHyp = {template | openstack = openstack, physical = physical, aws = aws, digital = digital, gce = gce} 
+      newTemplate = {withHyp | name = machine.hostname, type' = type', machine = machine}
+
     in 
-      {model | template = newTemplate}
+      {model | template = newTemplate, hyp = hyp}
+
+setEnvironments : Model -> Environments -> (Model, Effects Action)
+setEnvironments model es =
+   none {model | environments = Dict.keys es}
+
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({template, stage, editDefaults} as model) =
+update action ({template, hyp, editDefaults, environments} as model) =
   case action of
     SaveTemplate -> 
       if editDefaults == False then
-        (model, persistModel saveTemplate template stage)
+        (model, persistModel saveTemplate template hyp)
       else
         (model, getEditor NoOp)
 
-    SetSystem system -> 
-      none (intoTemplate model system)
+    SetSystem hyp system -> 
+      none (intoTemplate model system hyp)
 
     LoadEditor -> 
-      ({ model | editDefaults = not editDefaults}, loadEditor NoOp (encodeDefaults emptyDefaults stage))
+      let
+        encoded = (encodeDefaults (defaultsByEnv environments) hyp)
+      in 
+      ({ model | editDefaults = not editDefaults}, loadEditor NoOp encoded)
     
     NameInput name -> 
       let 
@@ -94,10 +106,13 @@ update action ({template, stage, editDefaults} as model) =
        let 
          newTemplate = { template | defaults = Just (decodeDefaults json) }
        in 
-         ({ model | template = newTemplate}, persistModel saveTemplate template stage)
+         ({ model | template = newTemplate}, persistModel saveTemplate template hyp)
     
     TemplateSaved result -> 
       Debug.log (toString result) (none model)
+
+    SetEnvironments result ->
+       (successHandler result model (setEnvironments model) NoOp)
 
     _ -> 
       (model, Effects.none)

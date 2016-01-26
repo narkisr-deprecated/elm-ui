@@ -46,7 +46,7 @@ div.jsoneditor-menu {
   background-color: #7B879B;
 }
 
-div.jsoneditor-poweredBy {
+a.jsoneditor-poweredBy {
   visibility : hidden
 }
 

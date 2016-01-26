@@ -70,7 +70,7 @@ setEnvironments model es =
     (updated, Effects.none)
 
 
-withoutEffects : (Model, Effects action) -> Model
+withoutEffects : (a , Effects action) -> a 
 withoutEffects (model,_) =
   model
  

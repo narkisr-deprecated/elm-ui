@@ -44,6 +44,9 @@ type alias Defaults =
 emptyDefaults = 
   Dict.empty
 
+defaultsByEnv : List String -> Dict String Defaults
+defaultsByEnv envs =  
+  Dict.fromList (List.map (\ env -> (env, {openstack = Just emptyOpenstackDefaults})) envs)
 
 openstackDefaults = 
   object1 OpenstackDefaults

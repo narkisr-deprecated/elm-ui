@@ -26,7 +26,8 @@ init =
     (templates, templatesAction) = Templates.init
     (systems, systemsAction) = Systems.init
     effects = [ 
-                Effects.map TypesAction typesAction
+                Effects.map TemplatesAction templatesAction
+              , Effects.map TypesAction typesAction
               , Effects.map SystemsAction systemsAction
               , Effects.map NavHeaderAction navHeaderAction
               , Effects.map JobsList jobsListAction
@@ -130,7 +131,9 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
 
           Just (Templates, section) -> 
             let
-             (newTemplates, effects) = Templates.update (Templates.add (Systems.addedSystem newModel.systems)) model.templates 
+             (hyp, system) = (Systems.addedSystem newModel.systems)
+             add = (Templates.add hyp system)
+             (newTemplates, effects) = Templates.update add model.templates 
             in
              (goto Templates section {newModel | templates = newTemplates} , Effects.map TemplatesAction effects)
           _ -> 

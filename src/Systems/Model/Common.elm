@@ -3,7 +3,7 @@ module Systems.Model.Common where
 import Systems.Model.AWS exposing (AWS)
 import Systems.Model.GCE exposing (GCE)
 import Systems.Model.Digital exposing (Digital)
-import Systems.Model.Openstack exposing (Openstack, OpenstackDefaults)
+import Systems.Model.Openstack exposing (Openstack)
 import Systems.Model.Physical exposing (Physical)
 import Dict exposing (Dict)
 

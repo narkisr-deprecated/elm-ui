@@ -71,8 +71,8 @@
 	} else {
         var container = document.getElementById('jsoneditor');
 	  var options = {
-	    mode : 'code',
-	    modes: ['code', 'tree'], // allowed modes
+	    mode : 'tree',
+	    modes: ['tree','code'], // allowed modes
 	  };
 	  if(editor === undefined) {
 	   editor = new JSONEditor(container, options, JSON.parse(event));
