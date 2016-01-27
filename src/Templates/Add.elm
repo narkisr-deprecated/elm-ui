@@ -50,6 +50,7 @@ type Action =
   | Saved (Result Http.Error SaveResponse)
   | SetSystem String System
   | NameInput String
+  | DescriptionInput String
   | DefaultsInput String
   | SetEnvironments (Result Http.Error Environments)
   | ErrorsView Errors.Action
@@ -95,6 +96,13 @@ update action ({template, hyp, editDefaults, environments} as model) =
         newTemplate = { template | name = name }
       in 
         none { model | template = newTemplate} 
+
+    DescriptionInput description -> 
+      let 
+        newTemplate = { template | description = description }
+      in 
+        none { model | template = newTemplate} 
+
 
     SetDefaults json -> 
        let 
@@ -146,6 +154,7 @@ editing ({template, editDefaults} as model) address  =
     (Html.form [] [
        div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
          group' "Name" (inputText address NameInput " "  template.name)
+       , group' "Description" (inputText address DescriptionInput " "  template.description)
        , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
        , div [id "jsoneditor", style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
        ]

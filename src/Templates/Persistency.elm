@@ -32,10 +32,11 @@ encodeDefaults defaults hyp =
   E.encode 0 (defaultsDictEncoder defaults hyp)
 
 encode: Template -> String -> Value
-encode ({type', machine, defaults, name} as template) hyp =
+encode ({type', machine, defaults, name, description} as template) hyp =
  object [
     ("type" , string type')
   , ("name" , string name)
+  , ("description" , string description)
   , (encoderOf template hyp)
   , ("machine" , machineEncoder machine)
   , ("defaults", (defaultsDictEncoder (withDefault Dict.empty defaults) hyp))

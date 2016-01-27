@@ -23041,6 +23041,11 @@ Elm.Templates.Model.Common.make = function (_elm) {
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm);
    var _op = {};
+   var partialMachine = F2(function (user,os) {    return A5($Systems$Model$Common.Machine,user,"","",$Maybe.Nothing,os);});
+   var partialMachineDecoder = A3($Json$Decode.object2,
+   partialMachine,
+   A2($Json$Decode._op[":="],"user",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"os",$Json$Decode.string));
    var emptyDefaults = $Dict.empty;
    var Defaults = function (a) {    return {openstack: a};};
    var Template = function (a) {
@@ -23095,7 +23100,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
    A2($Json$Decode.map,Template,A2($Json$Decode._op[":="],"name",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"type",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"description",$Json$Decode.string)),
-   A2($Json$Decode._op[":="],"machine",$Systems$Decoders.machineDecoder)),
+   A2($Json$Decode._op[":="],"machine",partialMachineDecoder)),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"aws",$Systems$Decoders.awsDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"gce",$Systems$Decoders.gceDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"digital-ocean",$Systems$Decoders.digitalDecoder))),
@@ -23114,6 +23119,8 @@ Elm.Templates.Model.Common.make = function (_elm) {
                                                ,defaultsDecoder: defaultsDecoder
                                                ,defaultsDictDecoder: defaultsDictDecoder
                                                ,decodeDefaults: decodeDefaults
+                                               ,partialMachine: partialMachine
+                                               ,partialMachineDecoder: partialMachineDecoder
                                                ,templateDecoder: templateDecoder};
 };
 Elm.Templates = Elm.Templates || {};
@@ -23162,6 +23169,7 @@ Elm.Templates.Persistency.make = function (_elm) {
       var _p5 = _p4;
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p5.type$)}
                                          ,{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(_p5.name)}
+                                         ,{ctor: "_Tuple2",_0: "description",_1: $Json$Encode.string(_p5.description)}
                                          ,A2($Systems$Add$Encoders.encoderOf,_p5,hyp)
                                          ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p5.machine)}
                                          ,{ctor: "_Tuple2",_0: "defaults",_1: A2(defaultsDictEncoder,A2($Maybe.withDefault,$Dict.empty,_p5.defaults),hyp)}]));
@@ -23240,6 +23248,7 @@ Elm.Templates.Add.make = function (_elm) {
    var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
    var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
    var DefaultsInput = function (a) {    return {ctor: "DefaultsInput",_0: a};};
+   var DescriptionInput = function (a) {    return {ctor: "DescriptionInput",_0: a};};
    var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
    var SetSystem = F2(function (a,b) {    return {ctor: "SetSystem",_0: a,_1: b};});
    var Saved = function (a) {    return {ctor: "Saved",_0: a};};
@@ -23250,13 +23259,15 @@ Elm.Templates.Add.make = function (_elm) {
    var LoadEditor = {ctor: "LoadEditor"};
    var editing = F2(function (_p0,address) {
       var _p1 = _p0;
+      var _p2 = _p1.template;
       return A2($Common$Components.panelContents,
       "New Template",
       A2($Html.form,
       _U.list([]),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A2($Systems$Add$Common.group$,"Name",A4($Systems$Add$Common.inputText,address,NameInput," ",_p1.template.name))
+      _U.list([A2($Systems$Add$Common.group$,"Name",A4($Systems$Add$Common.inputText,address,NameInput," ",_p2.name))
+              ,A2($Systems$Add$Common.group$,"Description",A4($Systems$Add$Common.inputText,address,DescriptionInput," ",_p2.description))
               ,A2($Systems$Add$Common.group$,"Edit defaults",A3($Systems$Add$Common.checkbox,address,LoadEditor,_p1.editDefaults))
               ,A2($Html.div,
               _U.list([$Html$Attributes.id("jsoneditor")
@@ -23265,13 +23276,13 @@ Elm.Templates.Add.make = function (_elm) {
                                                       ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
               _U.list([]))]))])));
    });
-   var currentView = F2(function (address,_p2) {
-      var _p3 = _p2;
-      var _p4 = _p3.stage;
-      if (_p4.ctor === "Editing") {
-            return A2(editing,_p3,address);
+   var currentView = F2(function (address,_p3) {
+      var _p4 = _p3;
+      var _p5 = _p4.stage;
+      if (_p5.ctor === "Editing") {
+            return A2(editing,_p4,address);
          } else {
-            return A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p3.saveErrors);
+            return A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p4.saveErrors);
          }
    });
    var Cancel = {ctor: "Cancel"};
@@ -23295,48 +23306,50 @@ Elm.Templates.Add.make = function (_elm) {
    });
    var Error = {ctor: "Error"};
    var Editing = {ctor: "Editing"};
-   var intoTemplate = F3(function (_p6,_p5,hyp) {
-      var _p7 = _p6;
-      var _p8 = _p5;
-      var _p9 = _p8.machine;
-      var withHyp = _U.update(_p7.template,{openstack: _p8.openstack,physical: _p8.physical,aws: _p8.aws,digital: _p8.digital,gce: _p8.gce});
-      var newTemplate = _U.update(withHyp,{name: _p9.hostname,type$: _p8.type$,machine: _p9});
-      return _U.update(_p7,{template: newTemplate,hyp: hyp,stage: Editing});
+   var intoTemplate = F3(function (_p7,_p6,hyp) {
+      var _p8 = _p7;
+      var _p9 = _p6;
+      var _p10 = _p9.machine;
+      var withHyp = _U.update(_p8.template,{openstack: _p9.openstack,physical: _p9.physical,aws: _p9.aws,digital: _p9.digital,gce: _p9.gce});
+      var newTemplate = _U.update(withHyp,{name: _p10.hostname,type$: _p9.type$,machine: _p10});
+      return _U.update(_p8,{template: newTemplate,hyp: hyp,stage: Editing});
    });
-   var update = F2(function (action,_p10) {
-      var _p11 = _p10;
-      var _p17 = _p11.template;
-      var _p16 = _p11;
-      var _p15 = _p11.hyp;
-      var _p14 = _p11.editDefaults;
-      var _p12 = action;
-      switch (_p12.ctor)
-      {case "SaveTemplate": return _U.eq(_p14,false) ? {ctor: "_Tuple2"
-                                                       ,_0: _p16
-                                                       ,_1: A3($Templates$Persistency.persistModel,saveTemplate,_p17,_p15)} : {ctor: "_Tuple2"
-                                                                                                                              ,_0: _p16
+   var update = F2(function (action,_p11) {
+      var _p12 = _p11;
+      var _p18 = _p12.template;
+      var _p17 = _p12;
+      var _p16 = _p12.hyp;
+      var _p15 = _p12.editDefaults;
+      var _p13 = action;
+      switch (_p13.ctor)
+      {case "SaveTemplate": return _U.eq(_p15,false) ? {ctor: "_Tuple2"
+                                                       ,_0: _p17
+                                                       ,_1: A3($Templates$Persistency.persistModel,saveTemplate,_p18,_p16)} : {ctor: "_Tuple2"
+                                                                                                                              ,_0: _p17
                                                                                                                               ,_1: $Common$Editor.getEditor(NoOp)};
-         case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p16,_p12._1,_p12._0));
-         case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p11.environments),_p15);
-           return {ctor: "_Tuple2",_0: _U.update(_p16,{editDefaults: $Basics.not(_p14)}),_1: A2($Common$Editor.loadEditor,NoOp,encoded)};
-         case "NameInput": var newTemplate = _U.update(_p17,{name: _p12._0});
-           return $Common$Utils.none(_U.update(_p16,{template: newTemplate}));
-         case "SetDefaults": var newTemplate = _U.update(_p17,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p12._0))});
-           return {ctor: "_Tuple2",_0: _U.update(_p16,{template: newTemplate}),_1: A3($Templates$Persistency.persistModel,saveTemplate,_p17,_p15)};
-         case "Saved": var _p13 = A3($Common$Redirect.errorsHandler,_p12._0,_p16,NoOp);
-           var newModel = _p13._0;
-           var saveErrors = _p13._0.saveErrors;
-           var effects = _p13._1;
+         case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p17,_p13._1,_p13._0));
+         case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p12.environments),_p16);
+           return {ctor: "_Tuple2",_0: _U.update(_p17,{editDefaults: $Basics.not(_p15)}),_1: A2($Common$Editor.loadEditor,NoOp,encoded)};
+         case "NameInput": var newTemplate = _U.update(_p18,{name: _p13._0});
+           return $Common$Utils.none(_U.update(_p17,{template: newTemplate}));
+         case "DescriptionInput": var newTemplate = _U.update(_p18,{description: _p13._0});
+           return $Common$Utils.none(_U.update(_p17,{template: newTemplate}));
+         case "SetDefaults": var newTemplate = _U.update(_p18,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p13._0))});
+           return {ctor: "_Tuple2",_0: _U.update(_p17,{template: newTemplate}),_1: A3($Templates$Persistency.persistModel,saveTemplate,_p18,_p16)};
+         case "Saved": var _p14 = A3($Common$Redirect.errorsHandler,_p13._0,_p17,NoOp);
+           var newModel = _p14._0;
+           var saveErrors = _p14._0.saveErrors;
+           var effects = _p14._1;
            return $Basics.not($Dict.isEmpty(saveErrors.errors.keyValues)) ? {ctor: "_Tuple2"
                                                                             ,_0: _U.update(newModel,{stage: Error})
-                                                                            ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p16,_1: effects};
-         case "SetEnvironments": return A4($Common$Redirect.successHandler,_p12._0,_p16,setEnvironments(_p16),NoOp);
-         default: return {ctor: "_Tuple2",_0: _p16,_1: $Effects.none};}
+                                                                            ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p17,_1: effects};
+         case "SetEnvironments": return A4($Common$Redirect.successHandler,_p13._0,_p17,setEnvironments(_p17),NoOp);
+         default: return {ctor: "_Tuple2",_0: _p17,_1: $Effects.none};}
    });
    var Model = F6(function (a,b,c,d,e,f) {    return {template: a,hyp: b,editDefaults: c,saveErrors: d,environments: e,stage: f};});
    var init = function () {
-      var _p18 = $Common$Errors.init;
-      var errorsModel = _p18._0;
+      var _p19 = $Common$Errors.init;
+      var errorsModel = _p19._0;
       return {ctor: "_Tuple2"
              ,_0: A6(Model,$Templates$Model$Common.emptyTemplate,"",false,errorsModel,_U.list([]),Editing)
              ,_1: $Environments$List.getEnvironments(SetEnvironments)};
@@ -23353,6 +23366,7 @@ Elm.Templates.Add.make = function (_elm) {
                                       ,Saved: Saved
                                       ,SetSystem: SetSystem
                                       ,NameInput: NameInput
+                                      ,DescriptionInput: DescriptionInput
                                       ,DefaultsInput: DefaultsInput
                                       ,SetEnvironments: SetEnvironments
                                       ,ErrorsView: ErrorsView

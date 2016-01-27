@@ -36,7 +36,7 @@ type alias Template =
 
 emptyTemplate : Template
 emptyTemplate  =
- Template "" "" "" emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing
+  Template "" "" "" emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing
 
 type alias Defaults = 
   {
@@ -72,13 +72,22 @@ decodeDefaults json =
     Err error -> 
       Debug.log error emptyDefaults
 
+partialMachine user os = 
+  Machine user "" "" Nothing os
+
+partialMachineDecoder: Decoder Machine
+partialMachineDecoder = 
+  object2 partialMachine
+    ("user" := string)
+    ("os" := string)
+ 
 templateDecoder : Decoder Template
 templateDecoder = 
   map Template
     ("name" := string )
     `apply` ("type" := string )
     `apply` ("description" := string )
-    `apply` ("machine" := machineDecoder)
+    `apply` ("machine" := partialMachineDecoder)
     `apply` (maybe ("aws" := awsDecoder))
     `apply` (maybe ("gce" := gceDecoder))
     `apply` (maybe ("digital-ocean" := digitalDecoder))
