@@ -19,15 +19,20 @@
 
 (watch-dir run-facts (clojure.java.io/file "./test/elm/"))
 
+(defn modetime []
+  (.lastModified (java.io.File. "main.js")))
+
+(def mainjs (atom (modetime)))
+
 (go-loop []
    (let [x (<! (async/merge [(timeout 1000) c] (dropping-buffer 1)))]
      (try 
-       (timbre/info "Starting to run suite")
-       (let [{:keys [out err exit]} (sh "lein" "midje" "elm.ui.add")]
-         (if-not (= exit 0)
-            (timbre/error err)
-            (timbre/info out)
-           )
-        )
-     (catch Exception e (timbre/error e))))
+       (when (< @mainjs (modetime))
+         (reset! mainjs (modetime))
+         (timbre/info "Starting to run suite")
+         (let [{:keys [out err exit]} (sh "lein" "midje" "elm.ui.add")]
+           (if-not (= exit 0)
+              (timbre/error err)
+              (timbre/info out))))
+      (catch Exception e (timbre/error e))))
    (recur))
