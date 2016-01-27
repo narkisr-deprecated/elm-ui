@@ -10,7 +10,10 @@
 (def run-tests (atom false))
 
 
-(def c (chan (dropping-buffer 1) (filter (fn [{:keys [file]}] (.contains (.getPath file) "main.js")))))
+(def c (chan (dropping-buffer 1) 
+  (filter 
+    (fn [{:keys [file]}] 
+      (or (.contains (.getPath file) "index.html") (.contains (.getPath file) "main.js"))))))
 
 (defn run-facts [e] 
   (go (>! c e)))
