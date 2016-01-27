@@ -10,29 +10,21 @@
 (def run-tests (atom false))
 
 
-(def c (chan))
+(def c (chan (dropping-buffer 1) (filter (fn [{:keys [file]}] (.contains (.getPath file) "main.js")))))
 
 (defn run-facts [e] 
   (go (>! c e)))
 
-(watch-dir run-facts (clojure.java.io/file "./src/"))
-
-(watch-dir run-facts (clojure.java.io/file "./test/elm/"))
-
-(defn modetime []
-  (.lastModified (java.io.File. "main.js")))
-
-(def mainjs (atom (modetime)))
+(watch-dir run-facts (clojure.java.io/file "."))
 
 (go-loop []
-   (let [x (<! (async/merge [(timeout 1000) c] (dropping-buffer 1)))]
+   (let [x (<! (async/merge [(timeout 1000) c] ))]
+     (timbre/info x)
      (try 
-       (when (< @mainjs (modetime))
-         (reset! mainjs (modetime))
-         (timbre/info "Starting to run suite")
-         (let [{:keys [out err exit]} (sh "lein" "midje" "elm.ui.add")]
-           (if-not (= exit 0)
-              (timbre/error err)
-              (timbre/info out))))
+      (timbre/info "Starting to run suite")
+      (let [{:keys [out err exit]} (sh "lein" "midje" "elm.ui.add")]
+        (if-not (= exit 0)
+           (timbre/error err)
+           (timbre/info out)))
       (catch Exception e (timbre/error e))))
    (recur))
