@@ -17464,14 +17464,11 @@ Elm.Types.List.make = function (_elm) {
    var view = F2(function (address,_p3) {
       var _p4 = _p3;
       return _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("box box-info")]),
-      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("box-header")]),_U.list([$Html.text("")]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("box-body")]),
-              _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                      _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-                      _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
-                      ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]))]);
+      _U.list([$Html$Attributes.$class("")]),
+      _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+              _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+              _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
+              ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]);
    });
    var typeRow = F2(function (id,_p5) {
       var _p6 = _p5;
@@ -23433,14 +23430,11 @@ Elm.Templates.List.make = function (_elm) {
    var view = F2(function (address,_p3) {
       var _p4 = _p3;
       return _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("box box-info")]),
-      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("box-header")]),_U.list([$Html.text("")]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.$class("box-body")]),
-              _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                      _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-                      _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
-                      ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]))]);
+      _U.list([]),
+      _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+              _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+              _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
+              ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]);
    });
    var templateRow = F2(function (id,_p5) {
       var _p6 = _p5;

@@ -73,18 +73,15 @@ update action model =
 
 view : Signal.Address Action -> Model -> List Html
 view address ({types, pager, table} as model) =
-  [div  [class "box box-info"] [
-       div  [class "box-header"] [text ""]
-    ,  div [class "box-body"] [
-       row_ [
-         div [class "col-md-offset-1 col-md-10"] [
-           panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
-         ]
-       ],
-       row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+  [ div [class ""] [
+    row_ [
+      div [class "col-md-offset-1 col-md-10"] [
+        panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
       ]
-    ] 
-  ]
+    ],
+   row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+  ]]
+  
 
 -- Decoding
 
