@@ -30,9 +30,10 @@ init =
      (systemsView, _) = View.init 
      (systemsAdd, systemsAddAction ) = Add.init 
      (systemsLaunch, _) = Launch.init 
-     effects = [ Effects.map SystemsListing systemsListAction 
-               , Effects.map SystemsAdd systemsAddAction 
-               ]
+     effects = [ 
+       Effects.map SystemsListing systemsListAction 
+     , Effects.map SystemsAdd systemsAddAction 
+     ]
   in
     (Model systemsList systemsAdd systemsView systemsLaunch Nothing, Effects.batch effects)
 

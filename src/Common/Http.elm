@@ -2,7 +2,7 @@ module Common.Http where
 
 import Task exposing (Task)
 import Http exposing (Error(BadResponse))
-import Json.Decode exposing (..)
+import Json.Decode as Json exposing (..)
 
 httpJson : String -> Http.Body -> Decoder value -> String -> Task Http.Error value
 httpJson verb body decoder url  =
@@ -22,3 +22,9 @@ httpJson verb body decoder url  =
 getJson = httpJson "GET" Http.empty
 
 postJson = httpJson "POST"
+
+apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
+apply func value =
+    Json.object2 (<|) func value
+
+

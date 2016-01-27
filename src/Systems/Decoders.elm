@@ -7,10 +7,7 @@ import Systems.Model.Digital exposing (..)
 import Systems.Model.Physical exposing (..)
 import Systems.Model.Openstack as Openstack exposing (..)
 import Json.Decode as Json exposing (..)
-
-apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
-apply func value =
-    Json.object2 (<|) func value
+import Common.Http exposing (apply)
 
 vpcDecoder : Decoder VPC
 vpcDecoder = 

@@ -64,6 +64,7 @@ drop address active actions =
 menus : Signal.Address Action -> List Html
 menus address =
    [ drop address Systems [List, Add, Launch]
+   , drop address Templates [List]
    , drop address Types [List, Add]
    , drop address Jobs [List, Stats]
    ]

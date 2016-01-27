@@ -7,8 +7,10 @@ import Systems.Model.Digital exposing (Digital)
 import Systems.Model.Openstack exposing (Openstack)
 import Systems.Model.Physical exposing (Physical)
 import Systems.Model.Common exposing (Machine, emptyMachine)
+import Systems.Decoders exposing (..)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
+import Common.Http exposing (apply)
 
 type alias OpenstackDefaults = 
   {
@@ -22,6 +24,7 @@ type alias Template =
   { 
     name : String
   , type' : String 
+  , description : String
   , machine: Machine
   , aws : Maybe AWS
   , gce : Maybe GCE
@@ -33,7 +36,7 @@ type alias Template =
 
 emptyTemplate : Template
 emptyTemplate  =
- Template "" "" emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing
+ Template "" "" "" emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing
 
 type alias Defaults = 
   {
@@ -68,4 +71,21 @@ decodeDefaults json =
        value
     Err error -> 
       Debug.log error emptyDefaults
+
+templateDecoder : Decoder Template
+templateDecoder = 
+  map Template
+    ("name" := string )
+    `apply` ("type" := string )
+    `apply` ("description" := string )
+    `apply` ("machine" := machineDecoder)
+    `apply` (maybe ("aws" := awsDecoder))
+    `apply` (maybe ("gce" := gceDecoder))
+    `apply` (maybe ("digital-ocean" := digitalDecoder))
+    `apply` (maybe ("openstack" := openstackDecoder))
+    `apply` (maybe ("physical" := physicalDecoder))
+    `apply` (maybe ("defaults" := defaultsDictDecoder))
+ 
+
+
 

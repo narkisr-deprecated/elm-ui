@@ -14177,6 +14177,37 @@ Elm.Systems.Model.Common.make = function (_elm) {
    }();
    return _elm.Systems.Model.Common.values = {_op: _op,Machine: Machine,System: System,emptyMachine: emptyMachine,emptySystem: emptySystem};
 };
+Elm.Common = Elm.Common || {};
+Elm.Common.Http = Elm.Common.Http || {};
+Elm.Common.Http.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Http = _elm.Common.Http || {};
+   if (_elm.Common.Http.values) return _elm.Common.Http.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var apply = F2(function (func,value) {    return A3($Json$Decode.object2,F2(function (x,y) {    return x(y);}),func,value);});
+   var httpJson = F4(function (verb,body,decoder,url) {
+      var request = {verb: verb
+                    ,headers: _U.list([{ctor: "_Tuple2",_0: "Content-Type",_1: "application/json;charset=UTF-8"}
+                                      ,{ctor: "_Tuple2",_0: "Accept",_1: "application/json, text/plain, */*"}])
+                    ,url: url
+                    ,body: body};
+      return A2($Http.fromJson,decoder,A2($Http.send,$Http.defaultSettings,request));
+   });
+   var getJson = A2(httpJson,"GET",$Http.empty);
+   var postJson = httpJson("POST");
+   return _elm.Common.Http.values = {_op: _op,httpJson: httpJson,getJson: getJson,postJson: postJson,apply: apply};
+};
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Decoders = Elm.Systems.Decoders || {};
 Elm.Systems.Decoders.make = function (_elm) {
@@ -14186,6 +14217,7 @@ Elm.Systems.Decoders.make = function (_elm) {
    if (_elm.Systems.Decoders.values) return _elm.Systems.Decoders.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
@@ -14211,6 +14243,21 @@ Elm.Systems.Decoders.make = function (_elm) {
    A2($Json$Decode._op[":="],"device",$Json$Decode.string),
    A2($Json$Decode._op[":="],"size",$Json$Decode.$int),
    A2($Json$Decode._op[":="],"clear",$Json$Decode.bool));
+   var openstackDecoder = A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Json$Decode.map,$Systems$Model$Openstack.Openstack,A2($Json$Decode._op[":="],"flavor",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"tenant",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"key-name",$Json$Decode.string)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"floating-ip",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"floating-ip-pool",$Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"security-groups",$Json$Decode.list($Json$Decode.string)))),
+   A2($Json$Decode._op[":="],"networks",$Json$Decode.list($Json$Decode.string))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(openstackVolumeDecoder))));
    var physicalDecoder = A3($Json$Decode.object2,
    $Systems$Model$Physical.Physical,
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"mac",$Json$Decode.string)),
@@ -14243,16 +14290,15 @@ Elm.Systems.Decoders.make = function (_elm) {
    A2($Json$Decode._op[":="],"subnetId",$Json$Decode.string),
    A2($Json$Decode._op[":="],"vpcId",$Json$Decode.string),
    A2($Json$Decode._op[":="],"assignIp",$Json$Decode.bool));
-   var apply = F2(function (func,value) {    return A3($Json$Decode.object2,F2(function (x,y) {    return x(y);}),func,value);});
-   var awsDecoder = A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
+   var awsDecoder = A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
    A2($Json$Decode.map,$Systems$Model$AWS.AWS,A2($Json$Decode._op[":="],"instance-type",$Json$Decode.string)),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"instance-id",$Json$Decode.string))),
    A2($Json$Decode._op[":="],"key-name",$Json$Decode.string)),
@@ -14263,29 +14309,14 @@ Elm.Systems.Decoders.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(awsVolumeDecoder)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"block-devices",$Json$Decode.list(blockDecoder)))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"vpc",vpcDecoder)));
-   var openstackDecoder = A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2($Json$Decode.map,$Systems$Model$Openstack.Openstack,A2($Json$Decode._op[":="],"flavor",$Json$Decode.string)),
-   A2($Json$Decode._op[":="],"tenant",$Json$Decode.string)),
-   A2($Json$Decode._op[":="],"key-name",$Json$Decode.string)),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"floating-ip",$Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"floating-ip-pool",$Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"security-groups",$Json$Decode.list($Json$Decode.string)))),
-   A2($Json$Decode._op[":="],"networks",$Json$Decode.list($Json$Decode.string))),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"volumes",$Json$Decode.list(openstackVolumeDecoder))));
-   var systemDecoder = A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
-   A2(apply,
+   var systemDecoder = A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
    A2($Json$Decode.map,$Systems$Model$Common.System,A2($Json$Decode._op[":="],"owner",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"env",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"type",$Json$Decode.string)),
@@ -14296,7 +14327,6 @@ Elm.Systems.Decoders.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"openstack",openstackDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"physical",physicalDecoder)));
    return _elm.Systems.Decoders.values = {_op: _op
-                                         ,apply: apply
                                          ,vpcDecoder: vpcDecoder
                                          ,blockDecoder: blockDecoder
                                          ,awsVolumeDecoder: awsVolumeDecoder
@@ -14412,36 +14442,6 @@ Elm.Common.Redirect.make = function (_elm) {
                                         ,failHandler: failHandler
                                         ,errorsHandler: errorsHandler
                                         ,setErrors: setErrors};
-};
-Elm.Common = Elm.Common || {};
-Elm.Common.Http = Elm.Common.Http || {};
-Elm.Common.Http.make = function (_elm) {
-   "use strict";
-   _elm.Common = _elm.Common || {};
-   _elm.Common.Http = _elm.Common.Http || {};
-   if (_elm.Common.Http.values) return _elm.Common.Http.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var httpJson = F4(function (verb,body,decoder,url) {
-      var request = {verb: verb
-                    ,headers: _U.list([{ctor: "_Tuple2",_0: "Content-Type",_1: "application/json;charset=UTF-8"}
-                                      ,{ctor: "_Tuple2",_0: "Accept",_1: "application/json, text/plain, */*"}])
-                    ,url: url
-                    ,body: body};
-      return A2($Http.fromJson,decoder,A2($Http.send,$Http.defaultSettings,request));
-   });
-   var getJson = A2(httpJson,"GET",$Http.empty);
-   var postJson = httpJson("POST");
-   return _elm.Common.Http.values = {_op: _op,httpJson: httpJson,getJson: getJson,postJson: postJson};
 };
 Elm.Pager = Elm.Pager || {};
 Elm.Pager.make = function (_elm) {
@@ -18493,6 +18493,7 @@ Elm.Nav.Side.make = function (_elm) {
    var init = {active: Systems,section: List};
    var menus = function (address) {
       return _U.list([A3(drop,address,Systems,_U.list([List,Add,Launch]))
+                     ,A3(drop,address,Templates,_U.list([List]))
                      ,A3(drop,address,Types,_U.list([List,Add]))
                      ,A3(drop,address,Jobs,_U.list([List,Stats]))]);
    };
@@ -23024,6 +23025,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
    if (_elm.Templates.Model.Common.values) return _elm.Templates.Model.Common.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
@@ -23031,6 +23033,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $Systems$Decoders = Elm.Systems.Decoders.make(_elm),
    $Systems$Model$AWS = Elm.Systems.Model.AWS.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
@@ -23040,17 +23043,28 @@ Elm.Templates.Model.Common.make = function (_elm) {
    var _op = {};
    var emptyDefaults = $Dict.empty;
    var Defaults = function (a) {    return {openstack: a};};
-   var Template = F9(function (a,b,c,d,e,f,g,h,i) {    return {name: a,type$: b,machine: c,aws: d,gce: e,digital: f,openstack: g,physical: h,defaults: i};});
-   var emptyTemplate = A9(Template,
-   "",
-   "",
-   $Systems$Model$Common.emptyMachine,
-   $Maybe.Nothing,
-   $Maybe.Nothing,
-   $Maybe.Nothing,
-   $Maybe.Nothing,
-   $Maybe.Nothing,
-   $Maybe.Nothing);
+   var Template = function (a) {
+      return function (b) {
+         return function (c) {
+            return function (d) {
+               return function (e) {
+                  return function (f) {
+                     return function (g) {
+                        return function (h) {
+                           return function (i) {
+                              return function (j) {
+                                 return {name: a,type$: b,description: c,machine: d,aws: e,gce: f,digital: g,openstack: h,physical: i,defaults: j};
+                              };
+                           };
+                        };
+                     };
+                  };
+               };
+            };
+         };
+      };
+   };
+   var emptyTemplate = Template("")("")("")($Systems$Model$Common.emptyMachine)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing);
    var OpenstackDefaults = function (a) {    return {networks: a};};
    var emptyOpenstackDefaults = OpenstackDefaults($Maybe.Just(_U.list([])));
    var defaultsByEnv = function (envs) {
@@ -23069,6 +23083,25 @@ Elm.Templates.Model.Common.make = function (_elm) {
             return A2($Debug.log,_p0._0,emptyDefaults);
          }
    };
+   var templateDecoder = A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Common$Http.apply,
+   A2($Json$Decode.map,Template,A2($Json$Decode._op[":="],"name",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"type",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"description",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"machine",$Systems$Decoders.machineDecoder)),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"aws",$Systems$Decoders.awsDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"gce",$Systems$Decoders.gceDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"digital-ocean",$Systems$Decoders.digitalDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"openstack",$Systems$Decoders.openstackDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"physical",$Systems$Decoders.physicalDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"defaults",defaultsDictDecoder)));
    return _elm.Templates.Model.Common.values = {_op: _op
                                                ,OpenstackDefaults: OpenstackDefaults
                                                ,emptyOpenstackDefaults: emptyOpenstackDefaults
@@ -23080,7 +23113,8 @@ Elm.Templates.Model.Common.make = function (_elm) {
                                                ,openstackDefaults: openstackDefaults
                                                ,defaultsDecoder: defaultsDecoder
                                                ,defaultsDictDecoder: defaultsDictDecoder
-                                               ,decodeDefaults: decodeDefaults};
+                                               ,decodeDefaults: decodeDefaults
+                                               ,templateDecoder: templateDecoder};
 };
 Elm.Templates = Elm.Templates || {};
 Elm.Templates.Persistency = Elm.Templates.Persistency || {};
@@ -23335,6 +23369,91 @@ Elm.Templates.Add.make = function (_elm) {
                                       ,saveTemplate: saveTemplate};
 };
 Elm.Templates = Elm.Templates || {};
+Elm.Templates.List = Elm.Templates.List || {};
+Elm.Templates.List.make = function (_elm) {
+   "use strict";
+   _elm.Templates = _elm.Templates || {};
+   _elm.Templates.List = _elm.Templates.List || {};
+   if (_elm.Templates.List.values) return _elm.Templates.List.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Redirect = Elm.Common.Redirect.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Pager = Elm.Pager.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Table = Elm.Table.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Templates$Model$Common = Elm.Templates.Model.Common.make(_elm);
+   var _op = {};
+   var templateList = A2($Json$Decode.at,_U.list(["templates"]),$Json$Decode.list($Templates$Model$Common.templateDecoder));
+   var getTemplates = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,templateList,"/templates"))));};
+   var setTemplates = F2(function (model,templates) {
+      var templatePairs = A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1.type$,_1: _p1};},templates);
+      var newTable = A2($Table.update,$Table.UpdateRows(templatePairs),model.table);
+      var total = $List.length(templates);
+      var newPager = A2($Pager.update,$Pager.UpdateTotal($Basics.toFloat(total)),model.pager);
+      return {ctor: "_Tuple2",_0: _U.update(model,{templates: templates,pager: newPager,table: newTable}),_1: $Effects.none};
+   });
+   var NoOp = {ctor: "NoOp"};
+   var update = F2(function (action,model) {
+      var _p2 = action;
+      if (_p2.ctor === "SetTemplates") {
+            return A4($Common$Redirect.successHandler,_p2._0,model,setTemplates(model),NoOp);
+         } else {
+            return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         }
+   });
+   var SetTemplates = function (a) {    return {ctor: "SetTemplates",_0: a};};
+   var GotoPage = function (a) {    return {ctor: "GotoPage",_0: a};};
+   var LoadPage = function (a) {    return {ctor: "LoadPage",_0: a};};
+   var view = F2(function (address,_p3) {
+      var _p4 = _p3;
+      return _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("box box-info")]),
+      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("box-header")]),_U.list([$Html.text("")]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.$class("box-body")]),
+              _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                      _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+                      _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
+                      ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]))]);
+   });
+   var templateRow = F2(function (id,_p5) {
+      var _p6 = _p5;
+      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(_p6.name)]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p6.type$)]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p6.description)]))]);
+   });
+   var Model = F3(function (a,b,c) {    return {templates: a,table: b,pager: c};});
+   var init = function () {
+      var table = A5($Table.init,"templateListing",true,_U.list(["Name","Type","Description"]),templateRow,"Templates");
+      return {ctor: "_Tuple2",_0: A3(Model,_U.list([]),table,$Pager.init),_1: getTemplates(SetTemplates)};
+   }();
+   return _elm.Templates.List.values = {_op: _op
+                                       ,Model: Model
+                                       ,templateRow: templateRow
+                                       ,init: init
+                                       ,LoadPage: LoadPage
+                                       ,GotoPage: GotoPage
+                                       ,SetTemplates: SetTemplates
+                                       ,NoOp: NoOp
+                                       ,setTemplates: setTemplates
+                                       ,update: update
+                                       ,view: view
+                                       ,templateList: templateList
+                                       ,getTemplates: getTemplates};
+};
+Elm.Templates = Elm.Templates || {};
 Elm.Templates.Core = Elm.Templates.Core || {};
 Elm.Templates.Core.make = function (_elm) {
    "use strict";
@@ -23352,49 +23471,65 @@ Elm.Templates.Core.make = function (_elm) {
    $Nav$Side = Elm.Nav.Side.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Templates$Add = Elm.Templates.Add.make(_elm);
+   $Templates$Add = Elm.Templates.Add.make(_elm),
+   $Templates$List = Elm.Templates.List.make(_elm);
    var _op = {};
    var NoOp = {ctor: "NoOp"};
+   var TemplatesList = function (a) {    return {ctor: "TemplatesList",_0: a};};
    var TemplatesAdd = function (a) {    return {ctor: "TemplatesAdd",_0: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
-      if (_p0.ctor === "TemplatesAdd") {
-            var _p4 = _p0._0;
-            var _p1 = _p4;
-            if (_p1.ctor === "Saved") {
-                  var _p2 = A2($Templates$Add.update,_p4,model.add);
-                  var newAdd = _p2._0;
-                  var effects = _p2._1;
-                  return {ctor: "_Tuple2"
-                         ,_0: _U.update(model,{add: newAdd,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                         ,_1: A2($Effects.map,TemplatesAdd,effects)};
-               } else {
-                  var _p3 = A2($Templates$Add.update,_p4,model.add);
-                  var newAdd = _p3._0;
-                  var effects = _p3._1;
-                  return {ctor: "_Tuple2",_0: _U.update(model,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};
-               }
-         } else {
-            return $Common$Utils.none(model);
-         }
+      switch (_p0.ctor)
+      {case "TemplatesAdd": var _p4 = _p0._0;
+           var _p1 = _p4;
+           if (_p1.ctor === "Saved") {
+                 var _p2 = A2($Templates$Add.update,_p4,model.add);
+                 var newAdd = _p2._0;
+                 var effects = _p2._1;
+                 return {ctor: "_Tuple2"
+                        ,_0: _U.update(model,{add: newAdd,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                        ,_1: A2($Effects.map,TemplatesAdd,effects)};
+              } else {
+                 var _p3 = A2($Templates$Add.update,_p4,model.add);
+                 var newAdd = _p3._0;
+                 var effects = _p3._1;
+                 return {ctor: "_Tuple2",_0: _U.update(model,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};
+              }
+         case "TemplatesList": var _p5 = A2($Templates$List.update,_p0._0,model.list);
+           var newList = _p5._0;
+           var effects = _p5._1;
+           return {ctor: "_Tuple2",_0: _U.update(model,{list: newList}),_1: A2($Effects.map,TemplatesList,effects)};
+         default: return $Common$Utils.none(model);}
    });
    var add = F2(function (hyp,system) {    return TemplatesAdd(A2($Templates$Add.SetSystem,hyp,system));});
-   var view = F3(function (address,model,section) {
-      var _p5 = section;
-      if (_p5.ctor === "Add") {
-            return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),model.add);
-         } else {
-            return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
-         }
+   var view = F3(function (address,_p6,section) {
+      var _p7 = _p6;
+      var _p8 = section;
+      switch (_p8.ctor)
+      {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p7.add);
+         case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p7.list);
+         default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
-   var Model = F2(function (a,b) {    return {add: a,navChange: b};});
+   var Model = F3(function (a,b,c) {    return {add: a,list: b,navChange: c};});
    var init = function () {
-      var _p6 = $Templates$Add.init;
-      var add = _p6._0;
-      var effects = _p6._1;
-      return {ctor: "_Tuple2",_0: A2(Model,add,$Maybe.Nothing),_1: A2($Effects.map,TemplatesAdd,effects)};
+      var _p9 = $Templates$List.init;
+      var list = _p9._0;
+      var listEffects = _p9._1;
+      var _p10 = $Templates$Add.init;
+      var add = _p10._0;
+      var addEffects = _p10._1;
+      var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
+      return {ctor: "_Tuple2",_0: A3(Model,add,list,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();
-   return _elm.Templates.Core.values = {_op: _op,Model: Model,init: init,TemplatesAdd: TemplatesAdd,NoOp: NoOp,update: update,add: add,view: view};
+   return _elm.Templates.Core.values = {_op: _op
+                                       ,Model: Model
+                                       ,init: init
+                                       ,TemplatesAdd: TemplatesAdd
+                                       ,TemplatesList: TemplatesList
+                                       ,NoOp: NoOp
+                                       ,update: update
+                                       ,add: add
+                                       ,view: view};
 };
 Elm.Users = Elm.Users || {};
 Elm.Users.Session = Elm.Users.Session || {};
