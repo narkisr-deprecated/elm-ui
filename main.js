@@ -18466,12 +18466,13 @@ Elm.Nav.Side.make = function (_elm) {
               ,A2($Html$Events.onClick,address,A2(Goto,active,section))]),
       _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-circle-o")]),_U.list([])),$Html.text($Basics.toString(section))]))]));
    });
-   var drop = F3(function (address,active,actions) {
+   var drop = F4(function (address,active,actions,icon) {
       return A2($Html.li,
       _U.list([$Html$Attributes.$class("treeview")]),
       _U.list([A2($Html.a,
               _U.list([$Html$Attributes.$class(A2($Basics._op["++"],$Basics.toString(active),"Menu")),$Html$Attributes.href("#")]),
-              _U.list([A2($Html.span,_U.list([]),_U.list([$Html.text($Basics.toString(active))]))
+              _U.list([A2($Html.i,_U.list([$Html$Attributes.$class(icon)]),_U.list([]))
+                      ,A2($Html.span,_U.list([]),_U.list([$Html.text($Basics.toString(active))]))
                       ,A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-angle-left pull-right")]),_U.list([]))]))
               ,A2($Html.ul,
               _U.list([$Html$Attributes.$class("treeview-menu")]),
@@ -18489,10 +18490,10 @@ Elm.Nav.Side.make = function (_elm) {
    var Systems = {ctor: "Systems"};
    var init = {active: Systems,section: List};
    var menus = function (address) {
-      return _U.list([A3(drop,address,Systems,_U.list([List,Add,Launch]))
-                     ,A3(drop,address,Templates,_U.list([List]))
-                     ,A3(drop,address,Types,_U.list([List,Add]))
-                     ,A3(drop,address,Jobs,_U.list([List,Stats]))]);
+      return _U.list([A4(drop,address,Systems,_U.list([List,Add]),"fa fa-server")
+                     ,A4(drop,address,Templates,_U.list([List,Launch]),"fa fa-clone")
+                     ,A4(drop,address,Types,_U.list([List,Add]),"fa fa-archive")
+                     ,A4(drop,address,Jobs,_U.list([List,Stats]),"fa fa-tasks")]);
    };
    var view = F2(function (address,model) {
       return _U.list([A2($Html.aside,
@@ -24002,4 +24003,28 @@ Elm.Main.make = function (_elm) {
                              ,jobsListPolling: jobsListPolling
                              ,jobsStatsPolling: jobsStatsPolling
                              ,menuClick: menuClick};
+};
+Elm.Templates = Elm.Templates || {};
+Elm.Templates.Launch = Elm.Templates.Launch || {};
+Elm.Templates.Launch.make = function (_elm) {
+   "use strict";
+   _elm.Templates = _elm.Templates || {};
+   _elm.Templates.Launch = _elm.Templates.Launch || {};
+   if (_elm.Templates.Launch.values) return _elm.Templates.Launch.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),_U.list([]));});
+   var update = F2(function (action,model) {    var _p0 = action;return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
+   var NoOp = {ctor: "NoOp"};
+   var Model = {};
+   var init = {ctor: "_Tuple2",_0: Model,_1: $Effects.none};
+   return _elm.Templates.Launch.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,update: update,view: view};
 };

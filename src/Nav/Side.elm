@@ -49,11 +49,12 @@ sectionItem address active section =
         , text (toString section) ]
       ]
 
-drop : Signal.Address Action -> Active -> List Section -> Html
-drop address active actions =
+drop : Signal.Address Action -> Active -> List Section -> String -> Html
+drop address active actions icon =
   li [class "treeview"] [
     a [class ((toString active) ++ "Menu"), href "#"]  [
-      span [] [text (toString active)]
+      i [class icon] []
+    , span [] [text (toString active)]
     , i [class "fa fa-angle-left pull-right"] []
     ] 
       
@@ -63,10 +64,10 @@ drop address active actions =
 
 menus : Signal.Address Action -> List Html
 menus address =
-   [ drop address Systems [List, Add, Launch]
-   , drop address Templates [List]
-   , drop address Types [List, Add]
-   , drop address Jobs [List, Stats]
+   [ drop address Systems [List, Add] "fa fa-server"
+   , drop address Templates [List, Launch] "fa fa-clone"
+   , drop address Types [List, Add] "fa fa-archive"
+   , drop address Jobs [List, Stats] "fa fa-tasks"
    ]
 
 view : Signal.Address Action -> Model -> List Html
