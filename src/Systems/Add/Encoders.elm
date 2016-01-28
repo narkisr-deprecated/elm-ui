@@ -4,7 +4,7 @@ import Json.Encode as E exposing (..)
 import Systems.Model.Common exposing (..)
 
 import Systems.Model.AWS as AWS exposing (AWS, emptyVpc, emptyAws)
-import Systems.Model.Openstack as Openstack exposing (Openstack, OpenstackDefaults, emptyOpenstack, emptyOpenstackDefaults)
+import Systems.Model.Openstack as Openstack exposing (Openstack, emptyOpenstack)
 import Systems.Model.GCE exposing (GCE, emptyGce)
 import Systems.Model.Digital exposing (Digital, emptyDigital)
 import Systems.Model.Physical exposing (Physical, emptyPhysical)
