@@ -6,6 +6,7 @@ import Effects exposing (Effects)
 import Html exposing (..)
 import Templates.Add as Add
 import Templates.List as List
+import Templates.Launch as Launch
 import Nav.Side as NavSide exposing (Active(Templates), Section(Stats, Launch, Add, List, View))
 import Systems.Model.Common exposing (System)
 
@@ -13,6 +14,7 @@ type alias Model =
   { 
     add : Add.Model
   , list: List.Model
+  , launch: Launch.Model
   , navChange : Maybe (Active, Section)
   }
 
@@ -21,16 +23,19 @@ init =
   let
     (add, addEffects) = Add.init
     (list, listEffects) = List.init
+    (launch, launchEffects) = Launch.init
     effects = [
       Effects.map TemplatesAdd addEffects
     , Effects.map TemplatesList listEffects
+    , Effects.map TemplatesLaunch launchEffects
     ]
   in
-    (Model add list Nothing, Effects.batch effects)
+    (Model add list launch Nothing, Effects.batch effects)
 
 type Action = 
   TemplatesAdd Add.Action
     | TemplatesList List.Action
+    | TemplatesLaunch Launch.Action
     | NoOp
 
 update : Action ->  Model-> (Model , Effects Action)
@@ -59,6 +64,12 @@ update action model =
         (newList, effects) = (List.update action model.list)
       in
        ({ model | list = newList }, Effects.map TemplatesList effects)
+
+    TemplatesLaunch action -> 
+      let 
+        (newLaunch, effects) = (Launch.update action model.launch)
+      in
+       ({ model | launch = newLaunch }, Effects.map TemplatesLaunch effects)
 
 
     _ -> 

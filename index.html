@@ -97,14 +97,34 @@
     }
   });
  
+  systemAction = function (e) {
+    function(key, opt){
+      main.ports.menuPort.send(["Systems",e]); 
+    }
+  }
+
   $.contextMenu({
     selector: "#systemsListing tr",
     items: {
-        start: {name: "Start", callback: function(key, opt){ main.ports.menuPort.send("start"); }},
-        stop: {name: "Stop", callback: function(key, opt){ main.ports.menuPort.send("stop") }},
-        provision: {name: "Provision", callback: function(key, opt){ main.ports.menuPort.send("provision") }},
-	  reload: {name: "Reload", callback: function(key, opt){  main.ports.menuPort.send("reload") }},
-        destroy: {name: "Destroy", callback: function(key, opt){  main.ports.menuPort.send("destroy") }}
+        start: { name: "Start", callback: systemAction("start") },
+        stop:  { name: "Stop", callback: systemAction("stop")},
+        provision: {name: "Provision", callback: systemAction("provision")},
+	  reload: { name: "Reload", callback: systemAction("reload")},
+        destroy: { name: "Destroy", callback: systemAction("destroy")}
+    }
+  }); 
+
+  templateAction = function (e) {
+    function(key, opt){
+      main.ports.menuPort.send(["Templates",e]); 
+    }
+  }
+
+  $.contextMenu({
+    selector: "#templateListing tr",
+    items: {
+        create: { name: "Launch", callback: templateAction("launch")},
+        destroy: { name: "Clear", callback: templateAction("clear") }
     }
   }); 
 </script>

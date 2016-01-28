@@ -17,7 +17,10 @@ import Set exposing (Set)
 -- Model 
 
 type alias Model = 
-  { job : String, table : Table.Model System}
+  { 
+    job : String
+  , table : Table.Model System
+  }
 
 type Action = 
   SetupJob String

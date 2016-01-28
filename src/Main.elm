@@ -10,6 +10,9 @@ import Application exposing (init, view, update)
 import Systems.List
 import Systems.Launch as SystemsLaunch
 import Systems.Core as SystemsCore
+import Templates.Launch as TemplatesLaunch
+import Templates.Core as TemplatesCore
+
 import Templates.Add as TemplatesAdd
 import Templates.Core as TemplatesCore
 
@@ -111,9 +114,19 @@ jobsStatsPolling =
   in
   Signal.map (\t -> Application.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
  
-port menuPort : Signal String
+port menuPort : Signal (String, String)
+
+intoActions (dest, job) = 
+  case dest of
+    "Systems" ->
+       Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
+
+    "Templates" ->
+       Application.TemplatesAction (TemplatesCore.TemplatesLaunch (TemplatesLaunch.SetupJob job))
+
+    _ -> 
+       Application.NoOp
 
 menuClick p =
- Signal.map (\job -> Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))) p
-
+ Signal.map intoActions p
 

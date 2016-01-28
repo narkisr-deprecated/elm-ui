@@ -23463,6 +23463,38 @@ Elm.Templates.List.make = function (_elm) {
                                        ,getTemplates: getTemplates};
 };
 Elm.Templates = Elm.Templates || {};
+Elm.Templates.Launch = Elm.Templates.Launch || {};
+Elm.Templates.Launch.make = function (_elm) {
+   "use strict";
+   _elm.Templates = _elm.Templates || {};
+   _elm.Templates.Launch = _elm.Templates.Launch || {};
+   if (_elm.Templates.Launch.values) return _elm.Templates.Launch.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]));});
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "SetupJob") {
+            return {ctor: "_Tuple2",_0: _U.update(model,{job: _p0._0}),_1: $Effects.none};
+         } else {
+            return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         }
+   });
+   var NoOp = {ctor: "NoOp"};
+   var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
+   var Model = function (a) {    return {job: a};};
+   var init = {ctor: "_Tuple2",_0: Model(""),_1: $Effects.none};
+   return _elm.Templates.Launch.values = {_op: _op,Model: Model,init: init,SetupJob: SetupJob,NoOp: NoOp,update: update,view: view};
+};
+Elm.Templates = Elm.Templates || {};
 Elm.Templates.Core = Elm.Templates.Core || {};
 Elm.Templates.Core.make = function (_elm) {
    "use strict";
@@ -23481,9 +23513,11 @@ Elm.Templates.Core.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Templates$Add = Elm.Templates.Add.make(_elm),
+   $Templates$Launch = Elm.Templates.Launch.make(_elm),
    $Templates$List = Elm.Templates.List.make(_elm);
    var _op = {};
    var NoOp = {ctor: "NoOp"};
+   var TemplatesLaunch = function (a) {    return {ctor: "TemplatesLaunch",_0: a};};
    var TemplatesList = function (a) {    return {ctor: "TemplatesList",_0: a};};
    var TemplatesAdd = function (a) {    return {ctor: "TemplatesAdd",_0: a};};
    var update = F2(function (action,model) {
@@ -23512,33 +23546,43 @@ Elm.Templates.Core.make = function (_elm) {
            var newList = _p6._0;
            var effects = _p6._1;
            return {ctor: "_Tuple2",_0: _U.update(model,{list: newList}),_1: A2($Effects.map,TemplatesList,effects)};
+         case "TemplatesLaunch": var _p7 = A2($Templates$Launch.update,_p0._0,model.launch);
+           var newLaunch = _p7._0;
+           var effects = _p7._1;
+           return {ctor: "_Tuple2",_0: _U.update(model,{launch: newLaunch}),_1: A2($Effects.map,TemplatesLaunch,effects)};
          default: return $Common$Utils.none(model);}
    });
    var add = F2(function (hyp,system) {    return TemplatesAdd(A2($Templates$Add.SetSystem,hyp,system));});
-   var view = F3(function (address,_p7,section) {
-      var _p8 = _p7;
-      var _p9 = section;
-      switch (_p9.ctor)
-      {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p8.add);
-         case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p8.list);
+   var view = F3(function (address,_p8,section) {
+      var _p9 = _p8;
+      var _p10 = section;
+      switch (_p10.ctor)
+      {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p9.add);
+         case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p9.list);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
-   var Model = F3(function (a,b,c) {    return {add: a,list: b,navChange: c};});
+   var Model = F4(function (a,b,c,d) {    return {add: a,list: b,launch: c,navChange: d};});
    var init = function () {
-      var _p10 = $Templates$List.init;
-      var list = _p10._0;
-      var listEffects = _p10._1;
-      var _p11 = $Templates$Add.init;
-      var add = _p11._0;
-      var addEffects = _p11._1;
-      var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
-      return {ctor: "_Tuple2",_0: A3(Model,add,list,$Maybe.Nothing),_1: $Effects.batch(effects)};
+      var _p11 = $Templates$Launch.init;
+      var launch = _p11._0;
+      var launchEffects = _p11._1;
+      var _p12 = $Templates$List.init;
+      var list = _p12._0;
+      var listEffects = _p12._1;
+      var _p13 = $Templates$Add.init;
+      var add = _p13._0;
+      var addEffects = _p13._1;
+      var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects)
+                            ,A2($Effects.map,TemplatesList,listEffects)
+                            ,A2($Effects.map,TemplatesLaunch,launchEffects)]);
+      return {ctor: "_Tuple2",_0: A4(Model,add,list,launch,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();
    return _elm.Templates.Core.values = {_op: _op
                                        ,Model: Model
                                        ,init: init
                                        ,TemplatesAdd: TemplatesAdd
                                        ,TemplatesList: TemplatesList
+                                       ,TemplatesLaunch: TemplatesLaunch
                                        ,NoOp: NoOp
                                        ,update: update
                                        ,add: add
@@ -23700,6 +23744,7 @@ Elm.Application.make = function (_elm) {
    if (_elm.Application.values) return _elm.Application.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -23720,6 +23765,7 @@ Elm.Application.make = function (_elm) {
       var _p1 = _p0;
       return _U.update(_p1,{navSide: A2($Nav$Side.update,A2($Nav$Side.Goto,active,section),_p1.navSide)});
    });
+   var NoOp = {ctor: "NoOp"};
    var TemplatesAction = function (a) {    return {ctor: "TemplatesAction",_0: a};};
    var TypesAction = function (a) {    return {ctor: "TypesAction",_0: a};};
    var NavHeaderAction = function (a) {    return {ctor: "NavHeaderAction",_0: a};};
@@ -23827,7 +23873,7 @@ Elm.Application.make = function (_elm) {
               } else {
                  return {ctor: "_Tuple2",_0: newModel,_1: A2($Effects.map,TemplatesAction,effects)};
               }
-         default: var _p27 = A2($Systems$Core.update,_p18._0,_p17.systems);
+         case "SystemsAction": var _p27 = A2($Systems$Core.update,_p18._0,_p17.systems);
            var newSystems = _p27._0;
            var effects = _p27._1;
            var newModel = _U.update(_p33,{systems: newSystems});
@@ -23860,7 +23906,8 @@ Elm.Application.make = function (_elm) {
                     break _v8_3;
                  }
            } while (false);
-           return {ctor: "_Tuple2",_0: newModel,_1: newEffects};}
+           return {ctor: "_Tuple2",_0: newModel,_1: newEffects};
+         default: return $Common$Utils.none(_p33);}
    });
    return _elm.Application.values = {_op: _op
                                     ,init: init
@@ -23872,6 +23919,7 @@ Elm.Application.make = function (_elm) {
                                     ,NavHeaderAction: NavHeaderAction
                                     ,TypesAction: TypesAction
                                     ,TemplatesAction: TemplatesAction
+                                    ,NoOp: NoOp
                                     ,jobListing: jobListing
                                     ,$goto: $goto
                                     ,update: update
@@ -23905,22 +23953,34 @@ Elm.Main.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Templates$Add = Elm.Templates.Add.make(_elm),
    $Templates$Core = Elm.Templates.Core.make(_elm),
+   $Templates$Launch = Elm.Templates.Launch.make(_elm),
    $Time = Elm.Time.make(_elm);
    var _op = {};
-   var menuClick = function (p) {
-      return A2($Signal.map,function (job) {    return $Application.SystemsAction($Systems$Core.SystemsLaunch($Systems$Launch.SetupJob(job)));},p);
+   var intoActions = function (_p0) {
+      var _p1 = _p0;
+      var _p3 = _p1._1;
+      var _p2 = _p1._0;
+      switch (_p2)
+      {case "Systems": return $Application.SystemsAction($Systems$Core.SystemsLaunch($Systems$Launch.SetupJob(_p3)));
+         case "Templates": return $Application.TemplatesAction($Templates$Core.TemplatesLaunch($Templates$Launch.SetupJob(_p3)));
+         default: return $Application.NoOp;}
    };
+   var menuClick = function (p) {    return A2($Signal.map,intoActions,p);};
    var menuPort = Elm.Native.Port.make(_elm).inboundSignal("menuPort",
-   "String",
+   "( String, String )",
    function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+      return typeof v === "object" && v instanceof Array ? {ctor: "_Tuple2"
+                                                           ,_0: typeof v[0] === "string" || typeof v[0] === "object" && v[0] instanceof String ? v[0] : _U.badPort("a string",
+                                                           v[0])
+                                                           ,_1: typeof v[1] === "string" || typeof v[1] === "object" && v[1] instanceof String ? v[1] : _U.badPort("a string",
+                                                           v[1])} : _U.badPort("an array",v);
    });
    var jobsStatsPolling = function () {
-      var _p0 = $Jobs$Stats.init;
-      var model = _p0._0;
+      var _p4 = $Jobs$Stats.init;
+      var model = _p4._0;
       return A2($Signal.map,function (t) {    return $Application.JobsStats($Jobs$Stats.PollMetrics(t));},$Time.every(model.interval * $Time.second));
    }();
-   var jobsListPolling = A2($Signal.map,function (_p1) {    return $Application.JobsList($Jobs$List.Polling);},$Time.every(1 * $Time.second));
+   var jobsListPolling = A2($Signal.map,function (_p5) {    return $Application.JobsList($Jobs$List.Polling);},$Time.every(1 * $Time.second));
    var parsingErr = Elm.Native.Port.make(_elm).inboundSignal("parsingErr",
    "Search.ParseResult",
    function (v) {
@@ -23948,7 +24008,7 @@ Elm.Main.make = function (_elm) {
                                                                                          v.result)} : _U.badPort("an object with fields `message`, `source`, `result`",
       v);
    });
-   var toQuery = function (action) {    var _p2 = action;if (_p2.ctor === "Parse") {    return _p2._0;} else {    return "";}};
+   var toQuery = function (action) {    var _p6 = action;if (_p6.ctor === "Parse") {    return _p6._0;} else {    return "";}};
    var parserPort = Elm.Native.Port.make(_elm).outboundSignal("parserPort",
    function (v) {
       return v;
@@ -23962,13 +24022,13 @@ Elm.Main.make = function (_elm) {
    function (v) {
       return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
    });
-   var toJson = function (action) {    var _p3 = action;if (_p3.ctor === "Load") {    return _p3._0;} else {    return "";}};
+   var toJson = function (action) {    var _p7 = action;if (_p7.ctor === "Load") {    return _p7._0;} else {    return "";}};
    var editorOutPort = Elm.Native.Port.make(_elm).outboundSignal("editorOutPort",
    function (v) {
       return v;
    },
    A2($Signal.map,toJson,A3($Signal.filter,function (s) {    return !_U.eq(s,$Common$Editor.NoOp);},$Common$Editor.NoOp,$Common$Editor.editorActions.signal)));
-   var toUrl = function (action) {    var _p4 = action;if (_p4.ctor === "Open") {    return _p4._0;} else {    return "";}};
+   var toUrl = function (action) {    var _p8 = action;if (_p8.ctor === "Open") {    return _p8._0;} else {    return "";}};
    var newtabPort = Elm.Native.Port.make(_elm).outboundSignal("newtabPort",
    function (v) {
       return v;
@@ -24002,29 +24062,6 @@ Elm.Main.make = function (_elm) {
                              ,parsingInput: parsingInput
                              ,jobsListPolling: jobsListPolling
                              ,jobsStatsPolling: jobsStatsPolling
+                             ,intoActions: intoActions
                              ,menuClick: menuClick};
-};
-Elm.Templates = Elm.Templates || {};
-Elm.Templates.Launch = Elm.Templates.Launch || {};
-Elm.Templates.Launch.make = function (_elm) {
-   "use strict";
-   _elm.Templates = _elm.Templates || {};
-   _elm.Templates.Launch = _elm.Templates.Launch || {};
-   if (_elm.Templates.Launch.values) return _elm.Templates.Launch.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),_U.list([]));});
-   var update = F2(function (action,model) {    var _p0 = action;return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
-   var NoOp = {ctor: "NoOp"};
-   var Model = {};
-   var init = {ctor: "_Tuple2",_0: Model,_1: $Effects.none};
-   return _elm.Templates.Launch.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,update: update,view: view};
 };

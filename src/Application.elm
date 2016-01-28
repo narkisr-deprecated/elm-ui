@@ -56,6 +56,7 @@ type Action =
     | NavHeaderAction NavHeader.Action
     | TypesAction Types.Action
     | TemplatesAction Templates.Action
+    | NoOp
 
 -- Navigation changes
 jobListing : Model -> (Model , Effects Action)
@@ -121,9 +122,9 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
 
     SystemsAction action -> 
       let 
-       (newSystems, effects) = Systems.update action systems
-       newModel = { model | systems = newSystems}
-       newEffects = Effects.map SystemsAction effects
+        (newSystems, effects) = Systems.update action systems
+        newModel = { model | systems = newSystems}
+        newEffects = Effects.map SystemsAction effects
       in
         case newSystems.navChange  of
           Just (Jobs, List) -> 
@@ -144,6 +145,9 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
              (goto Templates section {newModel | templates = newTemplates} , Effects.map TemplatesAction effects)
           _ -> 
             (newModel, newEffects)
+
+    _ -> 
+          none model
 
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats} as model) =

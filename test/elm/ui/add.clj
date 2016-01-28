@@ -173,5 +173,5 @@
     (let [hostname (openstack-flow)] 
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
-(openstack-partial-template)
+;; (openstack-partial-template)
 ;; (openstack-partial-save)
