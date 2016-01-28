@@ -23488,44 +23488,48 @@ Elm.Templates.Core.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "TemplatesAdd": var _p4 = _p0._0;
-           var _p1 = _p4;
+      {case "TemplatesAdd": var _p5 = _p0._0;
+           var _p1 = _p5;
            if (_p1.ctor === "Saved") {
-                 var _p2 = A2($Templates$Add.update,_p4,model.add);
-                 var newAdd = _p2._0;
-                 var effects = _p2._1;
+                 var _p2 = $Templates$List.init;
+                 var newList = _p2._0;
+                 var listEffects = _p2._1;
+                 var _p3 = A2($Templates$Add.update,_p5,model.add);
+                 var newAdd = _p3._0;
+                 var addEffects = _p3._1;
+                 var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
                  return {ctor: "_Tuple2"
                         ,_0: _U.update(model,{add: newAdd,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                        ,_1: A2($Effects.map,TemplatesAdd,effects)};
+                        ,_1: $Effects.batch(effects)};
               } else {
-                 var _p3 = A2($Templates$Add.update,_p4,model.add);
-                 var newAdd = _p3._0;
-                 var effects = _p3._1;
+                 var _p4 = A2($Templates$Add.update,_p5,model.add);
+                 var newAdd = _p4._0;
+                 var effects = _p4._1;
                  return {ctor: "_Tuple2",_0: _U.update(model,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};
               }
-         case "TemplatesList": var _p5 = A2($Templates$List.update,_p0._0,model.list);
-           var newList = _p5._0;
-           var effects = _p5._1;
+         case "TemplatesList": var _p6 = A2($Templates$List.update,_p0._0,model.list);
+           var newList = _p6._0;
+           var effects = _p6._1;
            return {ctor: "_Tuple2",_0: _U.update(model,{list: newList}),_1: A2($Effects.map,TemplatesList,effects)};
          default: return $Common$Utils.none(model);}
    });
    var add = F2(function (hyp,system) {    return TemplatesAdd(A2($Templates$Add.SetSystem,hyp,system));});
-   var view = F3(function (address,_p6,section) {
-      var _p7 = _p6;
-      var _p8 = section;
-      switch (_p8.ctor)
-      {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p7.add);
-         case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p7.list);
+   var view = F3(function (address,_p7,section) {
+      var _p8 = _p7;
+      var _p9 = section;
+      switch (_p9.ctor)
+      {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p8.add);
+         case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p8.list);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
    var Model = F3(function (a,b,c) {    return {add: a,list: b,navChange: c};});
    var init = function () {
-      var _p9 = $Templates$List.init;
-      var list = _p9._0;
-      var listEffects = _p9._1;
-      var _p10 = $Templates$Add.init;
-      var add = _p10._0;
-      var addEffects = _p10._1;
+      var _p10 = $Templates$List.init;
+      var list = _p10._0;
+      var listEffects = _p10._1;
+      var _p11 = $Templates$Add.init;
+      var add = _p11._0;
+      var addEffects = _p11._1;
       var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
       return {ctor: "_Tuple2",_0: A3(Model,add,list,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();

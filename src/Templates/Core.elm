@@ -40,9 +40,14 @@ update action model =
       case action of 
         Add.Saved _ -> 
           let 
-           (newAdd, effects) = (Add.update action model.add)
+           (newAdd, addEffects) = (Add.update action model.add)
+           (newList, listEffects) = List.init
+           effects = [
+             Effects.map TemplatesAdd addEffects
+           , Effects.map TemplatesList listEffects
+           ]
           in
-            ({ model | add = newAdd, navChange = Just (Templates, List)}, Effects.map TemplatesAdd effects)
+            ({ model | add = newAdd, navChange = Just (Templates, List)},Effects.batch effects )
         _ -> 
          let 
           (newAdd, effects) = (Add.update action model.add)
