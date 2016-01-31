@@ -53,6 +53,10 @@ update action ({launch, list} as model) =
            ]
           in
             ({ model | add = newAdd, navChange = Just (Templates, List)},Effects.batch effects )
+
+        Add.Cancel -> 
+          none { model | navChange = Just (Templates, List)}
+
         _ -> 
          let 
           (newAdd, effects) = (Add.update action model.add)

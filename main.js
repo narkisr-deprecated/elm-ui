@@ -23592,23 +23592,22 @@ Elm.Templates.Core.make = function (_elm) {
       switch (_p2.ctor)
       {case "TemplatesAdd": var _p7 = _p2._0;
            var _p3 = _p7;
-           if (_p3.ctor === "Saved") {
-                 var _p4 = $Templates$List.init;
-                 var newList = _p4._0;
-                 var listEffects = _p4._1;
-                 var _p5 = A2($Templates$Add.update,_p7,_p13.add);
-                 var newAdd = _p5._0;
-                 var addEffects = _p5._1;
-                 var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
-                 return {ctor: "_Tuple2"
-                        ,_0: _U.update(_p13,{add: newAdd,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                        ,_1: $Effects.batch(effects)};
-              } else {
-                 var _p6 = A2($Templates$Add.update,_p7,_p13.add);
-                 var newAdd = _p6._0;
-                 var effects = _p6._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p13,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};
-              }
+           switch (_p3.ctor)
+           {case "Saved": var _p4 = $Templates$List.init;
+                var newList = _p4._0;
+                var listEffects = _p4._1;
+                var _p5 = A2($Templates$Add.update,_p7,_p13.add);
+                var newAdd = _p5._0;
+                var addEffects = _p5._1;
+                var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
+                return {ctor: "_Tuple2"
+                       ,_0: _U.update(_p13,{add: newAdd,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                       ,_1: $Effects.batch(effects)};
+              case "Cancel": return $Common$Utils.none(_U.update(_p13,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}));
+              default: var _p6 = A2($Templates$Add.update,_p7,_p13.add);
+                var newAdd = _p6._0;
+                var effects = _p6._1;
+                return {ctor: "_Tuple2",_0: _U.update(_p13,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};}
          case "TemplatesList": var _p8 = A2($Templates$List.update,_p2._0,_p13.list);
            var newList = _p8._0;
            var effects = _p8._1;
