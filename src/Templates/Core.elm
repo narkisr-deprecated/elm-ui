@@ -75,6 +75,9 @@ update action ({launch, list} as model) =
           in
             (newModel , Effects.map TemplatesLaunch effects)
 
+        Launch.Cancel -> 
+          none { model | navChange = Just (Templates, List)}
+
         _ -> 
           let 
             (newLaunch, effects) = (Launch.update action model.launch)
