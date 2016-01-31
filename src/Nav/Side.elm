@@ -65,7 +65,7 @@ drop address active actions icon =
 menus : Signal.Address Action -> List Html
 menus address =
    [ drop address Systems [List, Add] "fa fa-server"
-   , drop address Templates [List, Launch] "fa fa-clone"
+   , drop address Templates [List] "fa fa-clone"
    , drop address Types [List, Add] "fa fa-archive"
    , drop address Jobs [List, Stats] "fa fa-tasks"
    ]

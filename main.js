@@ -18491,7 +18491,7 @@ Elm.Nav.Side.make = function (_elm) {
    var init = {active: Systems,section: List};
    var menus = function (address) {
       return _U.list([A4(drop,address,Systems,_U.list([List,Add]),"fa fa-server")
-                     ,A4(drop,address,Templates,_U.list([List,Launch]),"fa fa-clone")
+                     ,A4(drop,address,Templates,_U.list([List]),"fa fa-clone")
                      ,A4(drop,address,Types,_U.list([List,Add]),"fa fa-archive")
                      ,A4(drop,address,Jobs,_U.list([List,Stats]),"fa fa-tasks")]);
    };
@@ -23549,7 +23549,9 @@ Elm.Templates.Core.make = function (_elm) {
          case "TemplatesLaunch": var _p7 = A2($Templates$Launch.update,_p0._0,model.launch);
            var newLaunch = _p7._0;
            var effects = _p7._1;
-           return {ctor: "_Tuple2",_0: _U.update(model,{launch: newLaunch}),_1: A2($Effects.map,TemplatesLaunch,effects)};
+           return {ctor: "_Tuple2"
+                  ,_0: _U.update(model,{launch: newLaunch,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Launch})})
+                  ,_1: A2($Effects.map,TemplatesLaunch,effects)};
          default: return $Common$Utils.none(model);}
    });
    var add = F2(function (hyp,system) {    return TemplatesAdd(A2($Templates$Add.SetSystem,hyp,system));});
@@ -23868,11 +23870,21 @@ Elm.Application.make = function (_elm) {
            var effects = _p25._1;
            var newModel = _U.update(_p33,{templates: newTemplates});
            var _p26 = newTemplates.navChange;
-           if (_p26.ctor === "Just" && _p26._0.ctor === "_Tuple2" && _p26._0._0.ctor === "Templates" && _p26._0._1.ctor === "List") {
-                 return {ctor: "_Tuple2",_0: A3($goto,$Nav$Side.Templates,$Nav$Side.List,newModel),_1: A2($Effects.map,TemplatesAction,effects)};
-              } else {
-                 return {ctor: "_Tuple2",_0: newModel,_1: A2($Effects.map,TemplatesAction,effects)};
-              }
+           _v7_2: do {
+              if (_p26.ctor === "Just" && _p26._0.ctor === "_Tuple2" && _p26._0._0.ctor === "Templates") {
+                    switch (_p26._0._1.ctor)
+                    {case "List": return {ctor: "_Tuple2"
+                                         ,_0: A3($goto,$Nav$Side.Templates,$Nav$Side.List,newModel)
+                                         ,_1: A2($Effects.map,TemplatesAction,effects)};
+                       case "Launch": return {ctor: "_Tuple2"
+                                             ,_0: A3($goto,$Nav$Side.Templates,$Nav$Side.Launch,newModel)
+                                             ,_1: A2($Effects.map,TemplatesAction,effects)};
+                       default: break _v7_2;}
+                 } else {
+                    break _v7_2;
+                 }
+           } while (false);
+           return {ctor: "_Tuple2",_0: newModel,_1: A2($Effects.map,TemplatesAction,effects)};
          case "SystemsAction": var _p27 = A2($Systems$Core.update,_p18._0,_p17.systems);
            var newSystems = _p27._0;
            var effects = _p27._1;

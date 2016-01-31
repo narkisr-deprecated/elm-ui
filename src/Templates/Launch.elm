@@ -2,6 +2,7 @@ module Templates.Launch where
 
 import Effects exposing (Effects)
 import Html exposing (..)
+import Debug
 
 
 type alias Model = 

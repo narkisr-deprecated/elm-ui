@@ -69,7 +69,7 @@ update action model =
       let 
         (newLaunch, effects) = (Launch.update action model.launch)
       in
-       ({ model | launch = newLaunch }, Effects.map TemplatesLaunch effects)
+       ({ model | launch = newLaunch, navChange = Just (Templates, Launch) }, Effects.map TemplatesLaunch effects)
 
 
     _ -> 

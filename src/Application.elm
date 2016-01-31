@@ -117,6 +117,9 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
           Just (Templates, List) -> 
             (goto Templates List newModel , Effects.map TemplatesAction effects)
 
+          Just (Templates, Launch) -> 
+            (goto Templates Launch newModel , Effects.map TemplatesAction effects)
+
           _ -> 
             (newModel , Effects.map TemplatesAction effects) 
 
