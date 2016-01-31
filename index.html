@@ -45,7 +45,7 @@
   var outPorts = {
     parsingOk: empty,
     parsingErr: empty,
-    menuPort: ["",""],
+    menuPort: ["","", ""],
     editorInPort: ""
   }
   var main = Elm.embed(Elm.Main, elmDiv, outPorts);
@@ -99,7 +99,7 @@
  
   systemAction = function (e) {
     return function(key, opt){
-      main.ports.menuPort.send(["Systems",e]); 
+      main.ports.menuPort.send(["Systems",e, ""]); 
     }
   }
 
@@ -116,7 +116,8 @@
 
   templateAction = function (e) {
     return function(key, opt){
-      main.ports.menuPort.send(["Templates",e]); 
+      templateName = $(this).context.cells[0].innerText;
+      main.ports.menuPort.send(["Templates",e,templateName]); 
     }
   }
 

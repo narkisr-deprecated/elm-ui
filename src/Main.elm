@@ -114,15 +114,15 @@ jobsStatsPolling =
   in
   Signal.map (\t -> Application.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
  
-port menuPort : Signal (String, String)
+port menuPort : Signal (String, String, String)
 
-intoActions (dest, job) = 
+intoActions (dest, job, target) = 
   case dest of
     "Systems" ->
        Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
 
     "Templates" ->
-       Application.TemplatesAction (TemplatesCore.TemplatesLaunch (TemplatesLaunch.SetupJob job))
+       Application.TemplatesAction (TemplatesCore.TemplatesLaunch (TemplatesLaunch.SetupJob (job, target)))
 
     _ -> 
        Application.NoOp

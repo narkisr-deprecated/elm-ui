@@ -39,7 +39,7 @@ type Action =
     | NoOp
 
 update : Action ->  Model-> (Model , Effects Action)
-update action model =
+update action ({launch, list} as model) =
   case action of 
     TemplatesAdd action -> 
       case action of 
@@ -66,10 +66,21 @@ update action model =
        ({ model | list = newList }, Effects.map TemplatesList effects)
 
     TemplatesLaunch action -> 
-      let 
-        (newLaunch, effects) = (Launch.update action model.launch)
-      in
-       ({ model | launch = newLaunch, navChange = Just (Templates, Launch) }, Effects.map TemplatesLaunch effects)
+      case action of 
+        Launch.SetupJob (job, name) -> 
+          let
+            template = List.findTemplate list name
+            (newLaunch,effects) = Launch.update (Launch.SetTemplate template) launch
+            newModel = { model | launch = newLaunch, navChange = Just (Templates, Launch) }
+          in
+            (newModel , Effects.map TemplatesLaunch effects)
+
+        _ -> 
+          let 
+            (newLaunch, effects) = (Launch.update action model.launch)
+            newModel = { model | launch = newLaunch, navChange = Just (Templates, Launch) }
+          in
+            (newModel , Effects.map TemplatesLaunch effects)
 
 
     _ -> 
@@ -79,13 +90,16 @@ add hyp system =
   TemplatesAdd (Add.SetSystem hyp system)
 
 view : Signal.Address Action -> Model -> Section -> List Html
-view address {add, list} section =
+view address {add, list, launch} section =
   case section of
     Add ->
       Add.view (Signal.forwardTo address TemplatesAdd) add
 
     List ->
       List.view (Signal.forwardTo address TemplatesList) list
+
+    Launch ->
+      Launch.view (Signal.forwardTo address TemplatesLaunch) launch
 
 
     _ -> 

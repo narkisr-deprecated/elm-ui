@@ -82,6 +82,9 @@ view address ({pager, table} as model) =
     ]
   ]
 
+findTemplate : Model ->  String -> Template
+findTemplate {templates} name =
+  withDefault emptyTemplate (List.head (List.filter (\template -> (template.name == name)) templates ))
 
 templateList : Decoder (List Template)
 templateList =
