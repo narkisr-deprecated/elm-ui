@@ -18772,7 +18772,7 @@ Elm.Jobs.List.make = function (_elm) {
       var sec = $Basics.toString($Basics.round((_p2 - _p3) / 1000));
       var min = $Basics.toString($Basics.round(_p2 - _p3) / (1000 * 60) | 0);
       return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.identity)]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($Date$Format.format,"%d/%e/%Y %H:%M",$Date.fromTime(_p3)))]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($Date$Format.format,"%d/%m/%Y %H:%M",$Date.fromTime(_p3)))]))
                      ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.hostname)]))
                      ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.queue)]))
                      ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],pad(min),A2($Basics._op["++"],":",pad(sec))))]))

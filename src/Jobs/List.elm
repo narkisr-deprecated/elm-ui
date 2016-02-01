@@ -151,7 +151,7 @@ doneRow tableid {hostname, start, end, queue, identity, status} =
   in
     [
      td [] [ text identity]
-    , td [] [ text (format "%d/%e/%Y %H:%M" (Date.fromTime start))]
+    , td [] [ text (format "%d/%m/%Y %H:%M" (Date.fromTime start))]
     , td [] [ text hostname ]
     , td [] [ text queue]
     , td [] [ text ((pad min) ++ ":" ++ (pad sec)) ]
