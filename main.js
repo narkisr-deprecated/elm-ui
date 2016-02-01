@@ -17857,30 +17857,23 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                              ,encoderOf: encoderOf
                                              ,encode: encode};
 };
-Elm.Systems = Elm.Systems || {};
-Elm.Systems.Launch = Elm.Systems.Launch || {};
-Elm.Systems.Launch.make = function (_elm) {
+Elm.Jobs = Elm.Jobs || {};
+Elm.Jobs.Common = Elm.Jobs.Common || {};
+Elm.Jobs.Common.make = function (_elm) {
    "use strict";
-   _elm.Systems = _elm.Systems || {};
-   _elm.Systems.Launch = _elm.Systems.Launch || {};
-   if (_elm.Systems.Launch.values) return _elm.Systems.Launch.values;
+   _elm.Jobs = _elm.Jobs || {};
+   _elm.Jobs.Common = _elm.Jobs.Common || {};
+   if (_elm.Jobs.Common.values) return _elm.Jobs.Common.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
    $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
-   $Table = Elm.Table.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
    var JobResponse = F3(function (a,b,c) {    return {message: a,id: b,job: c};});
@@ -17894,87 +17887,7 @@ Elm.Systems.Launch.make = function (_elm) {
       action,
       $Task.toResult(A3($Http.post,jobResponse,A2($Basics._op["++"],"/jobs/",A2($Basics._op["++"],job,A2($Basics._op["++"],"/",id))),$Http.empty))));
    });
-   var systemRow = F2(function (id,_p0) {
-      var _p1 = _p0;
-      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(id)]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(function (_) {    return _.hostname;}(_p1.machine))]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.type$)]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.env)]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.owner)]))]);
-   });
-   var Cancel = {ctor: "Cancel"};
-   var NoOp = {ctor: "NoOp"};
-   var Run = function (a) {    return {ctor: "Run",_0: a};};
-   var JobLaunched = function (a) {    return {ctor: "JobLaunched",_0: a};};
-   var update = F2(function (action,model) {
-      var _p2 = action;
-      switch (_p2.ctor)
-      {case "JobLaunched": return A4($Common$Redirect.successHandler,
-           _p2._0,
-           model,
-           function (res) {
-              return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-           },
-           NoOp);
-         case "SetupJob": return {ctor: "_Tuple2",_0: _U.update(model,{job: _p2._0}),_1: $Effects.none};
-         case "LoadPage": var newTable = A2($Table.update,_p2._0,model.table);
-           return {ctor: "_Tuple2",_0: _U.update(model,{table: newTable}),_1: $Effects.none};
-         case "Run": var runAll = $Effects.batch(A2($List.map,
-           function (id) {
-              return A3(runJob,id,_p2._0,JobLaunched);
-           },
-           A2($List.map,function (_p3) {    var _p4 = _p3;return _p4._0;},model.table.rows)));
-           return {ctor: "_Tuple2",_0: model,_1: runAll};
-         case "Cancel": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
-   });
-   var LoadPage = function (a) {    return {ctor: "LoadPage",_0: a};};
-   var view = F2(function (address,model) {
-      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-                     _U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("panel panel-default")]),
-                     _U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("panel-body")]),
-                     _U.list([A2($Html.span,
-                     _U.list([]),
-                     _U.list([$Html.text("A ")
-                             ,A2($Html.strong,_U.list([]),_U.list([$Html.text(model.job)]))
-                             ,$Html.text(" operation ")
-                             ,$Html.text("will be performed on the following systems:")]))]))]))]))]))
-                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-                     _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),model.table))]))]))
-                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("btn-group col-md-offset-5 col-md-10")]),
-                     _U.list([A2($Html.button,
-                             _U.list([$Html$Attributes.$class("btn btn-danger btn-sm col-md-1 col-md-offset-1"),A2($Html$Events.onClick,address,Cancel)]),
-                             _U.list([$Html.text("Cancel")]))
-                             ,A2($Html.button,
-                             _U.list([$Html$Attributes.$class("btn btn-primary btn-sm col-md-1"),A2($Html$Events.onClick,address,Run(model.job))]),
-                             _U.list([$Html.text("Ok")]))]))]))]);
-   });
-   var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
-   var Model = F2(function (a,b) {    return {job: a,table: b};});
-   var init = function () {
-      var table = A5($Table.init,"launchListing",false,_U.list(["#","Hostname","Type","Env","Owner"]),systemRow,"Systems");
-      return {ctor: "_Tuple2",_0: A2(Model,"",table),_1: $Effects.none};
-   }();
-   return _elm.Systems.Launch.values = {_op: _op
-                                       ,Model: Model
-                                       ,SetupJob: SetupJob
-                                       ,LoadPage: LoadPage
-                                       ,JobLaunched: JobLaunched
-                                       ,Run: Run
-                                       ,NoOp: NoOp
-                                       ,Cancel: Cancel
-                                       ,systemRow: systemRow
-                                       ,init: init
-                                       ,update: update
-                                       ,view: view
-                                       ,JobResponse: JobResponse
-                                       ,jobResponse: jobResponse
-                                       ,runJob: runJob};
+   return _elm.Jobs.Common.values = {_op: _op,JobResponse: JobResponse,jobResponse: jobResponse,runJob: runJob};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
@@ -18046,6 +17959,7 @@ Elm.Systems.Add.make = function (_elm) {
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $Http = Elm.Http.make(_elm),
+   $Jobs$Common = Elm.Jobs.Common.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -18059,7 +17973,6 @@ Elm.Systems.Add.make = function (_elm) {
    $Systems$Add$Openstack = Elm.Systems.Add.Openstack.make(_elm),
    $Systems$Add$Persistency = Elm.Systems.Add.Persistency.make(_elm),
    $Systems$Add$Physical = Elm.Systems.Add.Physical.make(_elm),
-   $Systems$Launch = Elm.Systems.Launch.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
@@ -18094,7 +18007,7 @@ Elm.Systems.Add.make = function (_elm) {
    var JobLaunched = function (a) {    return {ctor: "JobLaunched",_0: a};};
    var setSaved = F3(function (next,model,_p5) {
       var _p6 = _p5;
-      return {ctor: "_Tuple2",_0: model,_1: A3($Systems$Launch.runJob,$Basics.toString(_p6.id),$String.toLower($Basics.toString(next)),JobLaunched)};
+      return {ctor: "_Tuple2",_0: model,_1: A3($Jobs$Common.runJob,$Basics.toString(_p6.id),$String.toLower($Basics.toString(next)),JobLaunched)};
    });
    var Saved = F2(function (a,b) {    return {ctor: "Saved",_0: a,_1: b};});
    var saveSystem = F2(function (next,json) {
@@ -18308,11 +18221,10 @@ Elm.Systems.Add.make = function (_elm) {
                                ,_0: _p36
                                ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Create),intoSystem(_p36),$Basics.toString(_p39))};
          case "SaveTemplate": return $Common$Utils.none(_p36);
-         case "Saved": var _p31 = A3($Common$Redirect.errorsHandler,_p29._1,_p36,NoOp);
+         case "Saved": var _p31 = A4($Common$Redirect.successHandler,_p29._1,_p36,A2(setSaved,_p29._0,_p36),NoOp);
            var newModel = _p31._0;
            var saveErrors = _p31._0.saveErrors;
            var effects = _p31._1;
-           var success = A2(setSaved,_p29._0,_p36);
            return $Basics.not($Dict.isEmpty(saveErrors.errors.keyValues)) ? {ctor: "_Tuple2"
                                                                             ,_0: _U.update(newModel,{stage: Error})
                                                                             ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p36,_1: effects};
@@ -18437,6 +18349,110 @@ Elm.Systems.View.make = function (_elm) {
                                      ,toHtml: toHtml
                                      ,view: view
                                      ,getSystem: getSystem};
+};
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Launch = Elm.Systems.Launch || {};
+Elm.Systems.Launch.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Launch = _elm.Systems.Launch || {};
+   if (_elm.Systems.Launch.values) return _elm.Systems.Launch.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Redirect = Elm.Common.Redirect.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Jobs$Common = Elm.Jobs.Common.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
+   $Table = Elm.Table.make(_elm);
+   var _op = {};
+   var systemRow = F2(function (id,_p0) {
+      var _p1 = _p0;
+      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(id)]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(function (_) {    return _.hostname;}(_p1.machine))]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.type$)]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.env)]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.owner)]))]);
+   });
+   var Cancel = {ctor: "Cancel"};
+   var NoOp = {ctor: "NoOp"};
+   var Run = function (a) {    return {ctor: "Run",_0: a};};
+   var JobLaunched = function (a) {    return {ctor: "JobLaunched",_0: a};};
+   var update = F2(function (action,model) {
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "JobLaunched": return A4($Common$Redirect.successHandler,
+           _p2._0,
+           model,
+           function (res) {
+              return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+           },
+           NoOp);
+         case "SetupJob": return {ctor: "_Tuple2",_0: _U.update(model,{job: _p2._0}),_1: $Effects.none};
+         case "LoadPage": var newTable = A2($Table.update,_p2._0,model.table);
+           return {ctor: "_Tuple2",_0: _U.update(model,{table: newTable}),_1: $Effects.none};
+         case "Run": var runAll = $Effects.batch(A2($List.map,
+           function (id) {
+              return A3($Jobs$Common.runJob,id,_p2._0,JobLaunched);
+           },
+           A2($List.map,function (_p3) {    var _p4 = _p3;return _p4._0;},model.table.rows)));
+           return {ctor: "_Tuple2",_0: model,_1: runAll};
+         case "Cancel": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var LoadPage = function (a) {    return {ctor: "LoadPage",_0: a};};
+   var view = F2(function (address,model) {
+      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+                     _U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("panel panel-default")]),
+                     _U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("panel-body")]),
+                     _U.list([A2($Html.span,
+                     _U.list([]),
+                     _U.list([$Html.text("A ")
+                             ,A2($Html.strong,_U.list([]),_U.list([$Html.text(model.job)]))
+                             ,$Html.text(" operation ")
+                             ,$Html.text("will be performed on the following systems:")]))]))]))]))]))
+                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+                     _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),model.table))]))]))
+                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("btn-group col-md-offset-5 col-md-10")]),
+                     _U.list([A2($Html.button,
+                             _U.list([$Html$Attributes.$class("btn btn-danger btn-sm col-md-1 col-md-offset-1"),A2($Html$Events.onClick,address,Cancel)]),
+                             _U.list([$Html.text("Cancel")]))
+                             ,A2($Html.button,
+                             _U.list([$Html$Attributes.$class("btn btn-primary btn-sm col-md-1"),A2($Html$Events.onClick,address,Run(model.job))]),
+                             _U.list([$Html.text("Ok")]))]))]))]);
+   });
+   var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
+   var Model = F2(function (a,b) {    return {job: a,table: b};});
+   var init = function () {
+      var table = A5($Table.init,"launchListing",false,_U.list(["#","Hostname","Type","Env","Owner"]),systemRow,"Systems");
+      return {ctor: "_Tuple2",_0: A2(Model,"",table),_1: $Effects.none};
+   }();
+   return _elm.Systems.Launch.values = {_op: _op
+                                       ,Model: Model
+                                       ,SetupJob: SetupJob
+                                       ,LoadPage: LoadPage
+                                       ,JobLaunched: JobLaunched
+                                       ,Run: Run
+                                       ,NoOp: NoOp
+                                       ,Cancel: Cancel
+                                       ,systemRow: systemRow
+                                       ,init: init
+                                       ,update: update
+                                       ,view: view};
 };
 Elm.Nav = Elm.Nav || {};
 Elm.Nav.Side = Elm.Nav.Side || {};

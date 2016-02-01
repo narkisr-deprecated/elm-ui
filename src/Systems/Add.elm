@@ -22,7 +22,7 @@ import Systems.Add.Digital as Digital exposing (..)
 import Systems.Add.General as General exposing (..)
 import Common.Errors as Errors exposing (..)
 import Systems.Add.Encoders exposing (..)
-import Systems.Launch as Launch exposing (runJob, JobResponse)
+import Jobs.Common as Jobs exposing (runJob, JobResponse)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
@@ -234,13 +234,12 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
 
     Saved next result -> 
       let
-        success = (setSaved next model)
-        (({saveErrors} as newModel), effects) = errorsHandler result model NoOp
+        (({saveErrors} as newModel), effects) = successHandler result model (setSaved next model) NoOp
       in
-         if not (Dict.isEmpty saveErrors.errors.keyValues) then
-           ({newModel | stage = Error} , Effects.none)
-         else
-           (model, effects)
+       if not (Dict.isEmpty saveErrors.errors.keyValues) then
+          ({newModel | stage = Error} , Effects.none)
+       else
+          (model, effects)
 
     _ -> (model, Effects.none)
 

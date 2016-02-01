@@ -12,6 +12,7 @@ import Table exposing (view)
 import Bootstrap.Html exposing (..)
 import Debug
 import Systems.Model.Common exposing (System)
+import Jobs.Common exposing (runJob, JobResponse)
 
 import Set exposing (Set)
 -- Model 
@@ -116,19 +117,3 @@ view address model =
 
 -- Effects
 
-type alias JobResponse = 
-  { message : String , id : String , job : String } 
-
-jobResponse : Decoder JobResponse
-jobResponse = 
-  object3 JobResponse
-    ("message" := Json.string) 
-    ("id" := Json.string)
-    ("job" := Json.string)
-
-runJob : String -> String -> (Result Error JobResponse -> a) -> Effects a
-runJob id job action =
-  Http.post jobResponse ("/jobs/" ++  job ++ "/" ++ id) Http.empty
-    |> Task.toResult
-    |> Task.map action
-    |> Effects.task
