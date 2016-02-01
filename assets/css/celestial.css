@@ -39,6 +39,9 @@ div.progress-bar#processing {
   background-color: #e7e7e7;
 }
 
+#templateListing tr:hover {
+  background-color: #e7e7e7;
+}
 
 /* Json editor */
 div.jsoneditor-menu {
