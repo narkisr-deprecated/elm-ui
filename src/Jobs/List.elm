@@ -191,7 +191,11 @@ view address ({running, done, pager} as model) =
          (panelDefault_ (Table.view (Signal.forwardTo address LoadRunning) running))
      , accordionPanel (not (List.isEmpty done.rows)) "Done" 
          (div [] 
-           [ row_ [ (panelDefault_ (Table.view (Signal.forwardTo address LoadDone) done)) ]
+           [ row_ [
+               div [class "col-md-12"][
+                 (panelDefault_ (Table.view (Signal.forwardTo address LoadDone) done))
+               ]
+             ]
            , row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
            ]
          ) 

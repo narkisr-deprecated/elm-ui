@@ -18824,7 +18824,9 @@ Elm.Jobs.List.make = function (_elm) {
               "Done",
               A2($Html.div,
               _U.list([]),
-              _U.list([$Bootstrap$Html.row_(_U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadDone),_p18))]))
+              _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                      _U.list([$Html$Attributes.$class("col-md-12")]),
+                      _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadDone),_p18))]))]))
                       ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p17.pager)]))])))]))]);
    });
    var Polling = {ctor: "Polling"};
