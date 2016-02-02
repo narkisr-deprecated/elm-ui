@@ -18,7 +18,7 @@ type alias Model =
   , navChange : Maybe (Active, Section)
   }
 
-init : (Model , Effects Action)
+init : (Model, Effects Action)
 init =
   let
     (add, addEffects) = Add.init
@@ -85,7 +85,7 @@ update action ({launch, list} as model) =
         _ -> 
           let 
             (newLaunch, effects) = (Launch.update action model.launch)
-            newModel = { model | launch = newLaunch, navChange = Just (Templates, Launch) }
+            newModel = { model | launch = newLaunch }
           in
             (newModel , Effects.map TemplatesLaunch effects)
 

@@ -11,30 +11,38 @@ import Html.Events exposing (onClick)
 import Common.Components exposing (panelContents)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Systems.Add.Common exposing (..)
-
+import Admin.Core as Admin 
+import Environments.List exposing (Environments, Environment, getEnvironments)
 
 type alias Model = 
   {
     job : String 
   , template : Template
+  , admin : Admin.Model
   }
  
 init : (Model , Effects Action)
 init =
-  none (Model "" emptyTemplate)
+  let 
+    (admin, effects) = Admin.init
+  in 
+    (Model "" emptyTemplate admin,Effects.map AdminAction effects)
+
 
 -- Update 
 
 type Action = 
   SetupJob (String, String)
     | SetTemplate Template
-    | LaunchJob
+    | AdminAction Admin.Action 
+    | Launch
     | NameInput String
     | Cancel
     | NoOp
 
+
 update : Action ->  Model-> (Model , Effects Action)
-update action model =
+update action ({admin} as model) =
   case action of 
     SetupJob (job, _) ->
       none { model | job = job }
@@ -42,20 +50,25 @@ update action model =
     SetTemplate template -> 
       none { model | template = template } 
 
+    AdminAction action -> 
+     let
+       (newAdmin, effects) = Admin.update action admin
+     in  
+       ({ model | admin = newAdmin} , Effects.map AdminAction effects)
+
     _ -> 
       none model
 
 -- View
 
-launch address  {template} =
+launch address {template, admin} =
   panelContents "Launch from template" 
     (Html.form [] [
-       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-         group' "Instance name" (inputText address NameInput " "  template.name)
-       ]
-        
+       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+       (List.append
+         [ group' "Hostname" (inputText address NameInput " "  template.name) ]
+         (Admin.view (Signal.forwardTo address AdminAction) admin))
     ])
-
 
 currentView : Signal.Address Action -> Model -> List Html
 currentView address ({job} as model)=
@@ -71,7 +84,7 @@ buttons address model =
   in 
    [ 
       button [id "Cancel", class "btn btn-primary", margin, click Cancel] [text "Cancel"]
-    , button [id "Save", class "btn btn-primary", margin, click LaunchJob] [text "Ok"]
+    , button [id "Save", class "btn btn-primary", margin, click Launch] [text "Ok"]
    ]
  
 view :
@@ -85,4 +98,22 @@ view address ({template} as model) =
  , row_ (buttons address model)
  ]
 
+-- Effects
 
+-- type alias SaveResponse = 
+--   { message : String , id : Int } 
+--
+-- saveResponse : Decoder SaveResponse
+-- saveResponse = 
+--   object2 SaveResponse
+--     ("message" := string) 
+--     ("id" := int)
+--
+-- saveSystem : Action -> String -> Effects Action
+-- saveSystem next json  = 
+--   postJson (Http.string json) saveResponse "/systems"  
+--     |> Task.toResult
+--     |> Task.map (Saved next)
+--     |> Effects.task
+--
+--

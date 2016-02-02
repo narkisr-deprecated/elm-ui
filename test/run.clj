@@ -13,7 +13,7 @@
 (def c (chan (dropping-buffer 1) 
   (filter 
     (fn [{:keys [file]}] 
-      (or (.contains (.getPath file) "index.html") (.contains (.getPath file) "main.js"))))))
+      (first (filter identity (map #(.contains (.getPath file) %) ["index.html" "main.js" "add.clj"])))))))
 
 (defn run-facts [e] 
   (go (>! c e)))
@@ -21,7 +21,7 @@
 (watch-dir run-facts (clojure.java.io/file "."))
 
 (go-loop []
-   (let [x (<! (async/merge [(timeout 1000) c] ))]
+   (let [x (<! (async/merge [(timeout 1000) c] (dropping-buffer 1)))]
      (timbre/info x)
      (try 
       (timbre/info "Starting to run suite")
