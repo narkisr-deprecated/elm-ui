@@ -97,9 +97,9 @@ view address ({admin} as model) =
     (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        (List.append
+         (Admin.view (Signal.forwardTo address AdminAction) admin)
          [ group' "Type" (selector address SelectType model.types model.type')
          , group' "Hypervisor" (selector address SelectHypervisor model.hypervisors model.hypervisor)]
-          (Admin.view (Signal.forwardTo address AdminAction) admin)
          )
 
     ])

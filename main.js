@@ -17629,9 +17629,9 @@ Elm.Systems.Add.General.make = function (_elm) {
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       A2($List.append,
+      A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p3.admin),
       _U.list([A2($Systems$Add$Common.group$,"Type",A4($Systems$Add$Common.selector,address,SelectType,_p4.types,_p4.type$))
-              ,A2($Systems$Add$Common.group$,"Hypervisor",A4($Systems$Add$Common.selector,address,SelectHypervisor,_p4.hypervisors,_p4.hypervisor))]),
-      A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p3.admin)))])));
+              ,A2($Systems$Add$Common.group$,"Hypervisor",A4($Systems$Add$Common.selector,address,SelectHypervisor,_p4.hypervisors,_p4.hypervisor))])))])));
    });
    var NoOp = {ctor: "NoOp"};
    var update = F2(function (action,_p5) {
