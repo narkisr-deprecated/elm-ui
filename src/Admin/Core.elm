@@ -15,13 +15,14 @@ type alias Model =
   {
     environments : List String
   , environment : String
+  , rawEnvironments : Environments
   , owners : List String
   , owner : String
   }
  
 init : (Model , Effects Action)
 init =
-  (Model [] "" [] "", batch [getUsers SetOwners,  getEnvironments SetEnvironments])
+  (Model [] "" Dict.empty [] "", batch [getUsers SetOwners,  getEnvironments SetEnvironments])
 
 -- Update 
 
@@ -45,7 +46,7 @@ setEnvironments model es =
   let 
     environment = (Maybe.withDefault "" (List.head (Dict.keys es)))
   in 
-    none {model | environments = Dict.keys es, environment = environment}
+    none {model | environments = Dict.keys es, environment = environment, rawEnvironments = es}
 
 
 

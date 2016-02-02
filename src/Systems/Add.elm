@@ -125,8 +125,8 @@ machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalMod
 intoSystem : Model -> System
 intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, stage} as model) = 
   let
-    {owner, type', environment} =  general
-    baseSystem = System owner environment type' (machineFrom (toString stage) model)
+    {admin, type'} =  general
+    baseSystem = System admin.owner admin.environment type' (machineFrom (toString stage) model)
   in 
     baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical)
   
@@ -135,7 +135,8 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
   case action of
     Next -> 
       let 
-        current = withDefault Dict.empty (Dict.get general.environment general.rawEnvironments)
+        {admin} = general
+        current = withDefault Dict.empty (Dict.get admin.environment admin.rawEnvironments)
       in
         case general.hypervisor of
           "aws" -> 

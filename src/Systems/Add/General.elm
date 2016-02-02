@@ -22,34 +22,29 @@ import Debug
 -- Model
 
 type alias Model = 
-  { owners : List String
-  , owner : String
+  { 
+    type' : String
   , types : List String
-  , type' : String
-  , environments : List String
-  , environment : String 
-  , hypervisors : List String
   , hypervisor : String
-  , rawEnvironments : Environments
+  , hypervisors : List String
+  , admin : Admin.Model
   }
 
 type Action = 
   NoOp
-  | SetOwners (Result Http.Error (List User))
-  | SelectOwner String
+  | AdminAction Admin.Action 
   | SetTypes (Result Http.Error (List Type))
   | SelectType String
-  | SetEnvironments (Result Http.Error Environments)
-  | SelectEnvironment String
   | SelectHypervisor String
 
 
 init : (Model , Effects Action)
 init =
   let
-    loadEffects = [getUsers SetOwners, getTypes SetTypes, getEnvironments SetEnvironments]
+    (admin, effects) = Admin.init
+    loadEffects = [getTypes SetTypes, (Effects.map AdminAction effects)]
   in
-   (Model [] "" [] "" [] "" [] "" Dict.empty, batch loadEffects)
+   (Model "" [] "" [] admin, batch loadEffects)
 
 -- Update
 
@@ -61,20 +56,9 @@ updateHypervisors model es environment =
   in 
     {model | hypervisors = hypervisors, hypervisor = hypervisor}
 
-setEnvironments : Model -> Environments -> (Model, Effects Action)
-setEnvironments model es =
-  let 
-    environment = (Maybe.withDefault "" (List.head (Dict.keys es)))
-    withEnvironment = {model | environments = Dict.keys es, environment = environment, rawEnvironments = es}
-    updated = (updateHypervisors withEnvironment es environment)
-  in 
-    (updated, Effects.none)
-
-
 withoutEffects : (a , Effects action) -> a 
 withoutEffects (model,_) =
   model
- 
 
 setTypes : Model -> List Type -> (Model, Effects Action)
 setTypes model types =
@@ -84,28 +68,14 @@ setTypes model types =
   in
     ({model | types = typesList , type' = firstType}, Effects.none)
 
-setOwners : Model -> List User -> (Model, Effects Action)
-setOwners model owners =
-  let
-    users = List.map .username owners
-    user = Maybe.withDefault "" (List.head users)
-  in
-  ({model | owners = users, owner = user}, Effects.none)
-
 update : Action ->  Model-> Model
-update action model =
+update action ({admin} as model) =
   case action of
-    SetOwners result ->
-      withoutEffects (successHandler result model (setOwners model) NoOp)
-
-    SelectOwner owner -> 
-      {model | owner = owner}
-
-    SetEnvironments result ->
-       withoutEffects (successHandler result model (setEnvironments model) NoOp)
-
-    SelectEnvironment environment -> 
-      updateHypervisors {model | environment = environment} model.rawEnvironments environment
+    AdminAction action -> 
+      let
+        (newAdmin, _) = Admin.update action admin
+      in  
+        (updateHypervisors { model | admin = newAdmin} newAdmin.rawEnvironments newAdmin.environment)
 
     SelectHypervisor hypervisor -> 
       {model | hypervisor = hypervisor}
@@ -122,14 +92,16 @@ update action model =
 -- View
 
 view : Signal.Address Action -> Model -> List Html
-view address model =
+view address ({admin} as model) =
   panelContents "General Information" 
     (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       [ group' "Owner" (selector address SelectOwner model.owners model.owner)
-       , group' "Type" (selector address SelectType model.types model.type')
-       , group' "Environment" (selector address SelectEnvironment model.environments model.environment)
-       , group' "Hypervisor" (selector address SelectHypervisor model.hypervisors model.hypervisor)]
+       (List.append
+         [ group' "Type" (selector address SelectType model.types model.type')
+         , group' "Hypervisor" (selector address SelectHypervisor model.hypervisors model.hypervisor)]
+          (Admin.view (Signal.forwardTo address AdminAction) admin)
+         )
+
     ])
 
 
