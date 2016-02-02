@@ -19,6 +19,8 @@ httpJson verb body decoder url  =
     Http.fromJson decoder (Http.send Http.defaultSettings request)
 
 
+delete = httpJson "DELETE" Http.empty
+
 getJson = httpJson "GET" Http.empty
 
 postJson = httpJson "POST"
