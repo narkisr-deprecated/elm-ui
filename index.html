@@ -116,8 +116,10 @@
 
   templateAction = function (e) {
     return function(key, opt){
-      templateName = $(this).context.cells[0].innerText;
-      main.ports.menuPort.send(["Templates",e,templateName]); 
+      templateName = $(this).context.cells[0].innerHTML;
+	if (templateName !== undefined) {
+	  main.ports.menuPort.send(["Templates",e, templateName]); 
+	}
     }
   }
 
