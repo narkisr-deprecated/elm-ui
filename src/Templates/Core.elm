@@ -7,7 +7,7 @@ import Html exposing (..)
 import Templates.Add as Add
 import Templates.List as List
 import Templates.Launch as Launch
-import Nav.Side as NavSide exposing (Active(Templates), Section(Stats, Launch, Add, List, View))
+import Nav.Side as NavSide exposing (Active(Templates), Section(Add, Launch, List))
 import Systems.Model.Common exposing (System)
 
 type alias Model = 
@@ -71,23 +71,20 @@ update action ({launch, list} as model) =
 
     TemplatesLaunch action -> 
       case action of 
-        Launch.SetupJob (job, name) -> 
-          let
-            template = List.findTemplate list name
-            (newLaunch,effects) = Launch.update (Launch.SetTemplate template) launch
-            newModel = { model | launch = newLaunch, navChange = Just (Templates, Launch) }
-          in
-            (newModel , Effects.map TemplatesLaunch effects)
-
         Launch.Cancel -> 
           none { model | navChange = Just (Templates, List)}
 
+        Launch.SetupJob (_,_) -> 
+          let 
+            (newLaunch, effects) = (Launch.update action model.launch)
+          in
+
+          ({ model | launch = newLaunch, navChange = Just (Templates, Launch) }, Effects.map TemplatesLaunch effects)
         _ -> 
           let 
             (newLaunch, effects) = (Launch.update action model.launch)
-            newModel = { model | launch = newLaunch }
           in
-            (newModel , Effects.map TemplatesLaunch effects)
+            ({ model | launch = newLaunch } , Effects.map TemplatesLaunch effects)
 
 
     _ -> 
@@ -107,7 +104,6 @@ view address {add, list, launch} section =
 
     Launch ->
       Launch.view (Signal.forwardTo address TemplatesLaunch) launch
-
 
     _ -> 
      [div  [] [text "not implemented"]]
