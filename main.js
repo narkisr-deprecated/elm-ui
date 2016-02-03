@@ -15282,14 +15282,32 @@ Elm.Common.Components.make = function (_elm) {
    if (_elm.Common.Components.values) return _elm.Common.Components.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var dialogPanel = F5(function (address,message,body,cancel,ok) {
+      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+                     _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("callout callout-danger")]),message)]))]))
+                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),_U.list([body]))]))
+                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("text-center")]),
+                     _U.list([A2($Html.div,
+                     _U.list([$Html$Attributes.$class("btn-group col-md-offset-5 col-md-10")]),
+                     _U.list([A2($Html.button,
+                             _U.list([$Html$Attributes.$class("btn btn-danger btn-sm col-md-1 col-md-offset-1"),A2($Html$Events.onClick,address,cancel)]),
+                             _U.list([$Html.text("Cancel")]))
+                             ,A2($Html.button,
+                             _U.list([$Html$Attributes.$class("btn btn-primary btn-sm col-md-1"),A2($Html$Events.onClick,address,ok)]),
+                             _U.list([$Html.text("Ok")]))]))]))]))]);
+   });
    var panelContents = F2(function (title,body) {
       var height = "550px";
       return _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("panel-heading")]),_U.list([$Html.text(title)]))
@@ -15301,7 +15319,7 @@ Elm.Common.Components.make = function (_elm) {
                                                              ,{ctor: "_Tuple2",_0: "height",_1: height}]))]),
                      _U.list([body]))]);
    });
-   return _elm.Common.Components.values = {_op: _op,panelContents: panelContents};
+   return _elm.Common.Components.values = {_op: _op,panelContents: panelContents,dialogPanel: dialogPanel};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};
@@ -18415,12 +18433,11 @@ Elm.Systems.Launch.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
    $Http = Elm.Http.make(_elm),
    $Jobs$Common = Elm.Jobs.Common.make(_elm),
    $List = Elm.List.make(_elm),
@@ -18430,6 +18447,15 @@ Elm.Systems.Launch.make = function (_elm) {
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Table = Elm.Table.make(_elm);
    var _op = {};
+   var message = function (job) {
+      return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Notice!")]))
+                     ,A2($Html.span,
+                     _U.list([]),
+                     _U.list([$Html.text("A ")
+                             ,A2($Html.strong,_U.list([]),_U.list([$Html.text(job)]))
+                             ,$Html.text(" operation ")
+                             ,$Html.text("will be performed on the following systems:")]))]);
+   };
    var systemRow = F2(function (id,_p0) {
       var _p1 = _p0;
       return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(id)]))
@@ -18465,30 +18491,11 @@ Elm.Systems.Launch.make = function (_elm) {
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
    var LoadPage = function (a) {    return {ctor: "LoadPage",_0: a};};
-   var view = F2(function (address,model) {
-      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-                     _U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("panel panel-default")]),
-                     _U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("panel-body")]),
-                     _U.list([A2($Html.span,
-                     _U.list([]),
-                     _U.list([$Html.text("A ")
-                             ,A2($Html.strong,_U.list([]),_U.list([$Html.text(model.job)]))
-                             ,$Html.text(" operation ")
-                             ,$Html.text("will be performed on the following systems:")]))]))]))]))]))
-                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-                     _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),model.table))]))]))
-                     ,$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("btn-group col-md-offset-5 col-md-10")]),
-                     _U.list([A2($Html.button,
-                             _U.list([$Html$Attributes.$class("btn btn-danger btn-sm col-md-1 col-md-offset-1"),A2($Html$Events.onClick,address,Cancel)]),
-                             _U.list([$Html.text("Cancel")]))
-                             ,A2($Html.button,
-                             _U.list([$Html$Attributes.$class("btn btn-primary btn-sm col-md-1"),A2($Html$Events.onClick,address,Run(model.job))]),
-                             _U.list([$Html.text("Ok")]))]))]))]);
+   var view = F2(function (address,_p5) {
+      var _p6 = _p5;
+      var _p7 = _p6.job;
+      var systemsTable = $Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p6.table));
+      return A5($Common$Components.dialogPanel,address,message(_p7),systemsTable,Cancel,Run(_p7));
    });
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
    var Model = F2(function (a,b) {    return {job: a,table: b};});
@@ -18507,6 +18514,7 @@ Elm.Systems.Launch.make = function (_elm) {
                                        ,systemRow: systemRow
                                        ,init: init
                                        ,update: update
+                                       ,message: message
                                        ,view: view};
 };
 Elm.Nav = Elm.Nav || {};
@@ -23552,15 +23560,14 @@ Elm.Templates.Launch.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Admin$Core = Elm.Admin.Core.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
    $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
@@ -23578,31 +23585,27 @@ Elm.Templates.Launch.make = function (_elm) {
    A2($Json$Decode._op[":="],"id",$Json$Decode.$int));
    var DeleteResponse = function (a) {    return {message: a};};
    var deleteResponse = A2($Json$Decode.object1,DeleteResponse,A2($Json$Decode._op[":="],"message",$Json$Decode.string));
-   var deleteView = F2(function (address,_p0) {
-      var _p1 = _p0;
-      return A2($Common$Components.panelContents,
-      "Delete template",
-      A2($Html.form,
-      _U.list([]),
-      _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A2($Html.p,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],"You are about to delete ",A2($Basics._op["++"],_p1.name,"!")))]))]))])));
-   });
+   var errorMessage = function (fail) {
+      return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Notice!")])),A2($Html.span,_U.list([]),_U.list([$Html.text(fail)]))]);
+   };
+   var deleteMessage = function (name) {
+      return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Notice!")]))
+                     ,A2($Html.span,
+                     _U.list([]),
+                     _U.list([$Html.text("Template"),A2($Html.strong,_U.list([]),_U.list([$Html.text(name)])),$Html.text(" will be deleted! ")]))]);
+   };
    var NoOp = {ctor: "NoOp"};
    var Cancel = {ctor: "Cancel"};
    var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
    var Delete = {ctor: "Delete"};
-   var Launch = {ctor: "Launch"};
-   var buttons = F2(function (address,model) {
-      var click = $Html$Events.onClick(address);
-      var margin = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "30%"}]));
-      return _U.list([A2($Html.button,
-                     _U.list([$Html$Attributes.id("Cancel"),$Html$Attributes.$class("btn btn-primary"),margin,click(Cancel)]),
-                     _U.list([$Html.text("Cancel")]))
-                     ,A2($Html.button,
-                     _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),margin,click(Launch)]),
-                     _U.list([$Html.text("Ok")]))]);
+   var deleteView = F2(function (address,_p0) {
+      var _p1 = _p0;
+      return A5($Common$Components.dialogPanel,address,deleteMessage(_p1.name),A2($Html.div,_U.list([]),_U.list([])),Cancel,Delete);
    });
+   var errorView = F2(function (address,message) {
+      return A5($Common$Components.dialogPanel,address,errorMessage(message),A2($Html.div,_U.list([]),_U.list([])),Cancel,Delete);
+   });
+   var Launch = {ctor: "Launch"};
    var AdminAction = function (a) {    return {ctor: "AdminAction",_0: a};};
    var launchView = F2(function (address,_p2) {
       var _p3 = _p2;
@@ -23619,18 +23622,13 @@ Elm.Templates.Launch.make = function (_elm) {
    var currentView = F2(function (address,_p4) {
       var _p5 = _p4;
       var _p7 = _p5;
-      var _p6 = _p5.job;
-      switch (_p6)
-      {case "launch": return A2(launchView,address,_p7);
-         case "clear": return A2(deleteView,address,_p7);
-         default: return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);}
+      var _p6 = _p5.state;
+      switch (_p6.ctor)
+      {case "Launching": return A2(launchView,address,_p7);
+         case "Deleting": return A2(deleteView,address,_p7);
+         default: return A2(errorView,address,_p6._0);}
    });
-   var view = F2(function (address,model) {
-      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
-                     _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("panel panel-default")]),A2(currentView,address,model))]))]))
-                     ,$Bootstrap$Html.row_(A2(buttons,address,model))]);
-   });
+   var view = F2(function (address,model) {    return _U.list([A2($Html.div,_U.list([]),A2(currentView,address,model))]);});
    var Saved = function (a) {    return {ctor: "Saved",_0: a};};
    var intoSystem = F2(function (json,name) {
       return $Effects.task(A2($Task.map,
@@ -23641,41 +23639,59 @@ Elm.Templates.Launch.make = function (_elm) {
    var deleteTemplate = function (name) {
       return $Effects.task(A2($Task.map,Deleted,$Task.toResult(A2($Common$Http.$delete,deleteResponse,A2($Basics._op["++"],"/templates/",name)))));
    };
-   var update = F2(function (action,_p8) {
-      var _p9 = _p8;
-      var _p13 = _p9;
-      var _p10 = action;
-      _v5_3: do {
-         switch (_p10.ctor)
-         {case "SetupJob": if (_p10._0.ctor === "_Tuple2") {
-                    return $Common$Utils.none(_U.update(_p13,{job: _p10._0._0,name: _p10._0._1}));
-                 } else {
-                    break _v5_3;
-                 }
-            case "AdminAction": var _p11 = A2($Admin$Core.update,_p10._0,_p9.admin);
-              var newAdmin = _p11._0;
-              var effects = _p11._1;
-              return {ctor: "_Tuple2",_0: _U.update(_p13,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
-            case "Launch": var _p12 = _p9.job;
-              switch (_p12)
-              {case "clear": return {ctor: "_Tuple2",_0: _p13,_1: deleteTemplate(_p9.name)};
-                 case "launch": return $Common$Utils.none(_p13);
-                 default: return $Common$Utils.none(_p13);}
-            default: break _v5_3;}
-      } while (false);
-      return $Common$Utils.none(_p13);
-   });
    var SetTemplate = function (a) {    return {ctor: "SetTemplate",_0: a};};
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
-   var Model = F3(function (a,b,c) {    return {job: a,name: b,admin: c};});
+   var Deleting = {ctor: "Deleting"};
+   var Launching = {ctor: "Launching"};
+   var Errored = function (a) {    return {ctor: "Errored",_0: a};};
+   var toState = function (job) {
+      var _p8 = job;
+      switch (_p8)
+      {case "clear": return Deleting;
+         case "launch": return Launching;
+         default: return Errored("no state");}
+   };
+   var update = F2(function (action,_p9) {
+      var _p10 = _p9;
+      var _p15 = _p10;
+      var _p11 = action;
+      _v6_5: do {
+         switch (_p11.ctor)
+         {case "SetupJob": if (_p11._0.ctor === "_Tuple2") {
+                    var _p12 = _p11._0._0;
+                    return $Common$Utils.none(_U.update(_p15,{job: _p12,name: _p11._0._1,state: toState(_p12)}));
+                 } else {
+                    break _v6_5;
+                 }
+            case "AdminAction": var _p13 = A2($Admin$Core.update,_p11._0,_p10.admin);
+              var newAdmin = _p13._0;
+              var effects = _p13._1;
+              return {ctor: "_Tuple2",_0: _U.update(_p15,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
+            case "Deleted": return A4($Common$Redirect.failHandler,
+              _p11._0,
+              _p15,
+              function (_p14) {
+                 return $Common$Utils.none(_U.update(_p15,{state: Errored("Failed to delete template")}));
+              },
+              NoOp);
+            case "Delete": return {ctor: "_Tuple2",_0: _p15,_1: deleteTemplate(_p10.name)};
+            case "Launch": return $Common$Utils.none(_p15);
+            default: break _v6_5;}
+      } while (false);
+      return $Common$Utils.none(_p15);
+   });
+   var Model = F4(function (a,b,c,d) {    return {job: a,name: b,admin: c,state: d};});
    var init = function () {
-      var _p14 = $Admin$Core.init;
-      var admin = _p14._0;
-      var effects = _p14._1;
-      return {ctor: "_Tuple2",_0: A3(Model,"","",admin),_1: A2($Effects.map,AdminAction,effects)};
+      var _p16 = $Admin$Core.init;
+      var admin = _p16._0;
+      var effects = _p16._1;
+      return {ctor: "_Tuple2",_0: A4(Model,"","",admin,Launching),_1: A2($Effects.map,AdminAction,effects)};
    }();
    return _elm.Templates.Launch.values = {_op: _op
                                          ,Model: Model
+                                         ,Errored: Errored
+                                         ,Launching: Launching
+                                         ,Deleting: Deleting
                                          ,init: init
                                          ,SetupJob: SetupJob
                                          ,SetTemplate: SetTemplate
@@ -23687,11 +23703,14 @@ Elm.Templates.Launch.make = function (_elm) {
                                          ,NameInput: NameInput
                                          ,Cancel: Cancel
                                          ,NoOp: NoOp
+                                         ,toState: toState
                                          ,update: update
                                          ,launchView: launchView
+                                         ,deleteMessage: deleteMessage
                                          ,deleteView: deleteView
+                                         ,errorMessage: errorMessage
+                                         ,errorView: errorView
                                          ,currentView: currentView
-                                         ,buttons: buttons
                                          ,view: view
                                          ,DeleteResponse: DeleteResponse
                                          ,deleteResponse: deleteResponse
@@ -23722,81 +23741,109 @@ Elm.Templates.Core.make = function (_elm) {
    $Templates$Launch = Elm.Templates.Launch.make(_elm),
    $Templates$List = Elm.Templates.List.make(_elm);
    var _op = {};
+   var navigate = F2(function (action,_p0) {
+      var _p1 = _p0;
+      var _p7 = _p1;
+      var _p6 = _p1._0;
+      var _p5 = _p1._1;
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "TemplatesAdd": var _p3 = _p2._0;
+           switch (_p3.ctor)
+           {case "Saved": return {ctor: "_Tuple2"
+                                 ,_0: _U.update(_p6,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                 ,_1: _p5};
+              case "Cancel": return {ctor: "_Tuple2"
+                                    ,_0: _U.update(_p6,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                    ,_1: _p5};
+              default: return _p7;}
+         case "TemplatesLaunch": var _p4 = _p2._0;
+           _v3_3: do {
+              switch (_p4.ctor)
+              {case "Cancel": return {ctor: "_Tuple2"
+                                     ,_0: _U.update(_p6,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                     ,_1: _p5};
+                 case "Deleted": return !_U.eq(_p1._0.launch.state,$Templates$Launch.Errored("Failed to delete template")) ? {ctor: "_Tuple2"
+                                                                                                                             ,_0: _U.update(_p6,
+                                                                                                                             {navChange: $Maybe.Just({ctor: "_Tuple2"
+                                                                                                                                                     ,_0: $Nav$Side.Templates
+                                                                                                                                                     ,_1: $Nav$Side.List})})
+                                                                                                                             ,_1: _p5} : _p7;
+                 case "SetupJob": if (_p4._0.ctor === "_Tuple2") {
+                         return {ctor: "_Tuple2"
+                                ,_0: _U.update(_p6,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Launch})})
+                                ,_1: _p5};
+                      } else {
+                         break _v3_3;
+                      }
+                 default: break _v3_3;}
+           } while (false);
+           return _p7;
+         default: return _p7;}
+   });
    var NoOp = {ctor: "NoOp"};
    var TemplatesLaunch = function (a) {    return {ctor: "TemplatesLaunch",_0: a};};
    var TemplatesList = function (a) {    return {ctor: "TemplatesList",_0: a};};
    var TemplatesAdd = function (a) {    return {ctor: "TemplatesAdd",_0: a};};
-   var update = F2(function (action,_p0) {
-      var _p1 = _p0;
-      var _p13 = _p1;
-      var _p2 = action;
-      switch (_p2.ctor)
-      {case "TemplatesAdd": var _p7 = _p2._0;
-           var _p3 = _p7;
-           switch (_p3.ctor)
-           {case "Saved": var _p4 = $Templates$List.init;
-                var newList = _p4._0;
-                var listEffects = _p4._1;
-                var _p5 = A2($Templates$Add.update,_p7,_p13.add);
-                var newAdd = _p5._0;
-                var addEffects = _p5._1;
-                var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
-                return {ctor: "_Tuple2"
-                       ,_0: _U.update(_p13,{add: newAdd,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                       ,_1: $Effects.batch(effects)};
-              case "Cancel": return $Common$Utils.none(_U.update(_p13,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}));
-              default: var _p6 = A2($Templates$Add.update,_p7,_p13.add);
-                var newAdd = _p6._0;
-                var effects = _p6._1;
-                return {ctor: "_Tuple2",_0: _U.update(_p13,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};}
-         case "TemplatesList": var _p8 = A2($Templates$List.update,_p2._0,_p13.list);
-           var newList = _p8._0;
-           var effects = _p8._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p13,{list: newList}),_1: A2($Effects.map,TemplatesList,effects)};
-         case "TemplatesLaunch": var _p12 = _p2._0;
-           var _p9 = _p12;
-           _v3_2: do {
-              switch (_p9.ctor)
-              {case "Cancel": return $Common$Utils.none(_U.update(_p13,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}));
-                 case "SetupJob": if (_p9._0.ctor === "_Tuple2") {
-                         var _p10 = A2($Templates$Launch.update,_p12,_p13.launch);
-                         var newLaunch = _p10._0;
-                         var effects = _p10._1;
-                         return {ctor: "_Tuple2"
-                                ,_0: _U.update(_p13,{launch: newLaunch,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Launch})})
-                                ,_1: A2($Effects.map,TemplatesLaunch,effects)};
-                      } else {
-                         break _v3_2;
-                      }
-                 default: break _v3_2;}
-           } while (false);
-           var _p11 = A2($Templates$Launch.update,_p12,_p13.launch);
-           var newLaunch = _p11._0;
-           var effects = _p11._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p13,{launch: newLaunch}),_1: A2($Effects.map,TemplatesLaunch,effects)};
-         default: return $Common$Utils.none(_p13);}
+   var route = F2(function (action,_p8) {
+      var _p9 = _p8;
+      var _p20 = _p9;
+      var _p19 = _p9.add;
+      var _p10 = action;
+      switch (_p10.ctor)
+      {case "TemplatesAdd": var _p15 = _p10._0;
+           var _p11 = _p15;
+           if (_p11.ctor === "Saved") {
+                 var _p12 = $Templates$List.init;
+                 var newList = _p12._0;
+                 var listEffects = _p12._1;
+                 var _p13 = A2($Templates$Add.update,_p15,_p19);
+                 var newAdd = _p13._0;
+                 var addEffects = _p13._1;
+                 var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects),A2($Effects.map,TemplatesList,listEffects)]);
+                 return {ctor: "_Tuple2",_0: _U.update(_p20,{add: newAdd}),_1: $Effects.batch(effects)};
+              } else {
+                 var _p14 = A2($Templates$Add.update,_p15,_p19);
+                 var newAdd = _p14._0;
+                 var effects = _p14._1;
+                 return {ctor: "_Tuple2",_0: _U.update(_p20,{add: newAdd}),_1: A2($Effects.map,TemplatesAdd,effects)};
+              }
+         case "TemplatesList": var _p16 = A2($Templates$List.update,_p10._0,_p9.list);
+           var newList = _p16._0;
+           var effects = _p16._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p20,{list: newList}),_1: A2($Effects.map,TemplatesList,effects)};
+         case "TemplatesLaunch": var _p17 = $Templates$List.init;
+           var newList = _p17._0;
+           var listEffects = _p17._1;
+           var _p18 = A2($Templates$Launch.update,_p10._0,_p9.launch);
+           var newLaunch = _p18._0;
+           var launchEffects = _p18._1;
+           var effects = _U.list([A2($Effects.map,TemplatesLaunch,launchEffects),A2($Effects.map,TemplatesList,listEffects)]);
+           return {ctor: "_Tuple2",_0: _U.update(_p20,{launch: newLaunch}),_1: $Effects.batch(effects)};
+         default: return $Common$Utils.none(_p20);}
    });
+   var update = F2(function (action,_p21) {    var _p22 = _p21;return A2(navigate,action,A2(route,action,_p22));});
    var add = F2(function (hyp,system) {    return TemplatesAdd(A2($Templates$Add.SetSystem,hyp,system));});
-   var view = F3(function (address,_p14,section) {
-      var _p15 = _p14;
-      var _p16 = section;
-      switch (_p16.ctor)
-      {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p15.add);
-         case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p15.list);
-         case "Launch": return A2($Templates$Launch.view,A2($Signal.forwardTo,address,TemplatesLaunch),_p15.launch);
+   var view = F3(function (address,_p23,section) {
+      var _p24 = _p23;
+      var _p25 = section;
+      switch (_p25.ctor)
+      {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p24.add);
+         case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p24.list);
+         case "Launch": return A2($Templates$Launch.view,A2($Signal.forwardTo,address,TemplatesLaunch),_p24.launch);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
    var Model = F4(function (a,b,c,d) {    return {add: a,list: b,launch: c,navChange: d};});
    var init = function () {
-      var _p17 = $Templates$Launch.init;
-      var launch = _p17._0;
-      var launchEffects = _p17._1;
-      var _p18 = $Templates$List.init;
-      var list = _p18._0;
-      var listEffects = _p18._1;
-      var _p19 = $Templates$Add.init;
-      var add = _p19._0;
-      var addEffects = _p19._1;
+      var _p26 = $Templates$Launch.init;
+      var launch = _p26._0;
+      var launchEffects = _p26._1;
+      var _p27 = $Templates$List.init;
+      var list = _p27._0;
+      var listEffects = _p27._1;
+      var _p28 = $Templates$Add.init;
+      var add = _p28._0;
+      var addEffects = _p28._1;
       var effects = _U.list([A2($Effects.map,TemplatesAdd,addEffects)
                             ,A2($Effects.map,TemplatesList,listEffects)
                             ,A2($Effects.map,TemplatesLaunch,launchEffects)]);
@@ -23809,6 +23856,8 @@ Elm.Templates.Core.make = function (_elm) {
                                        ,TemplatesList: TemplatesList
                                        ,TemplatesLaunch: TemplatesLaunch
                                        ,NoOp: NoOp
+                                       ,navigate: navigate
+                                       ,route: route
                                        ,update: update
                                        ,add: add
                                        ,view: view};

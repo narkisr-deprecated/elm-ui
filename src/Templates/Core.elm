@@ -38,57 +38,88 @@ type Action =
     | TemplatesLaunch Launch.Action
     | NoOp
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({launch, list} as model) =
+navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
+navigate action ((({launch} as model), effects) as result) =
+  case action of 
+    TemplatesAdd add -> 
+      case add of 
+        Add.Saved _ -> 
+          ({ model | navChange = Just (Templates, List) }, effects)
+
+        Add.Cancel -> 
+          ({ model | navChange = Just (Templates, List)}, effects)
+
+        _ -> 
+          result
+
+    TemplatesLaunch launchAction -> 
+       case launchAction of
+         Launch.Cancel -> 
+          ({ model | navChange = Just (Templates, List)}, effects)
+
+         Launch.Deleted _ -> 
+           if launch.state /= (Launch.Errored "Failed to delete template") then
+             ({ model | navChange = Just (Templates, List)}, effects)
+           else
+             result
+
+         Launch.SetupJob (_,_) -> 
+          ({ model | navChange = Just (Templates, Launch) }, effects)
+          
+         _ -> 
+           result
+
+    _ -> 
+      result
+
+
+
+route : Action ->  Model -> (Model , Effects Action)
+route action ({add, launch, list} as model) =
   case action of 
     TemplatesAdd action -> 
       case action of 
         Add.Saved _ -> 
           let 
-           (newAdd, addEffects) = (Add.update action model.add)
+           (newAdd, addEffects) = (Add.update action add)
            (newList, listEffects) = List.init
            effects = [
              Effects.map TemplatesAdd addEffects
            , Effects.map TemplatesList listEffects
            ]
           in
-            ({ model | add = newAdd, navChange = Just (Templates, List)},Effects.batch effects )
-
-        Add.Cancel -> 
-          none { model | navChange = Just (Templates, List)}
+           ({ model | add = newAdd},Effects.batch effects )
 
         _ -> 
          let 
-          (newAdd, effects) = (Add.update action model.add)
+          (newAdd, effects) = (Add.update action add)
          in
           ({ model | add = newAdd }, Effects.map TemplatesAdd effects)
 
     TemplatesList action -> 
       let 
-        (newList, effects) = (List.update action model.list)
+        (newList, effects) = (List.update action list)
       in
        ({ model | list = newList }, Effects.map TemplatesList effects)
 
     TemplatesLaunch action -> 
-      case action of 
-        Launch.Cancel -> 
-          none { model | navChange = Just (Templates, List)}
-
-        Launch.SetupJob (_,_) -> 
-          let 
-            (newLaunch, effects) = (Launch.update action model.launch)
-          in
-
-          ({ model | launch = newLaunch, navChange = Just (Templates, Launch) }, Effects.map TemplatesLaunch effects)
-        _ -> 
-          let 
-            (newLaunch, effects) = (Launch.update action model.launch)
-          in
-            ({ model | launch = newLaunch } , Effects.map TemplatesLaunch effects)
-
+      let 
+         (newLaunch, launchEffects) = (Launch.update action launch)
+         (newList, listEffects) = List.init
+         effects = [
+           Effects.map TemplatesLaunch launchEffects
+         , Effects.map TemplatesList listEffects
+         ]
+      in
+         ({ model | launch = newLaunch } , Effects.batch effects )
 
     _ -> 
       none model
+
+
+update : Action ->  Model -> (Model , Effects Action)
+update action ({add, launch, list} as model) =
+   navigate action (route action model)
 
 add hyp system = 
   TemplatesAdd (Add.SetSystem hyp system)
