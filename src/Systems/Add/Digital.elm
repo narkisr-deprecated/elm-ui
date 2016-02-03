@@ -36,7 +36,7 @@ init =
   let 
     steps = [ Instance, Summary ]
   in 
-  (Model Zero [] steps (emptyDigital) (emptyMachine) Dict.empty Dict.empty, Effects.none)
+  (Model Zero [] steps emptyDigital emptyMachine Dict.empty Dict.empty, Effects.none)
 
 type Action = 
   Next 
@@ -129,7 +129,6 @@ update action ({next, prev, step, digital, machine} as model) =
         |> setMachine (\machine -> {machine | user = user })
         |> validate step "User" stringValidations
         
-
     HostnameInput host -> 
       model 
         |> setMachine (\machine -> {machine | hostname = host })
