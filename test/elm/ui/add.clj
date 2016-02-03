@@ -116,8 +116,7 @@
       (input-text (find-element-under "div#Networks" {:tag :input}) "net04")
       (click-next)
       ; skipping volumes
-      (click-next) 
-      ))
+      (click-next)))
 
 (defn openstack-partial-template []
    (set-driver!  {:browser :firefox})
@@ -131,8 +130,7 @@
       (click-next)
       ; skipping volumes
       (click-next) 
-      (save "Template")
-      ))
+      (save "Template")))
 
 (defn openstack-flow []
    (add "openstack" "redis")
@@ -162,7 +160,17 @@
     (save) (search (str "hostname=" hostname))
      hostname
    ))
-  
+
+(defn digital-partial-save []
+   (set-driver!  {:browser :firefox})
+   (login)    
+   (add "digital-ocean" "redis")
+   (let [hostname (uuid)] 
+      (input-text (find-element-under "div#User" {:tag :input}) "Foo")
+      (input-text (find-element-under "div#Hostname" {:tag :input}) "Bar")
+      (input-text (find-element-under "div#Domain" {:tag :input}) "local")
+      (click-next)))
+
 #_(with-driver- (create-phantom)
   (login)    
   (fact "Adding gce system" :gce 
@@ -173,5 +181,6 @@
     (let [hostname (openstack-flow)] 
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
- (openstack-partial-template)
+(digital-partial-save)
+;; (openstack-partial-template)
 ;; (openstack-partial-save)
