@@ -13,6 +13,7 @@ import Bootstrap.Html exposing (..)
 import Debug
 import Systems.Model.Common exposing (System)
 import Jobs.Common exposing (runJob, JobResponse)
+import Common.Components exposing (dialogPanel)
 
 import Set exposing (Set)
 -- Model 
@@ -85,35 +86,26 @@ update action model =
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
-view address model =
-  [ row_ 
-    [div [class "col-md-offset-1 col-md-10"]
-      [div [class "panel panel-default"] [ 
-          div [class "panel-body"] 
-             [span [] 
-                [text "A "
-                , strong [] [text model.job] 
-                , text " operation "
-                , text "will be performed on the following systems:"   
-                ]
-             ]
-         ]
-      ]
-    ]
-  , row_ [
-      div [class "col-md-offset-1 col-md-10"] [
-       panelDefault_ (Table.view (Signal.forwardTo address LoadPage) model.table)
-      ]
-    ]
-  , row_ [
-     div [class "btn-group col-md-offset-5 col-md-10"] [
-           button 
-            [class "btn btn-danger btn-sm col-md-1 col-md-offset-1", onClick address Cancel ] [text "Cancel"]
-         , button [class "btn btn-primary btn-sm col-md-1", onClick address (Run model.job) ][text "Ok"]
+message : String -> List Html
+message job =
+  [
+     h4 [] [ text "Notice!" ]
+  ,  span [] [
+         text "A "
+       , strong [] [text job] 
+       , text " operation "
+       , text "will be performed on the following systems:"   
      ]
-    ]
-  ]
+ ]
+
+view : Signal.Address Action -> Model -> List Html
+view address {table, job} =
+ let 
+   systemsTable = (panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table))
+ in
+   dialogPanel address (message job) systemsTable  Cancel (Run job)
+
+
 
 -- Effects
 
