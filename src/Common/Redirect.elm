@@ -29,7 +29,9 @@ type Error =
     | Value String
 
 type alias Errors = 
-  {type' : String,  keyValues : Dict String Error} 
+  {  type' : String
+  ,  keyValues : Dict String Error
+  } 
 
 errorDecoder : Decoder Errors
 errorDecoder  =
@@ -52,8 +54,10 @@ decodeError error =
       case (decodeString errorDecoder value) of
         Result.Ok errors -> 
           errors
+
         Result.Err e -> 
           Debug.log e (Errors "" Dict.empty)
+
     _ -> Errors "" Dict.empty
   
 
@@ -68,14 +72,18 @@ identityFail model res =
 resultHandler : Result Http.Error r -> m -> (r -> (m, Effects a)) -> (Errors -> (m, Effects a)) -> a -> (m, Effects a)
 resultHandler result model success fail noop = 
   case result of
+
    Result.Ok res -> 
      success res
+
    Result.Err e -> 
      case e of 
        BadResponse 401 m _ ->
          Debug.log (toString e) (model , (redirect noop))
+
        BadResponse 400 m resp ->
          (fail (decodeError resp))
+
        _ -> Debug.log (toString e) (model , Effects.none)
 
 successHandler : Result Http.Error r -> m -> (r -> (m, Effects a)) -> a -> (m, Effects a)
