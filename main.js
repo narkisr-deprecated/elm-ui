@@ -18040,7 +18040,7 @@ Elm.Systems.Add.make = function (_elm) {
       var machines = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "aws",_1: _p1.awsModel.machine}
                                             ,{ctor: "_Tuple2",_0: "gce",_1: _p1.gceModel.machine}
                                             ,{ctor: "_Tuple2",_0: "openstack",_1: _p1.openstackModel.machine}
-                                            ,{ctor: "_Tuple2",_0: "digitalocean",_1: _p1.digitalModel.machine}
+                                            ,{ctor: "_Tuple2",_0: "digital",_1: _p1.digitalModel.machine}
                                             ,{ctor: "_Tuple2",_0: "physical",_1: _p1.physicalModel.machine}]));
       return A2($Maybe.withDefault,$Systems$Model$Common.emptyMachine,A2($Dict.get,$String.toLower(stage),machines));
    });

@@ -115,7 +115,7 @@ machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalMod
             ("aws", awsModel.machine)
           , ("gce", gceModel.machine)
           , ("openstack", openstackModel.machine)
-          , ("digitalocean", digitalModel.machine)
+          , ("digital", digitalModel.machine)
           , ("physical", physicalModel.machine)
       ]
   in
