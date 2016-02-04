@@ -55,7 +55,7 @@ encodeProvided : Admin.Model -> Value
 encodeProvided {owner, environment} = 
  object [
     ("owner" , string owner)
-  , ("environment" , string environment)
+  , ("env" , string environment)
  ]
 
 persistProvided f provided = 
