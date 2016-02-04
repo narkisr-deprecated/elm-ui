@@ -114,11 +114,8 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
          newModel = { model | templates = newTemplates }
       in
         case newTemplates.navChange of
-          Just (Templates, List) -> 
-            (goto Templates List newModel , Effects.map TemplatesAction effects)
-
-          Just (Templates, Launch) -> 
-            (goto Templates Launch newModel , Effects.map TemplatesAction effects)
+          Just (Templates, dest) -> 
+            (goto Templates dest newModel, Effects.map TemplatesAction effects)
 
           _ -> 
             (newModel , Effects.map TemplatesAction effects) 
@@ -146,6 +143,7 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
              (newTemplates, effects) = Templates.update add model.templates 
             in
              (goto Templates section {newModel | templates = newTemplates} , Effects.map TemplatesAction effects)
+
           _ -> 
             (newModel, newEffects)
 
@@ -155,24 +153,24 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats} as model) =
   case model.navSide.active of
-   Systems -> 
-     Systems.view (Signal.forwardTo address SystemsAction) model.systems model.navSide.section 
+    Systems -> 
+      Systems.view (Signal.forwardTo address SystemsAction) model.systems model.navSide.section 
 
-   Types -> 
-     Types.view (Signal.forwardTo address TypesAction) model.types model.navSide.section
+    Types -> 
+      Types.view (Signal.forwardTo address TypesAction) model.types model.navSide.section
 
-   Templates -> 
-     Templates.view (Signal.forwardTo address TemplatesAction) model.templates model.navSide.section
-  
-   Jobs -> 
-     case model.navSide.section of
-       List ->
-         Jobs.List.view (Signal.forwardTo address JobsList) jobsList
+    Templates -> 
+      Templates.view (Signal.forwardTo address TemplatesAction) model.templates model.navSide.section
+    
+    Jobs -> 
+      case model.navSide.section of
+        List ->
+          Jobs.List.view (Signal.forwardTo address JobsList) jobsList
 
-       Stats ->
-         Jobs.Stats.view (Signal.forwardTo address JobsStats) jobsStats
+        Stats ->
+          Jobs.Stats.view (Signal.forwardTo address JobsStats) jobsStats
 
-       _ ->
+        _ ->
            []
 
 view : Signal.Address Action -> Model -> Html
