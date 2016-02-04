@@ -5,13 +5,12 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import Bootstrap.Html exposing (..)
 
-panelContents : String -> Html -> List Html
-panelContents title body =
+panelContents :  Html -> List Html
+panelContents body =
   let 
     height = "550px"
   in 
-  [ div [class "panel-heading"] [(text title)]
-  , div [class "panel-body"
+  [ div [class "panel-body"
         , style [ ("height","auto !important")
                 , ("overflow", "auto")
                 , ("min-height", height)

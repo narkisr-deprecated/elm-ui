@@ -61,7 +61,7 @@ toText key error =
 
 view : Signal.Address Action -> Model -> List Html
 view address ({errors} as model) =
-  panelContents "Errors" 
+  panelContents 
     (div  [] 
       [  h4 [] [text "The following errors found (please move back and fix them):"]
       ,  ul [style [("list-style-type", "none")]]

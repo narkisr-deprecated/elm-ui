@@ -55,20 +55,20 @@ update action model =
       
 -- View
 
-toHtml title ({system} as model) f prop= 
+toHtml ({system} as model) f prop= 
   case prop of
     Just value -> 
-       panelContents title (div [] (f (value, system.machine)))
+       panelContents (div [] (f (value, system.machine)))
     Nothing -> 
        []
 
 view : Signal.Address Action -> Model -> List Html
 view address ({system} as model) =
     let
-      options = [ toHtml "AWS system" model AWSView.summarize system.aws
-                , toHtml "GCE system" model GCEView.summarize system.gce
-                , toHtml "Openstack system" model OpenstackView.summarize system.openstack
-                , toHtml "Digital system" model DigitalView.summarize system.digital]
+      options = [ toHtml  model AWSView.summarize system.aws
+                , toHtml  model GCEView.summarize system.gce
+                , toHtml  model OpenstackView.summarize system.openstack
+                , toHtml  model DigitalView.summarize system.digital]
 
     in 
       withDefault [div  [] [text "not implemented"]] (List.head (List.filter (not << List.isEmpty) options))

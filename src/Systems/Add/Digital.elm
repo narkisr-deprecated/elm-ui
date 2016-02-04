@@ -202,5 +202,5 @@ stepView address ({digital, machine} as model) =
 
 
 view : Signal.Address Action -> Model -> List Html
-view address ({step} as model)=
-  panelContents (toString step) (Html.form [] (stepView address model))
+view address ({step} as model) =
+  panelContents (Html.form [] (stepView address model))

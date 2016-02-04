@@ -14,11 +14,12 @@ import Systems.Add.Common exposing (..)
 import Admin.Core as Admin 
 import Environments.List exposing (Environments, Environment, getEnvironments)
 import Common.Http exposing (delete, postJson)
-import Task
-import Json.Decode exposing (..)
 import Http exposing (Error(BadResponse))
 import Common.Components exposing (dialogPanel)
 import Common.Redirect exposing (failHandler)
+import Templates.Persistency exposing (persistProvided)
+import Task
+import Json.Decode exposing (..)
 
 type alias Model = 
   {
@@ -47,7 +48,7 @@ type Action =
   SetupJob (String, String)
     | SetTemplate Template
     | Deleted (Result Http.Error DeleteResponse)
-    | Saved (Result Http.Error SaveResponse)
+    | SystemSaved (Result Http.Error SaveResponse)
     | AdminAction Admin.Action 
     | Launch
     | Delete
@@ -87,22 +88,22 @@ update action ({admin, job, name, state} as model) =
       (model, deleteTemplate name)
 
     Launch -> 
-     none model
-
-       
+       (model, persistProvided (intoSystem name) admin)
+    
     _ -> 
       none model
 
 -- View
 
 launchView address {name, admin} =
-  panelContents "Launch from template" 
-    (Html.form [] [
-       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       (List.append
-         [ group' "Hostname" (inputText address NameInput " "  name) ]
-         (Admin.view (Signal.forwardTo address AdminAction) admin))
-    ])
+   [div [class "panel panel-default"] 
+     (panelContents 
+       (Html.form [] [
+         div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+         (List.append
+           [ group' "Hostname" (inputText address NameInput " "  name) ]
+           (Admin.view (Signal.forwardTo address AdminAction) admin))
+         ]))]
 
 deleteMessage : String -> List Html
 deleteMessage name =
@@ -145,7 +146,7 @@ currentView address ({job, state} as model)=
 
 view : Signal.Address Action -> Model -> List Html
 view address model =
- [div[] (currentView address model)]
+ [div [] (currentView address model)]
 
 -- Effects
 
@@ -175,10 +176,10 @@ saveResponse =
     ("id" := int)
 
 intoSystem : String -> String -> Effects Action
-intoSystem json name = 
+intoSystem name json = 
   postJson (Http.string json) saveResponse ("/systems/template/"  ++ name)
     |> Task.toResult
-    |> Task.map Saved
+    |> Task.map SystemSaved
     |> Effects.task
 
 

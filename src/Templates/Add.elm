@@ -17,7 +17,7 @@ import Systems.Model.Common exposing (System)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
-import Templates.Persistency exposing (persistModel, encodeDefaults)
+import Templates.Persistency exposing (persistTemplate, encodeDefaults)
 import Common.Components exposing (panelContents)
 import Systems.Add.Common exposing (..)
 import Common.Editor exposing (loadEditor, getEditor)
@@ -78,7 +78,7 @@ update action ({template, hyp, editDefaults, environments} as model) =
   case action of
     SaveTemplate -> 
       if editDefaults == False then
-        (model, persistModel saveTemplate template hyp)
+        (model, persistTemplate saveTemplate template hyp)
       else
         (model, getEditor NoOp)
 
@@ -108,7 +108,7 @@ update action ({template, hyp, editDefaults, environments} as model) =
        let 
          newTemplate = { template | defaults = Just (decodeDefaults json) }
        in 
-         ({ model | template = newTemplate}, persistModel saveTemplate template hyp)
+         ({ model | template = newTemplate}, persistTemplate saveTemplate template hyp)
     
     Saved result -> 
       let
@@ -150,7 +150,7 @@ buttons address model =
  
 
 editing ({template, editDefaults} as model) address  =
-  panelContents "New Template" 
+  panelContents 
     (Html.form [] [
        div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
          group' "Name" (inputText address NameInput " "  template.name)
