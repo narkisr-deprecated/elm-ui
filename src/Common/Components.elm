@@ -5,13 +5,12 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import Bootstrap.Html exposing (..)
 
-panelContents : String -> Html -> List Html
-panelContents title body =
+panelContents :  Html -> List Html
+panelContents body =
   let 
     height = "550px"
   in 
-  [ div [class "panel-heading"] [(text title)]
-  , div [class "panel-body"
+  [ div [class "panel-body"
         , style [ ("height","auto !important")
                 , ("overflow", "auto")
                 , ("min-height", height)
@@ -19,11 +18,11 @@ panelContents title body =
   ]
 
 
-dialogPanel : Signal.Address a -> List Html -> Html -> a -> a -> List Html
-dialogPanel address message body cancel ok = 
+dialogPanel : String -> Signal.Address a -> List Html -> Html -> a -> a -> List Html
+dialogPanel type' address message body cancel ok = 
   [ row_ [
      div [class "col-md-offset-1 col-md-10"] [
-      div [ class "callout callout-danger" ] message
+      div [ class ("callout callout-" ++ type') ] message
      ]
    ] 
   , row_ [
@@ -35,12 +34,23 @@ dialogPanel address message body cancel ok =
      div [class "text-center"] [
        div [class "btn-group col-md-offset-5 col-md-10"] [
            button [class "btn btn-danger btn-sm col-md-1 col-md-offset-1", onClick address cancel ] [
-            text "Cancel"
+            text (toString cancel)
           ]
        ,  button [class "btn btn-primary btn-sm col-md-1", onClick address ok ][
-           text "Ok"
+           text (toString ok) 
          ]
       ]
     ]
   ]
  ]
+
+infoCallout address message body cancel ok = 
+  dialogPanel "info" address message body cancel ok
+
+dangerCallout address message body cancel ok = 
+  dialogPanel "danger" address message body cancel ok
+
+warningCallout address message body cancel ok = 
+  dialogPanel "warning" address message body cancel ok
+
+

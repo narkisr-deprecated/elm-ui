@@ -493,4 +493,4 @@ stepView address ({aws, machine} as model) =
 
 view : Signal.Address Action -> Model -> List Html
 view address ({step} as model)=
-  panelContents (toString step) (Html.form [] (stepView address model))
+  panelContents (Html.form [] (stepView address model))

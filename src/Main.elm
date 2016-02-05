@@ -122,7 +122,7 @@ intoActions (dest, job, target) =
        Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
 
     "Templates" ->
-       Application.TemplatesAction (TemplatesCore.TemplatesLaunch (TemplatesLaunch.SetupJob (job, target)))
+       Application.TemplatesAction (TemplatesCore.SetupJob (job, target))
 
     _ -> 
        Application.NoOp

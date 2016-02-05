@@ -17,6 +17,7 @@ type Active =
 type Section = 
   Add 
     | Launch 
+    | Delete
     | List 
     | View
     | Stats

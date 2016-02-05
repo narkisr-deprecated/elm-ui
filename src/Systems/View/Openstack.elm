@@ -60,6 +60,6 @@ summarize model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   div []
-    (panelContents "System" (div [] []))
+    (panelContents (div [] []))
 
 

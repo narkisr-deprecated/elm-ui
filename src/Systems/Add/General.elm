@@ -93,7 +93,7 @@ update action ({admin} as model) =
 
 view : Signal.Address Action -> Model -> List Html
 view address ({admin} as model) =
-  panelContents "General Information" 
+  panelContents 
     (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        (List.append

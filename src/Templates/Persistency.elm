@@ -1,6 +1,7 @@
 module Templates.Persistency where
 
 import Templates.Model.Common exposing (Template, emptyOpenstackDefaults, Defaults, OpenstackDefaults)
+import Admin.Core as Admin
 import Systems.Add.Persistency exposing (transform)
 import Systems.Add.Encoders exposing (encoderOf, machineEncoder)
 import Effects exposing (Effects)
@@ -43,7 +44,19 @@ encode ({type', machine, defaults, name, description} as template) hyp =
  ] 
 
 
-persistModel : (String -> Effects a) -> Template -> String -> Effects a
-persistModel f template hyp =
-    (f (E.encode 0 (encode template hyp)))
+persistModel : (String -> Effects a) -> Value -> Effects a
+persistModel f value =
+    (f (E.encode 0 value))
 
+persistTemplate f template hyp = 
+  persistModel f (encode template hyp)
+
+encodeProvided : Admin.Model -> Value
+encodeProvided {owner, environment} = 
+ object [
+    ("owner" , string owner)
+  , ("env" , string environment)
+ ]
+
+persistProvided f provided = 
+  persistModel f (encodeProvided provided)
