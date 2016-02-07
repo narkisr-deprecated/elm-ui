@@ -28,7 +28,7 @@ type Action =
   SetupJob String
   | LoadPage (Table.Action System)
   | JobLaunched (Result Http.Error JobResponse)
-  | Run String
+  | Run
   | NoOp
   | Cancel
 
@@ -54,7 +54,7 @@ init =
 -- Update
 
 update : Action ->  Model-> (Model , Effects Action)
-update action model =
+update action ({job} as model) =
   case action  of
     JobLaunched result ->
       successHandler result model (\ res -> (model, Effects.none)) NoOp 
@@ -68,7 +68,7 @@ update action model =
       in
        ({ model | table = newTable }, Effects.none)
 
-    Run job -> 
+    Run -> 
       let
         runAll = model.table.rows 
           |> (List.map (\(id,_) -> id)) 
@@ -103,7 +103,7 @@ view address {table, job} =
  let 
    systemsTable = (panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table))
  in
-   dialogPanel "danger" address (message job) systemsTable  Cancel (Run job)
+   dialogPanel "danger" address (message job) systemsTable  Cancel Run
 
 
 

@@ -18444,36 +18444,31 @@ Elm.Systems.Launch.make = function (_elm) {
    });
    var Cancel = {ctor: "Cancel"};
    var NoOp = {ctor: "NoOp"};
-   var Run = function (a) {    return {ctor: "Run",_0: a};};
+   var Run = {ctor: "Run"};
    var JobLaunched = function (a) {    return {ctor: "JobLaunched",_0: a};};
-   var update = F2(function (action,model) {
-      var _p2 = action;
-      switch (_p2.ctor)
-      {case "JobLaunched": return A4($Common$Redirect.successHandler,
-           _p2._0,
-           model,
-           function (res) {
-              return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-           },
-           NoOp);
-         case "SetupJob": return {ctor: "_Tuple2",_0: _U.update(model,{job: _p2._0}),_1: $Effects.none};
-         case "LoadPage": var newTable = A2($Table.update,_p2._0,model.table);
-           return {ctor: "_Tuple2",_0: _U.update(model,{table: newTable}),_1: $Effects.none};
+   var update = F2(function (action,_p2) {
+      var _p3 = _p2;
+      var _p7 = _p3;
+      var _p4 = action;
+      switch (_p4.ctor)
+      {case "JobLaunched": return A4($Common$Redirect.successHandler,_p4._0,_p7,function (res) {    return {ctor: "_Tuple2",_0: _p7,_1: $Effects.none};},NoOp);
+         case "SetupJob": return {ctor: "_Tuple2",_0: _U.update(_p7,{job: _p4._0}),_1: $Effects.none};
+         case "LoadPage": var newTable = A2($Table.update,_p4._0,_p7.table);
+           return {ctor: "_Tuple2",_0: _U.update(_p7,{table: newTable}),_1: $Effects.none};
          case "Run": var runAll = $Effects.batch(A2($List.map,
            function (id) {
-              return A3($Jobs$Common.runJob,id,_p2._0,JobLaunched);
+              return A3($Jobs$Common.runJob,id,_p3.job,JobLaunched);
            },
-           A2($List.map,function (_p3) {    var _p4 = _p3;return _p4._0;},model.table.rows)));
-           return {ctor: "_Tuple2",_0: model,_1: runAll};
-         case "Cancel": return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
-         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+           A2($List.map,function (_p5) {    var _p6 = _p5;return _p6._0;},_p7.table.rows)));
+           return {ctor: "_Tuple2",_0: _p7,_1: runAll};
+         case "Cancel": return {ctor: "_Tuple2",_0: _p7,_1: $Effects.none};
+         default: return {ctor: "_Tuple2",_0: _p7,_1: $Effects.none};}
    });
    var LoadPage = function (a) {    return {ctor: "LoadPage",_0: a};};
-   var view = F2(function (address,_p5) {
-      var _p6 = _p5;
-      var _p7 = _p6.job;
-      var systemsTable = $Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p6.table));
-      return A6($Common$Components.dialogPanel,"danger",address,message(_p7),systemsTable,Cancel,Run(_p7));
+   var view = F2(function (address,_p8) {
+      var _p9 = _p8;
+      var systemsTable = $Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p9.table));
+      return A6($Common$Components.dialogPanel,"danger",address,message(_p9.job),systemsTable,Cancel,Run);
    });
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
    var Model = F2(function (a,b) {    return {job: a,table: b};});
