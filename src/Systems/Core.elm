@@ -117,7 +117,7 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
         SetupJob job -> 
           setupJob launchAction model
 
-        Run job -> 
+        Run -> 
           let 
              (newLaunch, effect) = Launch.update launchAction model.systemsLaunch
           in 
