@@ -146,7 +146,7 @@ doneRow : String -> DoneJob -> List Html
 doneRow tableid {hostname, start, end, queue, identity, status} = 
   let 
    min = (toString ((round (end - start)) // (1000 * 60)))
-   sec = (toString (round ((end - start) / 1000)))
+   sec = (toString (((round ((end - start) / 1000))) % 60))
    pad = (\str ->  if String.length str == 1 then ("0" ++ str) else str)
   in
     [

@@ -18807,7 +18807,7 @@ Elm.Jobs.List.make = function (_elm) {
       var _p3 = _p1.start;
       var _p2 = _p1.end;
       var pad = function (str) {    return _U.eq($String.length(str),1) ? A2($Basics._op["++"],"0",str) : str;};
-      var sec = $Basics.toString($Basics.round((_p2 - _p3) / 1000));
+      var sec = $Basics.toString(A2($Basics._op["%"],$Basics.round((_p2 - _p3) / 1000),60));
       var min = $Basics.toString($Basics.round(_p2 - _p3) / (1000 * 60) | 0);
       return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(_p1.identity)]))
                      ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($Date$Format.format,"%d/%m/%Y %H:%M",$Date.fromTime(_p3)))]))
