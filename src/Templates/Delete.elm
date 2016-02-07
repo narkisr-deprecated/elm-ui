@@ -6,7 +6,7 @@ import Html exposing (..)
 import Task
 import Json.Decode exposing (..)
 import Http exposing (Error(BadResponse))
-import Common.Components exposing (warningCallout)
+import Common.Components exposing (dangerCallout)
 import Common.Redirect exposing (failHandler)
 import Common.Http exposing (delete)
 
@@ -47,26 +47,14 @@ deleteMessage name =
   [
      h4 [] [ text "Notice!" ]
   ,  span [] [
-          text "Template" 
+          text "Template " 
         , strong [] [text name] 
         , text " will be deleted! "
      ]
  ]
 
--- errorMessage : String -> List Html
--- errorMessage fail =
---   [
---      h4 [] [ text "Notice!" ]
---   ,  span [] [ text fail ]
---  ]
---
-
--- errorView:  Signal.Address Action -> String -> List Html
--- errorView address message =
---    dialogPanel address (errorMessage message) (div [] []) Cancel Delete
---  
 deleteView address {name} =
-   warningCallout address (deleteMessage name) (div [] []) Cancel Delete
+   dangerCallout address (deleteMessage name) (div [] []) Cancel Delete
 
 view : Signal.Address Action -> Model -> List Html
 view address model =

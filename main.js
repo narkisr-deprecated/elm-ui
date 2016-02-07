@@ -23699,7 +23699,7 @@ Elm.Templates.Delete.make = function (_elm) {
       return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Notice!")]))
                      ,A2($Html.span,
                      _U.list([]),
-                     _U.list([$Html.text("Template"),A2($Html.strong,_U.list([]),_U.list([$Html.text(name)])),$Html.text(" will be deleted! ")]))]);
+                     _U.list([$Html.text("Template "),A2($Html.strong,_U.list([]),_U.list([$Html.text(name)])),$Html.text(" will be deleted! ")]))]);
    };
    var Error = function (a) {    return {ctor: "Error",_0: a};};
    var Deleted = function (a) {    return {ctor: "Deleted",_0: a};};
@@ -23711,7 +23711,7 @@ Elm.Templates.Delete.make = function (_elm) {
    var Cancel = {ctor: "Cancel"};
    var deleteView = F2(function (address,_p2) {
       var _p3 = _p2;
-      return A5($Common$Components.warningCallout,address,deleteMessage(_p3.name),A2($Html.div,_U.list([]),_U.list([])),Cancel,Delete);
+      return A5($Common$Components.dangerCallout,address,deleteMessage(_p3.name),A2($Html.div,_U.list([]),_U.list([])),Cancel,Delete);
    });
    var view = F2(function (address,model) {    return A2(deleteView,address,model);});
    var NoOp = {ctor: "NoOp"};
