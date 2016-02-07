@@ -23550,13 +23550,17 @@ Elm.Templates.Launch.make = function (_elm) {
    $Admin$Core = Elm.Admin.Core.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Http = Elm.Http.make(_elm),
+   $Jobs$Common = Elm.Jobs.Common.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -23571,6 +23575,8 @@ Elm.Templates.Launch.make = function (_elm) {
    SaveResponse,
    A2($Json$Decode._op[":="],"message",$Json$Decode.string),
    A2($Json$Decode._op[":="],"id",$Json$Decode.$int));
+   var errorMessage = _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Error!")]))
+                              ,A2($Html.span,_U.list([]),_U.list([$Html.text("Failed to save system")]))]);
    var infoMessage = function (name) {
       return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Info")]))
                      ,A2($Html.span,
@@ -23580,6 +23586,7 @@ Elm.Templates.Launch.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    var Cancel = {ctor: "Cancel"};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
+   var Done = {ctor: "Done"};
    var Launch = {ctor: "Launch"};
    var AdminAction = function (a) {    return {ctor: "AdminAction",_0: a};};
    var launchView = F2(function (address,_p0) {
@@ -23598,7 +23605,17 @@ Elm.Templates.Launch.make = function (_elm) {
    });
    var view = F2(function (address,_p2) {
       var _p3 = _p2;
-      return A5($Common$Components.infoCallout,address,infoMessage(_p3.name),A2(launchView,address,_p3),Cancel,Launch);
+      return $Basics.not($Dict.isEmpty(_p3.saveErrors.errors.keyValues)) ? A5($Common$Components.dangerCallout,
+      address,
+      errorMessage,
+      A2($Html.div,_U.list([]),_U.list([])),
+      Cancel,
+      Done) : A5($Common$Components.infoCallout,address,infoMessage(_p3.name),A2(launchView,address,_p3),Cancel,Launch);
+   });
+   var JobLaunched = function (a) {    return {ctor: "JobLaunched",_0: a};};
+   var setSaved = F2(function (model,_p4) {
+      var _p5 = _p4;
+      return {ctor: "_Tuple2",_0: model,_1: A3($Jobs$Common.runJob,$Basics.toString(_p5.id),"stage",JobLaunched)};
    });
    var Launched = function (a) {    return {ctor: "Launched",_0: a};};
    var intoSystem = F2(function (name,json) {
@@ -23606,42 +23623,52 @@ Elm.Templates.Launch.make = function (_elm) {
       Launched,
       $Task.toResult(A3($Common$Http.postJson,$Http.string(json),saveResponse,A2($Basics._op["++"],"/systems/template/",name)))));
    });
-   var update = F2(function (action,_p4) {
-      var _p5 = _p4;
-      var _p9 = _p5;
-      var _p8 = _p5.admin;
-      var _p6 = action;
-      switch (_p6.ctor)
-      {case "AdminAction": var _p7 = A2($Admin$Core.update,_p6._0,_p8);
-           var newAdmin = _p7._0;
-           var effects = _p7._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p9,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
-         case "Launch": return {ctor: "_Tuple2",_0: _p9,_1: A2($Templates$Persistency.persistProvided,intoSystem(_p5.name),_p8)};
-         case "Launched": return $Common$Utils.none(_p9);
-         case "HostnameInput": return $Common$Utils.none(_U.update(_p9,{hostname: _p6._0}));
-         default: return $Common$Utils.none(_p9);}
+   var update = F2(function (action,_p6) {
+      var _p7 = _p6;
+      var _p12 = _p7;
+      var _p11 = _p7.admin;
+      var _p8 = action;
+      switch (_p8.ctor)
+      {case "AdminAction": var _p9 = A2($Admin$Core.update,_p8._0,_p11);
+           var newAdmin = _p9._0;
+           var effects = _p9._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p12,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
+         case "Launch": return {ctor: "_Tuple2",_0: _p12,_1: A2($Templates$Persistency.persistProvided,intoSystem(_p7.name),_p11)};
+         case "Launched": var _p10 = A4($Common$Redirect.successHandler,_p8._0,_p12,setSaved(_p12),NoOp);
+           var newModel = _p10._0;
+           var saveErrors = _p10._0.saveErrors;
+           var effects = _p10._1;
+           return {ctor: "_Tuple2",_0: newModel,_1: effects};
+         case "HostnameInput": return $Common$Utils.none(_U.update(_p12,{hostname: _p8._0}));
+         default: return $Common$Utils.none(_p12);}
    });
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
-   var Model = F3(function (a,b,c) {    return {name: a,hostname: b,admin: c};});
+   var Model = F4(function (a,b,c,d) {    return {name: a,hostname: b,admin: c,saveErrors: d};});
    var init = function () {
-      var _p10 = $Admin$Core.init;
-      var admin = _p10._0;
-      var effects = _p10._1;
-      return {ctor: "_Tuple2",_0: A3(Model,"","",admin),_1: A2($Effects.map,AdminAction,effects)};
+      var _p13 = $Common$Errors.init;
+      var errors = _p13._0;
+      var _p14 = $Admin$Core.init;
+      var admin = _p14._0;
+      var effects = _p14._1;
+      return {ctor: "_Tuple2",_0: A4(Model,"","",admin,errors),_1: A2($Effects.map,AdminAction,effects)};
    }();
    return _elm.Templates.Launch.values = {_op: _op
                                          ,Model: Model
                                          ,init: init
                                          ,SetupJob: SetupJob
                                          ,Launched: Launched
+                                         ,JobLaunched: JobLaunched
                                          ,AdminAction: AdminAction
                                          ,Launch: Launch
+                                         ,Done: Done
                                          ,HostnameInput: HostnameInput
                                          ,Cancel: Cancel
                                          ,NoOp: NoOp
+                                         ,setSaved: setSaved
                                          ,update: update
                                          ,infoMessage: infoMessage
                                          ,launchView: launchView
+                                         ,errorMessage: errorMessage
                                          ,view: view
                                          ,SaveResponse: SaveResponse
                                          ,saveResponse: saveResponse
@@ -23782,11 +23809,14 @@ Elm.Templates.Core.make = function (_elm) {
                                        ,_1: _p7};
                  default: return _p9;}
             case "TemplatesLaunch": var _p5 = _p2._0;
-              if (_p5.ctor === "Cancel") {
-                    return {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}),_1: _p7};
-                 } else {
-                    return _p9;
-                 }
+              switch (_p5.ctor)
+              {case "Cancel": return {ctor: "_Tuple2"
+                                     ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                     ,_1: _p7};
+                 case "JobLaunched": return {ctor: "_Tuple2"
+                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.List})})
+                                            ,_1: _p7};
+                 default: return _p9;}
             case "TemplatesDelete": var _p6 = _p2._0;
               switch (_p6.ctor)
               {case "Deleted": return !_U.eq(_p1._0.$delete.error,"Failed to delete template") ? {ctor: "_Tuple2"
@@ -23857,7 +23887,7 @@ Elm.Templates.Core.make = function (_elm) {
             case "TemplatesLaunch": var _p23 = A2($Templates$Launch.update,_p15._0,_p28);
               var newLaunch = _p23._0;
               var effects = _p23._1;
-              return A2(refreshList,true,{ctor: "_Tuple2",_0: _U.update(_p29,{launch: newLaunch}),_1: A2($Effects.map,TemplatesLaunch,effects)});
+              return {ctor: "_Tuple2",_0: _U.update(_p29,{launch: newLaunch}),_1: A2($Effects.map,TemplatesLaunch,effects)};
             case "TemplatesDelete": var _p25 = _p15._0;
               var _p24 = A2($Templates$Delete.update,_p25,_p27);
               var newDelete = _p24._0;
@@ -24198,8 +24228,8 @@ Elm.Application.make = function (_elm) {
            var effects = _p25._1;
            var newModel = _U.update(_p33,{templates: newTemplates});
            var _p26 = newTemplates.navChange;
-           if (_p26.ctor === "Just" && _p26._0.ctor === "_Tuple2" && _p26._0._0.ctor === "Templates") {
-                 return {ctor: "_Tuple2",_0: A3($goto,$Nav$Side.Templates,_p26._0._1,newModel),_1: A2($Effects.map,TemplatesAction,effects)};
+           if (_p26.ctor === "Just" && _p26._0.ctor === "_Tuple2") {
+                 return {ctor: "_Tuple2",_0: A3($goto,_p26._0._0,_p26._0._1,newModel),_1: A2($Effects.map,TemplatesAction,effects)};
               } else {
                  return {ctor: "_Tuple2",_0: newModel,_1: A2($Effects.map,TemplatesAction,effects)};
               }

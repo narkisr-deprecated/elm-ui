@@ -8,7 +8,7 @@ import Templates.Add as Add
 import Templates.List as List
 import Templates.Launch as Launch
 import Templates.Delete as Delete
-import Nav.Side as NavSide exposing (Active(Templates), Section(Add, Launch, List, Delete))
+import Nav.Side as NavSide exposing (Active(Templates, Jobs), Section(Add, Launch, List, Delete))
 import Systems.Model.Common exposing (System)
 
 type alias Model = 
@@ -75,6 +75,9 @@ navigate action ((({launch, delete} as model), effects) as result) =
           Launch.Cancel -> 
             ({ model | navChange = Just (Templates, List)}, effects)
 
+          Launch.JobLaunched r -> 
+            ({ model | navChange = Just (Jobs, List)}, effects)
+
           _ -> 
             result
 
@@ -93,7 +96,6 @@ navigate action ((({launch, delete} as model), effects) as result) =
             result
     _ -> 
       result
-
 
 setName model name = 
   { model | name = name } 
@@ -148,7 +150,7 @@ route action ({add, launch, list, delete} as model) =
       let 
          (newLaunch, effects) = (Launch.update action launch)
       in
-        refreshList True ({ model | launch = newLaunch } , Effects.map TemplatesLaunch effects)
+        ({ model | launch = newLaunch } , Effects.map TemplatesLaunch effects)
 
     TemplatesDelete action -> 
       let 

@@ -1,5 +1,6 @@
 module Templates.Launch where
 
+import Common.Redirect as Redirect exposing (successHandler)
 import Html.Shorthand exposing (..)
 import Bootstrap.Html exposing (..)
 import Effects exposing (Effects)
@@ -8,7 +9,7 @@ import Templates.Model.Common exposing (emptyTemplate, Template)
 import Common.Utils exposing (none)
 import Debug
 import Html.Events exposing (onClick)
-import Common.Components exposing (panelContents, infoCallout)
+import Common.Components exposing (panelContents, infoCallout, dangerCallout)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Systems.Add.Common exposing (..)
 import Admin.Core as Admin 
@@ -18,20 +19,25 @@ import Http exposing (Error(BadResponse))
 import Templates.Persistency exposing (persistProvided)
 import Task
 import Json.Decode exposing (..)
+import Jobs.Common as Jobs exposing (runJob, JobResponse)
+import Dict
+import Common.Errors as Errors exposing (..)
 
 type alias Model = 
   {
     name : String
   , hostname : String
   , admin : Admin.Model
+  , saveErrors : Errors.Model
   }
  
 init : (Model , Effects Action)
 init =
   let 
     (admin, effects) = Admin.init
+    (errors, _) = Errors.init
   in 
-    (Model "" "" admin, Effects.map AdminAction effects)
+    (Model "" "" admin errors, Effects.map AdminAction effects)
 
 
 -- Update 
@@ -39,11 +45,17 @@ init =
 type Action = 
   SetupJob (String, String)
     | Launched (Result Http.Error SaveResponse)
+    | JobLaunched (Result Http.Error JobResponse)
     | AdminAction Admin.Action 
     | Launch
+    | Done
     | HostnameInput String
     | Cancel
     | NoOp
+
+setSaved : Model -> SaveResponse -> (Model, Effects Action)
+setSaved model {id} =
+  (model, runJob (toString id) "stage" JobLaunched)
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({admin, name} as model) =
@@ -58,7 +70,10 @@ update action ({admin, name} as model) =
        (model, persistProvided (intoSystem name) admin)
     
     Launched result -> 
-      none model
+      let
+        (({saveErrors} as newModel), effects) = successHandler result model (setSaved model) NoOp
+      in
+        (newModel , effects)
 
     HostnameInput hostname -> 
         none { model | hostname = hostname }
@@ -91,9 +106,20 @@ launchView address {hostname, name, admin} =
     ]
   ]
 
+errorMessage : List Html
+errorMessage =
+  [
+    h4 [] [ text "Error!" ]
+  , span [] [ text "Failed to save system" ]
+  ]
+
+
 view : Signal.Address Action -> Model -> List Html
-view address ({name} as model) =
-   infoCallout address (infoMessage name) (launchView address model) Cancel Launch
+view address ({name, saveErrors} as model) =
+  if not (Dict.isEmpty saveErrors.errors.keyValues) then
+    dangerCallout address (errorMessage) (div [] []) Cancel Done
+  else 
+    infoCallout address (infoMessage name) (launchView address model) Cancel Launch
 
 -- Effects
 
