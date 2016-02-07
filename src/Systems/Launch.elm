@@ -103,7 +103,7 @@ view address {table, job} =
  let 
    systemsTable = (panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table))
  in
-   dialogPanel address (message job) systemsTable  Cancel (Run job)
+   dialogPanel "danger" address (message job) systemsTable  Cancel (Run job)
 
 
 

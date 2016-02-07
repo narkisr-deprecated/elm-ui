@@ -18473,7 +18473,7 @@ Elm.Systems.Launch.make = function (_elm) {
       var _p6 = _p5;
       var _p7 = _p6.job;
       var systemsTable = $Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p6.table));
-      return A5($Common$Components.dialogPanel,address,message(_p7),systemsTable,Cancel,Run(_p7));
+      return A6($Common$Components.dialogPanel,"danger",address,message(_p7),systemsTable,Cancel,Run(_p7));
    });
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
    var Model = F2(function (a,b) {    return {job: a,table: b};});
