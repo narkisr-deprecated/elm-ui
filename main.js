@@ -13935,32 +13935,41 @@ Elm.Common.Redirect.make = function (_elm) {
       return A2($Debug.log,A2($Basics._op["++"],"request failed",$Basics.toString(res)),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
    });
    var identitySuccess = F2(function (model,res) {    return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
-   var Errors = F2(function (a,b) {    return {type$: a,keyValues: b};});
+   var Errors = F3(function (a,b,c) {    return {type$: a,keyValues: b,message: c};});
+   var messageDecoder = A2($Json$Decode.object1,A2(Errors,"",$Dict.empty),$Json$Decode.maybe(A2($Json$Decode._op[":="],"message",$Json$Decode.string)));
    var Value = function (a) {    return {ctor: "Value",_0: a};};
    var NestedList = function (a) {    return {ctor: "NestedList",_0: a};};
    var DeepNestedList = function (a) {    return {ctor: "DeepNestedList",_0: a};};
    var Nested = function (a) {    return {ctor: "Nested",_0: a};};
-   var errorDecoder = function () {
+   var errorsDecoder = function () {
       var options = _U.list([A2($Json$Decode.map,Value,$Json$Decode.string)
                             ,A2($Json$Decode.map,Nested,$Json$Decode.dict($Json$Decode.string))
                             ,A2($Json$Decode.map,DeepNestedList,$Json$Decode.dict($Json$Decode.list($Json$Decode.dict($Json$Decode.dict($Json$Decode.string)))))
                             ,A2($Json$Decode.map,NestedList,$Json$Decode.dict($Json$Decode.list($Json$Decode.dict($Json$Decode.string))))]);
-      return A3($Json$Decode.object2,
+      return A4($Json$Decode.object3,
       Errors,
       A2($Json$Decode.at,_U.list(["object","type"]),$Json$Decode.string),
-      A2($Json$Decode.at,_U.list(["object","errors"]),$Json$Decode.dict($Json$Decode.oneOf(options))));
+      A2($Json$Decode.at,_U.list(["object","errors"]),$Json$Decode.dict($Json$Decode.oneOf(options))),
+      $Json$Decode.$null($Maybe.Nothing));
    }();
    var decodeError = function (error) {
+      var emptyErrors = A3(Errors,"",$Dict.empty,$Maybe.Nothing);
       var _p2 = error;
       if (_p2.ctor === "Text") {
-            var _p3 = A2($Json$Decode.decodeString,errorDecoder,_p2._0);
+            var _p5 = _p2._0;
+            var _p3 = A2($Json$Decode.decodeString,errorsDecoder,_p5);
             if (_p3.ctor === "Ok") {
                   return _p3._0;
                } else {
-                  return A2($Debug.log,_p3._0,A2(Errors,"",$Dict.empty));
+                  var _p4 = A2($Json$Decode.decodeString,messageDecoder,_p5);
+                  if (_p4.ctor === "Ok") {
+                        return _p4._0;
+                     } else {
+                        return A2($Debug.log,_p4._0,emptyErrors);
+                     }
                }
          } else {
-            return A2(Errors,"",$Dict.empty);
+            return emptyErrors;
          }
    };
    var Prompt = {ctor: "Prompt"};
@@ -13968,23 +13977,23 @@ Elm.Common.Redirect.make = function (_elm) {
    var redirectActions = $Signal.mailbox(NoOp);
    var redirect = function (noop) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,redirectActions.address,Prompt)));};
    var resultHandler = F5(function (result,model,success,fail,noop) {
-      var _p4 = result;
-      if (_p4.ctor === "Ok") {
-            return success(_p4._0);
+      var _p6 = result;
+      if (_p6.ctor === "Ok") {
+            return success(_p6._0);
          } else {
-            var _p6 = _p4._0;
-            var _p5 = _p6;
-            _v4_2: do {
-               if (_p5.ctor === "BadResponse") {
-                     switch (_p5._0)
-                     {case 401: return A2($Debug.log,$Basics.toString(_p6),{ctor: "_Tuple2",_0: model,_1: redirect(noop)});
-                        case 400: return fail(decodeError(_p5._2));
-                        default: break _v4_2;}
+            var _p8 = _p6._0;
+            var _p7 = _p8;
+            _v5_2: do {
+               if (_p7.ctor === "BadResponse") {
+                     switch (_p7._0)
+                     {case 401: return A2($Debug.log,$Basics.toString(_p8),{ctor: "_Tuple2",_0: model,_1: redirect(noop)});
+                        case 400: return fail(decodeError(_p7._2));
+                        default: break _v5_2;}
                   } else {
-                     break _v4_2;
+                     break _v5_2;
                   }
             } while (false);
-            return A2($Debug.log,$Basics.toString(_p6),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
+            return A2($Debug.log,$Basics.toString(_p8),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
          }
    });
    var successHandler = F4(function (result,model,success,noop) {    return A5(resultHandler,result,model,success,identityFail(model),noop);});
@@ -14000,7 +14009,8 @@ Elm.Common.Redirect.make = function (_elm) {
                                         ,NestedList: NestedList
                                         ,Value: Value
                                         ,Errors: Errors
-                                        ,errorDecoder: errorDecoder
+                                        ,errorsDecoder: errorsDecoder
+                                        ,messageDecoder: messageDecoder
                                         ,decodeError: decodeError
                                         ,identitySuccess: identitySuccess
                                         ,identityFail: identityFail
@@ -23695,6 +23705,9 @@ Elm.Templates.Delete.make = function (_elm) {
    var _op = {};
    var DeleteResponse = function (a) {    return {message: a};};
    var deleteResponse = A2($Json$Decode.object1,DeleteResponse,A2($Json$Decode._op[":="],"message",$Json$Decode.string));
+   var errorMessage = function (message) {
+      return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Error!")])),A2($Html.span,_U.list([]),_U.list([$Html.text(message)]))]);
+   };
    var deleteMessage = function (name) {
       return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Notice!")]))
                      ,A2($Html.span,
@@ -23707,28 +23720,36 @@ Elm.Templates.Delete.make = function (_elm) {
       return $Effects.task(A2($Task.map,Deleted,$Task.toResult(A2($Common$Http.$delete,deleteResponse,A2($Basics._op["++"],"/templates/",name)))));
    };
    var succeeded = F2(function (action,_p0) {    var _p1 = _p0;return _U.eq(action,Deleted($Result.Ok({message: "Template deleted"}))) ? true : false;});
+   var Done = {ctor: "Done"};
    var Delete = {ctor: "Delete"};
    var Cancel = {ctor: "Cancel"};
    var deleteView = F2(function (address,_p2) {
       var _p3 = _p2;
       return A5($Common$Components.dangerCallout,address,deleteMessage(_p3.name),A2($Html.div,_U.list([]),_U.list([])),Cancel,Delete);
    });
-   var view = F2(function (address,model) {    return A2(deleteView,address,model);});
-   var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p4) {
+   var view = F2(function (address,_p4) {
       var _p5 = _p4;
-      var _p8 = _p5;
-      var _p6 = action;
-      switch (_p6.ctor)
+      var _p6 = _p5.error;
+      return !_U.eq(_p6,"") ? A5($Common$Components.dangerCallout,address,errorMessage(_p6),A2($Html.div,_U.list([]),_U.list([])),Cancel,Done) : A2(deleteView,
+      address,
+      _p5);
+   });
+   var NoOp = {ctor: "NoOp"};
+   var update = F2(function (action,_p7) {
+      var _p8 = _p7;
+      var _p12 = _p8;
+      var _p9 = action;
+      switch (_p9.ctor)
       {case "Deleted": return A4($Common$Redirect.failHandler,
-           _p6._0,
-           _p8,
-           function (_p7) {
-              return $Common$Utils.none(_U.update(_p8,{error: "Failed to delete template"}));
+           _p9._0,
+           _p12,
+           function (_p10) {
+              var _p11 = _p10;
+              return $Common$Utils.none(_U.update(_p12,{error: A2($Maybe.withDefault,"Failed to delete template",_p11.message)}));
            },
            NoOp);
-         case "Delete": return {ctor: "_Tuple2",_0: _p8,_1: deleteTemplate(_p5.name)};
-         default: return $Common$Utils.none(_p8);}
+         case "Delete": return {ctor: "_Tuple2",_0: _p12,_1: deleteTemplate(_p8.name)};
+         default: return $Common$Utils.none(_p12);}
    });
    var Model = F2(function (a,b) {    return {name: a,error: b};});
    var init = $Common$Utils.none(A2(Model,"",""));
@@ -23738,10 +23759,12 @@ Elm.Templates.Delete.make = function (_elm) {
                                          ,NoOp: NoOp
                                          ,Cancel: Cancel
                                          ,Delete: Delete
+                                         ,Done: Done
                                          ,Deleted: Deleted
                                          ,Error: Error
                                          ,update: update
                                          ,deleteMessage: deleteMessage
+                                         ,errorMessage: errorMessage
                                          ,deleteView: deleteView
                                          ,view: view
                                          ,DeleteResponse: DeleteResponse
@@ -23773,74 +23796,75 @@ Elm.Templates.Core.make = function (_elm) {
    $Templates$List = Elm.Templates.List.make(_elm);
    var _op = {};
    var setName = F2(function (model,name) {    return _U.update(model,{name: name});});
-   var navigate = F2(function (action,_p0) {
-      var _p1 = _p0;
-      var _p9 = _p1;
-      var _p8 = _p1._0;
-      var _p7 = _p1._1;
-      var _p2 = action;
-      _v1_4: do {
-         switch (_p2.ctor)
-         {case "SetupJob": if (_p2._0.ctor === "_Tuple2") {
-                    var _p3 = _p2._0._0;
-                    switch (_p3)
-                    {case "launch": return {ctor: "_Tuple2"
-                                           ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Launch})})
-                                           ,_1: _p7};
-                       case "clear": return {ctor: "_Tuple2"
-                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Delete})})
-                                            ,_1: _p7};
-                       default: return _p9;}
-                 } else {
-                    break _v1_4;
-                 }
-            case "TemplatesAdd": var _p4 = _p2._0;
-              switch (_p4.ctor)
-              {case "Saved": return {ctor: "_Tuple2"
-                                    ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                                    ,_1: _p7};
-                 case "Cancel": return {ctor: "_Tuple2"
-                                       ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                                       ,_1: _p7};
-                 default: return _p9;}
-            case "TemplatesLaunch": var _p5 = _p2._0;
-              switch (_p5.ctor)
-              {case "Cancel": return {ctor: "_Tuple2"
-                                     ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                                     ,_1: _p7};
-                 case "JobLaunched": return {ctor: "_Tuple2"
-                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.List})})
-                                            ,_1: _p7};
-                 default: return _p9;}
-            case "TemplatesDelete": var _p6 = _p2._0;
-              switch (_p6.ctor)
-              {case "Deleted": return !_U.eq(_p1._0.$delete.error,"Failed to delete template") ? {ctor: "_Tuple2"
-                                                                                                 ,_0: _U.update(_p8,
-                                                                                                 {navChange: $Maybe.Just({ctor: "_Tuple2"
-                                                                                                                         ,_0: $Nav$Side.Templates
-                                                                                                                         ,_1: $Nav$Side.List})})
-                                                                                                 ,_1: _p7} : _p9;
-                 case "Cancel": return {ctor: "_Tuple2"
-                                       ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                                       ,_1: _p7};
-                 default: return _p9;}
-            default: break _v1_4;}
-      } while (false);
-      return _p9;
-   });
    var NoOp = {ctor: "NoOp"};
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
    var TemplatesDelete = function (a) {    return {ctor: "TemplatesDelete",_0: a};};
    var TemplatesLaunch = function (a) {    return {ctor: "TemplatesLaunch",_0: a};};
    var TemplatesList = function (a) {    return {ctor: "TemplatesList",_0: a};};
-   var refreshList = F2(function (succeeded,_p10) {
-      var _p11 = _p10;
+   var refreshList = F2(function (succeeded,_p0) {
+      var _p1 = _p0;
       if (succeeded) {
-            var _p12 = $Templates$List.init;
-            var listEffects = _p12._1;
-            var effects = _U.list([_p11._1,A2($Effects.map,TemplatesList,listEffects)]);
-            return {ctor: "_Tuple2",_0: _p11._0,_1: $Effects.batch(effects)};
-         } else return _p11;
+            var _p2 = $Templates$List.init;
+            var listEffects = _p2._1;
+            var effects = _U.list([_p1._1,A2($Effects.map,TemplatesList,listEffects)]);
+            return {ctor: "_Tuple2",_0: _p1._0,_1: $Effects.batch(effects)};
+         } else return _p1;
+   });
+   var navigate = F2(function (action,_p3) {
+      var _p4 = _p3;
+      var _p12 = _p4;
+      var _p11 = _p4._0;
+      var _p10 = _p4._1;
+      var _p5 = action;
+      _v2_4: do {
+         switch (_p5.ctor)
+         {case "SetupJob": if (_p5._0.ctor === "_Tuple2") {
+                    var _p6 = _p5._0._0;
+                    switch (_p6)
+                    {case "launch": return {ctor: "_Tuple2"
+                                           ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Launch})})
+                                           ,_1: _p10};
+                       case "clear": return {ctor: "_Tuple2"
+                                            ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Delete})})
+                                            ,_1: _p10};
+                       default: return _p12;}
+                 } else {
+                    break _v2_4;
+                 }
+            case "TemplatesAdd": var _p7 = _p5._0;
+              switch (_p7.ctor)
+              {case "Saved": return {ctor: "_Tuple2"
+                                    ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                    ,_1: _p10};
+                 case "Cancel": return {ctor: "_Tuple2"
+                                       ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                       ,_1: _p10};
+                 default: return _p12;}
+            case "TemplatesLaunch": var _p8 = _p5._0;
+              switch (_p8.ctor)
+              {case "Cancel": return {ctor: "_Tuple2"
+                                     ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                     ,_1: _p10};
+                 case "JobLaunched": return {ctor: "_Tuple2"
+                                            ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.List})})
+                                            ,_1: _p10};
+                 default: return _p12;}
+            case "TemplatesDelete": var _p9 = _p5._0;
+              switch (_p9.ctor)
+              {case "Deleted": return _U.eq(_p4._0.$delete.error,"") ? {ctor: "_Tuple2"
+                                                                       ,_0: _U.update(_p11,
+                                                                       {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                                                       ,_1: _p10} : _p12;
+                 case "Cancel": return A2(refreshList,
+                   true,
+                   {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}),_1: _p10});
+                 case "Done": return A2(refreshList,
+                   true,
+                   {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}),_1: _p10});
+                 default: return _p12;}
+            default: break _v2_4;}
+      } while (false);
+      return _p12;
    });
    var TemplatesAdd = function (a) {    return {ctor: "TemplatesAdd",_0: a};};
    var route = F2(function (action,_p13) {

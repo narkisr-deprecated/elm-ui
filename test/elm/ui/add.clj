@@ -181,6 +181,6 @@
     (let [hostname (openstack-flow)] 
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
-(digital-partial-save)
-;; (openstack-partial-template)
+;; (digital-partial-save)
+(openstack-partial-template)
 ;; (openstack-partial-save)

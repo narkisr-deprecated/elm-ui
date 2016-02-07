@@ -84,13 +84,16 @@ navigate action ((({launch, delete} as model), effects) as result) =
     TemplatesDelete deleteAction -> 
        case deleteAction of 
           Delete.Deleted _  -> 
-           if delete.error /= "Failed to delete template" then
+           if delete.error == "" then
              ({ model | navChange = Just (Templates, List)}, effects)
            else
              result
 
           Delete.Cancel -> 
-            ({ model | navChange = Just (Templates, List)}, effects)
+            refreshList True ({ model | navChange = Just (Templates, List)}, effects)
+
+          Delete.Done -> 
+            refreshList True ({ model | navChange = Just (Templates, List)}, effects)
          
           _ -> 
             result

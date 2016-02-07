@@ -31,10 +31,11 @@ type Error =
 type alias Errors = 
   {  type' : String
   ,  keyValues : Dict String Error
+  ,  message : Maybe String
   } 
 
-errorDecoder : Decoder Errors
-errorDecoder  =
+errorsDecoder : Decoder Errors
+errorsDecoder  =
   let
     options = [ map Value string 
               , map Nested (dict string) 
@@ -42,23 +43,37 @@ errorDecoder  =
               , map NestedList (dict (list (dict string)))
               ]
   in
-   (object2 Errors
+    (object3 Errors
       (at ["object", "type"] string)
-      (at ["object", "errors"] 
-        (dict (oneOf options))))
+      (at ["object", "errors"] (dict (oneOf options)))
+      (null Nothing)
+      )
+
+messageDecoder : Decoder Errors
+messageDecoder  =
+    (object1 (Errors "" Dict.empty)
+      (maybe ("message" := string)))
 
 decodeError : Http.Value -> Errors
 decodeError error = 
+  let 
+    emptyErrors = (Errors "" Dict.empty Nothing)
+  in 
   case error of
     Http.Text value -> 
-      case (decodeString errorDecoder value) of
+      case (decodeString errorsDecoder value) of
         Result.Ok errors -> 
           errors
 
         Result.Err e -> 
-          Debug.log e (Errors "" Dict.empty)
+          case (decodeString messageDecoder value) of
+            Result.Ok errors -> 
+               errors
 
-    _ -> Errors "" Dict.empty
+            Result.Err e -> 
+              Debug.log e emptyErrors
+
+    _ -> emptyErrors
   
 
 identitySuccess : m -> r -> (m, Effects a)

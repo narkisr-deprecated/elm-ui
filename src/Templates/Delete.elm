@@ -9,6 +9,7 @@ import Http exposing (Error(BadResponse))
 import Common.Components exposing (dangerCallout)
 import Common.Redirect exposing (failHandler)
 import Common.Http exposing (delete)
+import Maybe exposing (withDefault)
 
 type alias Model = 
   {
@@ -26,6 +27,7 @@ type Action =
   NoOp
   | Cancel
   | Delete
+  | Done
   | Deleted (Result Http.Error DeleteResponse)
   | Error String
 
@@ -33,7 +35,7 @@ update : Action ->  Model-> (Model , Effects Action)
 update action ({name} as model) =
   case action of 
     Deleted result -> 
-      failHandler result model (\_ -> none { model | error = "Failed to delete template" } ) NoOp
+      failHandler result model (\{message} -> none { model | error = withDefault "Failed to delete template" message }) NoOp
        
     Delete -> 
       (model, deleteTemplate name)
@@ -52,13 +54,22 @@ deleteMessage name =
         , text " will be deleted! "
      ]
  ]
+errorMessage : String -> List Html
+errorMessage message=
+  [
+    h4 [] [ text "Error!" ]
+  , span [] [ text message ]
+  ]
 
 deleteView address {name} =
    dangerCallout address (deleteMessage name) (div [] []) Cancel Delete
 
 view : Signal.Address Action -> Model -> List Html
-view address model =
-   deleteView address model  
+view address ({error} as model) =
+  if error /= "" then
+    dangerCallout address (errorMessage error) (div [] []) Cancel Done
+  else
+    deleteView address model  
 
 type alias DeleteResponse = 
   { message : String } 
