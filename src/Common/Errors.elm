@@ -15,7 +15,7 @@ type alias Model =
 
 init : (Model , Effects Action)
 init =
-  (Model (Redirect.Errors "" Dict.empty), Effects.none)
+  (Model (Redirect.Errors "" Dict.empty Nothing), Effects.none)
 
 type Action = 
   NoOp

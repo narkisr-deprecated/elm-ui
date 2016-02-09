@@ -17745,7 +17745,7 @@ Elm.Common.Errors.make = function (_elm) {
    });
    var NoOp = {ctor: "NoOp"};
    var Model = function (a) {    return {errors: a};};
-   var init = {ctor: "_Tuple2",_0: Model(A2($Common$Redirect.Errors,"",$Dict.empty)),_1: $Effects.none};
+   var init = {ctor: "_Tuple2",_0: Model(A3($Common$Redirect.Errors,"",$Dict.empty,$Maybe.Nothing)),_1: $Effects.none};
    return _elm.Common.Errors.values = {_op: _op
                                       ,Model: Model
                                       ,init: init
