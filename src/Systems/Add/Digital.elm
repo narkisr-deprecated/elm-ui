@@ -18,13 +18,13 @@ import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
 import Maybe exposing (withDefault)
 import Debug
+import Common.Wizard as Wizard
 
 -- Model 
 
 type alias Model = 
-  { step : Step
-  , prev : List Step
-  , next : List Step
+  { 
+    wizard : (Wizard.Model Step)
   , digital : Digital
   , machine : Machine
   , environment : Environment
@@ -34,13 +34,12 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let 
-    steps = [ Instance, Summary ]
+    wizard = Wizard.init Zero Instance [ Instance, Summary ]
   in 
-  (Model Zero [] steps emptyDigital emptyMachine Dict.empty Dict.empty, Effects.none)
+  (Model wizard emptyDigital emptyMachine Dict.empty Dict.empty, Effects.none)
 
 type Action = 
-  Next 
-  | Back 
+  WizardAction Wizard.Action
   | Update Environment
   | SelectSize String
   | SelectOS String
@@ -76,31 +75,14 @@ stringValidations = Dict.fromList [
 validateDigital = validateAll [stringValidations]
 
 update : Action -> Model-> Model
-update action ({next, prev, step, digital, machine} as model) =
+update action ({wizard, digital, machine} as model) =
   case action of
-    Next -> 
+    WizardAction action -> 
       let
-        nextStep = withDefault Instance (List.head next)
-        nextSteps = defaultEmpty (List.tail next)
-        prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = (validateDigital step model)
+        ({errors} as newModel) = (validateDigital wizard.step model)
+        newWizard = Wizard.update (notAny errors) action wizard
       in
-        if notAny errors then
-           {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
-        else 
-           newModel
-
-    Back -> 
-      let
-        prevStep = withDefault Zero (List.head (List.reverse prev))
-        prevSteps = List.take ((List.length prev) - 1) prev
-        nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = (validateDigital step model)
-      in
-        if notAny errors then
-          {model | step = prevStep, next = nextSteps, prev = prevSteps}
-        else 
-          model
+       { newModel | wizard = newWizard } 
 
     Update environment -> 
         let
@@ -127,30 +109,37 @@ update action ({next, prev, step, digital, machine} as model) =
     UserInput user -> 
        model 
         |> setMachine (\machine -> {machine | user = user })
-        |> validate step "User" stringValidations
+        |> validate wizard.step "User" stringValidations
         
     HostnameInput host -> 
       model 
         |> setMachine (\machine -> {machine | hostname = host })
-        |> validate step "Hostname" stringValidations
+        |> validate wizard.step "Hostname" stringValidations
          
     DomainInput domain -> 
       model 
         |> setMachine (\machine -> {machine | domain = domain})
-        |> validate step "Domain" stringValidations
+        |> validate wizard.step "Domain" stringValidations
 
     PrivateNetworking -> 
        setDigital (\digital -> {digital | privateNetworking = (not (digital.privateNetworking))}) model
 
+next : Model -> Environment -> Model
+next model environment =
+      model 
+         |> update (Update environment) 
+         |> update (WizardAction Wizard.Next)
 
+back model =
+  (update (WizardAction Wizard.Back) model)
 
 hasNext : Model -> Bool
-hasNext model =
-  not (List.isEmpty model.next)
+hasNext {wizard} =
+  not (List.isEmpty wizard.next)
 
 hasPrev : Model -> Bool
-hasPrev model =
-  not (List.isEmpty model.prev)
+hasPrev {wizard}  =
+  not (List.isEmpty wizard.prev)
 
 getOses : Model -> Dict String Template
 getOses model =
@@ -189,8 +178,8 @@ withErrors errors key widget =
 
 
 stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({digital, machine} as model) =
-  case model.step of
+stepView address ({wizard, digital, machine} as model) =
+  case wizard.step of
     Instance -> 
       instance address model 
 
@@ -198,9 +187,9 @@ stepView address ({digital, machine} as model) =
       summarize (digital, machine)
 
     _ -> 
-      Debug.log (toString model.step) [div [] []]
+      Debug.log (toString wizard.step) [div [] []]
 
 
 view : Signal.Address Action -> Model -> List Html
-view address ({step} as model) =
+view address model =
   panelContents (Html.form [] (stepView address model))

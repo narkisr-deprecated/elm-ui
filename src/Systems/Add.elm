@@ -87,7 +87,7 @@ setSaved : Action -> Model -> SaveResponse -> (Model, Effects Action)
 setSaved next model {id} =
   (model, runJob (toString id) (toLower (toString next)) JobLaunched)
 
-back action hasPrev model =
+back hasPrev model =
    let
      newModel = { model |  hasNext = True}
    in
@@ -99,11 +99,11 @@ back action hasPrev model =
 getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) hyp = 
   let
    backs = Dict.fromList [
-      ("aws", (back AWS.Back (AWS.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.update AWS.Back awsModel)}))
-    , ("gce", (back GCE.Back (GCE.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.update GCE.Back gceModel)}))
-    , ("openstack", (back Openstack.Back (Openstack.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.update Openstack.Back openstackModel)}))
-    , ("digital-ocean", (back Digital.Back (Digital.hasPrev digitalModel) {model | stage = Digital, digitalModel = (Digital.update Digital.Back digitalModel)}))
-    , ("physical", (back Physical.Back (Physical.hasPrev physicalModel) {model | stage = Physical, physicalModel = (Physical.update Physical.Back physicalModel)}))
+      ("aws", (back (AWS.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.update AWS.Back awsModel)}))
+    , ("gce", (back (GCE.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.update GCE.Back gceModel)}))
+    , ("openstack", (back (Openstack.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.update Openstack.Back openstackModel)}))
+    , ("digital-ocean", (back (Digital.hasPrev digitalModel) {model | stage = Digital, digitalModel = Digital.back digitalModel}))
+    , ("physical", (back (Physical.hasPrev physicalModel) {model | stage = Physical, physicalModel = (Physical.update Physical.Back physicalModel)}))
    ]
   in
    withDefault model (Dict.get hyp backs)
@@ -157,9 +157,7 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
  
           "digital-ocean" -> 
             let
-               newDigital = digitalModel 
-                               |> Digital.update (Digital.Update current) 
-                               |> Digital.update Digital.Next
+               newDigital = Digital.next digitalModel current 
             in
               none { model | stage = Digital , digitalModel = newDigital , hasNext = Digital.hasNext newDigital}
 
