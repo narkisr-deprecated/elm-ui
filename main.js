@@ -16209,6 +16209,7 @@ Elm.Systems.Add.Physical.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -16238,8 +16239,6 @@ Elm.Systems.Add.Physical.make = function (_elm) {
             return $Dict.empty;
          }
    };
-   var hasPrev = function (model) {    return $Basics.not($List.isEmpty(model.prev));};
-   var hasNext = function (model) {    return $Basics.not($List.isEmpty(model.next));};
    var setPhysical = F2(function (f,_p1) {    var _p2 = _p1;var newPhysical = f(_p2.physical);return _U.update(_p2,{physical: newPhysical});});
    var Summary = {ctor: "Summary"};
    var Instance = {ctor: "Instance"};
@@ -16282,110 +16281,99 @@ Elm.Systems.Add.Physical.make = function (_elm) {
                return A2($Maybe.withDefault,"",_p10.machine.ip);
             })}]))]));
    var validatePhysical = $Systems$Add$Validations.validateAll(_U.list([stringValidations]));
-   var Zero = {ctor: "Zero"};
    var update = F2(function (action,_p11) {
       var _p12 = _p11;
-      var _p21 = _p12.step;
-      var _p20 = _p12.prev;
-      var _p19 = _p12.next;
-      var _p18 = _p12;
-      var _p17 = _p12.machine;
+      var _p18 = _p12.wizard;
+      var _p17 = _p12;
+      var _p16 = _p12.machine;
       var _p13 = action;
       switch (_p13.ctor)
-      {case "Next": var _p14 = A2(validatePhysical,_p21,_p18);
+      {case "WizardAction": var _p14 = A2(validatePhysical,_p18.step,_p17);
            var newModel = _p14;
            var errors = _p14.errors;
-           var prevSteps = !_U.eq(_p21,Zero) ? A2($List.append,_p20,_U.list([_p21])) : _p20;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p19));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p19));
-           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p15 = A2(validatePhysical,_p21,_p18);
-           var newModel = _p15;
-           var errors = _p15.errors;
-           var nextSteps = !_U.eq(_p21,Zero) ? A2($List.append,_U.list([_p21]),_p19) : _p19;
-           var prevSteps = A2($List.take,$List.length(_p20) - 1,_p20);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p20)));
-           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p18,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p18;
-         case "Update": var newModel = _U.update(_p18,{environment: _p13._0});
-           var _p16 = $List.head($Dict.keys(getOses(newModel)));
-           if (_p16.ctor === "Just") {
-                 return $String.isEmpty(_p17.os) ? _U.update(newModel,{machine: _U.update(_p17,{os: _p16._0})}) : newModel;
+           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p13._0,_p18);
+           return _U.update(newModel,{wizard: newWizard});
+         case "Update": var newModel = _U.update(_p17,{environment: _p13._0});
+           var _p15 = $List.head($Dict.keys(getOses(newModel)));
+           if (_p15.ctor === "Just") {
+                 return $String.isEmpty(_p16.os) ? _U.update(newModel,{machine: _U.update(_p16,{os: _p15._0})}) : newModel;
               } else {
                  return newModel;
               }
-         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p13._0});},_p18);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p13._0});},_p17);
          case "UserInput": return A4($Systems$Add$Validations.validate,
-           _p21,
+           _p18.step,
            "User",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p13._0});},_p18));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p13._0});},_p17));
          case "HostnameInput": return A4($Systems$Add$Validations.validate,
-           _p21,
+           _p18.step,
            "Hostname",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p13._0});},_p18));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p13._0});},_p17));
          case "DomainInput": return A4($Systems$Add$Validations.validate,
-           _p21,
+           _p18.step,
            "Domain",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p13._0});},_p18));
-         case "MacInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{mac: $Maybe.Just(_p13._0)});},_p18);
-         case "BroadcastInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{broadcast: $Maybe.Just(_p13._0)});},_p18);
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p13._0});},_p17));
+         case "MacInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{mac: $Maybe.Just(_p13._0)});},_p17);
+         case "BroadcastInput": return A2(setPhysical,function (physical) {    return _U.update(physical,{broadcast: $Maybe.Just(_p13._0)});},_p17);
          default: return A4($Systems$Add$Validations.validate,
-           _p21,
+           _p18.step,
            "IP",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{ip: $Maybe.Just(_p13._0)});},_p18));}
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{ip: $Maybe.Just(_p13._0)});},_p17));}
    });
+   var Zero = {ctor: "Zero"};
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var BroadcastInput = function (a) {    return {ctor: "BroadcastInput",_0: a};};
    var MacInput = function (a) {    return {ctor: "MacInput",_0: a};};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
-   var instance = F2(function (address,_p22) {
-      var _p23 = _p22;
-      var _p25 = _p23.physical;
-      var _p24 = _p23.machine;
-      var check = withErrors(_p23.errors);
+   var instance = F2(function (address,_p19) {
+      var _p20 = _p19;
+      var _p22 = _p20.physical;
+      var _p21 = _p20.machine;
+      var check = withErrors(_p20.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p24.user))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p21.user))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p24.ip)))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p24.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p24.domain))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p21.ip)))
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p21.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p21.domain))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("WOL")]))
-              ,A2(check,"Mac",A4($Systems$Add$Common.inputText,address,MacInput,"",A2($Maybe.withDefault,"",_p25.mac)))
-              ,A2(check,"Broadcast",A4($Systems$Add$Common.inputText,address,BroadcastInput,"",A2($Maybe.withDefault,"",_p25.broadcast)))]))]);
+              ,A2(check,"Mac",A4($Systems$Add$Common.inputText,address,MacInput,"",A2($Maybe.withDefault,"",_p22.mac)))
+              ,A2(check,"Broadcast",A4($Systems$Add$Common.inputText,address,BroadcastInput,"",A2($Maybe.withDefault,"",_p22.broadcast)))]))]);
    });
-   var stepView = F2(function (address,_p26) {
-      var _p27 = _p26;
-      var _p29 = _p27;
-      var _p28 = _p29.step;
-      switch (_p28.ctor)
-      {case "Instance": return A2(instance,address,_p29);
-         case "Summary": return $Systems$View$Physical.summarize({ctor: "_Tuple2",_0: _p27.physical,_1: _p27.machine});
-         default: return A2($Debug.log,$Basics.toString(_p29.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p23) {
+      var _p24 = _p23;
+      var _p26 = _p24.wizard;
+      var _p25 = _p26.step;
+      switch (_p25.ctor)
+      {case "Instance": return A2(instance,address,_p24);
+         case "Summary": return $Systems$View$Physical.summarize({ctor: "_Tuple2",_0: _p24.physical,_1: _p24.machine});
+         default: return A2($Debug.log,$Basics.toString(_p26.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p30) {    var _p31 = _p30;return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,_p31)));});
+   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var Back = {ctor: "Back"};
-   var Next = {ctor: "Next"};
-   var Model = F7(function (a,b,c,d,e,f,g) {    return {step: a,prev: b,next: c,physical: d,machine: e,environment: f,errors: g};});
+   var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
+   var next = F2(function (model,environment) {    return A2(update,WizardAction($Common$Wizard.Next),A2(update,Update(environment),model));});
+   var back = function (model) {    return A2(update,WizardAction($Common$Wizard.Back),model);};
+   var Model = F5(function (a,b,c,d,e) {    return {wizard: a,physical: b,machine: c,environment: d,errors: e};});
    var init = function () {
-      var steps = _U.list([Instance,Summary]);
+      var wizard = A3($Common$Wizard.init,Zero,Instance,_U.list([Instance,Summary]));
       return {ctor: "_Tuple2"
-             ,_0: A7(Model,Zero,_U.list([]),steps,$Systems$Model$Physical.emptyPhysical,$Systems$Model$Common.emptyMachine,$Dict.empty,$Dict.empty)
+             ,_0: A5(Model,wizard,$Systems$Model$Physical.emptyPhysical,$Systems$Model$Common.emptyMachine,$Dict.empty,$Dict.empty)
              ,_1: $Effects.none};
    }();
    return _elm.Systems.Add.Physical.values = {_op: _op
                                              ,Model: Model
                                              ,init: init
-                                             ,Next: Next
-                                             ,Back: Back
+                                             ,WizardAction: WizardAction
                                              ,Update: Update
                                              ,SelectOS: SelectOS
                                              ,UserInput: UserInput
@@ -16401,8 +16389,8 @@ Elm.Systems.Add.Physical.make = function (_elm) {
                                              ,stringValidations: stringValidations
                                              ,validatePhysical: validatePhysical
                                              ,update: update
-                                             ,hasNext: hasNext
-                                             ,hasPrev: hasPrev
+                                             ,next: next
+                                             ,back: back
                                              ,getOses: getOses
                                              ,instance: instance
                                              ,withErrors: withErrors
@@ -16500,6 +16488,7 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -16521,8 +16510,6 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    var withErrors = F3(function (errors,key,widget) {
       return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
    });
-   var hasPrev = function (model) {    return $Basics.not($List.isEmpty(model.prev));};
-   var hasNext = function (model) {    return $Basics.not($List.isEmpty(model.next));};
    var getFlavors = function (model) {
       var hypervisor = A2($Maybe.withDefault,$Environments$List.Empty,A2($Dict.get,"openstack",model.environment));
       var _p0 = hypervisor;
@@ -16648,124 +16635,113 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                                             return _p29.openstack.networks;
                                                          })}]))]));
    var validateOpenstack = $Systems$Add$Validations.validateAll(_U.list([stringValidations,listValidations]));
-   var Zero = {ctor: "Zero"};
    var update = F2(function (action,_p30) {
       var _p31 = _p30;
-      var _p41 = _p31.step;
-      var _p40 = _p31.prev;
-      var _p39 = _p31.openstack;
-      var _p38 = _p31.next;
-      var _p37 = _p31;
+      var _p38 = _p31.wizard;
+      var _p37 = _p31.openstack;
+      var _p36 = _p31;
       var _p32 = action;
       switch (_p32.ctor)
-      {case "Next": var _p33 = ignoreDevices(A2(validateOpenstack,_p41,_p37));
+      {case "WizardAction": var _p33 = ignoreDevices(A2(validateOpenstack,_p38.step,_p36));
            var newModel = _p33;
            var errors = _p33.errors;
-           var prevSteps = !_U.eq(_p41,Zero) ? A2($List.append,_p40,_U.list([_p41])) : _p40;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p38));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p38));
-           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p34 = ignoreDevices(A2(validateOpenstack,_p41,_p37));
-           var newModel = _p34;
-           var errors = _p34.errors;
-           var nextSteps = !_U.eq(_p41,Zero) ? A2($List.append,_U.list([_p41]),_p38) : _p38;
-           var prevSteps = A2($List.take,$List.length(_p40) - 1,_p40);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p40)));
-           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p37,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p37;
-         case "Update": return A2(setDefaultFlavor,_p37,A2($Systems$Add$Common.setDefaultOS,"openstack",_U.update(_p37,{environment: _p32._0})));
-         case "SelectFlavor": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{flavor: _p32._0});},_p37);
-         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p32._0});},_p37);
+           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p32._0,_p38);
+           return _U.update(newModel,{wizard: newWizard});
+         case "Update": return A2(setDefaultFlavor,_p36,A2($Systems$Add$Common.setDefaultOS,"openstack",_U.update(_p36,{environment: _p32._0})));
+         case "SelectFlavor": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{flavor: _p32._0});},_p36);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p32._0});},_p36);
          case "TenantInput": return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "Tenant",
            stringValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{tenant: _p32._0});},_p37));
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{tenant: _p32._0});},_p36));
          case "KeyPairInput": return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "Keypair",
            stringValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{keyName: _p32._0});},_p37));
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{keyName: _p32._0});},_p36));
          case "SecurityGroupsInput": var splited = A2($String.split," ",_p32._0);
            return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "Security groups",
            listValidations,
            A2(setOpenstack,
            function (openstack) {
               return _U.update(openstack,{securityGroups: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});
            },
-           _p37));
+           _p36));
          case "NetworksInput": var splited = A2($String.split," ",_p32._0);
            return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "Networks",
            listValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{networks: splited});},_p37));
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{networks: splited});},_p36));
          case "UserInput": return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "User",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p32._0});},_p37));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p32._0});},_p36));
          case "HostnameInput": return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "Hostname",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p32._0});},_p37));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p32._0});},_p36));
          case "DomainInput": return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "Domain",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p32._0});},_p37));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p32._0});},_p36));
          case "IPInput": return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "IP",
            stringValidations,
-           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIp: $Maybe.Just(_p32._0)});},_p37));
-         case "IPPoolInput": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIpPool: $Maybe.Just(_p32._0)});},_p37);
-         case "CinderSizeInput": var _p35 = $String.toInt(_p32._0);
-           if (_p35.ctor === "Ok") {
-                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p35._0});},_p37);
+           A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIp: $Maybe.Just(_p32._0)});},_p36));
+         case "IPPoolInput": return A2(setOpenstack,function (openstack) {    return _U.update(openstack,{floatingIpPool: $Maybe.Just(_p32._0)});},_p36);
+         case "CinderSizeInput": var _p34 = $String.toInt(_p32._0);
+           if (_p34.ctor === "Ok") {
+                 return A2(setVolume,function (volume) {    return _U.update(volume,{size: _p34._0});},_p36);
               } else {
-                 return _p37;
+                 return _p36;
               }
          case "CinderDeviceInput": return A4($Systems$Add$Validations.validate,
-           _p41,
+           _p38.step,
            "Cinder Device",
            tupleValidations,
-           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p32._0});},_p37));
-         case "CinderClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p37);
-         case "VolumeAdd": var newOpenstack = _U.update(_p39,
-           {volumes: $Maybe.Just(A2($List.append,_U.list([_p31.volume]),$Common$Utils.defaultEmpty(_p39.volumes)))});
-           var _p36 = A4($Systems$Add$Validations.validate,_p41,"Cinder Device",tupleValidations,_p37);
-           var newModel = _p36;
-           var errors = _p36.errors;
+           A2(setVolume,function (volume) {    return _U.update(volume,{device: _p32._0});},_p36));
+         case "CinderClear": return A2(setVolume,function (volume) {    return _U.update(volume,{clear: $Basics.not(volume.clear)});},_p36);
+         case "VolumeAdd": var newOpenstack = _U.update(_p37,
+           {volumes: $Maybe.Just(A2($List.append,_U.list([_p31.volume]),$Common$Utils.defaultEmpty(_p37.volumes)))});
+           var _p35 = A4($Systems$Add$Validations.validate,_p38.step,"Cinder Device",tupleValidations,_p36);
+           var newModel = _p35;
+           var errors = _p35.errors;
            return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,
-           {volume: $Systems$Model$Openstack.emptyVolume,openstack: newOpenstack}) : _U.update(newModel,{openstack: _p39});
-         default: var newVolumes = A2($List.filter,function (volume) {    return !_U.eq(volume.device,_p32._0);},$Common$Utils.defaultEmpty(_p39.volumes));
-           var newOpenstack = _U.update(_p39,{volumes: $Maybe.Just(newVolumes)});
-           return _U.update(_p37,{openstack: newOpenstack});}
+           {volume: $Systems$Model$Openstack.emptyVolume,openstack: newOpenstack}) : _U.update(newModel,{openstack: _p37});
+         default: var newVolumes = A2($List.filter,function (volume) {    return !_U.eq(volume.device,_p32._0);},$Common$Utils.defaultEmpty(_p37.volumes));
+           var newOpenstack = _U.update(_p37,{volumes: $Maybe.Just(newVolumes)});
+           return _U.update(_p36,{openstack: newOpenstack});}
    });
+   var Zero = {ctor: "Zero"};
    var VolumeRemove = function (a) {    return {ctor: "VolumeRemove",_0: a};};
-   var volumeRow = F2(function (address,_p42) {
-      var _p43 = _p42;
+   var volumeRow = F2(function (address,_p39) {
+      var _p40 = _p39;
       var props = _U.list([function (_) {
                              return _.device;
                           }
-                          ,function (_p44) {
-                             return $Basics.toString(function (_) {    return _.size;}(_p44));
+                          ,function (_p41) {
+                             return $Basics.toString(function (_) {    return _.size;}(_p41));
                           }
-                          ,function (_p45) {
-                             return $Basics.toString(function (_) {    return _.clear;}(_p45));
+                          ,function (_p42) {
+                             return $Basics.toString(function (_) {    return _.clear;}(_p42));
                           }]);
       var remove = A2($Html.span,
       _U.list([$Html$Attributes.$class("glyphicon glyphicon-remove")
               ,A2($Html$Attributes.attribute,"aria-hidden","true")
               ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "top",_1: "5px"}]))
-              ,A2($Html$Events.onClick,address,VolumeRemove(_p43.device))]),
+              ,A2($Html$Events.onClick,address,VolumeRemove(_p40.device))]),
       _U.list([]));
       return A2($Html.tr,
       _U.list([]),
-      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p43))]));},props),_U.list([remove])));
+      A2($List.append,A2($List.map,function (prop) {    return A2($Html.td,_U.list([]),_U.list([$Html.text(prop(_p40))]));},props),_U.list([remove])));
    });
    var volumes = F2(function (address,vs) {
       return A2($Html.div,
@@ -16783,42 +16759,42 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    var CinderClear = {ctor: "CinderClear"};
    var CinderDeviceInput = function (a) {    return {ctor: "CinderDeviceInput",_0: a};};
    var CinderSizeInput = function (a) {    return {ctor: "CinderSizeInput",_0: a};};
-   var cinder = F2(function (address,_p46) {
-      var _p47 = _p46;
-      var _p48 = _p47.volume;
-      var check = withErrors(_p47.errors);
+   var cinder = F2(function (address,_p43) {
+      var _p44 = _p43;
+      var _p45 = _p44.volume;
+      var check = withErrors(_p44.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Devices")]))
-              ,A2(check,"Cinder Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p48.device))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p48.size)))
-              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p48.clear))
+              ,A2(check,"Cinder Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p45.device))
+              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p45.size)))
+              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p45.clear))
               ,A2($Systems$Add$Common.group$,
               "",
               A2($Html.button,
               _U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,VolumeAdd)]),
               _U.list([$Html.text("Add")])))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Volumes")]))
-              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p47.openstack.volumes))]))]);
+              ,A2(volumes,address,$Common$Utils.defaultEmpty(_p44.openstack.volumes))]))]);
    });
    var NetworksInput = function (a) {    return {ctor: "NetworksInput",_0: a};};
    var IPPoolInput = function (a) {    return {ctor: "IPPoolInput",_0: a};};
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
-   var networking = F2(function (address,_p49) {
-      var _p50 = _p49;
-      var _p52 = _p50.openstack;
-      var _p51 = _p50.machine;
-      var networks = A2($String.join," ",_p52.networks);
-      var check = withErrors(_p50.errors);
+   var networking = F2(function (address,_p46) {
+      var _p47 = _p46;
+      var _p49 = _p47.openstack;
+      var _p48 = _p47.machine;
+      var networks = A2($String.join," ",_p49.networks);
+      var check = withErrors(_p47.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p51.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p51.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p52.floatingIp)))
-              ,A2(check,"IP-Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p52.floatingIpPool)))
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p48.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p48.domain))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p49.floatingIp)))
+              ,A2(check,"IP-Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p49.floatingIpPool)))
               ,A2(check,"Networks",A4($Systems$Add$Common.inputText,address,NetworksInput," ",networks))]))]);
    });
    var TenantInput = function (a) {    return {ctor: "TenantInput",_0: a};};
@@ -16827,48 +16803,48 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    var KeyPairInput = function (a) {    return {ctor: "KeyPairInput",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectFlavor = function (a) {    return {ctor: "SelectFlavor",_0: a};};
-   var instance = F2(function (address,_p53) {
-      var _p54 = _p53;
-      var _p56 = _p54.openstack;
-      var _p55 = _p54;
-      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"openstack",_p55));
-      var flavors = $Dict.keys(getFlavors(_p55));
-      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p56.securityGroups));
-      var check = withErrors(_p54.errors);
+   var instance = F2(function (address,_p50) {
+      var _p51 = _p50;
+      var _p53 = _p51.openstack;
+      var _p52 = _p51;
+      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"openstack",_p52));
+      var flavors = $Dict.keys(getFlavors(_p52));
+      var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p53.securityGroups));
+      var check = withErrors(_p51.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,"Flavor",A4($Systems$Add$Common.selector,address,SelectFlavor,flavors,_p56.flavor))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,oses,_p54.machine.os))
-              ,A2(check,"Tenant",A4($Systems$Add$Common.inputText,address,TenantInput,"",_p56.tenant))
+              ,A2($Systems$Add$Common.group$,"Flavor",A4($Systems$Add$Common.selector,address,SelectFlavor,flavors,_p53.flavor))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,oses,_p51.machine.os))
+              ,A2(check,"Tenant",A4($Systems$Add$Common.inputText,address,TenantInput,"",_p53.tenant))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p55.machine.user))
-              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p56.keyName))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p52.machine.user))
+              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p53.keyName))
               ,A2(check,"Security groups",A4($Systems$Add$Common.inputText,address,SecurityGroupsInput," ",groups))]))]);
    });
-   var stepView = F2(function (address,_p57) {
-      var _p58 = _p57;
-      var _p60 = _p58;
-      var _p59 = _p60.step;
-      switch (_p59.ctor)
-      {case "Instance": return A2(instance,address,_p60);
-         case "Networking": return A2(networking,address,_p60);
-         case "Cinder": return A2(cinder,address,_p60);
-         case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p58.openstack,_1: _p58.machine});
-         default: return A2($Debug.log,$Basics.toString(_p60.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p54) {
+      var _p55 = _p54;
+      var _p58 = _p55.wizard;
+      var _p57 = _p55;
+      var _p56 = _p58.step;
+      switch (_p56.ctor)
+      {case "Instance": return A2(instance,address,_p57);
+         case "Networking": return A2(networking,address,_p57);
+         case "Cinder": return A2(cinder,address,_p57);
+         case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p55.openstack,_1: _p55.machine});
+         default: return A2($Debug.log,$Basics.toString(_p58.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p61) {    var _p62 = _p61;return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,_p62)));});
+   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
    var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var Back = {ctor: "Back"};
-   var Next = {ctor: "Next"};
-   var Model = F8(function (a,b,c,d,e,f,g,h) {    return {step: a,prev: b,next: c,openstack: d,machine: e,environment: f,errors: g,volume: h};});
+   var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
+   var next = F2(function (model,environment) {    return A2(update,WizardAction($Common$Wizard.Next),A2(update,Update(environment),model));});
+   var back = function (model) {    return A2(update,WizardAction($Common$Wizard.Back),model);};
+   var Model = F6(function (a,b,c,d,e,f) {    return {wizard: a,openstack: b,machine: c,environment: d,errors: e,volume: f};});
    var init = function () {
-      var steps = _U.list([Instance,Networking,Cinder,Summary]);
+      var wizard = A3($Common$Wizard.init,Zero,Instance,_U.list([Instance,Networking,Cinder,Summary]));
       return {ctor: "_Tuple2"
-             ,_0: A8(Model,
-             Zero,
-             _U.list([]),
-             steps,
+             ,_0: A6(Model,
+             wizard,
              $Systems$Model$Openstack.emptyOpenstack,
              $Systems$Model$Common.emptyMachine,
              $Dict.empty,
@@ -16879,8 +16855,7 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    return _elm.Systems.Add.Openstack.values = {_op: _op
                                               ,Model: Model
                                               ,init: init
-                                              ,Next: Next
-                                              ,Back: Back
+                                              ,WizardAction: WizardAction
                                               ,Update: Update
                                               ,SelectFlavor: SelectFlavor
                                               ,SelectOS: SelectOS
@@ -16913,8 +16888,8 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                               ,setDefaultFlavor: setDefaultFlavor
                                               ,validateOpenstack: validateOpenstack
                                               ,update: update
-                                              ,hasNext: hasNext
-                                              ,hasPrev: hasPrev
+                                              ,next: next
+                                              ,back: back
                                               ,instance: instance
                                               ,withErrors: withErrors
                                               ,networking: networking
@@ -17001,6 +16976,7 @@ Elm.Systems.Add.GCE.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -17030,8 +17006,6 @@ Elm.Systems.Add.GCE.make = function (_elm) {
             return $Dict.empty;
          }
    };
-   var hasPrev = function (model) {    return $Basics.not($List.isEmpty(model.prev));};
-   var hasNext = function (model) {    return $Basics.not($List.isEmpty(model.next));};
    var setGCE = F2(function (f,_p1) {    var _p2 = _p1;var newGce = f(_p2.gce);return _U.update(_p2,{gce: newGce});});
    var Summary = {ctor: "Summary"};
    var Networking = {ctor: "Networking"};
@@ -17097,85 +17071,74 @@ Elm.Systems.Add.GCE.make = function (_elm) {
                return $Common$Utils.defaultEmpty(_p14.gce.tags);
             })}]))]));
    var validateGce = $Systems$Add$Validations.validateAll(_U.list([listValidations,stringValidations]));
-   var Zero = {ctor: "Zero"};
    var update = F2(function (action,_p15) {
       var _p16 = _p15;
-      var _p25 = _p16.step;
-      var _p24 = _p16.prev;
-      var _p23 = _p16.next;
-      var _p22 = _p16;
-      var _p21 = _p16.machine;
+      var _p22 = _p16.wizard;
+      var _p21 = _p16;
+      var _p20 = _p16.machine;
       var _p17 = action;
       switch (_p17.ctor)
-      {case "Next": var _p18 = A2(validateGce,_p25,_p22);
+      {case "WizardAction": var _p18 = A2(validateGce,_p22.step,_p21);
            var newModel = _p18;
            var errors = _p18.errors;
-           var prevSteps = !_U.eq(_p25,Zero) ? A2($List.append,_p24,_U.list([_p25])) : _p24;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p23));
-           var nextStep = A2($Maybe.withDefault,Instance,$List.head(_p23));
-           return $Systems$Add$Validations.notAny(errors) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var _p19 = A2(validateGce,_p25,_p22);
-           var newModel = _p19;
-           var errors = _p19.errors;
-           var nextSteps = !_U.eq(_p25,Zero) ? A2($List.append,_U.list([_p25]),_p23) : _p23;
-           var prevSteps = A2($List.take,$List.length(_p24) - 1,_p24);
-           var prevStep = A2($Maybe.withDefault,Zero,$List.head($List.reverse(_p24)));
-           return $Systems$Add$Validations.notAny(errors) ? _U.update(_p22,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p22;
-         case "Update": var newModel = _U.update(_p22,{environment: _p17._0});
-           var _p20 = $List.head($Dict.keys(getOses(newModel)));
-           if (_p20.ctor === "Just") {
-                 return $String.isEmpty(_p21.os) ? _U.update(newModel,{machine: _U.update(_p21,{os: _p20._0})}) : newModel;
+           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p17._0,_p22);
+           return _U.update(newModel,{wizard: newWizard});
+         case "Update": var newModel = _U.update(_p21,{environment: _p17._0});
+           var _p19 = $List.head($Dict.keys(getOses(newModel)));
+           if (_p19.ctor === "Just") {
+                 return $String.isEmpty(_p20.os) ? _U.update(newModel,{machine: _U.update(_p20,{os: _p19._0})}) : newModel;
               } else {
                  return newModel;
               }
-         case "SelectMachineType": return A2(setGCE,function (gce) {    return _U.update(gce,{machineType: _p17._0});},_p22);
-         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p17._0});},_p22);
-         case "SelectZone": return A2(setGCE,function (gce) {    return _U.update(gce,{zone: _p17._0});},_p22);
+         case "SelectMachineType": return A2(setGCE,function (gce) {    return _U.update(gce,{machineType: _p17._0});},_p21);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p17._0});},_p21);
+         case "SelectZone": return A2(setGCE,function (gce) {    return _U.update(gce,{zone: _p17._0});},_p21);
          case "UserInput": return A4($Systems$Add$Validations.validate,
-           _p25,
+           _p22.step,
            "User",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p17._0});},_p22));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p17._0});},_p21));
          case "HostnameInput": return A4($Systems$Add$Validations.validate,
-           _p25,
+           _p22.step,
            "Hostname",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p17._0});},_p22));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p17._0});},_p21));
          case "ProjectIdInput": return A4($Systems$Add$Validations.validate,
-           _p25,
+           _p22.step,
            "Project id",
            stringValidations,
-           A2(setGCE,function (gce) {    return _U.update(gce,{projectId: _p17._0});},_p22));
+           A2(setGCE,function (gce) {    return _U.update(gce,{projectId: _p17._0});},_p21));
          case "TagsInput": var splited = A2($String.split," ",_p17._0);
            return A4($Systems$Add$Validations.validate,
-           _p25,
+           _p22.step,
            "Tags",
            listValidations,
-           A2(setGCE,function (gce) {    return _U.update(gce,{tags: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});},_p22));
+           A2(setGCE,function (gce) {    return _U.update(gce,{tags: $Maybe.Just(_U.eq(splited,_U.list([""])) ? _U.list([]) : splited)});},_p21));
          case "DomainInput": return A4($Systems$Add$Validations.validate,
-           _p25,
+           _p22.step,
            "Domain",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p17._0});},_p22));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p17._0});},_p21));
          default: return A4($Systems$Add$Validations.validate,
-           _p25,
+           _p22.step,
            "IP",
            stringValidations,
-           A2(setGCE,function (gce) {    return _U.update(gce,{staticIp: $Maybe.Just(_p17._0)});},_p22));}
+           A2(setGCE,function (gce) {    return _U.update(gce,{staticIp: $Maybe.Just(_p17._0)});},_p21));}
    });
+   var Zero = {ctor: "Zero"};
    var IPInput = function (a) {    return {ctor: "IPInput",_0: a};};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
-   var networking = F2(function (address,_p26) {
-      var _p27 = _p26;
-      var _p28 = _p27.machine;
-      var check = withErrors(_p27.errors);
+   var networking = F2(function (address,_p23) {
+      var _p24 = _p23;
+      var _p25 = _p24.machine;
+      var check = withErrors(_p24.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("DNS")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p28.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p28.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p27.gce.staticIp)))]))]);
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p25.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p25.domain))
+              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p24.gce.staticIp)))]))]);
    });
    var TagsInput = function (a) {    return {ctor: "TagsInput",_0: a};};
    var ProjectIdInput = function (a) {    return {ctor: "ProjectIdInput",_0: a};};
@@ -17183,52 +17146,51 @@ Elm.Systems.Add.GCE.make = function (_elm) {
    var SelectZone = function (a) {    return {ctor: "SelectZone",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectMachineType = function (a) {    return {ctor: "SelectMachineType",_0: a};};
-   var instance = F2(function (address,_p29) {
-      var _p30 = _p29;
-      var _p32 = _p30;
-      var _p31 = _p30.gce;
+   var instance = F2(function (address,_p26) {
+      var _p27 = _p26;
+      var _p29 = _p27;
+      var _p28 = _p27.gce;
       var zone = A2($Maybe.withDefault,"",$List.head($Systems$Model$GCE.zones));
-      var tags = A2($String.join," ",$Common$Utils.defaultEmpty(_p31.tags));
-      var check = withErrors(_p30.errors);
+      var tags = A2($String.join," ",$Common$Utils.defaultEmpty(_p28.tags));
+      var check = withErrors(_p27.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
               ,A2($Systems$Add$Common.group$,
               "Machine type",
-              A4($Systems$Add$Common.selector,address,SelectMachineType,$Systems$Model$GCE.machineTypes,_p31.machineType))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p32)),_p30.machine.os))
-              ,A2($Systems$Add$Common.group$,"Zone",A4($Systems$Add$Common.selector,address,SelectZone,$Systems$Model$GCE.zones,_p31.zone))
-              ,A2(check,"Project id",A4($Systems$Add$Common.inputText,address,ProjectIdInput,"",_p31.projectId))
+              A4($Systems$Add$Common.selector,address,SelectMachineType,$Systems$Model$GCE.machineTypes,_p28.machineType))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p29)),_p27.machine.os))
+              ,A2($Systems$Add$Common.group$,"Zone",A4($Systems$Add$Common.selector,address,SelectZone,$Systems$Model$GCE.zones,_p28.zone))
+              ,A2(check,"Project id",A4($Systems$Add$Common.inputText,address,ProjectIdInput,"",_p28.projectId))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p32.machine.user))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p29.machine.user))
               ,A2(check,"Tags",A4($Systems$Add$Common.inputText,address,TagsInput," ",tags))]))]);
    });
-   var stepView = F2(function (address,_p33) {
-      var _p34 = _p33;
-      var _p36 = _p34;
-      var _p35 = _p36.step;
-      switch (_p35.ctor)
-      {case "Instance": return A2(instance,address,_p36);
-         case "Networking": return A2(networking,address,_p36);
-         case "Summary": return $Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p34.gce,_1: _p34.machine});
-         default: return A2($Debug.log,$Basics.toString(_p36.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p30) {
+      var _p31 = _p30;
+      var _p34 = _p31.wizard;
+      var _p33 = _p31;
+      var _p32 = _p34.step;
+      switch (_p32.ctor)
+      {case "Instance": return A2(instance,address,_p33);
+         case "Networking": return A2(networking,address,_p33);
+         case "Summary": return $Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p31.gce,_1: _p31.machine});
+         default: return A2($Debug.log,$Basics.toString(_p34.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,_p37) {    var _p38 = _p37;return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,_p38)));});
+   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
    var Update = function (a) {    return {ctor: "Update",_0: a};};
-   var Back = {ctor: "Back"};
-   var Next = {ctor: "Next"};
-   var Model = F7(function (a,b,c,d,e,f,g) {    return {step: a,prev: b,next: c,gce: d,machine: e,environment: f,errors: g};});
+   var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
+   var next = F2(function (model,environment) {    return A2(update,WizardAction($Common$Wizard.Next),A2(update,Update(environment),model));});
+   var back = function (model) {    return A2(update,WizardAction($Common$Wizard.Back),model);};
+   var Model = F5(function (a,b,c,d,e) {    return {wizard: a,gce: b,machine: c,environment: d,errors: e};});
    var init = function () {
-      var steps = _U.list([Instance,Networking,Summary]);
-      return {ctor: "_Tuple2"
-             ,_0: A7(Model,Zero,_U.list([]),steps,$Systems$Model$GCE.emptyGce,$Systems$Model$Common.emptyMachine,$Dict.empty,$Dict.empty)
-             ,_1: $Effects.none};
+      var wizard = A3($Common$Wizard.init,Zero,Instance,_U.list([Instance,Networking,Summary]));
+      return {ctor: "_Tuple2",_0: A5(Model,wizard,$Systems$Model$GCE.emptyGce,$Systems$Model$Common.emptyMachine,$Dict.empty,$Dict.empty),_1: $Effects.none};
    }();
    return _elm.Systems.Add.GCE.values = {_op: _op
                                         ,Model: Model
                                         ,init: init
-                                        ,Next: Next
-                                        ,Back: Back
+                                        ,WizardAction: WizardAction
                                         ,Update: Update
                                         ,SelectMachineType: SelectMachineType
                                         ,SelectOS: SelectOS
@@ -17248,8 +17210,8 @@ Elm.Systems.Add.GCE.make = function (_elm) {
                                         ,listValidations: listValidations
                                         ,validateGce: validateGce
                                         ,update: update
-                                        ,hasNext: hasNext
-                                        ,hasPrev: hasPrev
+                                        ,next: next
+                                        ,back: back
                                         ,getOses: getOses
                                         ,networking: networking
                                         ,instance: instance
@@ -18226,15 +18188,12 @@ Elm.Systems.Add.make = function (_elm) {
                                           ,_1: A2(back,$Common$Wizard.hasPrev(_p21),_U.update(_p24,{stage: AWS,awsModel: $Systems$Add$AWS.back(_p21)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "gce"
-                                          ,_1: A2(back,
-                                          $Systems$Add$GCE.hasPrev(_p23),
-                                          _U.update(_p24,{stage: GCE,gceModel: A2($Systems$Add$GCE.update,$Systems$Add$GCE.Back,_p23)}))}
+                                          ,_1: A2(back,$Common$Wizard.hasPrev(_p23),_U.update(_p24,{stage: GCE,gceModel: $Systems$Add$GCE.back(_p23)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "openstack"
                                           ,_1: A2(back,
-                                          $Systems$Add$Openstack.hasPrev(_p25),
-                                          _U.update(_p24,
-                                          {stage: Openstack,openstackModel: A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Back,_p25)}))}
+                                          $Common$Wizard.hasPrev(_p25),
+                                          _U.update(_p24,{stage: Openstack,openstackModel: $Systems$Add$Openstack.back(_p25)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "digital-ocean"
                                           ,_1: A2(back,
@@ -18243,9 +18202,8 @@ Elm.Systems.Add.make = function (_elm) {
                                          ,{ctor: "_Tuple2"
                                           ,_0: "physical"
                                           ,_1: A2(back,
-                                          $Systems$Add$Physical.hasPrev(_p26),
-                                          _U.update(_p24,
-                                          {stage: Physical,physicalModel: A2($Systems$Add$Physical.update,$Systems$Add$Physical.Back,_p26)}))}]));
+                                          $Common$Wizard.hasPrev(_p26),
+                                          _U.update(_p24,{stage: Physical,physicalModel: $Systems$Add$Physical.back(_p26)}))}]));
       return A2($Maybe.withDefault,_p24,A2($Dict.get,hyp,backs));
    });
    var update = F2(function (action,_p27) {
@@ -18267,19 +18225,14 @@ Elm.Systems.Add.make = function (_elm) {
            switch (_p31)
            {case "aws": var newAws = A2($Systems$Add$AWS.next,_p33,current);
                 return $Common$Utils.none(_U.update(_p37,{stage: AWS,awsModel: newAws,hasNext: $Common$Wizard.hasNext(newAws)}));
-              case "gce": var newGce = A2($Systems$Add$GCE.update,$Systems$Add$GCE.Next,A2($Systems$Add$GCE.update,$Systems$Add$GCE.Update(current),_p35));
-                return $Common$Utils.none(_U.update(_p37,{stage: GCE,gceModel: newGce,hasNext: $Systems$Add$GCE.hasNext(newGce)}));
+              case "gce": var newGce = A2($Systems$Add$GCE.next,_p35,current);
+                return $Common$Utils.none(_U.update(_p37,{stage: GCE,gceModel: newGce,hasNext: $Common$Wizard.hasNext(newGce)}));
               case "digital-ocean": var newDigital = A2($Systems$Add$Digital.next,_p34,current);
                 return $Common$Utils.none(_U.update(_p37,{stage: Digital,digitalModel: newDigital,hasNext: $Common$Wizard.hasNext(newDigital)}));
-              case "physical": var newPhysical = A2($Systems$Add$Physical.update,
-                $Systems$Add$Physical.Next,
-                A2($Systems$Add$Physical.update,$Systems$Add$Physical.Update(current),_p39));
-                return $Common$Utils.none(_U.update(_p37,{stage: Physical,physicalModel: newPhysical,hasNext: $Systems$Add$Physical.hasNext(newPhysical)}));
-              case "openstack": var newOpenstack = A2($Systems$Add$Openstack.update,
-                $Systems$Add$Openstack.Next,
-                A2($Systems$Add$Openstack.update,$Systems$Add$Openstack.Update(current),_p38));
-                return $Common$Utils.none(_U.update(_p37,
-                {stage: Openstack,openstackModel: newOpenstack,hasNext: $Systems$Add$Openstack.hasNext(newOpenstack)}));
+              case "physical": var newPhysical = A2($Systems$Add$Physical.next,_p39,current);
+                return $Common$Utils.none(_U.update(_p37,{stage: Physical,physicalModel: newPhysical,hasNext: $Common$Wizard.hasNext(newPhysical)}));
+              case "openstack": var newOpenstack = A2($Systems$Add$Openstack.next,_p38,current);
+                return $Common$Utils.none(_U.update(_p37,{stage: Openstack,openstackModel: newOpenstack,hasNext: $Common$Wizard.hasNext(newOpenstack)}));
               default: return {ctor: "_Tuple2",_0: _p37,_1: $Effects.none};}
          case "Back": return $Common$Utils.none(A2(getBack,_p37,_p36.hypervisor));
          case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p29._0,_p33);

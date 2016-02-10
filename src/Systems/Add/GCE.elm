@@ -18,13 +18,13 @@ import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
 import Maybe exposing (withDefault)
 import Debug
+import Common.Wizard as Wizard
 
 -- Model 
 
 type alias Model = 
-  { step : Step
-  , prev : List Step
-  , next : List Step
+  { 
+    wizard : (Wizard.Model Step)
   , gce : GCE
   , machine : Machine
   , environment : Environment
@@ -34,23 +34,22 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let 
-    steps = [ Instance, Networking, Summary ]
+    wizard = Wizard.init Zero Instance [ Instance, Networking, Summary ]
   in 
-  (Model Zero [] steps (emptyGce) (emptyMachine) Dict.empty Dict.empty, Effects.none)
+   (Model wizard emptyGce emptyMachine Dict.empty Dict.empty, Effects.none)
 
 type Action = 
-  Next 
-  | Back 
-  | Update Environment
-  | SelectMachineType String
-  | SelectOS String
-  | SelectZone String
-  | UserInput String
-  | ProjectIdInput String
-  | TagsInput String
-  | HostnameInput String
-  | DomainInput String
-  | IPInput String
+  WizardAction Wizard.Action
+   | Update Environment
+   | SelectMachineType String
+   | SelectOS String
+   | SelectZone String
+   | UserInput String
+   | ProjectIdInput String
+   | TagsInput String
+   | HostnameInput String
+   | DomainInput String
+   | IPInput String
 
 type Step = 
   Zero
@@ -88,31 +87,14 @@ listValidations = Dict.fromList [
 validateGce = validateAll [listValidations, stringValidations]
 
 update : Action -> Model-> Model
-update action ({next, prev, step, gce, machine} as model) =
+update action ({wizard, gce, machine} as model) =
   case action of
-    Next -> 
+    WizardAction action -> 
       let
-        nextStep = withDefault Instance (List.head next)
-        nextSteps = defaultEmpty (List.tail next)
-        prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = (validateGce step model)
+        ({errors} as newModel) = (validateGce wizard.step model)
+        newWizard = Wizard.update (notAny errors) action wizard
       in
-        if notAny errors then
-          {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
-        else 
-          newModel
-
-    Back -> 
-      let
-        prevStep = withDefault Zero (List.head (List.reverse prev))
-        prevSteps = List.take ((List.length prev) - 1) prev
-        nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = (validateGce step model)
-      in
-        if notAny errors then
-          {model | step = prevStep, next = nextSteps, prev = prevSteps}
-        else 
-          model
+       { newModel | wizard = newWizard } 
 
     Update environment -> 
         let
@@ -139,17 +121,17 @@ update action ({next, prev, step, gce, machine} as model) =
     UserInput user -> 
        model 
         |> setMachine (\machine -> {machine | user = user })
-        |> validate step "User" stringValidations
+        |> validate wizard.step "User" stringValidations
 
     HostnameInput host -> 
       model 
         |> setMachine (\machine -> {machine | hostname = host })
-        |> validate step "Hostname" stringValidations
+        |> validate wizard.step "Hostname" stringValidations
          
     ProjectIdInput id -> 
       model 
         |> setGCE (\gce-> {gce | projectId = id })
-        |> validate step "Project id" stringValidations
+        |> validate wizard.step "Project id" stringValidations
 
     TagsInput tags -> 
       let
@@ -157,26 +139,27 @@ update action ({next, prev, step, gce, machine} as model) =
       in
         model  
           |>  setGCE (\gce -> {gce | tags = Just (if splited == [""] then [] else splited)})
-          |>  validate step "Tags" listValidations
+          |>  validate wizard.step "Tags" listValidations
 
     DomainInput domain -> 
       model 
         |> setMachine (\machine -> {machine | domain = domain})
-        |> validate step "Domain" stringValidations
+        |> validate wizard.step "Domain" stringValidations
 
     IPInput ip -> 
       model 
         |> setGCE (\gce -> {gce | staticIp = Just ip})
-        |> validate step "IP" stringValidations
+        |> validate wizard.step "IP" stringValidations
 
+next : Model -> Environment -> Model
+next model environment =
+      model 
+         |> update (Update environment) 
+         |> update (WizardAction Wizard.Next)
 
-hasNext : Model -> Bool
-hasNext model =
-  not (List.isEmpty model.next)
+back model =
+  (update (WizardAction Wizard.Back) model)
 
-hasPrev : Model -> Bool
-hasPrev model =
-  not (List.isEmpty model.prev)
 
 getOses : Model -> Dict String Template
 getOses model =
@@ -229,8 +212,8 @@ withErrors errors key widget =
 
 
 stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({gce, machine} as model) =
-  case model.step of
+stepView address ({wizard, gce, machine} as model) =
+  case wizard.step of
     Instance -> 
       instance address model 
 
@@ -241,9 +224,9 @@ stepView address ({gce, machine} as model) =
       summarize (gce, machine)
 
     _ -> 
-      Debug.log (toString model.step) [div [] []]
+      Debug.log (toString wizard.step) [div [] []]
 
 
 view : Signal.Address Action -> Model -> List Html
-view address ({step} as model)=
+view address model =
   panelContents  (Html.form [] (stepView address model))

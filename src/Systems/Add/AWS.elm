@@ -38,7 +38,7 @@ init =
   let 
     wizard = Wizard.init Zero Instance [ Instance, Networking, EBS, Store, Summary ]
   in 
-   (Model wizard (emptyAws) (emptyMachine) Dict.empty Dict.empty emptyVolume emptyBlock, Effects.none)
+    (Model wizard emptyAws emptyMachine Dict.empty Dict.empty emptyVolume emptyBlock, Effects.none)
 
 type Action = 
   WizardAction Wizard.Action

@@ -17,13 +17,13 @@ import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
 import Maybe exposing (withDefault)
 import Debug
+import Common.Wizard as Wizard
 
 -- Model 
 
 type alias Model = 
-  { step : Step
-  , prev : List Step
-  , next : List Step
+  {
+    wizard : (Wizard.Model Step)
   , physical : Physical
   , machine : Machine
   , environment : Environment
@@ -33,21 +33,20 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let 
-    steps = [ Instance, Summary ]
+    wizard = Wizard.init Zero Instance [ Instance, Summary ]
   in 
-  (Model Zero [] steps (emptyPhysical) (emptyMachine) Dict.empty Dict.empty, Effects.none)
+    (Model wizard (emptyPhysical) (emptyMachine) Dict.empty Dict.empty, Effects.none)
 
 type Action = 
-  Next 
-  | Back 
-  | Update Environment
-  | SelectOS String
-  | UserInput String
-  | HostnameInput String
-  | DomainInput String
-  | MacInput String
-  | BroadcastInput String
-  | IPInput String
+  WizardAction Wizard.Action
+   | Update Environment
+   | SelectOS String
+   | UserInput String
+   | HostnameInput String
+   | DomainInput String
+   | MacInput String
+   | BroadcastInput String
+   | IPInput String
 
 type Step = 
   Zero
@@ -75,31 +74,14 @@ stringValidations = Dict.fromList [
 validatePhysical = validateAll [stringValidations]
 
 update : Action -> Model-> Model
-update action ({next, prev, step, physical, machine} as model) =
+update action ({wizard, physical, machine} as model) =
   case action of
-    Next -> 
+    WizardAction action -> 
       let
-        nextStep = withDefault Instance (List.head next)
-        nextSteps = defaultEmpty (List.tail next)
-        prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = (validatePhysical step model)
+        ({errors} as newModel) = validatePhysical wizard.step model
+        newWizard = Wizard.update (notAny errors) action wizard
       in
-        if notAny errors then
-           {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
-        else 
-           newModel
-
-    Back -> 
-      let
-        prevStep = withDefault Zero (List.head (List.reverse prev))
-        prevSteps = List.take ((List.length prev) - 1) prev
-        nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = (validatePhysical step model)
-      in
-        if notAny errors then
-          {model | step = prevStep, next = nextSteps, prev = prevSteps}
-        else 
-          model
+       { newModel | wizard = newWizard } 
 
     Update environment -> 
         let
@@ -120,18 +102,18 @@ update action ({next, prev, step, physical, machine} as model) =
     UserInput user -> 
        model 
         |> setMachine (\machine -> {machine | user = user })
-        |> validate step "User" stringValidations
+        |> validate wizard.step "User" stringValidations
         
 
     HostnameInput host -> 
       model 
         |> setMachine (\machine -> {machine | hostname = host })
-        |> validate step "Hostname" stringValidations
+        |> validate wizard.step "Hostname" stringValidations
          
     DomainInput domain -> 
       model 
         |> setMachine (\machine -> {machine | domain = domain})
-        |> validate step "Domain" stringValidations
+        |> validate wizard.step "Domain" stringValidations
 
     MacInput mac -> 
       setPhysical (\physical -> {physical| mac = Just mac}) model 
@@ -142,16 +124,17 @@ update action ({next, prev, step, physical, machine} as model) =
     IPInput ip -> 
       model 
         |> setMachine (\machine -> {machine | ip = Just ip })
-        |> validate step "IP" stringValidations
+        |> validate wizard.step "IP" stringValidations
 
+next : Model -> Environment -> Model
+next model environment =
+      model 
+         |> update (Update environment) 
+         |> update (WizardAction Wizard.Next)
 
-hasNext : Model -> Bool
-hasNext model =
-  not (List.isEmpty model.next)
+back model =
+  (update (WizardAction Wizard.Back) model)
 
-hasPrev : Model -> Bool
-hasPrev model =
-  not (List.isEmpty model.prev)
 
 getOses : Model -> Dict String Template
 getOses model =
@@ -189,8 +172,8 @@ withErrors errors key widget =
 
 
 stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({physical, machine} as model) =
-  case model.step of
+stepView address ({wizard, physical, machine} as model) =
+  case wizard.step of
     Instance -> 
       instance address model 
 
@@ -198,9 +181,9 @@ stepView address ({physical, machine} as model) =
       summarize (physical, machine)
 
     _ -> 
-      Debug.log (toString model.step) [div [] []]
+      Debug.log (toString wizard.step) [div [] []]
 
 
 view : Signal.Address Action -> Model -> List Html
-view address ({step} as model)=
+view address model =
   panelContents (Html.form [] (stepView address model))

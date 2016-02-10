@@ -18,13 +18,13 @@ import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
 import Maybe exposing (withDefault)
 import Debug
+import Common.Wizard as Wizard
 
 -- Model 
 
 type alias Model = 
-  { step : Step
-  , prev : List Step
-  , next : List Step
+  {
+    wizard : (Wizard.Model Step)
   , openstack : Openstack
   , machine : Machine
   , environment : Environment
@@ -35,30 +35,29 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let 
-    steps = [ Instance, Networking, Cinder, Summary ]
+    wizard = Wizard.init Zero Instance [ Instance, Networking, Cinder, Summary ]
   in 
-  (Model Zero [] steps (emptyOpenstack) (emptyMachine) Dict.empty Dict.empty (emptyVolume) , Effects.none)
+    (Model wizard emptyOpenstack emptyMachine Dict.empty Dict.empty emptyVolume , Effects.none)
 
 type Action = 
-  Next 
-  | Back 
-  | Update Environment
-  | SelectFlavor String
-  | SelectOS String
-  | KeyPairInput String
-  | SecurityGroupsInput String
-  | UserInput String
-  | TenantInput String
-  | HostnameInput String
-  | DomainInput String
-  | IPInput String
-  | IPPoolInput String
-  | NetworksInput String
-  | CinderSizeInput String
-  | CinderDeviceInput String
-  | CinderClear
-  | VolumeAdd
-  | VolumeRemove String
+  WizardAction Wizard.Action
+   | Update Environment
+   | SelectFlavor String
+   | SelectOS String
+   | KeyPairInput String
+   | SecurityGroupsInput String
+   | UserInput String
+   | TenantInput String
+   | HostnameInput String
+   | DomainInput String
+   | IPInput String
+   | IPPoolInput String
+   | NetworksInput String
+   | CinderSizeInput String
+   | CinderDeviceInput String
+   | CinderClear
+   | VolumeAdd
+   | VolumeRemove String
 
 
 type Step = 
@@ -146,31 +145,14 @@ setDefaultFlavor hyp ({openstack} as model) =
 validateOpenstack = validateAll [stringValidations, listValidations]
 
 update : Action -> Model-> Model
-update action ({next, prev, step, openstack, machine, volume} as model) =
+update action ({wizard, openstack, machine, volume} as model) =
   case action of
-    Next -> 
+    WizardAction action -> 
       let
-        nextStep = withDefault Instance (List.head next)
-        nextSteps = defaultEmpty (List.tail next)
-        prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = ignoreDevices (validateOpenstack step model)
+        ({errors} as newModel) = ignoreDevices (validateOpenstack wizard.step model)
+        newWizard = Wizard.update (notAny errors) action wizard
       in
-        if notAny errors then
-          {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
-        else 
-          newModel
-
-    Back -> 
-      let
-        prevStep = withDefault Zero (List.head (List.reverse prev))
-        prevSteps = List.take ((List.length prev) - 1) prev
-        nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = ignoreDevices (validateOpenstack step model)
-      in
-        if notAny errors then
-          {model | step = prevStep, next = nextSteps, prev = prevSteps}
-        else 
-          model
+       { newModel | wizard = newWizard } 
 
     Update environment -> 
       setDefaultOS "openstack" { model | environment = environment} 
@@ -185,13 +167,13 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
     TenantInput tenant -> 
       model 
         |> setOpenstack (\openstack -> {openstack | tenant = tenant }) 
-        |> validate step "Tenant" stringValidations
+        |> validate wizard.step "Tenant" stringValidations
 
    
     KeyPairInput key -> 
       model 
         |> setOpenstack (\openstack -> {openstack | keyName = key }) 
-        |> validate step "Keypair" stringValidations
+        |> validate wizard.step "Keypair" stringValidations
 
     SecurityGroupsInput groups -> 
       let
@@ -199,7 +181,7 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
       in
         model  
           |>  setOpenstack (\openstack -> {openstack | securityGroups = Just (if splited == [""] then [] else splited)})
-          |>  validate step "Security groups" listValidations
+          |>  validate wizard.step "Security groups" listValidations
 
 
     NetworksInput networks -> 
@@ -208,28 +190,28 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
       in
         model  
           |>  setOpenstack (\openstack -> {openstack | networks = splited})
-          |>  validate step "Networks" listValidations
+          |>  validate wizard.step "Networks" listValidations
 
 
     UserInput user -> 
        model 
         |> setMachine (\machine -> {machine | user = user })
-        |> validate step "User" stringValidations
+        |> validate wizard.step "User" stringValidations
 
     HostnameInput host -> 
       model 
         |> setMachine (\machine -> {machine | hostname = host })
-        |> validate step "Hostname" stringValidations
+        |> validate wizard.step "Hostname" stringValidations
 
     DomainInput domain -> 
       model 
         |> setMachine (\machine -> {machine | domain = domain})
-        |> validate step "Domain" stringValidations
+        |> validate wizard.step "Domain" stringValidations
 
     IPInput ip -> 
       model 
         |> setOpenstack (\openstack -> {openstack | floatingIp = Just ip })
-        |> validate step "IP" stringValidations
+        |> validate wizard.step "IP" stringValidations
 
     IPPoolInput pool -> 
       model 
@@ -245,14 +227,14 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
     CinderDeviceInput device -> 
       model 
         |> setVolume (\volume -> { volume | device = device})
-        |> validate step "Cinder Device" tupleValidations
+        |> validate wizard.step "Cinder Device" tupleValidations
 
     CinderClear -> 
       setVolume (\volume -> { volume | clear = not volume.clear}) model
 
     VolumeAdd -> 
       let 
-        ({errors} as newModel) = validate step "Cinder Device" tupleValidations model
+        ({errors} as newModel) = validate wizard.step "Cinder Device" tupleValidations model
         newOpenstack = {openstack | volumes = Just (List.append [volume] (defaultEmpty openstack.volumes)) } 
       in 
         if notAny errors then
@@ -267,16 +249,14 @@ update action ({next, prev, step, openstack, machine, volume} as model) =
       in 
         { model | openstack = newOpenstack } 
 
-    
-hasNext : Model -> Bool
-hasNext model =
-  not (List.isEmpty model.next)
+next : Model -> Environment -> Model
+next model environment =
+      model 
+         |> update (Update environment) 
+         |> update (WizardAction Wizard.Next)
 
-hasPrev : Model -> Bool
-hasPrev model =
-  not (List.isEmpty model.prev)
-
-
+back model =
+  (update (WizardAction Wizard.Back) model)
 
 instance : Signal.Address Action -> Model -> List Html
 instance address ({openstack, machine, errors} as model) =
@@ -362,8 +342,8 @@ cinder address ({errors, volume, openstack} as model) =
   ]
 
 stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({openstack, machine} as model) =
-  case model.step of
+stepView address ({wizard, openstack, machine} as model) =
+  case wizard.step of
     Instance -> 
       instance address model 
 
@@ -377,9 +357,9 @@ stepView address ({openstack, machine} as model) =
       summarize (openstack, machine)
 
     _ -> 
-      Debug.log (toString model.step) [div [] []]
+      Debug.log (toString wizard.step) [div [] []]
 
 
 view : Signal.Address Action -> Model -> List Html
-view address ({step} as model)=
+view address model =
   panelContents (Html.form [] (stepView address model))

@@ -101,10 +101,10 @@ getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as mo
   let
    backs = Dict.fromList [
       ("aws", (back (Wizard.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.back awsModel)}))
-    , ("gce", (back (GCE.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.update GCE.Back gceModel)}))
-    , ("openstack", (back (Openstack.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.update Openstack.Back openstackModel)}))
+    , ("gce", (back (Wizard.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.back gceModel)}))
+    , ("openstack", (back (Wizard.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.back openstackModel)}))
     , ("digital-ocean", (back (Wizard.hasPrev digitalModel) {model | stage = Digital, digitalModel = Digital.back digitalModel}))
-    , ("physical", (back (Physical.hasPrev physicalModel) {model | stage = Physical, physicalModel = (Physical.update Physical.Back physicalModel)}))
+    , ("physical", (back (Wizard.hasPrev physicalModel) {model | stage = Physical, physicalModel = (Physical.back physicalModel)}))
    ]
   in
    withDefault model (Dict.get hyp backs)
@@ -148,33 +148,28 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
 
           "gce" -> 
              let
-                newGce = gceModel 
-                         |> GCE.update (GCE.Update current) 
-                         |> GCE.update GCE.Next
+               newGce = GCE.next gceModel current 
              in
-               none { model | stage = GCE , gceModel = newGce , hasNext = GCE.hasNext newGce}
- 
+               none { model | stage = GCE, gceModel = newGce , hasNext = Wizard.hasNext newGce}
+
           "digital-ocean" -> 
             let
                newDigital = Digital.next digitalModel current 
             in
               none { model | stage = Digital , digitalModel = newDigital , hasNext = Wizard.hasNext newDigital}
 
+
           "physical" -> 
             let
-               newPhysical = physicalModel 
-                               |> Physical.update (Physical.Update current) 
-                               |> Physical.update Physical.Next
+              newPhysical = Physical.next physicalModel current 
             in
-              none { model | stage = Physical , physicalModel = newPhysical , hasNext = Physical.hasNext newPhysical}
+              none { model | stage = Physical , physicalModel = newPhysical , hasNext = Wizard.hasNext newPhysical}
 
           "openstack" -> 
             let
-               newOpenstack = openstackModel
-                               |> Openstack.update (Openstack.Update current) 
-                               |> Openstack.update Openstack.Next
+              newOpenstack = Openstack.next openstackModel current 
             in
-              none { model | stage = Openstack , openstackModel = newOpenstack , hasNext = Openstack.hasNext newOpenstack}
+              none { model | stage = Openstack , openstackModel = newOpenstack , hasNext = Wizard.hasNext newOpenstack}
 
           _ -> 
             (model, Effects.none)
