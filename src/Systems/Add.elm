@@ -100,7 +100,7 @@ back hasPrev model =
 getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) hyp = 
   let
    backs = Dict.fromList [
-      ("aws", (back (AWS.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.update AWS.Back awsModel)}))
+      ("aws", (back (Wizard.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.back awsModel)}))
     , ("gce", (back (GCE.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.update GCE.Back gceModel)}))
     , ("openstack", (back (Openstack.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.update Openstack.Back openstackModel)}))
     , ("digital-ocean", (back (Wizard.hasPrev digitalModel) {model | stage = Digital, digitalModel = Digital.back digitalModel}))
@@ -141,12 +141,10 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
       in
         case general.hypervisor of
           "aws" -> 
-             let
-               newAws = awsModel 
-                         |> AWS.update (AWS.Update current) 
-                         |> AWS.update AWS.Next
-             in
-              none { model | stage = AWS , awsModel = newAws, hasNext = AWS.hasNext newAws}
+            let
+              newAws = AWS.next awsModel current 
+            in
+              none { model | stage = AWS, awsModel = newAws , hasNext = Wizard.hasNext newAws}
 
           "gce" -> 
              let

@@ -18,13 +18,13 @@ import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
 import Maybe exposing (withDefault)
 import Debug
+import Common.Wizard as Wizard
 
 -- Model 
 
 type alias Model = 
-  { step : Step
-  , prev : List Step
-  , next : List Step
+  { 
+    wizard : (Wizard.Model Step)
   , aws : AWS
   , machine : Machine
   , environment : Environment
@@ -36,39 +36,38 @@ type alias Model =
 init : (Model , Effects Action)
 init =
   let 
-    steps = [ Instance, Networking, EBS, Store, Summary ]
+    wizard = Wizard.init Zero Instance [ Instance, Networking, EBS, Store, Summary ]
   in 
-  (Model Zero [] steps (emptyAws) (emptyMachine) Dict.empty Dict.empty (emptyVolume) (emptyBlock), Effects.none)
+   (Model wizard (emptyAws) (emptyMachine) Dict.empty Dict.empty emptyVolume emptyBlock, Effects.none)
 
 type Action = 
-  Next 
-  | Back 
-  | Update Environment
-  | SelectInstanceType String
-  | SelectOS String
-  | SelectEndpoint String
-  | SelectZone String
-  | KeyPairInput String
-  | SecurityGroupsInput String
-  | UserInput String
-  | HostnameInput String
-  | DomainInput String
-  | IPInput String
-  | SelectEBSType String
-  | EBSSizeInput String
-  | EBSIOPSInput String
-  | EBSDeviceInput String
-  | VolumeAdd
-  | VolumeRemove String
-  | EBSOptimized
-  | EBSClear
-  | VPCIdInput String
-  | SubnetIdInput String
-  | AssignIp
-  | InstanceDeviceInput String
-  | InstanceVolumeInput String
-  | BlockAdd
-  | BlockRemove String
+  WizardAction Wizard.Action
+   | Update Environment
+   | SelectInstanceType String
+   | SelectOS String
+   | SelectEndpoint String
+   | SelectZone String
+   | KeyPairInput String
+   | SecurityGroupsInput String
+   | UserInput String
+   | HostnameInput String
+   | DomainInput String
+   | IPInput String
+   | SelectEBSType String
+   | EBSSizeInput String
+   | EBSIOPSInput String
+   | EBSDeviceInput String
+   | VolumeAdd
+   | VolumeRemove String
+   | EBSOptimized
+   | EBSClear
+   | VPCIdInput String
+   | SubnetIdInput String
+   | AssignIp
+   | InstanceDeviceInput String
+   | InstanceVolumeInput String
+   | BlockAdd
+   | BlockRemove String
 
 
 type Step = 
@@ -147,31 +146,14 @@ ignoreDevices ({errors} as model) =
 
 
 update : Action -> Model-> Model
-update action ({next, prev, step, aws, machine, volume, block} as model) =
+update action ({wizard, aws, machine, volume, block} as model) =
   case action of
-    Next -> 
+    WizardAction action -> 
       let
-        nextStep = withDefault Instance (List.head next)
-        nextSteps = defaultEmpty (List.tail next)
-        prevSteps = if step /= Zero then List.append prev [step] else prev
-        ({errors} as newModel) = ignoreDevices (validateAWS step model)
+        ({errors} as newModel) = ignoreDevices (validateAWS wizard.step model)
+        newWizard = Wizard.update (notAny errors) action wizard
       in
-        if notAny errors then
-          {newModel | step = nextStep, next = nextSteps, prev = prevSteps}
-        else 
-          newModel
-
-    Back -> 
-      let
-        prevStep = withDefault Zero (List.head (List.reverse prev))
-        prevSteps = List.take ((List.length prev) - 1) prev
-        nextSteps = if step /= Zero then List.append [step] next else next
-        ({errors} as newModel) = ignoreDevices (validateAWS step model)
-      in
-        if notAny errors then
-          {model | step = prevStep, next = nextSteps, prev = prevSteps}
-        else 
-          model
+       { newModel | wizard = newWizard } 
 
     Update environment -> 
        (setDefaultOS "aws" { model | environment = environment })
@@ -194,7 +176,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
     KeyPairInput key -> 
       model 
         |> setAWS (\aws -> {aws | keyName = key }) 
-        |> validate step "Keypair" stringValidations
+        |> validate wizard.step "Keypair" stringValidations
 
     SecurityGroupsInput groups -> 
       let
@@ -202,27 +184,27 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
       in
         model  
           |>  setAWS (\aws -> {aws | securityGroups = Just (if splited == [""] then [] else splited)})
-          |>  validate step "Security groups" listValidations
+          |>  validate wizard.step "Security groups" listValidations
 
     UserInput user -> 
        model 
         |> setMachine (\machine -> {machine | user = user })
-        |> validate step "User" stringValidations
+        |> validate wizard.step "User" stringValidations
 
     HostnameInput host -> 
       model 
         |> setMachine (\machine -> {machine | hostname = host })
-        |> validate step "Hostname" stringValidations
+        |> validate wizard.step "Hostname" stringValidations
 
     DomainInput domain -> 
       model 
         |> setMachine (\machine -> {machine | domain = domain})
-        |> validate step "Domain" stringValidations
+        |> validate wizard.step "Domain" stringValidations
 
     IPInput ip -> 
       model 
         |> setMachine (\machine -> {machine | ip = Just ip })
-        |> validate step "IP" stringValidations
+        |> validate wizard.step "IP" stringValidations
 
     VPCIdInput vpcId -> 
       let
@@ -230,7 +212,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
       in
         model 
           |> setAWS (\aws -> {aws | vpc = Just { newVpc | vpcId = vpcId }})
-          |> validate step "VPC Id" stringValidations
+          |> validate wizard.step "VPC Id" stringValidations
 
     SubnetIdInput subnetId -> 
       let
@@ -238,7 +220,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
       in
         model 
           |> setAWS (\aws -> {aws | vpc = Just { newVpc | subnetId = subnetId }})
-          |> validate step "Subnet Id" stringValidations
+          |> validate wizard.step "Subnet Id" stringValidations
 
     AssignIp -> 
       let
@@ -266,7 +248,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
     EBSDeviceInput device -> 
       model 
         |> setVolume (\volume -> { volume | device = device})
-        |> validate step "EBS Device" tupleValidations
+        |> validate wizard.step "EBS Device" tupleValidations
 
     EBSOptimized -> 
       setAWS (\aws -> {aws | ebsOptimized = Just (not (withDefault False aws.ebsOptimized))}) model
@@ -276,7 +258,7 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
 
     VolumeAdd -> 
       let 
-        ({errors} as newModel) = validate step "EBS Device" tupleValidations model
+        ({errors} as newModel) = validate wizard.step "EBS Device" tupleValidations model
         newAws = {aws | volumes = Just (List.append [volume] (defaultEmpty aws.volumes)) } 
       in 
         if notAny errors then
@@ -287,18 +269,18 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
     InstanceDeviceInput device -> 
       model 
         |> setBlock (\block -> { block | device = device})
-        |> validate step "Instance Device" tupleValidations
+        |> validate wizard.step "Instance Device" tupleValidations
 
     InstanceVolumeInput volume -> 
       model 
         |> setBlock (\block -> { block | volume = volume})
-        |> validate step "Volume" tupleValidations
+        |> validate wizard.step "Volume" tupleValidations
 
     BlockAdd -> 
       let 
         ({errors} as newModel) = model 
-                                  |> validate step "Instance Device" tupleValidations 
-                                  |> validate step "Volume" tupleValidations 
+                                  |> validate wizard.step "Instance Device" tupleValidations 
+                                  |> validate wizard.step "Volume" tupleValidations 
         newAws = { aws | blockDevices = Just (List.append [block] (defaultEmpty aws.blockDevices)) } 
       in 
         if notAny errors then
@@ -320,15 +302,14 @@ update action ({next, prev, step, aws, machine, volume, block} as model) =
       in 
         { model | aws = newAws } 
 
+next : Model -> Environment -> Model
+next model environment =
+      model 
+         |> update (Update environment) 
+         |> update (WizardAction Wizard.Next)
 
-hasNext : Model -> Bool
-hasNext model =
-  not (List.isEmpty model.next)
-
-hasPrev : Model -> Bool
-hasPrev model =
-  not (List.isEmpty model.prev)
-
+back model =
+  (update (WizardAction Wizard.Back) model)
 
 instance : Signal.Address Action -> Model -> List Html
 instance address ({aws, machine, errors} as model) =
@@ -470,8 +451,8 @@ store address ({errors, block, aws} as model) =
 
 
 stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({aws, machine} as model) =
-  case model.step of
+stepView address ({wizard, aws, machine} as model) =
+  case wizard.step of
     Instance -> 
       instance address model 
 
@@ -488,9 +469,9 @@ stepView address ({aws, machine} as model) =
       summarize (aws, machine)
 
     _ -> 
-      Debug.log (toString model.step) [div [] []]
+      Debug.log (toString wizard.step) [div [] []]
 
 
 view : Signal.Address Action -> Model -> List Html
-view address ({step} as model)=
+view address model =
   panelContents (Html.form [] (stepView address model))
