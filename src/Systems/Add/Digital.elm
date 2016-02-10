@@ -133,14 +133,6 @@ next model environment =
 back model =
   (update (WizardAction Wizard.Back) model)
 
-hasNext : Model -> Bool
-hasNext {wizard} =
-  not (List.isEmpty wizard.next)
-
-hasPrev : Model -> Bool
-hasPrev {wizard}  =
-  not (List.isEmpty wizard.prev)
-
 getOses : Model -> Dict String Template
 getOses model =
   let 

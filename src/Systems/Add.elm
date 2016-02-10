@@ -28,6 +28,7 @@ import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
 import Systems.Add.Persistency exposing (persistModel)
 import Systems.Model.Common exposing (System, Machine, emptyMachine)
+import Common.Wizard as Wizard
 
 type Stage = 
   General 
@@ -102,7 +103,7 @@ getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as mo
       ("aws", (back (AWS.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.update AWS.Back awsModel)}))
     , ("gce", (back (GCE.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.update GCE.Back gceModel)}))
     , ("openstack", (back (Openstack.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.update Openstack.Back openstackModel)}))
-    , ("digital-ocean", (back (Digital.hasPrev digitalModel) {model | stage = Digital, digitalModel = Digital.back digitalModel}))
+    , ("digital-ocean", (back (Wizard.hasPrev digitalModel) {model | stage = Digital, digitalModel = Digital.back digitalModel}))
     , ("physical", (back (Physical.hasPrev physicalModel) {model | stage = Physical, physicalModel = (Physical.update Physical.Back physicalModel)}))
    ]
   in
@@ -159,7 +160,7 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
             let
                newDigital = Digital.next digitalModel current 
             in
-              none { model | stage = Digital , digitalModel = newDigital , hasNext = Digital.hasNext newDigital}
+              none { model | stage = Digital , digitalModel = newDigital , hasNext = Wizard.hasNext newDigital}
 
           "physical" -> 
             let

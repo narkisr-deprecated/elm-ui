@@ -62,3 +62,13 @@ view : Signal.Address Action -> Model a -> Html
 view address model =
   div [] [
   ]
+
+hasNext : {r | wizard : Model a} -> Bool
+hasNext {wizard} =
+  not (List.isEmpty wizard.next)
+
+hasPrev : {r | wizard : Model a} -> Bool
+hasPrev {wizard}  =
+  not (List.isEmpty wizard.prev)
+
+

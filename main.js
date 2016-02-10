@@ -17285,32 +17285,43 @@ Elm.Common.Wizard.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var hasPrev = function (_p0) {    var _p1 = _p0;return $Basics.not($List.isEmpty(_p1.wizard.prev));};
+   var hasNext = function (_p2) {    var _p3 = _p2;return $Basics.not($List.isEmpty(_p3.wizard.next));};
    var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),_U.list([]));});
-   var update = F3(function (noErrors,action,_p0) {
-      var _p1 = _p0;
-      var _p7 = _p1.zero;
-      var _p6 = _p1.step;
-      var _p5 = _p1.prev;
-      var _p4 = _p1.next;
-      var _p3 = _p1;
-      var _p2 = action;
-      switch (_p2.ctor)
-      {case "Next": var prevSteps = !_U.eq(_p6,_p7) ? A2($List.append,_p5,_U.list([_p6])) : _p5;
-           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p4));
-           var nextStep = A2($Maybe.withDefault,_p1.$default,$List.head(_p4));
-           return noErrors ? _U.update(_p3,{step: nextStep,next: nextSteps,prev: prevSteps}) : _p3;
-         case "Back": var nextSteps = !_U.eq(_p6,_p7) ? A2($List.append,_U.list([_p6]),_p4) : _p4;
-           var prevSteps = A2($List.take,$List.length(_p5) - 1,_p5);
-           var prevStep = A2($Maybe.withDefault,_p7,$List.head($List.reverse(_p5)));
-           return noErrors ? _U.update(_p3,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p3;
-         default: return _p3;}
+   var update = F3(function (noErrors,action,_p4) {
+      var _p5 = _p4;
+      var _p11 = _p5.zero;
+      var _p10 = _p5.step;
+      var _p9 = _p5.prev;
+      var _p8 = _p5.next;
+      var _p7 = _p5;
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "Next": var prevSteps = !_U.eq(_p10,_p11) ? A2($List.append,_p9,_U.list([_p10])) : _p9;
+           var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p8));
+           var nextStep = A2($Maybe.withDefault,_p5.$default,$List.head(_p8));
+           return noErrors ? _U.update(_p7,{step: nextStep,next: nextSteps,prev: prevSteps}) : _p7;
+         case "Back": var nextSteps = !_U.eq(_p10,_p11) ? A2($List.append,_U.list([_p10]),_p8) : _p8;
+           var prevSteps = A2($List.take,$List.length(_p9) - 1,_p9);
+           var prevStep = A2($Maybe.withDefault,_p11,$List.head($List.reverse(_p9)));
+           return noErrors ? _U.update(_p7,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p7;
+         default: return _p7;}
    });
    var NoOp = {ctor: "NoOp"};
    var Back = {ctor: "Back"};
    var Next = {ctor: "Next"};
    var Model = F5(function (a,b,c,d,e) {    return {zero: a,step: b,$default: c,prev: d,next: e};});
    var init = F3(function (zero,$default,steps) {    return A5(Model,zero,zero,$default,_U.list([]),steps);});
-   return _elm.Common.Wizard.values = {_op: _op,Model: Model,init: init,Next: Next,Back: Back,NoOp: NoOp,update: update,view: view};
+   return _elm.Common.Wizard.values = {_op: _op
+                                      ,Model: Model
+                                      ,init: init
+                                      ,Next: Next
+                                      ,Back: Back
+                                      ,NoOp: NoOp
+                                      ,update: update
+                                      ,view: view
+                                      ,hasNext: hasNext
+                                      ,hasPrev: hasPrev};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
@@ -17355,9 +17366,7 @@ Elm.Systems.Add.Digital.make = function (_elm) {
             return $Dict.empty;
          }
    };
-   var hasPrev = function (_p1) {    var _p2 = _p1;return $Basics.not($List.isEmpty(_p2.wizard.prev));};
-   var hasNext = function (_p3) {    var _p4 = _p3;return $Basics.not($List.isEmpty(_p4.wizard.next));};
-   var setDigital = F2(function (f,_p5) {    var _p6 = _p5;var newDigital = f(A2($Debug.log,"",_p6.digital));return _U.update(_p6,{digital: newDigital});});
+   var setDigital = F2(function (f,_p1) {    var _p2 = _p1;var newDigital = f(A2($Debug.log,"",_p2.digital));return _U.update(_p2,{digital: newDigital});});
    var Summary = {ctor: "Summary"};
    var Instance = {ctor: "Instance"};
    var stringValidations = $Dict.fromList(_U.list([A2($Systems$Add$Validations.vpair,
@@ -17367,67 +17376,67 @@ Elm.Systems.Add.Digital.make = function (_elm) {
             ,_1: A3($Systems$Add$Validations.validationOf,
             "Hostname",
             _U.list([$Systems$Add$Validations.notEmpty]),
-            function (_p7) {
-               var _p8 = _p7;
-               return _p8.machine.hostname;
+            function (_p3) {
+               var _p4 = _p3;
+               return _p4.machine.hostname;
             })}
            ,{ctor: "_Tuple2"
             ,_0: "Domain"
             ,_1: A3($Systems$Add$Validations.validationOf,
             "Domain",
             _U.list([$Systems$Add$Validations.notEmpty]),
-            function (_p9) {
-               var _p10 = _p9;
-               return _p10.machine.domain;
+            function (_p5) {
+               var _p6 = _p5;
+               return _p6.machine.domain;
             })}
            ,{ctor: "_Tuple2"
             ,_0: "User"
             ,_1: A3($Systems$Add$Validations.validationOf,
             "User",
             _U.list([$Systems$Add$Validations.notEmpty]),
-            function (_p11) {
-               var _p12 = _p11;
-               return _p12.machine.user;
+            function (_p7) {
+               var _p8 = _p7;
+               return _p8.machine.user;
             })}]))]));
    var validateDigital = $Systems$Add$Validations.validateAll(_U.list([stringValidations]));
-   var update = F2(function (action,_p13) {
-      var _p14 = _p13;
-      var _p20 = _p14.wizard;
-      var _p19 = _p14;
-      var _p18 = _p14.machine;
-      var _p15 = action;
-      switch (_p15.ctor)
-      {case "WizardAction": var _p16 = A2(validateDigital,_p20.step,_p19);
-           var newModel = _p16;
-           var errors = _p16.errors;
-           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p15._0,_p20);
+   var update = F2(function (action,_p9) {
+      var _p10 = _p9;
+      var _p16 = _p10.wizard;
+      var _p15 = _p10;
+      var _p14 = _p10.machine;
+      var _p11 = action;
+      switch (_p11.ctor)
+      {case "WizardAction": var _p12 = A2(validateDigital,_p16.step,_p15);
+           var newModel = _p12;
+           var errors = _p12.errors;
+           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p11._0,_p16);
            return _U.update(newModel,{wizard: newWizard});
-         case "Update": var newModel = _U.update(_p19,{environment: _p15._0});
-           var _p17 = $List.head($Dict.keys(getOses(newModel)));
-           if (_p17.ctor === "Just") {
-                 return $String.isEmpty(_p18.os) ? _U.update(newModel,{machine: _U.update(_p18,{os: _p17._0})}) : newModel;
+         case "Update": var newModel = _U.update(_p15,{environment: _p11._0});
+           var _p13 = $List.head($Dict.keys(getOses(newModel)));
+           if (_p13.ctor === "Just") {
+                 return $String.isEmpty(_p14.os) ? _U.update(newModel,{machine: _U.update(_p14,{os: _p13._0})}) : newModel;
               } else {
                  return newModel;
               }
-         case "SelectSize": return A2(setDigital,function (digital) {    return _U.update(digital,{size: _p15._0});},_p19);
-         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p15._0});},_p19);
-         case "SelectRegion": return A2(setDigital,function (digital) {    return _U.update(digital,{region: _p15._0});},_p19);
+         case "SelectSize": return A2(setDigital,function (digital) {    return _U.update(digital,{size: _p11._0});},_p15);
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p11._0});},_p15);
+         case "SelectRegion": return A2(setDigital,function (digital) {    return _U.update(digital,{region: _p11._0});},_p15);
          case "UserInput": return A4($Systems$Add$Validations.validate,
-           _p20.step,
+           _p16.step,
            "User",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p15._0});},_p19));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p11._0});},_p15));
          case "HostnameInput": return A4($Systems$Add$Validations.validate,
-           _p20.step,
+           _p16.step,
            "Hostname",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p15._0});},_p19));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p11._0});},_p15));
          case "DomainInput": return A4($Systems$Add$Validations.validate,
-           _p20.step,
+           _p16.step,
            "Domain",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p15._0});},_p19));
-         default: return A2(setDigital,function (digital) {    return _U.update(digital,{privateNetworking: $Basics.not(digital.privateNetworking)});},_p19);}
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p11._0});},_p15));
+         default: return A2(setDigital,function (digital) {    return _U.update(digital,{privateNetworking: $Basics.not(digital.privateNetworking)});},_p15);}
    });
    var Zero = {ctor: "Zero"};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
@@ -17437,33 +17446,33 @@ Elm.Systems.Add.Digital.make = function (_elm) {
    var PrivateNetworking = {ctor: "PrivateNetworking"};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var SelectSize = function (a) {    return {ctor: "SelectSize",_0: a};};
-   var instance = F2(function (address,_p21) {
-      var _p22 = _p21;
-      var _p24 = _p22.machine;
-      var _p23 = _p22.digital;
+   var instance = F2(function (address,_p17) {
+      var _p18 = _p17;
+      var _p20 = _p18.machine;
+      var _p19 = _p18.digital;
       var region = A2($Maybe.withDefault,"",$List.head($Systems$Model$Digital.regions));
-      var check = withErrors(_p22.errors);
+      var check = withErrors(_p18.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.selector,address,SelectSize,$Systems$Model$Digital.sizes,_p23.size))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p22)),_p24.os))
-              ,A2($Systems$Add$Common.group$,"Region",A4($Systems$Add$Common.selector,address,SelectRegion,$Systems$Model$Digital.regions,_p23.region))
+              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.selector,address,SelectSize,$Systems$Model$Digital.sizes,_p19.size))
+              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p18)),_p20.os))
+              ,A2($Systems$Add$Common.group$,"Region",A4($Systems$Add$Common.selector,address,SelectRegion,$Systems$Model$Digital.regions,_p19.region))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p24.user))
+              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p20.user))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p24.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p24.domain))
-              ,A2($Systems$Add$Common.group$,"Private Networking",A3($Systems$Add$Common.checkbox,address,PrivateNetworking,_p23.privateNetworking))]))]);
+              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p20.hostname))
+              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p20.domain))
+              ,A2($Systems$Add$Common.group$,"Private Networking",A3($Systems$Add$Common.checkbox,address,PrivateNetworking,_p19.privateNetworking))]))]);
    });
-   var stepView = F2(function (address,_p25) {
-      var _p26 = _p25;
-      var _p28 = _p26.wizard;
-      var _p27 = _p28.step;
-      switch (_p27.ctor)
-      {case "Instance": return A2(instance,address,_p26);
-         case "Summary": return $Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p26.digital,_1: _p26.machine});
-         default: return A2($Debug.log,$Basics.toString(_p28.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
+   var stepView = F2(function (address,_p21) {
+      var _p22 = _p21;
+      var _p24 = _p22.wizard;
+      var _p23 = _p24.step;
+      switch (_p23.ctor)
+      {case "Instance": return A2(instance,address,_p22);
+         case "Summary": return $Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p22.digital,_1: _p22.machine});
+         default: return A2($Debug.log,$Basics.toString(_p24.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
    var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
    var Update = function (a) {    return {ctor: "Update",_0: a};};
@@ -17498,8 +17507,6 @@ Elm.Systems.Add.Digital.make = function (_elm) {
                                             ,update: update
                                             ,next: next
                                             ,back: back
-                                            ,hasNext: hasNext
-                                            ,hasPrev: hasPrev
                                             ,getOses: getOses
                                             ,instance: instance
                                             ,withErrors: withErrors
@@ -18048,6 +18055,7 @@ Elm.Systems.Add.make = function (_elm) {
    $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -18245,7 +18253,7 @@ Elm.Systems.Add.make = function (_elm) {
                                          ,{ctor: "_Tuple2"
                                           ,_0: "digital-ocean"
                                           ,_1: A2(back,
-                                          $Systems$Add$Digital.hasPrev(_p22),
+                                          $Common$Wizard.hasPrev(_p22),
                                           _U.update(_p24,{stage: Digital,digitalModel: $Systems$Add$Digital.back(_p22)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "physical"
@@ -18277,7 +18285,7 @@ Elm.Systems.Add.make = function (_elm) {
               case "gce": var newGce = A2($Systems$Add$GCE.update,$Systems$Add$GCE.Next,A2($Systems$Add$GCE.update,$Systems$Add$GCE.Update(current),_p35));
                 return $Common$Utils.none(_U.update(_p37,{stage: GCE,gceModel: newGce,hasNext: $Systems$Add$GCE.hasNext(newGce)}));
               case "digital-ocean": var newDigital = A2($Systems$Add$Digital.next,_p34,current);
-                return $Common$Utils.none(_U.update(_p37,{stage: Digital,digitalModel: newDigital,hasNext: $Systems$Add$Digital.hasNext(newDigital)}));
+                return $Common$Utils.none(_U.update(_p37,{stage: Digital,digitalModel: newDigital,hasNext: $Common$Wizard.hasNext(newDigital)}));
               case "physical": var newPhysical = A2($Systems$Add$Physical.update,
                 $Systems$Add$Physical.Next,
                 A2($Systems$Add$Physical.update,$Systems$Add$Physical.Update(current),_p39));
