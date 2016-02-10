@@ -19,6 +19,7 @@ import String
 import Maybe exposing (withDefault)
 import Debug
 import Common.Wizard as Wizard
+import Common.Components exposing (..)
 
 -- Model 
 
@@ -277,10 +278,6 @@ instance address ({openstack, machine, errors} as model) =
        , check "Keypair" (inputText address KeyPairInput "" openstack.keyName)
        , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
    ]
-
-withErrors : Dict String (List Error) -> String ->  Html -> Html
-withErrors errors key widget =
-  group key widget (defaultEmpty  (Dict.get key errors))
 
 networking: Signal.Address Action -> Model -> List Html
 networking address ({errors, openstack, machine} as model) =

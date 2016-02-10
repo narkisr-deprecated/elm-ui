@@ -9,7 +9,6 @@ import Systems.Add.Common exposing (..)
 import Systems.View.AWS exposing (summarize)
 import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
-import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Model.AWS exposing (..)
 import Effects exposing (Effects, batch)
@@ -19,6 +18,8 @@ import String
 import Maybe exposing (withDefault)
 import Debug
 import Common.Wizard as Wizard
+import Dict as Dict exposing (Dict)
+import Common.Components exposing (..)
 
 -- Model 
 
@@ -333,10 +334,6 @@ instance address ({aws, machine, errors} as model) =
        , check "Keypair" (inputText address KeyPairInput "" aws.keyName)
        , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
    ]
-
-withErrors : Dict String (List Error) -> String ->  Html -> Html
-withErrors errors key widget =
-  group key widget (defaultEmpty  (Dict.get key errors))
 
 networking: Signal.Address Action -> Model -> List Html
 networking address ({errors, aws, machine} as model) =

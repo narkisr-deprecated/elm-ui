@@ -19,6 +19,7 @@ import String
 import Maybe exposing (withDefault)
 import Debug
 import Common.Wizard as Wizard
+import Common.Components exposing (..)
 
 -- Model 
 
@@ -163,11 +164,6 @@ instance address ({digital, machine, errors} as model) =
        , group' "Private Networking" (checkbox address PrivateNetworking digital.privateNetworking)
        ]
     ]
-
-withErrors : Dict String (List Error) -> String ->  Html -> Html
-withErrors errors key widget =
-  group key widget (defaultEmpty  (Dict.get key errors))
-
 
 stepView :  Signal.Address Action -> Model -> List Html
 stepView address ({wizard, digital, machine} as model) =

@@ -18,6 +18,7 @@ import String
 import Maybe exposing (withDefault)
 import Debug
 import Common.Wizard as Wizard
+import Common.Components exposing (..)
 
 -- Model 
 
@@ -165,11 +166,6 @@ instance address ({physical, machine, errors} as model) =
        , check "Broadcast"  (inputText address BroadcastInput "" (withDefault "" physical.broadcast))
        ]
     ]
-
-withErrors : Dict String (List Error) -> String ->  Html -> Html
-withErrors errors key widget =
-  group key widget (defaultEmpty  (Dict.get key errors))
-
 
 stepView :  Signal.Address Action -> Model -> List Html
 stepView address ({wizard, physical, machine} as model) =

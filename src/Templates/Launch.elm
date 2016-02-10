@@ -9,9 +9,8 @@ import Templates.Model.Common exposing (emptyTemplate, Template)
 import Common.Utils exposing (none)
 import Debug
 import Html.Events exposing (onClick)
-import Common.Components exposing (panelContents, infoCallout, dangerCallout)
+import Common.Components exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
-import Systems.Add.Common exposing (..)
 import Admin.Core as Admin 
 import Environments.List exposing (Environments, Environment, getEnvironments)
 import Common.Http exposing (postJson)
@@ -20,15 +19,24 @@ import Templates.Persistency exposing (persistProvided)
 import Task
 import Json.Decode exposing (..)
 import Jobs.Common as Jobs exposing (runJob, JobResponse)
-import Dict
+import Dict exposing (Dict)
 import Common.Errors as Errors exposing (..)
+import Systems.Add.Common exposing (setMachine)
+import Systems.Add.Validations exposing (notAny, validationOf, notEmpty)
+
+type alias PartialMachine = 
+  { 
+      hostname : String
+    , domain : String
+  } 
 
 type alias Model = 
   {
     name : String
-  , hostname : String
+  , machine : PartialMachine
   , admin : Admin.Model
   , saveErrors : Errors.Model
+  , errors : Dict String (List Systems.Add.Validations.Error)
   }
  
 init : (Model , Effects Action)
@@ -36,8 +44,9 @@ init =
   let 
     (admin, effects) = Admin.init
     (errors, _) = Errors.init
+    machine = PartialMachine "" "" 
   in 
-    (Model "" "" admin errors, Effects.map AdminAction effects)
+    (Model "" machine admin errors Dict.empty, Effects.map AdminAction effects)
 
 
 -- Update 
@@ -58,7 +67,7 @@ setSaved model {id} =
   (model, runJob (toString id) "stage" JobLaunched)
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({admin, name} as model) =
+update action ({errors, admin, name} as model) =
   case action of 
     AdminAction action -> 
      let
@@ -67,7 +76,10 @@ update action ({admin, name} as model) =
        ({ model | admin = newAdmin} , Effects.map AdminAction effects)
 
     Launch -> 
+      if (notAny errors) then
        (model, persistProvided (intoSystem name) admin)
+      else 
+       none model
     
     Launched result -> 
       let
@@ -76,7 +88,10 @@ update action ({admin, name} as model) =
         (newModel , effects)
 
     HostnameInput hostname -> 
-        none { model | hostname = hostname }
+      model
+        |> setMachine (\machine -> {machine | hostname = hostname })
+        |> (validationOf "Hostname" [notEmpty] (\{machine} -> machine.hostname))
+        |> none
 
     _ -> 
       none model
@@ -94,13 +109,13 @@ infoMessage name =
  ]
 
 
-launchView address {hostname, name, admin} =
+launchView address {machine, name, admin} =
    div [class "panel panel-default"] [
      div [class "panel-body"] [
        (Html.form [] [
          div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
          (List.append
-           [group' "Hostname" (inputText address HostnameInput " "  hostname)]
+           [group' "Hostname" (inputText address HostnameInput " "  machine.hostname)]
            (Admin.view (Signal.forwardTo address AdminAction) admin))
          ])
     ]

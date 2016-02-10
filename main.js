@@ -14171,86 +14171,6 @@ Elm.Users.List.make = function (_elm) {
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
-Elm.Systems.Add.Validations = Elm.Systems.Add.Validations || {};
-Elm.Systems.Add.Validations.make = function (_elm) {
-   "use strict";
-   _elm.Systems = _elm.Systems || {};
-   _elm.Systems.Add = _elm.Systems.Add || {};
-   _elm.Systems.Add.Validations = _elm.Systems.Add.Validations || {};
-   if (_elm.Systems.Add.Validations.values) return _elm.Systems.Add.Validations.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Regex = Elm.Regex.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var validate = F3(function (step,key,validations) {
-      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
-      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
-   });
-   var validateAll = F3(function (validations,step,model) {
-      var stepValues = A2($List.map,function (vs) {    return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));},validations);
-      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
-   });
-   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
-   var vpair = F2(function (step,validations) {    return {ctor: "_Tuple2",_0: $Basics.toString(step),_1: $Dict.fromList(validations)};});
-   var Invalid = function (a) {    return {ctor: "Invalid",_0: a};};
-   var None = {ctor: "None"};
-   var notEmpty = function (value) {    return $String.isEmpty(value) ? Invalid("cannot be empty") : None;};
-   var hasItems = function (value) {    return $List.isEmpty(value) ? Invalid("cannot be empty") : None;};
-   var notContained = function (_p0) {
-      var _p1 = _p0;
-      var _p3 = _p1._0;
-      var _p2 = notEmpty(_p3);
-      if (_p2.ctor === "Invalid") {
-            return Invalid(_p2._0);
-         } else {
-            return A2($List.member,_p3,_p1._1) ? Invalid("cannot add twice") : None;
-         }
-   };
-   var validIp = function (value) {
-      return $Basics.not($String.isEmpty(value)) && !_U.eq($List.length(A3($Regex.find,$Regex.All,$Regex.regex("\\d+\\.\\d+\\.\\d+\\.\\d+$"),value)),
-      1) ? Invalid("non legal ip address") : None;
-   };
-   var validId = F4(function (length,prefix,allowEmpty,value) {
-      return $String.isEmpty(value) && allowEmpty ? None : $Basics.not(A2($String.contains,prefix,value)) ? Invalid(A2($Basics._op["++"],
-      "Id should start with ",
-      prefix)) : !_U.eq($String.length(value),length) ? Invalid(A2($Basics._op["++"],
-      "Id should have ",
-      A2($Basics._op["++"],$Basics.toString(length)," characthers"))) : None;
-   });
-   var validationOf = F4(function (key,validations,value,_p4) {
-      var _p5 = _p4;
-      var _p7 = _p5;
-      var res = A2($List.filter,
-      function (error) {
-         return !_U.eq(error,None);
-      },
-      A2($List.map,function (validation) {    return validation(value(_p7));},validations));
-      var newErrors = A3($Dict.update,key,function (_p6) {    return $Maybe.Just(res);},_p5.errors);
-      return _U.update(_p7,{errors: newErrors});
-   });
-   return _elm.Systems.Add.Validations.values = {_op: _op
-                                                ,None: None
-                                                ,Invalid: Invalid
-                                                ,notEmpty: notEmpty
-                                                ,hasItems: hasItems
-                                                ,notContained: notContained
-                                                ,validIp: validIp
-                                                ,validId: validId
-                                                ,vpair: vpair
-                                                ,notAny: notAny
-                                                ,validateAll: validateAll
-                                                ,validate: validate
-                                                ,validationOf: validationOf};
-};
-Elm.Systems = Elm.Systems || {};
-Elm.Systems.Add = Elm.Systems.Add || {};
 Elm.Systems.Add.Common = Elm.Systems.Add.Common || {};
 Elm.Systems.Add.Common.make = function (_elm) {
    "use strict";
@@ -14263,16 +14183,11 @@ Elm.Systems.Add.Common.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Environments$List = Elm.Environments.List.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm),
-   $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm);
+   $String = Elm.String.make(_elm);
    var _op = {};
    var setMachine = F2(function (f,_p0) {    var _p1 = _p0;var newMachine = f(_p1.machine);return _U.update(_p1,{machine: newMachine});});
    var getOses = F2(function (hyp,model) {
@@ -14294,88 +14209,7 @@ Elm.Systems.Add.Common.make = function (_elm) {
             return _p7;
          }
    });
-   var checkbox = F3(function (address,action,currentValue) {
-      return A2($Html.input,
-      _U.list([$Html$Attributes.type$("checkbox")
-              ,A2($Html$Attributes.attribute,"aria-label","...")
-              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin",_1: "10px 0 0"}]))
-              ,A2($Html$Events.onClick,address,action)
-              ,$Html$Attributes.checked(currentValue)]),
-      _U.list([]));
-   });
-   var onInput = F2(function (address,action) {
-      return A3($Html$Events.on,
-      "input",
-      A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
-      function (_p8) {
-         return A2($Signal.message,address,action(_p8));
-      });
-   });
-   var typedInput = F5(function (address,action,place,currentValue,typed) {
-      return A2($Html.input,
-      _U.list([$Html$Attributes.$class("form-control")
-              ,$Html$Attributes.type$(typed)
-              ,$Html$Attributes.placeholder(place)
-              ,$Html$Attributes.value(currentValue)
-              ,A2(onInput,address,action)]),
-      _U.list([]));
-   });
-   var inputNumber = F4(function (address,action,place,currentValue) {    return A5(typedInput,address,action,place,currentValue,"number");});
-   var inputText = F4(function (address,action,place,currentValue) {    return A5(typedInput,address,action,place,currentValue,"text");});
-   var onSelect = F2(function (address,action) {
-      return A3($Html$Events.on,
-      "change",
-      A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
-      function (_p9) {
-         return A2($Signal.message,address,action(_p9));
-      });
-   });
-   var selected = F2(function (value,$default) {    return _U.eq(value,$default) ? _U.list([A2($Html$Attributes.attribute,"selected","true")]) : _U.list([]);});
-   var selector = F4(function (address,action,options,$default) {
-      return A2($Html.select,
-      _U.list([$Html$Attributes.$class("form-control"),A2(onSelect,address,action)]),
-      A2($List.map,function (opt) {    return A2($Html.option,A2(selected,opt,$default),_U.list([$Html.text(opt)]));},options));
-   });
-   var toHtml = function (error) {
-      var _p10 = error;
-      if (_p10.ctor === "Invalid") {
-            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([$Html.text(_p10._0)]));
-         } else {
-            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([]));
-         }
-   };
-   var withMessage = function (errors) {
-      if ($List.isEmpty(errors)) return A2($Html.div,_U.list([]),_U.list([])); else {
-            var messages = A2($List.map,toHtml,errors);
-            return A2($Maybe.withDefault,A2($Html.div,_U.list([]),_U.list([])),$List.head(messages));
-         }
-   };
-   var withError = F2(function (errors,$class) {    return $List.isEmpty(errors) ? $class : A2($Basics._op["++"],$class," has-error");});
-   var group = F3(function (title,widget,errors) {
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class(A2(withError,errors,"form-group")),$Html$Attributes.id(title)]),
-      _U.list([A2($Html.label,_U.list([$Html$Attributes.$for(title),$Html$Attributes.$class("col-sm-3 control-label")]),_U.list([$Html.text(title)]))
-              ,A2($Html.div,_U.list([$Html$Attributes.$class("col-sm-6")]),_U.list([widget]))
-              ,withMessage(errors)]));
-   });
-   var group$ = F2(function (title,widget) {    return A3(group,title,widget,_U.list([]));});
-   return _elm.Systems.Add.Common.values = {_op: _op
-                                           ,withError: withError
-                                           ,toHtml: toHtml
-                                           ,withMessage: withMessage
-                                           ,group: group
-                                           ,group$: group$
-                                           ,selected: selected
-                                           ,onSelect: onSelect
-                                           ,selector: selector
-                                           ,onInput: onInput
-                                           ,typedInput: typedInput
-                                           ,inputNumber: inputNumber
-                                           ,inputText: inputText
-                                           ,checkbox: checkbox
-                                           ,getOses: getOses
-                                           ,setDefaultOS: setDefaultOS
-                                           ,setMachine: setMachine};
+   return _elm.Systems.Add.Common.values = {_op: _op,getOses: getOses,setDefaultOS: setDefaultOS,setMachine: setMachine};
 };
 Elm.Admin = Elm.Admin || {};
 Elm.Admin.Core = Elm.Admin.Core || {};
@@ -15283,6 +15117,86 @@ Elm.Systems.List.make = function (_elm) {
                                      ,getSystems: getSystems
                                      ,getSystemsQuery: getSystemsQuery};
 };
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Add = Elm.Systems.Add || {};
+Elm.Systems.Add.Validations = Elm.Systems.Add.Validations || {};
+Elm.Systems.Add.Validations.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Add = _elm.Systems.Add || {};
+   _elm.Systems.Add.Validations = _elm.Systems.Add.Validations || {};
+   if (_elm.Systems.Add.Validations.values) return _elm.Systems.Add.Validations.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Regex = Elm.Regex.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var validate = F3(function (step,key,validations) {
+      var stepValidations = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),validations));
+      return A2($Maybe.withDefault,$Basics.identity,A2($Dict.get,key,stepValidations));
+   });
+   var validateAll = F3(function (validations,step,model) {
+      var stepValues = A2($List.map,function (vs) {    return A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,$Basics.toString(step),vs));},validations);
+      return A3($List.foldl,F2(function (v,m) {    return v(m);}),model,$List.concat(A2($List.map,$Dict.values,stepValues)));
+   });
+   var notAny = function (errors) {    return $List.isEmpty(A2($List.filter,function (e) {    return $Basics.not($List.isEmpty(e));},$Dict.values(errors)));};
+   var vpair = F2(function (step,validations) {    return {ctor: "_Tuple2",_0: $Basics.toString(step),_1: $Dict.fromList(validations)};});
+   var Invalid = function (a) {    return {ctor: "Invalid",_0: a};};
+   var None = {ctor: "None"};
+   var notEmpty = function (value) {    return $String.isEmpty(value) ? Invalid("cannot be empty") : None;};
+   var hasItems = function (value) {    return $List.isEmpty(value) ? Invalid("cannot be empty") : None;};
+   var notContained = function (_p0) {
+      var _p1 = _p0;
+      var _p3 = _p1._0;
+      var _p2 = notEmpty(_p3);
+      if (_p2.ctor === "Invalid") {
+            return Invalid(_p2._0);
+         } else {
+            return A2($List.member,_p3,_p1._1) ? Invalid("cannot add twice") : None;
+         }
+   };
+   var validIp = function (value) {
+      return $Basics.not($String.isEmpty(value)) && !_U.eq($List.length(A3($Regex.find,$Regex.All,$Regex.regex("\\d+\\.\\d+\\.\\d+\\.\\d+$"),value)),
+      1) ? Invalid("non legal ip address") : None;
+   };
+   var validId = F4(function (length,prefix,allowEmpty,value) {
+      return $String.isEmpty(value) && allowEmpty ? None : $Basics.not(A2($String.contains,prefix,value)) ? Invalid(A2($Basics._op["++"],
+      "Id should start with ",
+      prefix)) : !_U.eq($String.length(value),length) ? Invalid(A2($Basics._op["++"],
+      "Id should have ",
+      A2($Basics._op["++"],$Basics.toString(length)," characthers"))) : None;
+   });
+   var validationOf = F4(function (key,validations,value,_p4) {
+      var _p5 = _p4;
+      var _p7 = _p5;
+      var res = A2($List.filter,
+      function (error) {
+         return !_U.eq(error,None);
+      },
+      A2($List.map,function (validation) {    return validation(value(_p7));},validations));
+      var newErrors = A3($Dict.update,key,function (_p6) {    return $Maybe.Just(res);},_p5.errors);
+      return _U.update(_p7,{errors: newErrors});
+   });
+   return _elm.Systems.Add.Validations.values = {_op: _op
+                                                ,None: None
+                                                ,Invalid: Invalid
+                                                ,notEmpty: notEmpty
+                                                ,hasItems: hasItems
+                                                ,notContained: notContained
+                                                ,validIp: validIp
+                                                ,validId: validId
+                                                ,vpair: vpair
+                                                ,notAny: notAny
+                                                ,validateAll: validateAll
+                                                ,validate: validate
+                                                ,validationOf: validationOf};
+};
 Elm.Common = Elm.Common || {};
 Elm.Common.Components = Elm.Common.Components || {};
 Elm.Common.Components.make = function (_elm) {
@@ -15293,15 +15207,85 @@ Elm.Common.Components.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm);
    var _op = {};
+   var checkbox = F3(function (address,action,currentValue) {
+      return A2($Html.input,
+      _U.list([$Html$Attributes.type$("checkbox")
+              ,A2($Html$Attributes.attribute,"aria-label","...")
+              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin",_1: "10px 0 0"}]))
+              ,A2($Html$Events.onClick,address,action)
+              ,$Html$Attributes.checked(currentValue)]),
+      _U.list([]));
+   });
+   var onInput = F2(function (address,action) {
+      return A3($Html$Events.on,
+      "input",
+      A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
+      function (_p0) {
+         return A2($Signal.message,address,action(_p0));
+      });
+   });
+   var typedInput = F5(function (address,action,place,currentValue,typed) {
+      return A2($Html.input,
+      _U.list([$Html$Attributes.$class("form-control")
+              ,$Html$Attributes.type$(typed)
+              ,$Html$Attributes.placeholder(place)
+              ,$Html$Attributes.value(currentValue)
+              ,A2(onInput,address,action)]),
+      _U.list([]));
+   });
+   var inputNumber = F4(function (address,action,place,currentValue) {    return A5(typedInput,address,action,place,currentValue,"number");});
+   var inputText = F4(function (address,action,place,currentValue) {    return A5(typedInput,address,action,place,currentValue,"text");});
+   var onSelect = F2(function (address,action) {
+      return A3($Html$Events.on,
+      "change",
+      A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
+      function (_p1) {
+         return A2($Signal.message,address,action(_p1));
+      });
+   });
+   var selected = F2(function (value,$default) {    return _U.eq(value,$default) ? _U.list([A2($Html$Attributes.attribute,"selected","true")]) : _U.list([]);});
+   var selector = F4(function (address,action,options,$default) {
+      return A2($Html.select,
+      _U.list([$Html$Attributes.$class("form-control"),A2(onSelect,address,action)]),
+      A2($List.map,function (opt) {    return A2($Html.option,A2(selected,opt,$default),_U.list([$Html.text(opt)]));},options));
+   });
+   var toHtml = function (error) {
+      var _p2 = error;
+      if (_p2.ctor === "Invalid") {
+            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([$Html.text(_p2._0)]));
+         } else {
+            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([]));
+         }
+   };
+   var withMessage = function (errors) {
+      if ($List.isEmpty(errors)) return A2($Html.div,_U.list([]),_U.list([])); else {
+            var messages = A2($List.map,toHtml,errors);
+            return A2($Maybe.withDefault,A2($Html.div,_U.list([]),_U.list([])),$List.head(messages));
+         }
+   };
+   var withError = F2(function (errors,$class) {    return $List.isEmpty(errors) ? $class : A2($Basics._op["++"],$class," has-error");});
+   var group = F3(function (title,widget,errors) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class(A2(withError,errors,"form-group")),$Html$Attributes.id(title)]),
+      _U.list([A2($Html.label,_U.list([$Html$Attributes.$for(title),$Html$Attributes.$class("col-sm-3 control-label")]),_U.list([$Html.text(title)]))
+              ,A2($Html.div,_U.list([$Html$Attributes.$class("col-sm-6")]),_U.list([widget]))
+              ,withMessage(errors)]));
+   });
+   var group$ = F2(function (title,widget) {    return A3(group,title,widget,_U.list([]));});
+   var withErrors = F3(function (errors,key,widget) {    return A3(group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));});
    var dialogPanel = F6(function (type$,address,message,body,cancel,ok) {
       return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
                      _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
@@ -15336,7 +15320,21 @@ Elm.Common.Components.make = function (_elm) {
                                           ,dialogPanel: dialogPanel
                                           ,infoCallout: infoCallout
                                           ,dangerCallout: dangerCallout
-                                          ,warningCallout: warningCallout};
+                                          ,warningCallout: warningCallout
+                                          ,withError: withError
+                                          ,toHtml: toHtml
+                                          ,withMessage: withMessage
+                                          ,group: group
+                                          ,group$: group$
+                                          ,selected: selected
+                                          ,onSelect: onSelect
+                                          ,selector: selector
+                                          ,onInput: onInput
+                                          ,typedInput: typedInput
+                                          ,inputNumber: inputNumber
+                                          ,inputText: inputText
+                                          ,checkbox: checkbox
+                                          ,withErrors: withErrors};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};
@@ -15586,9 +15584,6 @@ Elm.Systems.Add.AWS.make = function (_elm) {
    var ebsTypes = $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "Magnetic",_1: "standard"}
                                          ,{ctor: "_Tuple2",_0: "General Purpose (SSD)",_1: "gp2"}
                                          ,{ctor: "_Tuple2",_0: "Provisioned IOPS (SSD)",_1: "io1"}]));
-   var withErrors = F3(function (errors,key,widget) {
-      return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
-   });
    var ignoreDevices = function (_p0) {
       var _p1 = _p0;
       var ignored = A2($Dict.remove,"Volume",A2($Dict.remove,"Instance Device",A2($Dict.remove,"EBS Device",_p1.errors)));
@@ -15894,13 +15889,13 @@ Elm.Systems.Add.AWS.make = function (_elm) {
    var store = F2(function (address,_p46) {
       var _p47 = _p46;
       var _p48 = _p47.block;
-      var check = withErrors(_p47.errors);
+      var check = $Common$Components.withErrors(_p47.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Instance Store")]))
-              ,A2(check,"Instance Device",A4($Systems$Add$Common.inputText,address,InstanceDeviceInput,"sdb",_p48.device))
-              ,A2(check,"Volume",A4($Systems$Add$Common.inputText,address,InstanceVolumeInput,"ephemeral0",_p48.volume))
-              ,A2($Systems$Add$Common.group$,
+              ,A2(check,"Instance Device",A4($Common$Components.inputText,address,InstanceDeviceInput,"sdb",_p48.device))
+              ,A2(check,"Volume",A4($Common$Components.inputText,address,InstanceVolumeInput,"ephemeral0",_p48.volume))
+              ,A2($Common$Components.group$,
               "",
               A2($Html.button,_U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,BlockAdd)]),_U.list([$Html.text("Add")])))
               ,A2(blocks,address,$Common$Utils.defaultEmpty(_p47.aws.blockDevices))]))]);
@@ -15956,24 +15951,22 @@ Elm.Systems.Add.AWS.make = function (_elm) {
       var _p54 = _p53;
       var _p56 = _p54.volume;
       var _p55 = _p54.aws;
-      var check = withErrors(_p54.errors);
+      var check = $Common$Components.withErrors(_p54.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Global")]))
-              ,A2($Systems$Add$Common.group$,
-              "EBS Optimized",
-              A3($Systems$Add$Common.checkbox,address,EBSOptimized,A2($Maybe.withDefault,false,_p55.ebsOptimized)))
+              ,A2($Common$Components.group$,"EBS Optimized",A3($Common$Components.checkbox,address,EBSOptimized,A2($Maybe.withDefault,false,_p55.ebsOptimized)))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Devices")]))
-              ,A2(check,"EBS Device",A4($Systems$Add$Common.inputText,address,EBSDeviceInput,"sdh",_p56.device))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,EBSSizeInput,"",$Basics.toString(_p56.size)))
-              ,A2($Systems$Add$Common.group$,"Type",A4($Systems$Add$Common.selector,address,SelectEBSType,$Dict.keys(ebsTypes),_p56.type$))
-              ,_U.eq(_p56.type$,"Provisioned IOPS (SSD)") ? A2($Systems$Add$Common.group$,
+              ,A2(check,"EBS Device",A4($Common$Components.inputText,address,EBSDeviceInput,"sdh",_p56.device))
+              ,A2($Common$Components.group$,"Size",A4($Common$Components.inputNumber,address,EBSSizeInput,"",$Basics.toString(_p56.size)))
+              ,A2($Common$Components.group$,"Type",A4($Common$Components.selector,address,SelectEBSType,$Dict.keys(ebsTypes),_p56.type$))
+              ,_U.eq(_p56.type$,"Provisioned IOPS (SSD)") ? A2($Common$Components.group$,
               "IOPS",
-              A4($Systems$Add$Common.inputNumber,address,EBSIOPSInput,"50",$Basics.toString(A2($Maybe.withDefault,50,_p56.iops)))) : A2($Html.div,
+              A4($Common$Components.inputNumber,address,EBSIOPSInput,"50",$Basics.toString(A2($Maybe.withDefault,50,_p56.iops)))) : A2($Html.div,
               _U.list([]),
               _U.list([]))
-              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,EBSClear,_p56.clear))
-              ,A2($Systems$Add$Common.group$,
+              ,A2($Common$Components.group$,"Clear",A3($Common$Components.checkbox,address,EBSClear,_p56.clear))
+              ,A2($Common$Components.group$,
               "",
               A2($Html.button,
               _U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,VolumeAdd)]),
@@ -15988,26 +15981,23 @@ Elm.Systems.Add.AWS.make = function (_elm) {
       var _p58 = _p57;
       var _p60 = _p58.machine;
       var _p59 = _p58.aws;
-      var check = withErrors(_p58.errors);
+      var check = $Common$Components.withErrors(_p58.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("DNS")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p60.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p60.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p60.ip)))
+              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p60.hostname))
+              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p60.domain))
+              ,A2(check,"IP",A4($Common$Components.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p60.ip)))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("VPC")]))
               ,A2(check,
               "VPC Id",
-              A4($Systems$Add$Common.inputText,address,VPCIdInput,"",A3($Common$Utils.withDefaultProp,_p59.vpc,"",function (_) {    return _.vpcId;})))
+              A4($Common$Components.inputText,address,VPCIdInput,"",A3($Common$Utils.withDefaultProp,_p59.vpc,"",function (_) {    return _.vpcId;})))
               ,A2(check,
               "Subnet Id",
-              A4($Systems$Add$Common.inputText,address,SubnetIdInput,"",A3($Common$Utils.withDefaultProp,_p59.vpc,"",function (_) {    return _.subnetId;})))
-              ,A2($Systems$Add$Common.group$,
+              A4($Common$Components.inputText,address,SubnetIdInput,"",A3($Common$Utils.withDefaultProp,_p59.vpc,"",function (_) {    return _.subnetId;})))
+              ,A2($Common$Components.group$,
               "Assign public IP",
-              A3($Systems$Add$Common.checkbox,
-              address,
-              AssignIp,
-              A3($Common$Utils.withDefaultProp,_p59.vpc,false,function (_) {    return _.assignPublic;})))]))]);
+              A3($Common$Components.checkbox,address,AssignIp,A3($Common$Utils.withDefaultProp,_p59.vpc,false,function (_) {    return _.assignPublic;})))]))]);
    });
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
    var SecurityGroupsInput = function (a) {    return {ctor: "SecurityGroupsInput",_0: a};};
@@ -16029,24 +16019,24 @@ Elm.Systems.Add.AWS.make = function (_elm) {
       var zoneOptions = A2($List.append,_U.list([""]),A2($List.map,function (k) {    return A2($Basics._op["++"],zone,k);},zones));
       var points = A2($List.map,function (_p66) {    var _p67 = _p66;return _p67._0;},$Dict.values($Systems$Model$AWS.endpoints));
       var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p68.securityGroups));
-      var check = withErrors(_p62.errors);
+      var check = $Common$Components.withErrors(_p62.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,
+              ,A2($Common$Components.group$,
               "Instance type",
-              A4($Systems$Add$Common.selector,address,SelectInstanceType,$Systems$Model$AWS.instanceTypes,_p68.instanceType))
-              ,A2($Systems$Add$Common.group$,
+              A4($Common$Components.selector,address,SelectInstanceType,$Systems$Model$AWS.instanceTypes,_p68.instanceType))
+              ,A2($Common$Components.group$,
               "OS",
-              A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(A2($Systems$Add$Common.getOses,"aws",_p69)),_p62.machine.os))
-              ,A2($Systems$Add$Common.group$,"Endpoint",A4($Systems$Add$Common.selector,address,SelectEndpoint,points,name))
-              ,A2($Systems$Add$Common.group$,
+              A4($Common$Components.selector,address,SelectOS,$Dict.keys(A2($Systems$Add$Common.getOses,"aws",_p69)),_p62.machine.os))
+              ,A2($Common$Components.group$,"Endpoint",A4($Common$Components.selector,address,SelectEndpoint,points,name))
+              ,A2($Common$Components.group$,
               "Availability Zone",
-              A4($Systems$Add$Common.selector,address,SelectZone,zoneOptions,A2($Maybe.withDefault,"",_p68.availabilityZone)))
+              A4($Common$Components.selector,address,SelectZone,zoneOptions,A2($Maybe.withDefault,"",_p68.availabilityZone)))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p69.machine.user))
-              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p68.keyName))
-              ,A2(check,"Security groups",A4($Systems$Add$Common.inputText,address,SecurityGroupsInput," ",groups))]))]);
+              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p69.machine.user))
+              ,A2(check,"Keypair",A4($Common$Components.inputText,address,KeyPairInput,"",_p68.keyName))
+              ,A2(check,"Security groups",A4($Common$Components.inputText,address,SecurityGroupsInput," ",groups))]))]);
    });
    var stepView = F2(function (address,_p70) {
       var _p71 = _p70;
@@ -16128,7 +16118,6 @@ Elm.Systems.Add.AWS.make = function (_elm) {
                                         ,next: next
                                         ,back: back
                                         ,instance: instance
-                                        ,withErrors: withErrors
                                         ,networking: networking
                                         ,ebsTypes: ebsTypes
                                         ,volumeRow: volumeRow
@@ -16208,7 +16197,6 @@ Elm.Systems.Add.Physical.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
-   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
@@ -16227,9 +16215,6 @@ Elm.Systems.Add.Physical.make = function (_elm) {
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm),
    $Systems$View$Physical = Elm.Systems.View.Physical.make(_elm);
    var _op = {};
-   var withErrors = F3(function (errors,key,widget) {
-      return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
-   });
    var getOses = function (model) {
       var hypervisor = A2($Maybe.withDefault,$Environments$List.OSTemplates($Dict.empty),A2($Dict.get,"physical",model.environment));
       var _p0 = hypervisor;
@@ -16335,18 +16320,18 @@ Elm.Systems.Add.Physical.make = function (_elm) {
       var _p20 = _p19;
       var _p22 = _p20.physical;
       var _p21 = _p20.machine;
-      var check = withErrors(_p20.errors);
+      var check = $Common$Components.withErrors(_p20.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p21.user))
+              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p21.user))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p21.ip)))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p21.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p21.domain))
+              ,A2(check,"IP",A4($Common$Components.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p21.ip)))
+              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p21.hostname))
+              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p21.domain))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("WOL")]))
-              ,A2(check,"Mac",A4($Systems$Add$Common.inputText,address,MacInput,"",A2($Maybe.withDefault,"",_p22.mac)))
-              ,A2(check,"Broadcast",A4($Systems$Add$Common.inputText,address,BroadcastInput,"",A2($Maybe.withDefault,"",_p22.broadcast)))]))]);
+              ,A2(check,"Mac",A4($Common$Components.inputText,address,MacInput,"",A2($Maybe.withDefault,"",_p22.mac)))
+              ,A2(check,"Broadcast",A4($Common$Components.inputText,address,BroadcastInput,"",A2($Maybe.withDefault,"",_p22.broadcast)))]))]);
    });
    var stepView = F2(function (address,_p23) {
       var _p24 = _p23;
@@ -16393,7 +16378,6 @@ Elm.Systems.Add.Physical.make = function (_elm) {
                                              ,back: back
                                              ,getOses: getOses
                                              ,instance: instance
-                                             ,withErrors: withErrors
                                              ,stepView: stepView
                                              ,view: view};
 };
@@ -16507,9 +16491,6 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$View$Openstack = Elm.Systems.View.Openstack.make(_elm);
    var _op = {};
-   var withErrors = F3(function (errors,key,widget) {
-      return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
-   });
    var getFlavors = function (model) {
       var hypervisor = A2($Maybe.withDefault,$Environments$List.Empty,A2($Dict.get,"openstack",model.environment));
       var _p0 = hypervisor;
@@ -16762,14 +16743,14 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
    var cinder = F2(function (address,_p43) {
       var _p44 = _p43;
       var _p45 = _p44.volume;
-      var check = withErrors(_p44.errors);
+      var check = $Common$Components.withErrors(_p44.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Devices")]))
-              ,A2(check,"Cinder Device",A4($Systems$Add$Common.inputText,address,CinderDeviceInput,"sdh",_p45.device))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p45.size)))
-              ,A2($Systems$Add$Common.group$,"Clear",A3($Systems$Add$Common.checkbox,address,CinderClear,_p45.clear))
-              ,A2($Systems$Add$Common.group$,
+              ,A2(check,"Cinder Device",A4($Common$Components.inputText,address,CinderDeviceInput,"sdh",_p45.device))
+              ,A2($Common$Components.group$,"Size",A4($Common$Components.inputNumber,address,CinderSizeInput,"",$Basics.toString(_p45.size)))
+              ,A2($Common$Components.group$,"Clear",A3($Common$Components.checkbox,address,CinderClear,_p45.clear))
+              ,A2($Common$Components.group$,
               "",
               A2($Html.button,
               _U.list([$Html$Attributes.$class("btn btn-sm col-md-2"),A2($Html$Events.onClick,address,VolumeAdd)]),
@@ -16787,15 +16768,15 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
       var _p49 = _p47.openstack;
       var _p48 = _p47.machine;
       var networks = A2($String.join," ",_p49.networks);
-      var check = withErrors(_p47.errors);
+      var check = $Common$Components.withErrors(_p47.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p48.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p48.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p49.floatingIp)))
-              ,A2(check,"IP-Pool",A4($Systems$Add$Common.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p49.floatingIpPool)))
-              ,A2(check,"Networks",A4($Systems$Add$Common.inputText,address,NetworksInput," ",networks))]))]);
+              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p48.hostname))
+              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p48.domain))
+              ,A2(check,"IP",A4($Common$Components.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p49.floatingIp)))
+              ,A2(check,"IP-Pool",A4($Common$Components.inputText,address,IPPoolInput,"",A2($Maybe.withDefault,"",_p49.floatingIpPool)))
+              ,A2(check,"Networks",A4($Common$Components.inputText,address,NetworksInput," ",networks))]))]);
    });
    var TenantInput = function (a) {    return {ctor: "TenantInput",_0: a};};
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
@@ -16810,17 +16791,17 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
       var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"openstack",_p52));
       var flavors = $Dict.keys(getFlavors(_p52));
       var groups = A2($String.join," ",$Common$Utils.defaultEmpty(_p53.securityGroups));
-      var check = withErrors(_p51.errors);
+      var check = $Common$Components.withErrors(_p51.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,"Flavor",A4($Systems$Add$Common.selector,address,SelectFlavor,flavors,_p53.flavor))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,oses,_p51.machine.os))
-              ,A2(check,"Tenant",A4($Systems$Add$Common.inputText,address,TenantInput,"",_p53.tenant))
+              ,A2($Common$Components.group$,"Flavor",A4($Common$Components.selector,address,SelectFlavor,flavors,_p53.flavor))
+              ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,oses,_p51.machine.os))
+              ,A2(check,"Tenant",A4($Common$Components.inputText,address,TenantInput,"",_p53.tenant))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p52.machine.user))
-              ,A2(check,"Keypair",A4($Systems$Add$Common.inputText,address,KeyPairInput,"",_p53.keyName))
-              ,A2(check,"Security groups",A4($Systems$Add$Common.inputText,address,SecurityGroupsInput," ",groups))]))]);
+              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p52.machine.user))
+              ,A2(check,"Keypair",A4($Common$Components.inputText,address,KeyPairInput,"",_p53.keyName))
+              ,A2(check,"Security groups",A4($Common$Components.inputText,address,SecurityGroupsInput," ",groups))]))]);
    });
    var stepView = F2(function (address,_p54) {
       var _p55 = _p54;
@@ -16891,7 +16872,6 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                               ,next: next
                                               ,back: back
                                               ,instance: instance
-                                              ,withErrors: withErrors
                                               ,networking: networking
                                               ,volumeRow: volumeRow
                                               ,volumes: volumes
@@ -16994,9 +16974,6 @@ Elm.Systems.Add.GCE.make = function (_elm) {
    $Systems$Model$GCE = Elm.Systems.Model.GCE.make(_elm),
    $Systems$View$GCE = Elm.Systems.View.GCE.make(_elm);
    var _op = {};
-   var withErrors = F3(function (errors,key,widget) {
-      return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
-   });
    var getOses = function (model) {
       var hypervisor = A2($Maybe.withDefault,$Environments$List.OSTemplates($Dict.empty),A2($Dict.get,"gce",model.environment));
       var _p0 = hypervisor;
@@ -17132,13 +17109,13 @@ Elm.Systems.Add.GCE.make = function (_elm) {
    var networking = F2(function (address,_p23) {
       var _p24 = _p23;
       var _p25 = _p24.machine;
-      var check = withErrors(_p24.errors);
+      var check = $Common$Components.withErrors(_p24.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("DNS")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p25.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p25.domain))
-              ,A2(check,"IP",A4($Systems$Add$Common.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p24.gce.staticIp)))]))]);
+              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p25.hostname))
+              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p25.domain))
+              ,A2(check,"IP",A4($Common$Components.inputText,address,IPInput,"",A2($Maybe.withDefault,"",_p24.gce.staticIp)))]))]);
    });
    var TagsInput = function (a) {    return {ctor: "TagsInput",_0: a};};
    var ProjectIdInput = function (a) {    return {ctor: "ProjectIdInput",_0: a};};
@@ -17152,19 +17129,19 @@ Elm.Systems.Add.GCE.make = function (_elm) {
       var _p28 = _p27.gce;
       var zone = A2($Maybe.withDefault,"",$List.head($Systems$Model$GCE.zones));
       var tags = A2($String.join," ",$Common$Utils.defaultEmpty(_p28.tags));
-      var check = withErrors(_p27.errors);
+      var check = $Common$Components.withErrors(_p27.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,
+              ,A2($Common$Components.group$,
               "Machine type",
-              A4($Systems$Add$Common.selector,address,SelectMachineType,$Systems$Model$GCE.machineTypes,_p28.machineType))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p29)),_p27.machine.os))
-              ,A2($Systems$Add$Common.group$,"Zone",A4($Systems$Add$Common.selector,address,SelectZone,$Systems$Model$GCE.zones,_p28.zone))
-              ,A2(check,"Project id",A4($Systems$Add$Common.inputText,address,ProjectIdInput,"",_p28.projectId))
+              A4($Common$Components.selector,address,SelectMachineType,$Systems$Model$GCE.machineTypes,_p28.machineType))
+              ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,$Dict.keys(getOses(_p29)),_p27.machine.os))
+              ,A2($Common$Components.group$,"Zone",A4($Common$Components.selector,address,SelectZone,$Systems$Model$GCE.zones,_p28.zone))
+              ,A2(check,"Project id",A4($Common$Components.inputText,address,ProjectIdInput,"",_p28.projectId))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p29.machine.user))
-              ,A2(check,"Tags",A4($Systems$Add$Common.inputText,address,TagsInput," ",tags))]))]);
+              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p29.machine.user))
+              ,A2(check,"Tags",A4($Common$Components.inputText,address,TagsInput," ",tags))]))]);
    });
    var stepView = F2(function (address,_p30) {
       var _p31 = _p30;
@@ -17215,7 +17192,6 @@ Elm.Systems.Add.GCE.make = function (_elm) {
                                         ,getOses: getOses
                                         ,networking: networking
                                         ,instance: instance
-                                        ,withErrors: withErrors
                                         ,stepView: stepView
                                         ,view: view};
 };
@@ -17284,7 +17260,6 @@ Elm.Systems.Add.Digital.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
-   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
@@ -17303,9 +17278,6 @@ Elm.Systems.Add.Digital.make = function (_elm) {
    $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
    $Systems$View$Digital = Elm.Systems.View.Digital.make(_elm);
    var _op = {};
-   var withErrors = F3(function (errors,key,widget) {
-      return A3($Systems$Add$Common.group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));
-   });
    var getOses = function (model) {
       var hypervisor = A2($Maybe.withDefault,$Environments$List.OSTemplates($Dict.empty),A2($Dict.get,"digital-ocean",model.environment));
       var _p0 = hypervisor;
@@ -17400,19 +17372,19 @@ Elm.Systems.Add.Digital.make = function (_elm) {
       var _p20 = _p18.machine;
       var _p19 = _p18.digital;
       var region = A2($Maybe.withDefault,"",$List.head($Systems$Model$Digital.regions));
-      var check = withErrors(_p18.errors);
+      var check = $Common$Components.withErrors(_p18.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Properties")]))
-              ,A2($Systems$Add$Common.group$,"Size",A4($Systems$Add$Common.selector,address,SelectSize,$Systems$Model$Digital.sizes,_p19.size))
-              ,A2($Systems$Add$Common.group$,"OS",A4($Systems$Add$Common.selector,address,SelectOS,$Dict.keys(getOses(_p18)),_p20.os))
-              ,A2($Systems$Add$Common.group$,"Region",A4($Systems$Add$Common.selector,address,SelectRegion,$Systems$Model$Digital.regions,_p19.region))
+              ,A2($Common$Components.group$,"Size",A4($Common$Components.selector,address,SelectSize,$Systems$Model$Digital.sizes,_p19.size))
+              ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,$Dict.keys(getOses(_p18)),_p20.os))
+              ,A2($Common$Components.group$,"Region",A4($Common$Components.selector,address,SelectRegion,$Systems$Model$Digital.regions,_p19.region))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Security")]))
-              ,A2(check,"User",A4($Systems$Add$Common.inputText,address,UserInput,"",_p20.user))
+              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p20.user))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Networking")]))
-              ,A2(check,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput,"",_p20.hostname))
-              ,A2(check,"Domain",A4($Systems$Add$Common.inputText,address,DomainInput,"",_p20.domain))
-              ,A2($Systems$Add$Common.group$,"Private Networking",A3($Systems$Add$Common.checkbox,address,PrivateNetworking,_p19.privateNetworking))]))]);
+              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p20.hostname))
+              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p20.domain))
+              ,A2($Common$Components.group$,"Private Networking",A3($Common$Components.checkbox,address,PrivateNetworking,_p19.privateNetworking))]))]);
    });
    var stepView = F2(function (address,_p21) {
       var _p22 = _p21;
@@ -17458,7 +17430,6 @@ Elm.Systems.Add.Digital.make = function (_elm) {
                                             ,back: back
                                             ,getOses: getOses
                                             ,instance: instance
-                                            ,withErrors: withErrors
                                             ,stepView: stepView
                                             ,view: view};
 };
@@ -23547,6 +23518,7 @@ Elm.Templates.Launch.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Systems$Add$Common = Elm.Systems.Add.Common.make(_elm),
+   $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm),
    $Task = Elm.Task.make(_elm),
    $Templates$Persistency = Elm.Templates.Persistency.make(_elm);
    var _op = {};
@@ -23580,7 +23552,7 @@ Elm.Templates.Launch.make = function (_elm) {
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       A2($List.append,
-      _U.list([A2($Systems$Add$Common.group$,"Hostname",A4($Systems$Add$Common.inputText,address,HostnameInput," ",_p1.hostname))]),
+      _U.list([A2($Common$Components.group$,"Hostname",A4($Common$Components.inputText,address,HostnameInput," ",_p1.machine.hostname))]),
       A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p1.admin)))]))]))]));
    });
    var view = F2(function (address,_p2) {
@@ -23605,34 +23577,48 @@ Elm.Templates.Launch.make = function (_elm) {
    });
    var update = F2(function (action,_p6) {
       var _p7 = _p6;
-      var _p12 = _p7;
-      var _p11 = _p7.admin;
+      var _p14 = _p7;
+      var _p13 = _p7.admin;
       var _p8 = action;
       switch (_p8.ctor)
-      {case "AdminAction": var _p9 = A2($Admin$Core.update,_p8._0,_p11);
+      {case "AdminAction": var _p9 = A2($Admin$Core.update,_p8._0,_p13);
            var newAdmin = _p9._0;
            var effects = _p9._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p12,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
-         case "Launch": return {ctor: "_Tuple2",_0: _p12,_1: A2($Templates$Persistency.persistProvided,intoSystem(_p7.name),_p11)};
-         case "Launched": var _p10 = A4($Common$Redirect.successHandler,_p8._0,_p12,setSaved(_p12),NoOp);
+           return {ctor: "_Tuple2",_0: _U.update(_p14,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
+         case "Launch": return $Systems$Add$Validations.notAny(_p7.errors) ? {ctor: "_Tuple2"
+                                                                             ,_0: _p14
+                                                                             ,_1: A2($Templates$Persistency.persistProvided,
+                                                                             intoSystem(_p7.name),
+                                                                             _p13)} : $Common$Utils.none(_p14);
+         case "Launched": var _p10 = A4($Common$Redirect.successHandler,_p8._0,_p14,setSaved(_p14),NoOp);
            var newModel = _p10._0;
            var saveErrors = _p10._0.saveErrors;
            var effects = _p10._1;
            return {ctor: "_Tuple2",_0: newModel,_1: effects};
-         case "HostnameInput": return $Common$Utils.none(_U.update(_p12,{hostname: _p8._0}));
-         default: return $Common$Utils.none(_p12);}
+         case "HostnameInput": return $Common$Utils.none(A4($Systems$Add$Validations.validationOf,
+           "Hostname",
+           _U.list([$Systems$Add$Validations.notEmpty]),
+           function (_p11) {
+              var _p12 = _p11;
+              return _p12.machine.hostname;
+           },
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p8._0});},_p14)));
+         default: return $Common$Utils.none(_p14);}
    });
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
-   var Model = F4(function (a,b,c,d) {    return {name: a,hostname: b,admin: c,saveErrors: d};});
+   var Model = F5(function (a,b,c,d,e) {    return {name: a,machine: b,admin: c,saveErrors: d,errors: e};});
+   var PartialMachine = F2(function (a,b) {    return {hostname: a,domain: b};});
    var init = function () {
-      var _p13 = $Common$Errors.init;
-      var errors = _p13._0;
-      var _p14 = $Admin$Core.init;
-      var admin = _p14._0;
-      var effects = _p14._1;
-      return {ctor: "_Tuple2",_0: A4(Model,"","",admin,errors),_1: A2($Effects.map,AdminAction,effects)};
+      var machine = A2(PartialMachine,"","");
+      var _p15 = $Common$Errors.init;
+      var errors = _p15._0;
+      var _p16 = $Admin$Core.init;
+      var admin = _p16._0;
+      var effects = _p16._1;
+      return {ctor: "_Tuple2",_0: A5(Model,"",machine,admin,errors,$Dict.empty),_1: A2($Effects.map,AdminAction,effects)};
    }();
    return _elm.Templates.Launch.values = {_op: _op
+                                         ,PartialMachine: PartialMachine
                                          ,Model: Model
                                          ,init: init
                                          ,SetupJob: SetupJob
