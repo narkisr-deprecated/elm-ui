@@ -19,11 +19,11 @@ import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
 import Templates.Persistency exposing (persistTemplate, encodeDefaults)
 import Common.Components exposing (panelContents)
-import Systems.Add.Common exposing (..)
 import Common.Editor exposing (loadEditor, getEditor)
 import Common.Errors as Errors exposing (..)
 import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
 import Environments.List exposing (Environments, getEnvironments)
+import Common.Components exposing (..)
 import Debug
 
 

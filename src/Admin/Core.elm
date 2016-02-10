@@ -7,7 +7,7 @@ import Environments.List exposing (Environments, Environment, getEnvironments)
 import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none)
 import Users.List exposing (User, getUsers)
-import Systems.Add.Common exposing (..)
+import Common.Components exposing (..)
 import Dict
 
 

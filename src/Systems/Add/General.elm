@@ -5,6 +5,7 @@ import Common.Redirect exposing (successHandler)
 import Effects exposing (Effects, batch)
 import Http exposing (Error(BadResponse))
 import Admin.Core as Admin 
+import Common.Components exposing (..)
 
 
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type')

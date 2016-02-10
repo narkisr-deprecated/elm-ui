@@ -109,13 +109,16 @@ infoMessage name =
  ]
 
 
-launchView address {machine, name, admin} =
+launchView address {errors, machine, name, admin} =
+  let
+    checked = withErrors errors
+  in
    div [class "panel panel-default"] [
      div [class "panel-body"] [
        (Html.form [] [
          div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
          (List.append
-           [group' "Hostname" (inputText address HostnameInput " "  machine.hostname)]
+           [checked "Hostname" (inputText address HostnameInput " "  machine.hostname)]
            (Admin.view (Signal.forwardTo address AdminAction) admin))
          ])
     ]
