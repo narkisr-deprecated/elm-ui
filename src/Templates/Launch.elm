@@ -9,20 +9,24 @@ import Templates.Model.Common exposing (emptyTemplate, Template)
 import Common.Utils exposing (none)
 import Debug
 import Html.Events exposing (onClick)
-import Common.Components exposing (..)
+import Common.Componentsz exposing (..)
+import Common.Components exposing (infoCallout, dangerCallout)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Admin.Core as Admin 
 import Environments.List exposing (Environments, Environment, getEnvironments)
-import Common.Http exposing (postJson)
+import Common.Http exposing (postJson, SaveResponse, saveResponse)
 import Http exposing (Error(BadResponse))
 import Templates.Persistency exposing (persistProvided)
 import Task
-import Json.Decode exposing (..)
 import Jobs.Common as Jobs exposing (runJob, JobResponse)
 import Dict exposing (Dict)
 import Common.Errors as Errors exposing (..)
 import Systems.Add.Common exposing (setMachine)
 import Systems.Add.Validations exposing (notAny, validationOf, notEmpty)
+import Form exposing (Form)
+import Form.Validate as Validate exposing (..)
+import Form.Input as Input
+
 
 type alias PartialMachine = 
   { 
@@ -30,68 +34,87 @@ type alias PartialMachine =
     , domain : String
   } 
 
+
+type alias Provided = 
+  {
+    machine : PartialMachine
+  }
+
 type alias Model = 
   {
     name : String
-  , machine : PartialMachine
+  , form : Form () Provided
   , admin : Admin.Model
   , saveErrors : Errors.Model
-  , errors : Dict String (List Systems.Add.Validations.Error)
   }
  
+validate : Validation () Provided
+validate =
+  form1 Provided
+    ("machine" := form2 PartialMachine
+        ("hostname" := string)
+        ("domain" := string))
+    
 init : (Model , Effects Action)
 init =
   let 
     (admin, effects) = Admin.init
     (errors, _) = Errors.init
-    machine = PartialMachine "" "" 
+    provided = Provided (PartialMachine "" "") 
   in 
-    (Model "" machine admin errors Dict.empty, Effects.map AdminAction effects)
+    (Model "" (Form.initial [] validate) admin errors, Effects.map AdminAction effects)
 
 
 -- Update 
 
 type Action = 
   SetupJob (String, String)
-    | Launched (Result Http.Error SaveResponse)
-    | JobLaunched (Result Http.Error JobResponse)
     | AdminAction Admin.Action 
+    | Launched (Result Http.Error SaveResponse)
+    | FormAction Form.Action
+    | JobLaunched (Result Http.Error JobResponse)
     | Launch
     | Done
-    | HostnameInput String
     | Cancel
     | NoOp
 
-setSaved : Model -> SaveResponse -> (Model, Effects Action)
-setSaved model {id} =
+stage : Model -> SaveResponse -> (Model, Effects Action)
+stage model {id} =
   (model, runJob (toString id) "stage" JobLaunched)
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({errors, admin, name} as model) =
+update action ({saveErrors, form, admin, name} as model) =
   case action of 
-    AdminAction action -> 
-     let
-       (newAdmin, effects) = Admin.update action admin
-     in  
-       ({ model | admin = newAdmin} , Effects.map AdminAction effects)
+    FormAction formAction ->
+       let 
+         newForm = Form.update formAction form
+       in
+         none { model | form = Form.update Form.validate newForm}
 
     Launch -> 
-      if (notAny errors) then
-       (model, persistProvided (intoSystem name) admin)
-      else 
-       none model
+      let
+        (newModel, _) = update (FormAction Form.validate) model
+      in
+        if List.isEmpty (Form.getErrors newModel.form) then
+          case (Form.getOutput newModel.form) of
+            Just {machine} -> 
+              (newModel, persistProvided (intoSystem name) machine admin)
+            Nothing ->
+               none newModel
+        else
+          none newModel
+
+    AdminAction action -> 
+      let
+        (newAdmin, effects) = Admin.update action admin
+      in  
+        ({ model | admin = newAdmin}, Effects.map AdminAction effects)
     
     Launched result -> 
       let
-        (({saveErrors} as newModel), effects) = successHandler result model (setSaved model) NoOp
+        (({saveErrors} as newModel), effects) = successHandler result model (stage model) NoOp
       in
         (newModel , effects)
-
-    HostnameInput hostname -> 
-      model
-        |> setMachine (\machine -> {machine | hostname = hostname })
-        |> (validationOf "Hostname" [notEmpty] (\{machine} -> machine.hostname))
-        |> none
 
     _ -> 
       none model
@@ -109,18 +132,25 @@ infoMessage name =
  ]
 
 
-launchView address {errors, machine, name, admin} =
-  let
-    checked = withErrors errors
-  in
+machineView address form =
+  let 
+    formAddress = Signal.forwardTo address FormAction
+    hostname = (Form.getFieldAsString "machine.hostname" form)
+    domain = (Form.getFieldAsString "machine.domain" form)
+  in 
+   [ group "Hostname" Input.textInput hostname formAddress
+   , group "Domain" Input.textInput domain formAddress 
+   ]
+
+launchView address {name, form, admin} =
    div [class "panel panel-default"] [
      div [class "panel-body"] [
        (Html.form [] [
-         div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-         (List.append
-           [checked "Hostname" (inputText address HostnameInput " "  machine.hostname)]
-           (Admin.view (Signal.forwardTo address AdminAction) admin))
-         ])
+          div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+           (List.append
+              (machineView address form) 
+              (Admin.view (Signal.forwardTo address AdminAction) admin))
+      ])
     ]
   ]
 
@@ -140,19 +170,6 @@ view address ({name, saveErrors} as model) =
     infoCallout address (infoMessage name) (launchView address model) Cancel Launch
 
 -- Effects
-
-
-type alias SaveResponse = 
-  {
-    message : String 
-  , id : Int 
-  } 
-
-saveResponse : Decoder SaveResponse
-saveResponse = 
-  object2 SaveResponse
-    ("message" := string) 
-    ("id" := int)
 
 intoSystem : String -> String -> Effects Action
 intoSystem name json = 

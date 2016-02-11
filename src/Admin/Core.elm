@@ -20,6 +20,10 @@ type alias Model =
   , owner : String
   }
  
+partialAdmin : String -> String -> Model
+partialAdmin owner environment =
+    Model [] environment Dict.empty [] owner
+
 init : (Model , Effects Action)
 init =
   (Model [] "" Dict.empty [] "", batch [getUsers SetOwners,  getEnvironments SetEnvironments])
@@ -47,8 +51,6 @@ setEnvironments model es =
     environment = (Maybe.withDefault "" (List.head (Dict.keys es)))
   in 
     none {model | environments = Dict.keys es, environment = environment, rawEnvironments = es}
-
-
 
 update : Action ->  Model-> (Model , Effects Action)
 update action model =

@@ -29,4 +29,16 @@ apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
 apply func value =
     Json.object2 (<|) func value
 
+type alias SaveResponse = 
+  {
+    message : String 
+  , id : Int 
+  } 
+
+saveResponse : Decoder SaveResponse
+saveResponse = 
+  object2 SaveResponse
+    ("message" := string) 
+    ("id" := int)
+
 

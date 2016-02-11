@@ -89,7 +89,8 @@ group title widget errors =
   div [class (withError errors "form-group"), id title] 
     [ label [for title, class "col-sm-3 control-label"] [(text title)]
     , div [class "col-sm-6"] [widget]
-    , withMessage errors]
+    , withMessage errors
+    ]
 
 group' : String -> Html -> Html
 group' title widget = 

@@ -2,7 +2,7 @@ module Systems.Add where
 
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
-import Common.Http exposing (postJson)
+import Common.Http exposing (postJson, SaveResponse, saveResponse)
 import Common.Redirect as Redirect exposing (resultHandler, successHandler, errorsHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
@@ -306,15 +306,6 @@ view address model =
  ]
 
 -- Effects
-
-type alias SaveResponse = 
-  { message : String , id : Int } 
-
-saveResponse : Decoder SaveResponse
-saveResponse = 
-  object2 SaveResponse
-    ("message" := string) 
-    ("id" := int)
 
 saveSystem : Action -> String -> Effects Action
 saveSystem next json  = 

@@ -1,8 +1,6 @@
 module Templates.Persistency where
 
 import Templates.Model.Common exposing (Template, emptyOpenstackDefaults, Defaults, OpenstackDefaults)
-import Admin.Core as Admin
-import Systems.Add.Persistency exposing (transform)
 import Systems.Add.Encoders exposing (encoderOf, machineEncoder)
 import Effects exposing (Effects)
 import Json.Encode as E exposing (..)
@@ -51,12 +49,18 @@ persistModel f value =
 persistTemplate f template hyp = 
   persistModel f (encode template hyp)
 
-encodeProvided : Admin.Model -> Value
-encodeProvided {owner, environment} = 
+encodeMachine {hostname, domain} = 
+  object [
+     ("hostname", string  hostname)
+   , ("domain", string domain)
+  ]
+
+encodeProvided machine admin = 
  object [
-    ("owner" , string owner)
-  , ("env" , string environment)
+    ("owner" , string admin.owner)
+  , ("env" , string admin.environment)
+  -- , ("machine" , encodeMachine machine)
  ]
 
-persistProvided f provided = 
-  persistModel f (encodeProvided provided)
+persistProvided f machine admin = 
+  persistModel f (encodeProvided machine admin)
