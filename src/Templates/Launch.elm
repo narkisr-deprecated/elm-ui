@@ -1,6 +1,5 @@
 module Templates.Launch where
 
-import Common.Redirect as Redirect exposing (successHandler)
 import Html.Shorthand exposing (..)
 import Bootstrap.Html exposing (..)
 import Effects exposing (Effects)
@@ -20,7 +19,7 @@ import Templates.Persistency exposing (persistProvided)
 import Task
 import Jobs.Common as Jobs exposing (runJob, JobResponse)
 import Dict exposing (Dict)
-import Common.Errors as Errors exposing (..)
+import Common.Errors as Errors exposing (errorsSuccessHandler)
 import Systems.Add.Common exposing (setMachine)
 import Systems.Add.Validations exposing (notAny, validationOf, notEmpty)
 import Form exposing (Form)
@@ -70,6 +69,7 @@ init =
 type Action = 
   SetupJob (String, String)
     | AdminAction Admin.Action 
+    | ErrorsView Errors.Action
     | Launched (Result Http.Error SaveResponse)
     | FormAction Form.Action
     | JobLaunched (Result Http.Error JobResponse)
@@ -99,6 +99,7 @@ update action ({saveErrors, form, admin, name} as model) =
           case (Form.getOutput newModel.form) of
             Just {machine} -> 
               (newModel, persistProvided (intoSystem name) machine admin)
+
             Nothing ->
                none newModel
         else
@@ -111,10 +112,7 @@ update action ({saveErrors, form, admin, name} as model) =
         ({ model | admin = newAdmin}, Effects.map AdminAction effects)
     
     Launched result -> 
-      let
-        (({saveErrors} as newModel), effects) = successHandler result model (stage model) NoOp
-      in
-        (newModel , effects)
+       errorsSuccessHandler result model (stage model) NoOp
 
     _ -> 
       none model
@@ -164,10 +162,13 @@ errorMessage =
 
 view : Signal.Address Action -> Model -> List Html
 view address ({name, saveErrors} as model) =
-  if not (Dict.isEmpty saveErrors.errors.keyValues) then
-    dangerCallout address (errorMessage) (div [] []) Cancel Done
-  else 
-    infoCallout address (infoMessage name) (launchView address model) Cancel Launch
+  let
+    errorsView = div [class "panel-body"][(Errors.view (Signal.forwardTo address ErrorsView) saveErrors)]
+  in
+    if Errors.hasErrors saveErrors then
+      dangerCallout address errorMessage errorsView Cancel Done
+    else 
+      infoCallout address (infoMessage name) (launchView address model) Cancel Launch
 
 -- Effects
 

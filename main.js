@@ -14202,6 +14202,29 @@ Elm.Date.Format.make = function (_elm) {
    var formatISO8601 = format("%Y-%m-%dT%H:%M:%SZ");
    return _elm.Date.Format.values = {_op: _op,format: format,formatISO8601: formatISO8601};
 };
+Elm.Common = Elm.Common || {};
+Elm.Common.Redirect = Elm.Common.Redirect || {};
+Elm.Common.Redirect.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Redirect = _elm.Common.Redirect || {};
+   if (_elm.Common.Redirect.values) return _elm.Common.Redirect.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var Prompt = {ctor: "Prompt"};
+   var NoOp = {ctor: "NoOp"};
+   var redirectActions = $Signal.mailbox(NoOp);
+   var redirect = function (noop) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,redirectActions.address,Prompt)));};
+   return _elm.Common.Redirect.values = {_op: _op,NoOp: NoOp,Prompt: Prompt,redirectActions: redirectActions,redirect: redirect};
+};
 Elm.Native.Http = {};
 Elm.Native.Http.make = function(localRuntime) {
 
@@ -14507,120 +14530,6 @@ Elm.Http.make = function (_elm) {
                              ,RawNetworkError: RawNetworkError};
 };
 Elm.Common = Elm.Common || {};
-Elm.Common.Redirect = Elm.Common.Redirect || {};
-Elm.Common.Redirect.make = function (_elm) {
-   "use strict";
-   _elm.Common = _elm.Common || {};
-   _elm.Common.Redirect = _elm.Common.Redirect || {};
-   if (_elm.Common.Redirect.values) return _elm.Common.Redirect.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var setErrors = F2(function (_p0,es) {
-      var _p1 = _p0;
-      var newErrors = _U.update(_p1.saveErrors,{errors: es});
-      return {ctor: "_Tuple2",_0: _U.update(_p1,{saveErrors: newErrors}),_1: $Effects.none};
-   });
-   var identityFail = F2(function (model,res) {
-      return A2($Debug.log,A2($Basics._op["++"],"request failed",$Basics.toString(res)),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
-   });
-   var identitySuccess = F2(function (model,res) {    return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
-   var Errors = F3(function (a,b,c) {    return {type$: a,keyValues: b,message: c};});
-   var messageDecoder = A2($Json$Decode.object1,A2(Errors,"",$Dict.empty),$Json$Decode.maybe(A2($Json$Decode._op[":="],"message",$Json$Decode.string)));
-   var Value = function (a) {    return {ctor: "Value",_0: a};};
-   var NestedList = function (a) {    return {ctor: "NestedList",_0: a};};
-   var DeepNestedList = function (a) {    return {ctor: "DeepNestedList",_0: a};};
-   var Nested = function (a) {    return {ctor: "Nested",_0: a};};
-   var errorsDecoder = function () {
-      var options = _U.list([A2($Json$Decode.map,Value,$Json$Decode.string)
-                            ,A2($Json$Decode.map,Nested,$Json$Decode.dict($Json$Decode.string))
-                            ,A2($Json$Decode.map,DeepNestedList,$Json$Decode.dict($Json$Decode.list($Json$Decode.dict($Json$Decode.dict($Json$Decode.string)))))
-                            ,A2($Json$Decode.map,NestedList,$Json$Decode.dict($Json$Decode.list($Json$Decode.dict($Json$Decode.string))))]);
-      return A4($Json$Decode.object3,
-      Errors,
-      A2($Json$Decode.at,_U.list(["object","type"]),$Json$Decode.string),
-      A2($Json$Decode.at,_U.list(["object","errors"]),$Json$Decode.dict($Json$Decode.oneOf(options))),
-      $Json$Decode.$null($Maybe.Nothing));
-   }();
-   var decodeError = function (error) {
-      var emptyErrors = A3(Errors,"",$Dict.empty,$Maybe.Nothing);
-      var _p2 = error;
-      if (_p2.ctor === "Text") {
-            var _p5 = _p2._0;
-            var _p3 = A2($Json$Decode.decodeString,errorsDecoder,_p5);
-            if (_p3.ctor === "Ok") {
-                  return _p3._0;
-               } else {
-                  var _p4 = A2($Json$Decode.decodeString,messageDecoder,_p5);
-                  if (_p4.ctor === "Ok") {
-                        return _p4._0;
-                     } else {
-                        return A2($Debug.log,_p4._0,emptyErrors);
-                     }
-               }
-         } else {
-            return emptyErrors;
-         }
-   };
-   var Prompt = {ctor: "Prompt"};
-   var NoOp = {ctor: "NoOp"};
-   var redirectActions = $Signal.mailbox(NoOp);
-   var redirect = function (noop) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,redirectActions.address,Prompt)));};
-   var resultHandler = F5(function (result,model,success,fail,noop) {
-      var _p6 = result;
-      if (_p6.ctor === "Ok") {
-            return success(_p6._0);
-         } else {
-            var _p8 = _p6._0;
-            var _p7 = _p8;
-            _v5_2: do {
-               if (_p7.ctor === "BadResponse") {
-                     switch (_p7._0)
-                     {case 401: return A2($Debug.log,$Basics.toString(_p8),{ctor: "_Tuple2",_0: model,_1: redirect(noop)});
-                        case 400: return fail(decodeError(_p7._2));
-                        default: break _v5_2;}
-                  } else {
-                     break _v5_2;
-                  }
-            } while (false);
-            return A2($Debug.log,$Basics.toString(_p8),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
-         }
-   });
-   var successHandler = F4(function (result,model,success,noop) {    return A5(resultHandler,result,model,success,identityFail(model),noop);});
-   var failHandler = F4(function (result,model,fail,noop) {    return A5(resultHandler,result,model,identitySuccess(model),fail,noop);});
-   var errorsHandler = F3(function (result,model,noop) {    return A5(resultHandler,result,model,identitySuccess(model),setErrors(model),noop);});
-   return _elm.Common.Redirect.values = {_op: _op
-                                        ,NoOp: NoOp
-                                        ,Prompt: Prompt
-                                        ,redirectActions: redirectActions
-                                        ,redirect: redirect
-                                        ,Nested: Nested
-                                        ,DeepNestedList: DeepNestedList
-                                        ,NestedList: NestedList
-                                        ,Value: Value
-                                        ,Errors: Errors
-                                        ,errorsDecoder: errorsDecoder
-                                        ,messageDecoder: messageDecoder
-                                        ,decodeError: decodeError
-                                        ,identitySuccess: identitySuccess
-                                        ,identityFail: identityFail
-                                        ,resultHandler: resultHandler
-                                        ,successHandler: successHandler
-                                        ,failHandler: failHandler
-                                        ,errorsHandler: errorsHandler
-                                        ,setErrors: setErrors};
-};
-Elm.Common = Elm.Common || {};
 Elm.Common.Http = Elm.Common.Http || {};
 Elm.Common.Http.make = function (_elm) {
    "use strict";
@@ -14719,67 +14628,47 @@ Elm.Environments.List.make = function (_elm) {
                                           ,environmentsList: environmentsList
                                           ,getEnvironments: getEnvironments};
 };
-Elm.Common = Elm.Common || {};
-Elm.Common.Utils = Elm.Common.Utils || {};
-Elm.Common.Utils.make = function (_elm) {
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Add = Elm.Systems.Add || {};
+Elm.Systems.Add.Common = Elm.Systems.Add.Common || {};
+Elm.Systems.Add.Common.make = function (_elm) {
    "use strict";
-   _elm.Common = _elm.Common || {};
-   _elm.Common.Utils = _elm.Common.Utils || {};
-   if (_elm.Common.Utils.values) return _elm.Common.Utils.values;
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Add = _elm.Systems.Add || {};
+   _elm.Systems.Add.Common = _elm.Systems.Add.Common || {};
+   if (_elm.Systems.Add.Common.values) return _elm.Systems.Add.Common.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var none = function (a) {    return {ctor: "_Tuple2",_0: a,_1: $Effects.none};};
-   var defaultEmpty = function (list) {    var _p0 = list;if (_p0.ctor === "Just") {    return _p0._0;} else {    return _U.list([]);}};
-   var withDefaultProp = F3(function (parent,$default,prop) {
-      var _p1 = parent;
-      if (_p1.ctor === "Just") {
-            return prop(_p1._0);
-         } else {
-            return $default;
-         }
-   });
-   var partition = F2(function (n,list) {
-      var $catch = A2($List.take,n,list);
-      return _U.eq(n,$List.length($catch)) ? A2($Basics._op["++"],_U.list([$catch]),A2(partition,n,A2($List.drop,n,list))) : _U.list([$catch]);
-   });
-   return _elm.Common.Utils.values = {_op: _op,partition: partition,withDefaultProp: withDefaultProp,defaultEmpty: defaultEmpty,none: none};
-};
-Elm.Users = Elm.Users || {};
-Elm.Users.List = Elm.Users.List || {};
-Elm.Users.List.make = function (_elm) {
-   "use strict";
-   _elm.Users = _elm.Users || {};
-   _elm.Users.List = _elm.Users.List || {};
-   if (_elm.Users.List.values) return _elm.Users.List.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Common$Http = Elm.Common.Http.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Environments$List = Elm.Environments.List.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
+   $String = Elm.String.make(_elm);
    var _op = {};
-   var User = F4(function (a,b,c,d) {    return {username: a,operations: b,roles: c,envs: d};});
-   var user = A5($Json$Decode.object4,
-   User,
-   A2($Json$Decode._op[":="],"username",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"operations",$Json$Decode.list($Json$Decode.string)),
-   A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
-   A2($Json$Decode._op[":="],"envs",$Json$Decode.list($Json$Decode.string)));
-   var usersList = $Json$Decode.list(user);
-   var getUsers = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,usersList,"/users"))));};
-   return _elm.Users.List.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
+   var setMachine = F2(function (f,_p0) {    var _p1 = _p0;var newMachine = f(_p1.machine);return _U.update(_p1,{machine: newMachine});});
+   var getOses = F2(function (hyp,model) {
+      var hypervisor = A2($Maybe.withDefault,$Environments$List.Empty,A2($Dict.get,hyp,model.environment));
+      var _p2 = hypervisor;
+      switch (_p2.ctor)
+      {case "OSTemplates": return _p2._0;
+         case "Openstack": return _p2._1;
+         default: return $Dict.empty;}
+   });
+   var setDefaultOS = F2(function (hyp,_p3) {
+      var _p4 = _p3;
+      var _p7 = _p4;
+      var _p6 = _p4.machine;
+      var _p5 = $List.head($Dict.keys(A2(getOses,hyp,_p7)));
+      if (_p5.ctor === "Just") {
+            return $String.isEmpty(_p6.os) ? _U.update(_p7,{machine: _U.update(_p6,{os: _p5._0})}) : _p7;
+         } else {
+            return _p7;
+         }
+   });
+   return _elm.Systems.Add.Common.values = {_op: _op,getOses: getOses,setDefaultOS: setDefaultOS,setMachine: setMachine};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
@@ -14860,6 +14749,38 @@ Elm.Systems.Add.Validations.make = function (_elm) {
                                                 ,validateAll: validateAll
                                                 ,validate: validate
                                                 ,validationOf: validationOf};
+};
+Elm.Common = Elm.Common || {};
+Elm.Common.Utils = Elm.Common.Utils || {};
+Elm.Common.Utils.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Utils = _elm.Common.Utils || {};
+   if (_elm.Common.Utils.values) return _elm.Common.Utils.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var none = function (a) {    return {ctor: "_Tuple2",_0: a,_1: $Effects.none};};
+   var defaultEmpty = function (list) {    var _p0 = list;if (_p0.ctor === "Just") {    return _p0._0;} else {    return _U.list([]);}};
+   var withDefaultProp = F3(function (parent,$default,prop) {
+      var _p1 = parent;
+      if (_p1.ctor === "Just") {
+            return prop(_p1._0);
+         } else {
+            return $default;
+         }
+   });
+   var partition = F2(function (n,list) {
+      var $catch = A2($List.take,n,list);
+      return _U.eq(n,$List.length($catch)) ? A2($Basics._op["++"],_U.list([$catch]),A2(partition,n,A2($List.drop,n,list))) : _U.list([$catch]);
+   });
+   return _elm.Common.Utils.values = {_op: _op,partition: partition,withDefaultProp: withDefaultProp,defaultEmpty: defaultEmpty,none: none};
 };
 Elm.Common = Elm.Common || {};
 Elm.Common.Components = Elm.Common.Components || {};
@@ -15000,6 +14921,209 @@ Elm.Common.Components.make = function (_elm) {
                                           ,checkbox: checkbox
                                           ,withErrors: withErrors};
 };
+Elm.Common = Elm.Common || {};
+Elm.Common.Errors = Elm.Common.Errors || {};
+Elm.Common.Errors.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Errors = _elm.Common.Errors || {};
+   if (_elm.Common.Errors.values) return _elm.Common.Errors.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Redirect = Elm.Common.Redirect.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var setErrors = F2(function (_p0,es) {
+      var _p1 = _p0;
+      var newErrors = _U.update(_p1.saveErrors,{errors: es});
+      return {ctor: "_Tuple2",_0: _U.update(_p1,{saveErrors: newErrors}),_1: $Effects.none};
+   });
+   var identityFail = F2(function (model,res) {
+      return A2($Debug.log,A2($Basics._op["++"],"request failed ",$Basics.toString(res)),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
+   });
+   var identitySuccess = F2(function (model,res) {    return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
+   var errorsList = function (errors) {    return $Basics.not($Dict.isEmpty(errors.keyValues));};
+   var hasErrors = function (_p2) {    var _p3 = _p2;var _p4 = _p3.errors;return errorsList(_p4) || !_U.eq(_p4.message,$Maybe.Nothing);};
+   var mapValues = F2(function (f,d) {    return $Dict.values(A2($Dict.map,f,d));});
+   var nestedSection = F2(function (key,errors) {
+      return A2($Html.div,
+      _U.list([]),
+      _U.list([$Html.text(key)
+              ,A2($Html.ul,
+              _U.list([]),
+              A2(mapValues,
+              F2(function (k,v) {    return A2($Html.li,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],k,A2($Basics._op["++"],": ",v)))]));}),
+              errors))]));
+   });
+   var nestedList = F2(function (prop,nested) {
+      return A2($Html.div,_U.list([]),A2($List.map,function (section) {    return A2(nestedSection,prop,section);},nested));
+   });
+   var deepNestedList = F2(function (prop,nested) {
+      return A2($Html.div,
+      _U.list([]),
+      $List.concat(A2($List.map,
+      function (parent) {
+         return A2(mapValues,F2(function (key,errors) {    return A2(nestedSection,A2($Basics._op["++"],prop,A2($Basics._op["++"],".",key)),errors);}),parent);
+      },
+      nested)));
+   });
+   var toText = F2(function (key,error) {
+      var _p5 = error;
+      switch (_p5.ctor)
+      {case "Nested": return A2(nestedSection,key,_p5._0);
+         case "DeepNestedList": return A2($Html.div,
+           _U.list([]),
+           A2(mapValues,F2(function (prop,nested) {    return A2(deepNestedList,A2($Basics._op["++"],key,A2($Basics._op["++"],".",prop)),nested);}),_p5._0));
+         case "NestedList": return A2($Html.div,
+           _U.list([]),
+           A2(mapValues,F2(function (prop,nested) {    return A2(nestedList,A2($Basics._op["++"],key,A2($Basics._op["++"],".",prop)),nested);}),_p5._0));
+         default: return $Html.text(A2($Basics._op["++"],key,A2($Basics._op["++"],": ",_p5._0)));}
+   });
+   var errorsText = function (errors) {
+      return errorsList(errors) ? A2($Html.ul,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+      $Dict.values(A2($Dict.map,F2(function (k,v) {    return A2($Html.li,_U.list([]),_U.list([A2(toText,k,v)]));}),errors.keyValues))) : A2($Html.div,
+      _U.list([]),
+      _U.list([$Html.text(A2($Maybe.withDefault,"",errors.message))]));
+   };
+   var view = F2(function (address,_p6) {
+      var _p7 = _p6;
+      return A2($Html.div,_U.list([]),_U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("The following errors found:")])),errorsText(_p7.errors)]));
+   });
+   var NoOp = {ctor: "NoOp"};
+   var Model = function (a) {    return {errors: a};};
+   var Errors = F3(function (a,b,c) {    return {type$: a,keyValues: b,message: c};});
+   var init = {ctor: "_Tuple2",_0: Model(A3(Errors,"",$Dict.empty,$Maybe.Nothing)),_1: $Effects.none};
+   var messageDecoder = A2($Json$Decode.object1,A2(Errors,"",$Dict.empty),$Json$Decode.maybe(A2($Json$Decode._op[":="],"message",$Json$Decode.string)));
+   var Value = function (a) {    return {ctor: "Value",_0: a};};
+   var NestedList = function (a) {    return {ctor: "NestedList",_0: a};};
+   var DeepNestedList = function (a) {    return {ctor: "DeepNestedList",_0: a};};
+   var Nested = function (a) {    return {ctor: "Nested",_0: a};};
+   var errorsDecoder = function () {
+      var options = _U.list([A2($Json$Decode.map,Value,$Json$Decode.string)
+                            ,A2($Json$Decode.map,Nested,$Json$Decode.dict($Json$Decode.string))
+                            ,A2($Json$Decode.map,DeepNestedList,$Json$Decode.dict($Json$Decode.list($Json$Decode.dict($Json$Decode.dict($Json$Decode.string)))))
+                            ,A2($Json$Decode.map,NestedList,$Json$Decode.dict($Json$Decode.list($Json$Decode.dict($Json$Decode.string))))]);
+      return A4($Json$Decode.object3,
+      Errors,
+      A2($Json$Decode.at,_U.list(["object","type"]),$Json$Decode.string),
+      A2($Json$Decode.at,_U.list(["object","errors"]),$Json$Decode.dict($Json$Decode.oneOf(options))),
+      $Json$Decode.maybe(A2($Json$Decode._op[":="],"message",$Json$Decode.string)));
+   }();
+   var decodeError = function (error) {
+      var emptyErrors = A3(Errors,"",$Dict.empty,$Maybe.Nothing);
+      var _p8 = error;
+      if (_p8.ctor === "Text") {
+            var _p11 = _p8._0;
+            var _p9 = A2($Json$Decode.decodeString,errorsDecoder,_p11);
+            if (_p9.ctor === "Ok") {
+                  return _p9._0;
+               } else {
+                  var _p10 = A2($Debug.log,$Basics.toString(_p9._0),A2($Json$Decode.decodeString,messageDecoder,_p11));
+                  if (_p10.ctor === "Ok") {
+                        return _p10._0;
+                     } else {
+                        return A2($Debug.log,_p10._0,emptyErrors);
+                     }
+               }
+         } else {
+            return emptyErrors;
+         }
+   };
+   var handler = F5(function (result,model,success,fail,noop) {
+      var _p12 = result;
+      if (_p12.ctor === "Ok") {
+            return success(_p12._0);
+         } else {
+            var _p14 = _p12._0;
+            var _p13 = _p14;
+            _v8_2: do {
+               if (_p13.ctor === "BadResponse") {
+                     switch (_p13._0)
+                     {case 401: return A2($Debug.log,$Basics.toString(_p14),{ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(noop)});
+                        case 400: return fail(decodeError(_p13._2));
+                        default: break _v8_2;}
+                  } else {
+                     break _v8_2;
+                  }
+            } while (false);
+            return A2($Debug.log,$Basics.toString(_p14),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
+         }
+   });
+   var successHandler = F4(function (result,model,success,noop) {    return A5(handler,result,model,success,identityFail(model),noop);});
+   var failHandler = F4(function (result,model,fail,noop) {    return A5(handler,result,model,identitySuccess(model),fail,noop);});
+   var errorsHandler = F3(function (result,model,noop) {    return A5(handler,result,model,identitySuccess(model),setErrors(model),noop);});
+   var errorsSuccessHandler = F4(function (result,model,success,noop) {    return A5(handler,result,model,success,setErrors(model),noop);});
+   return _elm.Common.Errors.values = {_op: _op
+                                      ,Nested: Nested
+                                      ,DeepNestedList: DeepNestedList
+                                      ,NestedList: NestedList
+                                      ,Value: Value
+                                      ,Errors: Errors
+                                      ,Model: Model
+                                      ,init: init
+                                      ,NoOp: NoOp
+                                      ,mapValues: mapValues
+                                      ,nestedSection: nestedSection
+                                      ,deepNestedList: deepNestedList
+                                      ,nestedList: nestedList
+                                      ,toText: toText
+                                      ,errorsList: errorsList
+                                      ,hasErrors: hasErrors
+                                      ,errorsText: errorsText
+                                      ,view: view
+                                      ,errorsDecoder: errorsDecoder
+                                      ,messageDecoder: messageDecoder
+                                      ,decodeError: decodeError
+                                      ,identitySuccess: identitySuccess
+                                      ,identityFail: identityFail
+                                      ,handler: handler
+                                      ,successHandler: successHandler
+                                      ,failHandler: failHandler
+                                      ,errorsHandler: errorsHandler
+                                      ,errorsSuccessHandler: errorsSuccessHandler
+                                      ,setErrors: setErrors};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.List = Elm.Users.List || {};
+Elm.Users.List.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.List = _elm.Users.List || {};
+   if (_elm.Users.List.values) return _elm.Users.List.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var User = F4(function (a,b,c,d) {    return {username: a,operations: b,roles: c,envs: d};});
+   var user = A5($Json$Decode.object4,
+   User,
+   A2($Json$Decode._op[":="],"username",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"operations",$Json$Decode.list($Json$Decode.string)),
+   A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
+   A2($Json$Decode._op[":="],"envs",$Json$Decode.list($Json$Decode.string)));
+   var usersList = $Json$Decode.list(user);
+   var getUsers = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,usersList,"/users"))));};
+   return _elm.Users.List.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
+};
 Elm.Admin = Elm.Admin || {};
 Elm.Admin.Core = Elm.Admin.Core || {};
 Elm.Admin.Core.make = function (_elm) {
@@ -15010,7 +15134,7 @@ Elm.Admin.Core.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
@@ -15037,9 +15161,9 @@ Elm.Admin.Core.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "SetEnvironments": return A4($Common$Redirect.successHandler,_p0._0,model,setEnvironments(model),NoOp);
+      {case "SetEnvironments": return A4($Common$Errors.successHandler,_p0._0,model,setEnvironments(model),NoOp);
          case "SelectEnvironment": return $Common$Utils.none(_U.update(model,{environment: _p0._0}));
-         case "SetOwners": return A4($Common$Redirect.successHandler,_p0._0,model,setOwners(model),NoOp);
+         case "SetOwners": return A4($Common$Errors.successHandler,_p0._0,model,setOwners(model),NoOp);
          case "SelectOwner": return $Common$Utils.none(_U.update(model,{owner: _p0._0}));
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
@@ -15738,8 +15862,8 @@ Elm.Systems.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -15845,7 +15969,7 @@ Elm.Systems.List.make = function (_elm) {
       var _p14 = _p7;
       var _p8 = action;
       switch (_p8.ctor)
-      {case "SetSystems": return A4($Common$Redirect.successHandler,_p8._0,_p14,setSystems(_p14),NoOp);
+      {case "SetSystems": return A4($Common$Errors.successHandler,_p8._0,_p14,setSystems(_p14),NoOp);
          case "GotoPage": var _p11 = _p8._0;
            var _p9 = _p11;
            if (_p9.ctor === "NextPage") {
@@ -15907,48 +16031,6 @@ Elm.Systems.List.make = function (_elm) {
                                      ,systemPage: systemPage
                                      ,getSystems: getSystems
                                      ,getSystemsQuery: getSystemsQuery};
-};
-Elm.Systems = Elm.Systems || {};
-Elm.Systems.Add = Elm.Systems.Add || {};
-Elm.Systems.Add.Common = Elm.Systems.Add.Common || {};
-Elm.Systems.Add.Common.make = function (_elm) {
-   "use strict";
-   _elm.Systems = _elm.Systems || {};
-   _elm.Systems.Add = _elm.Systems.Add || {};
-   _elm.Systems.Add.Common = _elm.Systems.Add.Common || {};
-   if (_elm.Systems.Add.Common.values) return _elm.Systems.Add.Common.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Environments$List = Elm.Environments.List.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var setMachine = F2(function (f,_p0) {    var _p1 = _p0;var newMachine = f(_p1.machine);return _U.update(_p1,{machine: newMachine});});
-   var getOses = F2(function (hyp,model) {
-      var hypervisor = A2($Maybe.withDefault,$Environments$List.Empty,A2($Dict.get,hyp,model.environment));
-      var _p2 = hypervisor;
-      switch (_p2.ctor)
-      {case "OSTemplates": return _p2._0;
-         case "Openstack": return _p2._1;
-         default: return $Dict.empty;}
-   });
-   var setDefaultOS = F2(function (hyp,_p3) {
-      var _p4 = _p3;
-      var _p7 = _p4;
-      var _p6 = _p4.machine;
-      var _p5 = $List.head($Dict.keys(A2(getOses,hyp,_p7)));
-      if (_p5.ctor === "Just") {
-            return $String.isEmpty(_p6.os) ? _U.update(_p7,{machine: _U.update(_p6,{os: _p5._0})}) : _p7;
-         } else {
-            return _p7;
-         }
-   });
-   return _elm.Systems.Add.Common.values = {_op: _op,getOses: getOses,setDefaultOS: setDefaultOS,setMachine: setMachine};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};
@@ -18076,8 +18158,8 @@ Elm.Types.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -18110,7 +18192,7 @@ Elm.Types.List.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p2 = action;
       if (_p2.ctor === "SetTypes") {
-            return A4($Common$Redirect.successHandler,_p2._0,model,setTypes(model),NoOp);
+            return A4($Common$Errors.successHandler,_p2._0,model,setTypes(model),NoOp);
          } else {
             return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
          }
@@ -18177,7 +18259,7 @@ Elm.Systems.Add.General.make = function (_elm) {
    $Admin$Core = Elm.Admin.Core.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -18228,7 +18310,7 @@ Elm.Systems.Add.General.make = function (_elm) {
            var newAdmin = _p8._0;
            return A3(updateHypervisors,_U.update(_p9,{admin: newAdmin}),newAdmin.rawEnvironments,newAdmin.environment);
          case "SelectHypervisor": return _U.update(_p9,{hypervisor: _p7._0});
-         case "SetTypes": return withoutEffects(A4($Common$Redirect.successHandler,_p7._0,_p9,setTypes(_p9),NoOp));
+         case "SetTypes": return withoutEffects(A4($Common$Errors.successHandler,_p7._0,_p9,setTypes(_p9),NoOp));
          case "SelectType": return _U.update(_p9,{type$: _p7._0});
          default: return _p9;}
    });
@@ -18253,85 +18335,6 @@ Elm.Systems.Add.General.make = function (_elm) {
                                             ,setTypes: setTypes
                                             ,update: update
                                             ,view: view};
-};
-Elm.Common = Elm.Common || {};
-Elm.Common.Errors = Elm.Common.Errors || {};
-Elm.Common.Errors.make = function (_elm) {
-   "use strict";
-   _elm.Common = _elm.Common || {};
-   _elm.Common.Errors = _elm.Common.Errors || {};
-   if (_elm.Common.Errors.values) return _elm.Common.Errors.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Common$Components = Elm.Common.Components.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var mapValues = F2(function (f,d) {    return $Dict.values(A2($Dict.map,f,d));});
-   var nestedSection = F2(function (key,errors) {
-      return A2($Html.div,
-      _U.list([]),
-      _U.list([$Html.text(key)
-              ,A2($Html.ul,
-              _U.list([]),
-              A2(mapValues,
-              F2(function (k,v) {    return A2($Html.li,_U.list([]),_U.list([$Html.text(A2($Basics._op["++"],k,A2($Basics._op["++"],": ",v)))]));}),
-              errors))]));
-   });
-   var nestedList = F2(function (prop,nested) {
-      return A2($Html.div,_U.list([]),A2($List.map,function (section) {    return A2(nestedSection,prop,section);},nested));
-   });
-   var deepNestedList = F2(function (prop,nested) {
-      return A2($Html.div,
-      _U.list([]),
-      $List.concat(A2($List.map,
-      function (parent) {
-         return A2(mapValues,F2(function (key,errors) {    return A2(nestedSection,A2($Basics._op["++"],prop,A2($Basics._op["++"],".",key)),errors);}),parent);
-      },
-      nested)));
-   });
-   var toText = F2(function (key,error) {
-      var _p0 = error;
-      switch (_p0.ctor)
-      {case "Nested": return A2(nestedSection,key,_p0._0);
-         case "DeepNestedList": return A2($Html.div,
-           _U.list([]),
-           A2(mapValues,F2(function (prop,nested) {    return A2(deepNestedList,A2($Basics._op["++"],key,A2($Basics._op["++"],".",prop)),nested);}),_p0._0));
-         case "NestedList": return A2($Html.div,
-           _U.list([]),
-           A2(mapValues,F2(function (prop,nested) {    return A2(nestedList,A2($Basics._op["++"],key,A2($Basics._op["++"],".",prop)),nested);}),_p0._0));
-         default: return $Html.text(A2($Basics._op["++"],key,A2($Basics._op["++"],": ",_p0._0)));}
-   });
-   var view = F2(function (address,_p1) {
-      var _p2 = _p1;
-      return $Common$Components.panelContents(A2($Html.div,
-      _U.list([]),
-      _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("The following errors found (please move back and fix them):")]))
-              ,A2($Html.ul,
-              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
-              $Dict.values(A2($Dict.map,F2(function (k,v) {    return A2($Html.li,_U.list([]),_U.list([A2(toText,k,v)]));}),_p2.errors.keyValues)))])));
-   });
-   var NoOp = {ctor: "NoOp"};
-   var Model = function (a) {    return {errors: a};};
-   var init = {ctor: "_Tuple2",_0: Model(A3($Common$Redirect.Errors,"",$Dict.empty,$Maybe.Nothing)),_1: $Effects.none};
-   return _elm.Common.Errors.values = {_op: _op
-                                      ,Model: Model
-                                      ,init: init
-                                      ,NoOp: NoOp
-                                      ,mapValues: mapValues
-                                      ,nestedSection: nestedSection
-                                      ,deepNestedList: deepNestedList
-                                      ,nestedList: nestedList
-                                      ,toText: toText
-                                      ,view: view};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
@@ -18584,9 +18587,9 @@ Elm.Systems.Add.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -18660,7 +18663,9 @@ Elm.Systems.Add.make = function (_elm) {
          case "Digital": return A2($Systems$Add$Digital.view,A2($Signal.forwardTo,address,DigitalView),_p8.digitalModel);
          case "Physical": return A2($Systems$Add$Physical.view,A2($Signal.forwardTo,address,PhysicalView),_p8.physicalModel);
          case "Openstack": return A2($Systems$Add$Openstack.view,A2($Signal.forwardTo,address,OpenstackView),_p8.openstackModel);
-         case "Error": return A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p8.saveErrors);
+         case "Error": return $Common$Components.panelContents(A2($Html.div,
+           _U.list([]),
+           _U.list([A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p8.saveErrors)])));
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);}
    });
    var NoOp = {ctor: "NoOp"};
@@ -18835,7 +18840,7 @@ Elm.Systems.Add.make = function (_elm) {
                                ,_0: _p37
                                ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Create),intoSystem(_p37),$Basics.toString(_p40))};
          case "SaveTemplate": return $Common$Utils.none(_p37);
-         case "Saved": var _p32 = A4($Common$Redirect.successHandler,_p29._1,_p37,A2(setSaved,_p29._0,_p37),NoOp);
+         case "Saved": var _p32 = A4($Common$Errors.successHandler,_p29._1,_p37,A2(setSaved,_p29._0,_p37),NoOp);
            var newModel = _p32._0;
            var saveErrors = _p32._0.saveErrors;
            var effects = _p32._1;
@@ -18893,8 +18898,8 @@ Elm.Systems.View.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -18944,7 +18949,7 @@ Elm.Systems.View.make = function (_elm) {
       var _p8 = action;
       switch (_p8.ctor)
       {case "ViewSystem": return {ctor: "_Tuple2",_0: model,_1: getSystem(_p8._0)};
-         case "SetSystem": return A4($Common$Redirect.successHandler,_p8._0,model,setSystem(model),NoOp);
+         case "SetSystem": return A4($Common$Errors.successHandler,_p8._0,model,setSystem(model),NoOp);
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
    var ViewSystem = function (a) {    return {ctor: "ViewSystem",_0: a};};
@@ -18973,7 +18978,7 @@ Elm.Systems.Launch.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -19012,7 +19017,7 @@ Elm.Systems.Launch.make = function (_elm) {
       var _p7 = _p3;
       var _p4 = action;
       switch (_p4.ctor)
-      {case "JobLaunched": return A4($Common$Redirect.successHandler,_p4._0,_p7,function (res) {    return {ctor: "_Tuple2",_0: _p7,_1: $Effects.none};},NoOp);
+      {case "JobLaunched": return A4($Common$Errors.successHandler,_p4._0,_p7,function (res) {    return {ctor: "_Tuple2",_0: _p7,_1: $Effects.none};},NoOp);
          case "SetupJob": return {ctor: "_Tuple2",_0: _U.update(_p7,{job: _p4._0}),_1: $Effects.none};
          case "LoadPage": var newTable = A2($Table.update,_p4._0,_p7.table);
            return {ctor: "_Tuple2",_0: _U.update(_p7,{table: newTable}),_1: $Effects.none};
@@ -19317,9 +19322,9 @@ Elm.Jobs.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
    $Common$NewTab = Elm.Common.NewTab.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Date = Elm.Date.make(_elm),
    $Date$Format = Elm.Date.Format.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -19484,8 +19489,8 @@ Elm.Jobs.List.make = function (_elm) {
       _v9_6: do {
          switch (_p22.ctor)
          {case "Polling": return {ctor: "_Tuple2",_0: _p33,_1: $Effects.batch(_U.list([getRunning,A2(getDone,_p21.pager.page,10)]))};
-            case "SetRunning": return A4($Common$Redirect.successHandler,_p22._0,_p33,setRunningJobs(_p33),NoOp);
-            case "SetDone": return A4($Common$Redirect.successHandler,_p22._0,_p33,setDoneJobs(_p33),NoOp);
+            case "SetRunning": return A4($Common$Errors.successHandler,_p22._0,_p33,setRunningJobs(_p33),NoOp);
+            case "SetDone": return A4($Common$Errors.successHandler,_p22._0,_p33,setDoneJobs(_p33),NoOp);
             case "GotoPage": var _p24 = _p22._0;
               var _p23 = _p24;
               if (_p23.ctor === "NextPage") {
@@ -23363,8 +23368,8 @@ Elm.Jobs.Stats.make = function (_elm) {
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Chartjs$Line = Elm.Chartjs.Line.make(_elm),
    $Color = Elm.Color.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Date = Elm.Date.make(_elm),
    $Date$Format = Elm.Date.Format.make(_elm),
@@ -23518,7 +23523,7 @@ Elm.Jobs.Stats.make = function (_elm) {
       var _p39 = action;
       switch (_p39.ctor)
       {case "PollMetrics": return {ctor: "_Tuple2",_0: _U.update(_p40,{lastPoll: _p39._0}),_1: getMetrics};
-         case "Load": return A4($Common$Redirect.successHandler,_p39._0,_p40,setMetrics(_p40),NoOp);
+         case "Load": return A4($Common$Errors.successHandler,_p39._0,_p40,setMetrics(_p40),NoOp);
          default: return {ctor: "_Tuple2",_0: _p40,_1: $Effects.none};}
    });
    return _elm.Jobs.Stats.values = {_op: _op
@@ -23758,15 +23763,16 @@ Elm.Templates.Persistency.make = function (_elm) {
    $Systems$Add$Encoders = Elm.Systems.Add.Encoders.make(_elm),
    $Templates$Model$Common = Elm.Templates.Model.Common.make(_elm);
    var _op = {};
-   var encodeProvided = F2(function (machine,admin) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(admin.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(admin.environment)}]));
-   });
    var encodeMachine = function (_p0) {
       var _p1 = _p0;
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "hostname",_1: $Json$Encode.string(_p1.hostname)}
                                          ,{ctor: "_Tuple2",_0: "domain",_1: $Json$Encode.string(_p1.domain)}]));
    };
+   var encodeProvided = F2(function (machine,admin) {
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(admin.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(admin.environment)}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: encodeMachine(machine)}]));
+   });
    var persistModel = F2(function (f,value) {    return f(A2($Json$Encode.encode,0,value));});
    var persistProvided = F3(function (f,machine,admin) {    return A2(persistModel,f,A2(encodeProvided,machine,admin));});
    var openstackDefaultsEncoder = function (openstack) {
@@ -23846,12 +23852,10 @@ Elm.Templates.Add.make = function (_elm) {
    if (_elm.Templates.Add.values) return _elm.Templates.Add.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Editor = Elm.Common.Editor.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
@@ -23859,7 +23863,6 @@ Elm.Templates.Add.make = function (_elm) {
    $Environments$List = Elm.Environments.List.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
    $Http = Elm.Http.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
@@ -23873,7 +23876,18 @@ Elm.Templates.Add.make = function (_elm) {
    var _op = {};
    var SaveResponse = function (a) {    return {message: a};};
    var saveResponse = A2($Json$Decode.object1,SaveResponse,A2($Json$Decode._op[":="],"message",$Json$Decode.string));
+   var errorMessage = _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Error!")]))
+                              ,A2($Html.span,_U.list([]),_U.list([$Html.text("Failed to save template")]))]);
+   var infoMessage = _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Info")])),A2($Html.span,_U.list([]),_U.list([$Html.text("Save a new template")]))]);
    var setEnvironments = F2(function (model,es) {    return $Common$Utils.none(_U.update(model,{environments: $Dict.keys(es)}));});
+   var intoTemplate = F3(function (_p1,_p0,hyp) {
+      var _p2 = _p1;
+      var _p3 = _p0;
+      var _p4 = _p3.machine;
+      var withHyp = _U.update(_p2.template,{openstack: _p3.openstack,physical: _p3.physical,aws: _p3.aws,digital: _p3.digital,gce: _p3.gce});
+      var newTemplate = _U.update(withHyp,{name: _p4.hostname,type$: _p3.type$,machine: _p4});
+      return _U.update(_p2,{template: newTemplate,hyp: hyp});
+   });
    var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
    var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
    var DefaultsInput = function (a) {    return {ctor: "DefaultsInput",_0: a};};
@@ -23886,106 +23900,82 @@ Elm.Templates.Add.make = function (_elm) {
    };
    var SetDefaults = function (a) {    return {ctor: "SetDefaults",_0: a};};
    var LoadEditor = {ctor: "LoadEditor"};
-   var editing = F2(function (_p0,address) {
-      var _p1 = _p0;
-      var _p2 = _p1.template;
-      return $Common$Components.panelContents(A2($Html.form,
+   var editing = F2(function (address,_p5) {
+      var _p6 = _p5;
+      var _p7 = _p6.template;
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("panel panel-default")]),
+      $Common$Components.panelContents(A2($Html.form,
       _U.list([]),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A2($Common$Components.group$,"Name",A4($Common$Components.inputText,address,NameInput," ",_p2.name))
-              ,A2($Common$Components.group$,"Description",A4($Common$Components.inputText,address,DescriptionInput," ",_p2.description))
-              ,A2($Common$Components.group$,"Edit defaults",A3($Common$Components.checkbox,address,LoadEditor,_p1.editDefaults))
+      _U.list([A2($Common$Components.group$,"Name",A4($Common$Components.inputText,address,NameInput," ",_p7.name))
+              ,A2($Common$Components.group$,"Description",A4($Common$Components.inputText,address,DescriptionInput," ",_p7.description))
+              ,A2($Common$Components.group$,"Edit defaults",A3($Common$Components.checkbox,address,LoadEditor,_p6.editDefaults))
               ,A2($Html.div,
               _U.list([$Html$Attributes.id("jsoneditor")
                       ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "550px"}
                                                       ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
                                                       ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
-              _U.list([]))]))])));
-   });
-   var currentView = F2(function (address,_p3) {
-      var _p4 = _p3;
-      var _p5 = _p4.stage;
-      if (_p5.ctor === "Editing") {
-            return A2(editing,_p4,address);
-         } else {
-            return A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p4.saveErrors);
-         }
+              _U.list([]))]))]))))]));
    });
    var Cancel = {ctor: "Cancel"};
    var NoOp = {ctor: "NoOp"};
-   var SaveTemplate = {ctor: "SaveTemplate"};
-   var buttons = F2(function (address,model) {
-      var click = $Html$Events.onClick(address);
-      var margin = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "30%"}]));
-      return _U.list([A2($Html.button,
-                     _U.list([$Html$Attributes.id("Cancel"),$Html$Attributes.$class("btn btn-primary"),margin,click(Cancel)]),
-                     _U.list([$Html.text("Cancel")]))
-                     ,A2($Html.button,
-                     _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),margin,click(SaveTemplate)]),
-                     _U.list([$Html.text("Save")]))]);
+   var update = F2(function (action,_p8) {
+      var _p9 = _p8;
+      var _p14 = _p9.template;
+      var _p13 = _p9;
+      var _p12 = _p9.hyp;
+      var _p11 = _p9.editDefaults;
+      var _p10 = action;
+      switch (_p10.ctor)
+      {case "Save": return _U.eq(_p11,false) ? {ctor: "_Tuple2"
+                                               ,_0: _p13
+                                               ,_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p14,_p12)} : {ctor: "_Tuple2"
+                                                                                                                         ,_0: _p13
+                                                                                                                         ,_1: $Common$Editor.getEditor(NoOp)};
+         case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p13,_p10._1,_p10._0));
+         case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p9.environments),_p12);
+           return {ctor: "_Tuple2",_0: _U.update(_p13,{editDefaults: $Basics.not(_p11)}),_1: A2($Common$Editor.loadEditor,NoOp,encoded)};
+         case "NameInput": var newTemplate = _U.update(_p14,{name: _p10._0});
+           return $Common$Utils.none(_U.update(_p13,{template: newTemplate}));
+         case "DescriptionInput": var newTemplate = _U.update(_p14,{description: _p10._0});
+           return $Common$Utils.none(_U.update(_p13,{template: newTemplate}));
+         case "SetDefaults": var newTemplate = _U.update(_p14,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p10._0))});
+           return {ctor: "_Tuple2",_0: _U.update(_p13,{template: newTemplate}),_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p14,_p12)};
+         case "Saved": return A3($Common$Errors.errorsHandler,_p10._0,_p13,NoOp);
+         case "SetEnvironments": return A4($Common$Errors.successHandler,_p10._0,_p13,setEnvironments(_p13),NoOp);
+         default: return {ctor: "_Tuple2",_0: _p13,_1: $Effects.none};}
    });
-   var view = F2(function (address,model) {
-      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
-                     _U.list([A2($Html.div,_U.list([$Html$Attributes.$class("panel panel-default")]),A2(currentView,address,model))]))]))
-                     ,$Bootstrap$Html.row_(A2(buttons,address,model))]);
+   var Done = {ctor: "Done"};
+   var Save = {ctor: "Save"};
+   var view = F2(function (address,_p15) {
+      var _p16 = _p15;
+      var _p17 = _p16.saveErrors;
+      var errorsView = A2($Html.div,
+      _U.list([$Html$Attributes.$class("panel-body")]),
+      _U.list([A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p17)]));
+      return $Common$Errors.hasErrors(_p17) ? A5($Common$Components.dangerCallout,
+      address,
+      errorMessage,
+      errorsView,
+      Cancel,
+      Done) : A5($Common$Components.infoCallout,address,infoMessage,A2(editing,address,_p16),Cancel,Save);
    });
-   var Error = {ctor: "Error"};
-   var Editing = {ctor: "Editing"};
-   var intoTemplate = F3(function (_p7,_p6,hyp) {
-      var _p8 = _p7;
-      var _p9 = _p6;
-      var _p10 = _p9.machine;
-      var withHyp = _U.update(_p8.template,{openstack: _p9.openstack,physical: _p9.physical,aws: _p9.aws,digital: _p9.digital,gce: _p9.gce});
-      var newTemplate = _U.update(withHyp,{name: _p10.hostname,type$: _p9.type$,machine: _p10});
-      return _U.update(_p8,{template: newTemplate,hyp: hyp,stage: Editing});
-   });
-   var update = F2(function (action,_p11) {
-      var _p12 = _p11;
-      var _p18 = _p12.template;
-      var _p17 = _p12;
-      var _p16 = _p12.hyp;
-      var _p15 = _p12.editDefaults;
-      var _p13 = action;
-      switch (_p13.ctor)
-      {case "SaveTemplate": return _U.eq(_p15,false) ? {ctor: "_Tuple2"
-                                                       ,_0: _p17
-                                                       ,_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p18,_p16)} : {ctor: "_Tuple2"
-                                                                                                                                 ,_0: _p17
-                                                                                                                                 ,_1: $Common$Editor.getEditor(NoOp)};
-         case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p17,_p13._1,_p13._0));
-         case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p12.environments),_p16);
-           return {ctor: "_Tuple2",_0: _U.update(_p17,{editDefaults: $Basics.not(_p15)}),_1: A2($Common$Editor.loadEditor,NoOp,encoded)};
-         case "NameInput": var newTemplate = _U.update(_p18,{name: _p13._0});
-           return $Common$Utils.none(_U.update(_p17,{template: newTemplate}));
-         case "DescriptionInput": var newTemplate = _U.update(_p18,{description: _p13._0});
-           return $Common$Utils.none(_U.update(_p17,{template: newTemplate}));
-         case "SetDefaults": var newTemplate = _U.update(_p18,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p13._0))});
-           return {ctor: "_Tuple2",_0: _U.update(_p17,{template: newTemplate}),_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p18,_p16)};
-         case "Saved": var _p14 = A3($Common$Redirect.errorsHandler,_p13._0,_p17,NoOp);
-           var newModel = _p14._0;
-           var saveErrors = _p14._0.saveErrors;
-           var effects = _p14._1;
-           return $Basics.not($Dict.isEmpty(saveErrors.errors.keyValues)) ? {ctor: "_Tuple2"
-                                                                            ,_0: _U.update(newModel,{stage: Error})
-                                                                            ,_1: $Effects.none} : {ctor: "_Tuple2",_0: _p17,_1: effects};
-         case "SetEnvironments": return A4($Common$Redirect.successHandler,_p13._0,_p17,setEnvironments(_p17),NoOp);
-         default: return {ctor: "_Tuple2",_0: _p17,_1: $Effects.none};}
-   });
-   var Model = F6(function (a,b,c,d,e,f) {    return {template: a,hyp: b,editDefaults: c,saveErrors: d,environments: e,stage: f};});
+   var Model = F5(function (a,b,c,d,e) {    return {template: a,hyp: b,editDefaults: c,saveErrors: d,environments: e};});
    var init = function () {
-      var _p19 = $Common$Errors.init;
-      var errorsModel = _p19._0;
+      var _p18 = $Common$Errors.init;
+      var errorsModel = _p18._0;
       return {ctor: "_Tuple2"
-             ,_0: A6(Model,$Templates$Model$Common.emptyTemplate,"",false,errorsModel,_U.list([]),Editing)
+             ,_0: A5(Model,$Templates$Model$Common.emptyTemplate,"",false,errorsModel,_U.list([]))
              ,_1: $Environments$List.getEnvironments(SetEnvironments)};
    }();
    return _elm.Templates.Add.values = {_op: _op
                                       ,Model: Model
-                                      ,Editing: Editing
-                                      ,Error: Error
-                                      ,SaveTemplate: SaveTemplate
+                                      ,Save: Save
+                                      ,Done: Done
                                       ,NoOp: NoOp
                                       ,Cancel: Cancel
                                       ,LoadEditor: LoadEditor
@@ -24001,9 +23991,9 @@ Elm.Templates.Add.make = function (_elm) {
                                       ,intoTemplate: intoTemplate
                                       ,setEnvironments: setEnvironments
                                       ,update: update
-                                      ,currentView: currentView
-                                      ,buttons: buttons
                                       ,editing: editing
+                                      ,infoMessage: infoMessage
+                                      ,errorMessage: errorMessage
                                       ,view: view
                                       ,SaveResponse: SaveResponse
                                       ,saveResponse: saveResponse
@@ -24019,8 +24009,8 @@ Elm.Templates.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -24055,7 +24045,7 @@ Elm.Templates.List.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p4 = action;
       if (_p4.ctor === "SetTemplates") {
-            return A4($Common$Redirect.successHandler,_p4._0,model,setTemplates(model),NoOp);
+            return A4($Common$Errors.successHandler,_p4._0,model,setTemplates(model),NoOp);
          } else {
             return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
          }
@@ -24160,10 +24150,8 @@ Elm.Templates.Launch.make = function (_elm) {
    $Common$Componentsz = Elm.Common.Componentsz.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Form = Elm.Form.make(_elm),
    $Form$Input = Elm.Form.Input.make(_elm),
@@ -24210,38 +24198,35 @@ Elm.Templates.Launch.make = function (_elm) {
       Launched,
       $Task.toResult(A3($Common$Http.postJson,$Http.string(json),$Common$Http.saveResponse,A2($Basics._op["++"],"/systems/template/",name)))));
    });
+   var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
    var AdminAction = function (a) {    return {ctor: "AdminAction",_0: a};};
    var update = F2(function (action,_p2) {
       var _p3 = _p2;
-      var _p10 = _p3;
-      var _p9 = _p3.admin;
+      var _p9 = _p3;
+      var _p8 = _p3.admin;
       var _p4 = action;
       switch (_p4.ctor)
       {case "FormAction": var newForm = A2($Form.update,_p4._0,_p3.form);
-           return $Common$Utils.none(_U.update(_p10,{form: A2($Form.update,$Form.validate,newForm)}));
-         case "Launch": var _p5 = A2(update,FormAction($Form.validate),_p10);
+           return $Common$Utils.none(_U.update(_p9,{form: A2($Form.update,$Form.validate,newForm)}));
+         case "Launch": var _p5 = A2(update,FormAction($Form.validate),_p9);
            var newModel = _p5._0;
            if ($List.isEmpty($Form.getErrors(newModel.form))) {
                  var _p6 = $Form.getOutput(newModel.form);
                  if (_p6.ctor === "Just") {
-                       return {ctor: "_Tuple2",_0: newModel,_1: A3($Templates$Persistency.persistProvided,intoSystem(_p3.name),_p6._0.machine,_p9)};
+                       return {ctor: "_Tuple2",_0: newModel,_1: A3($Templates$Persistency.persistProvided,intoSystem(_p3.name),_p6._0.machine,_p8)};
                     } else {
                        return $Common$Utils.none(newModel);
                     }
               } else return $Common$Utils.none(newModel);
-         case "AdminAction": var _p7 = A2($Admin$Core.update,_p4._0,_p9);
+         case "AdminAction": var _p7 = A2($Admin$Core.update,_p4._0,_p8);
            var newAdmin = _p7._0;
            var effects = _p7._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p10,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
-         case "Launched": var _p8 = A4($Common$Redirect.successHandler,_p4._0,_p10,stage(_p10),NoOp);
-           var newModel = _p8._0;
-           var saveErrors = _p8._0.saveErrors;
-           var effects = _p8._1;
-           return {ctor: "_Tuple2",_0: newModel,_1: effects};
-         default: return $Common$Utils.none(_p10);}
+           return {ctor: "_Tuple2",_0: _U.update(_p9,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
+         case "Launched": return A4($Common$Errors.errorsSuccessHandler,_p4._0,_p9,stage(_p9),NoOp);
+         default: return $Common$Utils.none(_p9);}
    });
-   var launchView = F2(function (address,_p11) {
-      var _p12 = _p11;
+   var launchView = F2(function (address,_p10) {
+      var _p11 = _p10;
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("panel panel-default")]),
       _U.list([A2($Html.div,
@@ -24250,16 +24235,20 @@ Elm.Templates.Launch.make = function (_elm) {
       _U.list([]),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      A2($List.append,A2(machineView,address,_p12.form),A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p12.admin)))]))]))]));
+      A2($List.append,A2(machineView,address,_p11.form),A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p11.admin)))]))]))]));
    });
-   var view = F2(function (address,_p13) {
-      var _p14 = _p13;
-      return $Basics.not($Dict.isEmpty(_p14.saveErrors.errors.keyValues)) ? A5($Common$Components.dangerCallout,
+   var view = F2(function (address,_p12) {
+      var _p13 = _p12;
+      var _p14 = _p13.saveErrors;
+      var errorsView = A2($Html.div,
+      _U.list([$Html$Attributes.$class("panel-body")]),
+      _U.list([A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p14)]));
+      return $Common$Errors.hasErrors(_p14) ? A5($Common$Components.dangerCallout,
       address,
       errorMessage,
-      A2($Html.div,_U.list([]),_U.list([])),
+      errorsView,
       Cancel,
-      Done) : A5($Common$Components.infoCallout,address,infoMessage(_p14.name),A2(launchView,address,_p14),Cancel,Launch);
+      Done) : A5($Common$Components.infoCallout,address,infoMessage(_p13.name),A2(launchView,address,_p13),Cancel,Launch);
    });
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
    var Model = F4(function (a,b,c,d) {    return {name: a,form: b,admin: c,saveErrors: d};});
@@ -24290,6 +24279,7 @@ Elm.Templates.Launch.make = function (_elm) {
                                          ,init: init
                                          ,SetupJob: SetupJob
                                          ,AdminAction: AdminAction
+                                         ,ErrorsView: ErrorsView
                                          ,Launched: Launched
                                          ,FormAction: FormAction
                                          ,JobLaunched: JobLaunched
@@ -24316,8 +24306,8 @@ Elm.Templates.Delete.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -24367,7 +24357,7 @@ Elm.Templates.Delete.make = function (_elm) {
       var _p12 = _p8;
       var _p9 = action;
       switch (_p9.ctor)
-      {case "Deleted": return A4($Common$Redirect.failHandler,
+      {case "Deleted": return A4($Common$Errors.failHandler,
            _p9._0,
            _p12,
            function (_p10) {
@@ -24459,14 +24449,21 @@ Elm.Templates.Core.make = function (_elm) {
                     break _v2_4;
                  }
             case "TemplatesAdd": var _p7 = _p5._0;
-              switch (_p7.ctor)
-              {case "Saved": return {ctor: "_Tuple2"
-                                    ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                                    ,_1: _p10};
-                 case "Cancel": return {ctor: "_Tuple2"
-                                       ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                                       ,_1: _p10};
-                 default: return _p12;}
+              _v4_2: do {
+                 switch (_p7.ctor)
+                 {case "Saved": if (_p7._0.ctor === "Ok") {
+                            return {ctor: "_Tuple2"
+                                   ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                   ,_1: _p10};
+                         } else {
+                            break _v4_2;
+                         }
+                    case "Cancel": return {ctor: "_Tuple2"
+                                          ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                          ,_1: _p10};
+                    default: break _v4_2;}
+              } while (false);
+              return _p12;
             case "TemplatesLaunch": var _p8 = _p5._0;
               switch (_p8.ctor)
               {case "Cancel": return {ctor: "_Tuple2"
@@ -24636,6 +24633,7 @@ Elm.Nav.Header.make = function (_elm) {
    if (_elm.Nav.Header.values) return _elm.Nav.Header.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -24661,7 +24659,7 @@ Elm.Nav.Header.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "LoadSession": return A4($Common$Redirect.successHandler,_p0._0,model,setSession(model),NoOp);
+      {case "LoadSession": return A4($Common$Errors.successHandler,_p0._0,model,setSession(model),NoOp);
          case "SignOut": return {ctor: "_Tuple2",_0: model,_1: $Users$Session.logout(Redirect)};
          case "Redirect": return {ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(NoOp)};
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}

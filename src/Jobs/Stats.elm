@@ -4,7 +4,7 @@ module Jobs.Stats where
 import Time exposing (Time,second)
 import Maybe exposing (withDefault)
 import Date.Format exposing (format)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
 import Date
 import Now

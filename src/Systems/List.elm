@@ -16,7 +16,7 @@ import Debug
 import Systems.Model.Common exposing (Machine, System, emptySystem)
 import Systems.Model.AWS exposing (emptyAws)
 import Systems.Decoders exposing (..)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
 
 import String exposing (isEmpty)

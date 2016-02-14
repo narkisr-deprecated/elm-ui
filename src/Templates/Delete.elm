@@ -7,7 +7,7 @@ import Task
 import Json.Decode exposing (..)
 import Http exposing (Error(BadResponse))
 import Common.Components exposing (dangerCallout)
-import Common.Redirect exposing (failHandler)
+import Common.Errors exposing (failHandler)
 import Common.Http exposing (delete)
 import Maybe exposing (withDefault)
 

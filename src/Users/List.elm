@@ -2,7 +2,7 @@ module Users.List where
 
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
 
 import Effects exposing (Effects)

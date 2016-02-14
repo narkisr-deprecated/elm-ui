@@ -16,7 +16,7 @@ import Http exposing (Error(BadResponse))
 import Effects exposing (Effects)
 import Task
 import Maybe exposing (withDefault)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Debug
 
 type alias Type = 

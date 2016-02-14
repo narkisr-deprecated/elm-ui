@@ -2,7 +2,7 @@ module Systems.Launch where
 
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Effects exposing (Effects, Never, batch, map)

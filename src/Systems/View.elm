@@ -9,7 +9,7 @@ import Common.Http exposing (getJson)
 import Task
 import Http exposing (Error(BadResponse))
 import Systems.Decoders exposing (systemDecoder)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 
 -- View
 import Common.Components exposing (panelContents)

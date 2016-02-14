@@ -10,7 +10,7 @@ import Templates.Model.Common exposing (templateDecoder)
 import Pager exposing (..)
 import Table
 import Common.Http exposing (getJson)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Html.Attributes exposing (type', class, id, style, attribute)
 
 import Bootstrap.Html exposing (..)

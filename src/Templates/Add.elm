@@ -3,7 +3,7 @@ module Templates.Add where
 import Html.Shorthand exposing (..)
 import Bootstrap.Html exposing (..)
 import Common.Http exposing (postJson)
-import Common.Redirect as Redirect exposing (errorsHandler, successHandler)
+import Common.Errors exposing (errorsHandler, successHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -34,15 +34,11 @@ type alias Model =
   , editDefaults : Bool
   , saveErrors : Errors.Model
   , environments : List String
-  , stage : Stage
   }
 
-type Stage = 
-  Editing
-    | Error
-
 type Action = 
-  SaveTemplate
+  Save
+  | Done
   | NoOp
   | Cancel
   | LoadEditor
@@ -59,14 +55,14 @@ init =
   let
     (errorsModel, _ ) = Errors.init
   in
-    (Model emptyTemplate "" False errorsModel [] Editing, getEnvironments SetEnvironments)   
+    (Model emptyTemplate "" False errorsModel [], getEnvironments SetEnvironments)   
 
 intoTemplate ({template} as model) {type', machine, openstack, physical, aws, digital, gce} hyp = 
     let 
       withHyp = {template | openstack = openstack, physical = physical, aws = aws, digital = digital, gce = gce} 
       newTemplate = {withHyp | name = machine.hostname, type' = type', machine = machine}
     in 
-      {model | template = newTemplate, hyp = hyp, stage = Editing}
+      {model | template = newTemplate, hyp = hyp}
 
 setEnvironments : Model -> Environments -> (Model, Effects Action)
 setEnvironments model es =
@@ -76,7 +72,7 @@ setEnvironments model es =
 update : Action ->  Model-> (Model , Effects Action)
 update action ({template, hyp, editDefaults, environments} as model) =
   case action of
-    SaveTemplate -> 
+    Save -> 
       if editDefaults == False then
         (model, persistTemplate saveTemplate template hyp)
       else
@@ -111,13 +107,7 @@ update action ({template, hyp, editDefaults, environments} as model) =
          ({ model | template = newTemplate}, persistTemplate saveTemplate template hyp)
     
     Saved result -> 
-      let
-        (({saveErrors} as newModel), effects) = errorsHandler result model NoOp
-      in
-         if not (Dict.isEmpty saveErrors.errors.keyValues) then
-           ({newModel | stage = Error} , Effects.none)
-         else
-           (model, effects)
+       errorsHandler result model NoOp
 
     SetEnvironments result ->
        (successHandler result model (setEnvironments model) NoOp)
@@ -127,49 +117,47 @@ update action ({template, hyp, editDefaults, environments} as model) =
 
 -- View
 
-currentView : Signal.Address Action -> Model -> List Html
-currentView address ({stage, saveErrors} as model)=
-  case stage of 
-    Editing -> 
-      editing model address
+editing address {template, editDefaults} =
+   div [class "col-md-offset-2 col-md-8"] [
+     div [class "panel panel-default"]
+        (panelContents 
+          (Html.form [] [
+            div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
+              group' "Name" (inputText address NameInput " "  template.name)
+            , group' "Description" (inputText address DescriptionInput " "  template.description)
+            , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
+            , div [ id "jsoneditor"
+                  , style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
+           ]
+          ])
+        )
+      ]
 
-    Error -> 
-      (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
 
-   
-buttons : Signal.Address Action -> Model -> List Html
-buttons address model =
-  let
-    margin = style [("margin-left", "30%")]
-    click = onClick address
-  in 
-   [ 
-      button [id "Cancel", class "btn btn-primary", margin, click Cancel] [text "Cancel"]
-    , button [id "Save", class "btn btn-primary", margin, click SaveTemplate] [text "Save"]
-   ]
- 
+infoMessage : List Html
+infoMessage =
+  [  h4 [] [ text "Info" ]
+  ,  span [] [ text "Save a new template"]
+  ]
 
-editing ({template, editDefaults} as model) address  =
-  panelContents 
-    (Html.form [] [
-       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-         group' "Name" (inputText address NameInput " "  template.name)
-       , group' "Description" (inputText address DescriptionInput " "  template.description)
-       , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
-       , div [id "jsoneditor", style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
-       ]
-        
-  ])
+
+errorMessage : List Html
+errorMessage =
+  [ h4 [] [ text "Error!" ]
+  , span [] [ text "Failed to save template"]
+  ]
+
 
 view : Signal.Address Action -> Model -> List Html
-view address  model =
- [ row_ [
-     div [class "col-md-offset-2 col-md-8"] [
-       div [class "panel panel-default"] (currentView address model)
-     ]
-   ]
- , row_ (buttons address model)
- ]
+view address ({saveErrors} as model) =
+  let
+    errorsView = div [class "panel-body"][(Errors.view (Signal.forwardTo address ErrorsView) saveErrors)]
+  in
+    if Errors.hasErrors saveErrors then
+      dangerCallout address errorMessage errorsView Cancel Done
+    else 
+      infoCallout address infoMessage (editing address model) Cancel Save
+
 
 -- Effects
 

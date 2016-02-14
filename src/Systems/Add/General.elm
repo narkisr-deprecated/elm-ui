@@ -1,7 +1,7 @@
 module Systems.Add.General where
 
 import Dict exposing (Dict)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Effects exposing (Effects, batch)
 import Http exposing (Error(BadResponse))
 import Admin.Core as Admin 

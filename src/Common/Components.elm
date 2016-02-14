@@ -16,12 +16,12 @@ panelContents body =
   let 
     height = "550px"
   in 
-  [ div [class "panel-body"
+    [div [class "panel-body"
         , style [ ("height","auto !important")
                 , ("overflow", "auto")
                 , ("min-height", height)
                 , ("height", height)]] [body]
-  ]
+    ]
 
 
 dialogPanel : String -> Signal.Address a -> List Html -> Html -> a -> a -> List Html

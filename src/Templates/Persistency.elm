@@ -59,7 +59,7 @@ encodeProvided machine admin =
  object [
     ("owner" , string admin.owner)
   , ("env" , string admin.environment)
-  -- , ("machine" , encodeMachine machine)
+  , ("machine" , encodeMachine machine)
  ]
 
 persistProvided f machine admin = 

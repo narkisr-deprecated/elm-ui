@@ -2,7 +2,7 @@ module Admin.Core where
 
 import Effects exposing (Effects, batch)
 import Html exposing (..)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Environments.List exposing (Environments, Environment, getEnvironments)
 import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none)

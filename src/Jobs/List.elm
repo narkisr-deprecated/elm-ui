@@ -17,7 +17,7 @@ import Date.Format exposing (format)
 
 -- model 
 import Dict exposing (Dict)
-import Common.Redirect exposing (successHandler)
+import Common.Errors exposing (successHandler)
 import Common.NewTab exposing (newtab)
 import Table exposing (view,Action(Select))
 import Pager exposing (..)

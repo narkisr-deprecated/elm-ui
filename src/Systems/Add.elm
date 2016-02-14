@@ -3,7 +3,7 @@ module Systems.Add where
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
 import Common.Http exposing (postJson, SaveResponse, saveResponse)
-import Common.Redirect as Redirect exposing (resultHandler, successHandler, errorsHandler)
+import Common.Errors exposing (successHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -29,6 +29,7 @@ import Common.Utils exposing (none)
 import Systems.Add.Persistency exposing (persistModel)
 import Systems.Model.Common exposing (System, Machine, emptyMachine)
 import Common.Wizard as Wizard
+import Common.Components exposing (panelContents)
 
 type Stage = 
   General 
@@ -258,8 +259,10 @@ currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstack
       (Openstack.view (Signal.forwardTo address OpenstackView) openstackModel)
 
     Error -> 
-      (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
-
+     panelContents 
+       (div [] [
+         (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+       ])
     _ -> 
       [div [] []]
 

@@ -61,7 +61,7 @@ navigate action ((({launch, delete} as model), effects) as result) =
           
     TemplatesAdd add -> 
       case add of 
-        Add.Saved _ -> 
+        Add.Saved (Result.Ok _) -> 
           ({ model | navChange = Just (Templates, List) }, effects)
 
         Add.Cancel -> 
