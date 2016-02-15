@@ -18,7 +18,6 @@ import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none)
 import Templates.Persistency exposing (persistTemplate, encodeDefaults)
-import Common.Components exposing (panelContents)
 import Common.Editor exposing (loadEditor, getEditor)
 import Common.Errors as Errors exposing (..)
 import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
@@ -118,9 +117,8 @@ update action ({template, hyp, editDefaults, environments} as model) =
 -- View
 
 editing address {template, editDefaults} =
-   div [class "col-md-offset-2 col-md-8"] [
-     div [class "panel panel-default"]
-        (panelContents 
+    panel
+      (panelContents 
           (Html.form [] [
             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
               group' "Name" (inputText address NameInput " "  template.name)
@@ -131,7 +129,6 @@ editing address {template, editDefaults} =
            ]
           ])
         )
-      ]
 
 
 infoMessage : List Html
@@ -151,7 +148,7 @@ errorMessage =
 view : Signal.Address Action -> Model -> List Html
 view address ({saveErrors} as model) =
   let
-    errorsView = div [class "panel-body"][(Errors.view (Signal.forwardTo address ErrorsView) saveErrors)]
+    errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
   in
     if Errors.hasErrors saveErrors then
       dangerCallout address errorMessage errorsView Cancel Done

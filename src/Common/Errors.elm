@@ -92,10 +92,12 @@ errorsText errors =
 
 view : Signal.Address Action -> Model -> Html
 view address {errors} =
-  div [] [
-    h4 [] [text "The following errors found:"]
-  , errorsText errors
-  ] 
+  div  [class "panel panel-default"] [
+    div [class "panel-body"] [
+      h4 [] [text "The following errors found:"]
+    , errorsText errors
+    ] 
+  ]
     
 
 errorsDecoder : Decoder Errors

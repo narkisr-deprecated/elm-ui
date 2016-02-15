@@ -14890,18 +14890,24 @@ Elm.Common.Components.make = function (_elm) {
    var infoCallout = F5(function (address,message,body,cancel,ok) {    return A6(dialogPanel,"info",address,message,body,cancel,ok);});
    var dangerCallout = F5(function (address,message,body,cancel,ok) {    return A6(dialogPanel,"danger",address,message,body,cancel,ok);});
    var warningCallout = F5(function (address,message,body,cancel,ok) {    return A6(dialogPanel,"warning",address,message,body,cancel,ok);});
-   var panelContents = function (body) {
-      var height = "550px";
-      return _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("panel-body")
-              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "height",_1: "auto !important"}
-                                              ,{ctor: "_Tuple2",_0: "overflow",_1: "auto"}
-                                              ,{ctor: "_Tuple2",_0: "min-height",_1: height}
-                                              ,{ctor: "_Tuple2",_0: "height",_1: height}]))]),
-      _U.list([body]))]);
+   var asList = function (body) {    return _U.list([body]);};
+   var panel = function (body) {    return A2($Html.div,_U.list([$Html$Attributes.$class("panel panel-default")]),_U.list([body]));};
+   var panelContents = function (body) {    return A2($Html.div,_U.list([$Html$Attributes.$class("panel-body")]),_U.list([body]));};
+   var fixedSize = function (height) {
+      return $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "height",_1: "auto !important"}
+                                            ,{ctor: "_Tuple2",_0: "overflow",_1: "auto"}
+                                            ,{ctor: "_Tuple2",_0: "min-height",_1: height}
+                                            ,{ctor: "_Tuple2",_0: "height",_1: height}]));
    };
+   var fixedPanel = function (body) {    return A2($Html.div,_U.list([$Html$Attributes.$class("panel-body"),fixedSize("550px")]),_U.list([body]));};
+   var notImplemented = asList(A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")])));
    return _elm.Common.Components.values = {_op: _op
+                                          ,notImplemented: notImplemented
+                                          ,fixedSize: fixedSize
                                           ,panelContents: panelContents
+                                          ,panel: panel
+                                          ,asList: asList
+                                          ,fixedPanel: fixedPanel
                                           ,dialogPanel: dialogPanel
                                           ,infoCallout: infoCallout
                                           ,dangerCallout: dangerCallout
@@ -14998,7 +15004,11 @@ Elm.Common.Errors.make = function (_elm) {
    };
    var view = F2(function (address,_p6) {
       var _p7 = _p6;
-      return A2($Html.div,_U.list([]),_U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("The following errors found:")])),errorsText(_p7.errors)]));
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("panel panel-default")]),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("panel-body")]),
+      _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("The following errors found:")])),errorsText(_p7.errors)]))]));
    });
    var NoOp = {ctor: "NoOp"};
    var Model = function (a) {    return {errors: a};};
@@ -16126,7 +16136,7 @@ Elm.Systems.View.AWS.make = function (_elm) {
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
    var _op = {};
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),$Common$Components.panelContents(A2($Html.div,_U.list([]),_U.list([]))));});
+   var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.div,_U.list([]),_U.list([])));});
    var summarySections = function (_p0) {
       var _p1 = _p0;
       var _p6 = _p1._1;
@@ -16747,7 +16757,9 @@ Elm.Systems.Add.AWS.make = function (_elm) {
          case "Summary": return $Systems$View$AWS.summarize({ctor: "_Tuple2",_0: _p71.aws,_1: _p71.machine});
          default: return A2($Debug.log,$Basics.toString(_p74.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
+   var view = F2(function (address,model) {
+      return $Common$Components.asList($Common$Components.fixedPanel(A2($Html.form,_U.list([]),A2(stepView,address,model))));
+   });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
    var next = F2(function (model,environment) {    return A2(update,WizardAction($Common$Wizard.Next),A2(update,Update(environment),model));});
@@ -16851,7 +16863,7 @@ Elm.Systems.View.Physical.make = function (_elm) {
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm),
    $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
    var _op = {};
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),$Common$Components.panelContents(A2($Html.div,_U.list([]),_U.list([]))));});
+   var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.div,_U.list([]),_U.list([])));});
    var summarySections = function (_p0) {
       var _p1 = _p0;
       var _p3 = _p1._0;
@@ -17038,7 +17050,9 @@ Elm.Systems.Add.Physical.make = function (_elm) {
          case "Summary": return $Systems$View$Physical.summarize({ctor: "_Tuple2",_0: _p24.physical,_1: _p24.machine});
          default: return A2($Debug.log,$Basics.toString(_p26.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
+   var view = F2(function (address,model) {
+      return $Common$Components.asList($Common$Components.fixedPanel(A2($Html.form,_U.list([]),A2(stepView,address,model))));
+   });
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
@@ -17104,7 +17118,7 @@ Elm.Systems.View.Openstack.make = function (_elm) {
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
    var _op = {};
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),$Common$Components.panelContents(A2($Html.div,_U.list([]),_U.list([]))));});
+   var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.div,_U.list([]),_U.list([])));});
    var summarySections = function (_p0) {
       var _p1 = _p0;
       var _p6 = _p1._0;
@@ -17511,7 +17525,9 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
          case "Summary": return $Systems$View$Openstack.summarize({ctor: "_Tuple2",_0: _p55.openstack,_1: _p55.machine});
          default: return A2($Debug.log,$Basics.toString(_p58.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
+   var view = F2(function (address,model) {
+      return $Common$Components.asList($Common$Components.fixedPanel(A2($Html.form,_U.list([]),A2(stepView,address,model))));
+   });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
    var next = F2(function (model,environment) {    return A2(update,WizardAction($Common$Wizard.Next),A2(update,Update(environment),model));});
@@ -17602,7 +17618,7 @@ Elm.Systems.View.GCE.make = function (_elm) {
    $Systems$Model$GCE = Elm.Systems.Model.GCE.make(_elm),
    $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
    var _op = {};
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),$Common$Components.panelContents(A2($Html.div,_U.list([]),_U.list([]))));});
+   var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.div,_U.list([]),_U.list([])));});
    var summarySections = function (_p0) {
       var _p1 = _p0;
       var _p4 = _p1._1;
@@ -17850,7 +17866,9 @@ Elm.Systems.Add.GCE.make = function (_elm) {
          case "Summary": return $Systems$View$GCE.summarize({ctor: "_Tuple2",_0: _p31.gce,_1: _p31.machine});
          default: return A2($Debug.log,$Basics.toString(_p34.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
+   var view = F2(function (address,model) {
+      return $Common$Components.asList($Common$Components.fixedPanel(A2($Html.form,_U.list([]),A2(stepView,address,model))));
+   });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
    var next = F2(function (model,environment) {    return A2(update,WizardAction($Common$Wizard.Next),A2(update,Update(environment),model));});
@@ -17917,7 +17935,7 @@ Elm.Systems.View.Digital.make = function (_elm) {
    $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
    $Systems$View$Common = Elm.Systems.View.Common.make(_elm);
    var _op = {};
-   var view = F2(function (address,model) {    return A2($Html.div,_U.list([]),$Common$Components.panelContents(A2($Html.div,_U.list([]),_U.list([]))));});
+   var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.div,_U.list([]),_U.list([])));});
    var summarySections = function (_p0) {
       var _p1 = _p0;
       var _p3 = _p1._1;
@@ -18091,7 +18109,9 @@ Elm.Systems.Add.Digital.make = function (_elm) {
          case "Summary": return $Systems$View$Digital.summarize({ctor: "_Tuple2",_0: _p22.digital,_1: _p22.machine});
          default: return A2($Debug.log,$Basics.toString(_p24.step),_U.list([A2($Html.div,_U.list([]),_U.list([]))]));}
    });
-   var view = F2(function (address,model) {    return $Common$Components.panelContents(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
+   var view = F2(function (address,model) {
+      return $Common$Components.asList($Common$Components.fixedPanel(A2($Html.form,_U.list([]),A2(stepView,address,model))));
+   });
    var Update = function (a) {    return {ctor: "Update",_0: a};};
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
    var next = F2(function (model,environment) {    return A2(update,WizardAction($Common$Wizard.Next),A2(update,Update(environment),model));});
@@ -18288,37 +18308,37 @@ Elm.Systems.Add.General.make = function (_elm) {
    var SelectType = function (a) {    return {ctor: "SelectType",_0: a};};
    var SetTypes = function (a) {    return {ctor: "SetTypes",_0: a};};
    var AdminAction = function (a) {    return {ctor: "AdminAction",_0: a};};
-   var view = F2(function (address,_p2) {
+   var general = F2(function (address,_p2) {
       var _p3 = _p2;
-      var _p4 = _p3;
-      return $Common$Components.panelContents(A2($Html.form,
-      _U.list([]),
-      _U.list([A2($Html.div,
+      return A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       A2($List.append,
       A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p3.admin),
-      _U.list([A2($Common$Components.group$,"Type",A4($Common$Components.selector,address,SelectType,_p4.types,_p4.type$))
-              ,A2($Common$Components.group$,"Hypervisor",A4($Common$Components.selector,address,SelectHypervisor,_p4.hypervisors,_p4.hypervisor))])))])));
+      _U.list([A2($Common$Components.group$,"Type",A4($Common$Components.selector,address,SelectType,_p3.types,_p3.type$))
+              ,A2($Common$Components.group$,"Hypervisor",A4($Common$Components.selector,address,SelectHypervisor,_p3.hypervisors,_p3.hypervisor))])));
+   });
+   var view = F2(function (address,model) {
+      return $Common$Components.asList($Common$Components.fixedPanel(A2($Html.form,_U.list([]),$Common$Components.asList(A2(general,address,model)))));
    });
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p5) {
-      var _p6 = _p5;
-      var _p9 = _p6;
-      var _p7 = action;
-      switch (_p7.ctor)
-      {case "AdminAction": var _p8 = A2($Admin$Core.update,_p7._0,_p6.admin);
-           var newAdmin = _p8._0;
-           return A3(updateHypervisors,_U.update(_p9,{admin: newAdmin}),newAdmin.rawEnvironments,newAdmin.environment);
-         case "SelectHypervisor": return _U.update(_p9,{hypervisor: _p7._0});
-         case "SetTypes": return withoutEffects(A4($Common$Errors.successHandler,_p7._0,_p9,setTypes(_p9),NoOp));
-         case "SelectType": return _U.update(_p9,{type$: _p7._0});
-         default: return _p9;}
+   var update = F2(function (action,_p4) {
+      var _p5 = _p4;
+      var _p8 = _p5;
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "AdminAction": var _p7 = A2($Admin$Core.update,_p6._0,_p5.admin);
+           var newAdmin = _p7._0;
+           return A3(updateHypervisors,_U.update(_p8,{admin: newAdmin}),newAdmin.rawEnvironments,newAdmin.environment);
+         case "SelectHypervisor": return _U.update(_p8,{hypervisor: _p6._0});
+         case "SetTypes": return withoutEffects(A4($Common$Errors.successHandler,_p6._0,_p8,setTypes(_p8),NoOp));
+         case "SelectType": return _U.update(_p8,{type$: _p6._0});
+         default: return _p8;}
    });
    var Model = F5(function (a,b,c,d,e) {    return {type$: a,types: b,hypervisor: c,hypervisors: d,admin: e};});
    var init = function () {
-      var _p10 = $Admin$Core.init;
-      var admin = _p10._0;
-      var effects = _p10._1;
+      var _p9 = $Admin$Core.init;
+      var admin = _p9._0;
+      var effects = _p9._1;
       var loadEffects = _U.list([$Types$List.getTypes(SetTypes),A2($Effects.map,AdminAction,effects)]);
       return {ctor: "_Tuple2",_0: A5(Model,"",_U.list([]),"",_U.list([]),admin),_1: $Effects.batch(loadEffects)};
    }();
@@ -18334,6 +18354,7 @@ Elm.Systems.Add.General.make = function (_elm) {
                                             ,withoutEffects: withoutEffects
                                             ,setTypes: setTypes
                                             ,update: update
+                                            ,general: general
                                             ,view: view};
 };
 Elm.Systems = Elm.Systems || {};
@@ -18663,10 +18684,10 @@ Elm.Systems.Add.make = function (_elm) {
          case "Digital": return A2($Systems$Add$Digital.view,A2($Signal.forwardTo,address,DigitalView),_p8.digitalModel);
          case "Physical": return A2($Systems$Add$Physical.view,A2($Signal.forwardTo,address,PhysicalView),_p8.physicalModel);
          case "Openstack": return A2($Systems$Add$Openstack.view,A2($Signal.forwardTo,address,OpenstackView),_p8.openstackModel);
-         case "Error": return $Common$Components.panelContents(A2($Html.div,
-           _U.list([]),
-           _U.list([A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p8.saveErrors)])));
-         default: return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);}
+         case "Error": return $Common$Components.asList($Common$Components.fixedPanel(A2($Common$Errors.view,
+           A2($Signal.forwardTo,address,ErrorsView),
+           _p8.saveErrors)));
+         default: return $Common$Components.asList(A2($Html.div,_U.list([]),_U.list([])));}
    });
    var NoOp = {ctor: "NoOp"};
    var Back = {ctor: "Back"};
@@ -18920,7 +18941,7 @@ Elm.Systems.View.make = function (_elm) {
       var _p1 = _p0;
       var _p2 = prop;
       if (_p2.ctor === "Just") {
-            return $Common$Components.panelContents(A2($Html.div,_U.list([]),f({ctor: "_Tuple2",_0: _p2._0,_1: _p1.system.machine})));
+            return $Common$Components.asList($Common$Components.fixedPanel(A2($Html.div,_U.list([]),f({ctor: "_Tuple2",_0: _p2._0,_1: _p1.system.machine}))));
          } else {
             return _U.list([]);
          }
@@ -18934,7 +18955,7 @@ Elm.Systems.View.make = function (_elm) {
                             ,A3(toHtml,_p6,$Systems$View$Openstack.summarize,_p7.openstack)
                             ,A3(toHtml,_p6,$Systems$View$Digital.summarize,_p7.digital)]);
       return A2($Maybe.withDefault,
-      _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]),
+      $Common$Components.notImplemented,
       $List.head(A2($List.filter,function (_p5) {    return $Basics.not($List.isEmpty(_p5));},options)));
    });
    var setSystem = F2(function (model,system) {    return {ctor: "_Tuple2",_0: _U.update(model,{system: system}),_1: $Effects.none};});
@@ -23903,11 +23924,7 @@ Elm.Templates.Add.make = function (_elm) {
    var editing = F2(function (address,_p5) {
       var _p6 = _p5;
       var _p7 = _p6.template;
-      return A2($Html.div,
-      _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
-      _U.list([A2($Html.div,
-      _U.list([$Html$Attributes.$class("panel panel-default")]),
-      $Common$Components.panelContents(A2($Html.form,
+      return $Common$Components.panel($Common$Components.panelContents(A2($Html.form,
       _U.list([]),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
@@ -23919,7 +23936,7 @@ Elm.Templates.Add.make = function (_elm) {
                       ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "550px"}
                                                       ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
                                                       ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
-              _U.list([]))]))]))))]));
+              _U.list([]))]))]))));
    });
    var Cancel = {ctor: "Cancel"};
    var NoOp = {ctor: "NoOp"};
@@ -23954,9 +23971,7 @@ Elm.Templates.Add.make = function (_elm) {
    var view = F2(function (address,_p15) {
       var _p16 = _p15;
       var _p17 = _p16.saveErrors;
-      var errorsView = A2($Html.div,
-      _U.list([$Html$Attributes.$class("panel-body")]),
-      _U.list([A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p17)]));
+      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p17);
       return $Common$Errors.hasErrors(_p17) ? A5($Common$Components.dangerCallout,
       address,
       errorMessage,
@@ -24449,19 +24464,22 @@ Elm.Templates.Core.make = function (_elm) {
                     break _v2_4;
                  }
             case "TemplatesAdd": var _p7 = _p5._0;
-              _v4_2: do {
+              _v4_3: do {
                  switch (_p7.ctor)
                  {case "Saved": if (_p7._0.ctor === "Ok") {
                             return {ctor: "_Tuple2"
                                    ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
                                    ,_1: _p10};
                          } else {
-                            break _v4_2;
+                            break _v4_3;
                          }
                     case "Cancel": return {ctor: "_Tuple2"
                                           ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
                                           ,_1: _p10};
-                    default: break _v4_2;}
+                    case "Done": return {ctor: "_Tuple2"
+                                        ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                        ,_1: _p10};
+                    default: break _v4_3;}
               } while (false);
               return _p12;
             case "TemplatesLaunch": var _p8 = _p5._0;

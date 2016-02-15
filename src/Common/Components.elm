@@ -11,18 +11,37 @@ import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
 import Dict exposing (Dict)
 
-panelContents :  Html -> List Html
-panelContents body =
-  let 
-    height = "550px"
-  in 
-    [div [class "panel-body"
-        , style [ ("height","auto !important")
-                , ("overflow", "auto")
-                , ("min-height", height)
-                , ("height", height)]] [body]
-    ]
+notImplemented = 
+  asList (
+    div [] [
+       text "not implemented"
+    ])
 
+fixedSize height = 
+  style [
+    ("height","auto !important")
+  , ("overflow", "auto")
+  , ("min-height", height)
+  , ("height", height)
+  ]
+
+panelContents body =
+  div [class "panel-body"] [
+    body
+  ] 
+   
+panel body = 
+   div [class "panel panel-default"] [
+      body
+   ]
+
+asList body = 
+  [body]
+
+fixedPanel body = 
+  div [class "panel-body" , (fixedSize "550px")] [
+    body
+  ] 
 
 dialogPanel : String -> Signal.Address a -> List Html -> Html -> a -> a -> List Html
 dialogPanel type' address message body cancel ok = 

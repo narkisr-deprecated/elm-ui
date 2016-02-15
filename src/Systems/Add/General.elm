@@ -15,8 +15,7 @@ import Systems.Add.Common exposing (..)
 import Environments.List exposing (Environments, Environment, getEnvironments)
 import Users.List exposing (User, getUsers)
 import Types.List exposing (Type, getTypes)
-
-import Common.Components exposing (panelContents)
+import Common.Components exposing (fixedPanel, asList)
 
 import Debug
 
@@ -92,17 +91,19 @@ update action ({admin} as model) =
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
-view address ({admin} as model) =
-  panelContents 
-    (Html.form [] [
-      div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       (List.append
-         (Admin.view (Signal.forwardTo address AdminAction) admin)
-         [ group' "Type" (selector address SelectType model.types model.type')
-         , group' "Hypervisor" (selector address SelectHypervisor model.hypervisors model.hypervisor)]
-         )
+general address {admin, type', types, hypervisors, hypervisor} =
+  div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+    (List.append
+       (Admin.view (Signal.forwardTo address AdminAction) admin)
+          [ group' "Type" (selector address SelectType types type')
+          , group' "Hypervisor" (selector address SelectHypervisor hypervisors hypervisor)
+          ]
+        )
 
-    ])
+view : Signal.Address Action -> Model -> List Html
+view address model =
+  asList (fixedPanel (Html.form [] (asList (general address model))))
+
+
 
 

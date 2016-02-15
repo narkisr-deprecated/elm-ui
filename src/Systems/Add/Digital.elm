@@ -13,7 +13,7 @@ import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Model.Digital exposing (..)
 import Effects exposing (Effects, batch)
-import Common.Components exposing (panelContents)
+import Common.Components exposing (fixedPanel, asList)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
 import Maybe exposing (withDefault)
@@ -180,4 +180,4 @@ stepView address ({wizard, digital, machine} as model) =
 
 view : Signal.Address Action -> Model -> List Html
 view address model =
-  panelContents (Html.form [] (stepView address model))
+  asList (fixedPanel (Html.form [] (stepView address model)))

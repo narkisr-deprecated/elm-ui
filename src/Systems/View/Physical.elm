@@ -8,7 +8,7 @@ import Systems.Model.Physical exposing (Physical)
 import Systems.View.Common exposing (..)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
-import Common.Components exposing (panelContents)
+import Common.Components exposing (fixedPanel)
 import Effects exposing (Effects, Never, map)
 import String
 
@@ -52,7 +52,6 @@ summarize model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div []
-    (panelContents (div [] []))
+  fixedPanel (div [] [])
 
 

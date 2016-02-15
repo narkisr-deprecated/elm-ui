@@ -7,7 +7,7 @@ import Systems.Model.Common exposing (Machine)
 import Systems.Model.AWS exposing (AWS)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
-import Common.Components exposing (panelContents)
+import Common.Components exposing (fixedPanel, asList)
 import Effects exposing (Effects, Never, map)
 import Systems.View.Common exposing (..)
 import String
@@ -66,7 +66,6 @@ summarize model =
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  div []
-    (panelContents (div [] []))
+    fixedPanel (div [] [])
 
 

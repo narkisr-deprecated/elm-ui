@@ -12,7 +12,7 @@ import Systems.Decoders exposing (systemDecoder)
 import Common.Errors exposing (successHandler)
 
 -- View
-import Common.Components exposing (panelContents)
+import Common.Components exposing (fixedPanel, asList, notImplemented)
 import Html exposing (..)
 import Systems.View.AWS  as AWSView
 import Systems.View.Openstack as OpenstackView
@@ -58,7 +58,7 @@ update action model =
 toHtml ({system} as model) f prop= 
   case prop of
     Just value -> 
-       panelContents (div [] (f (value, system.machine)))
+       asList (fixedPanel (div [] (f (value, system.machine))))
     Nothing -> 
        []
 
@@ -69,9 +69,10 @@ view address ({system} as model) =
                 , toHtml  model GCEView.summarize system.gce
                 , toHtml  model OpenstackView.summarize system.openstack
                 , toHtml  model DigitalView.summarize system.digital]
+      
 
     in 
-      withDefault [div  [] [text "not implemented"]] (List.head (List.filter (not << List.isEmpty) options))
+      withDefault notImplemented (List.head (List.filter (not << List.isEmpty) options))
 
 -- Effects
 
