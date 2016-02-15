@@ -12,10 +12,9 @@ import Common.Utils exposing (defaultEmpty)
 import Dict exposing (Dict)
 
 notImplemented = 
-  asList (
-    div [] [
-       text "not implemented"
-    ])
+  div [] [
+    text "not implemented"
+  ]
 
 fixedSize height = 
   style [
@@ -43,19 +42,8 @@ fixedPanel body =
     body
   ] 
 
-dialogPanel : String -> Signal.Address a -> List Html -> Html -> a -> a -> List Html
-dialogPanel type' address message body cancel ok = 
-  [ row_ [
-     div [class "col-md-offset-1 col-md-10"] [
-      div [ class ("callout callout-" ++ type') ] message
-     ]
-   ] 
-  , row_ [
-      div [class "col-md-offset-1 col-md-10"] [
-        body
-      ]
-    ]
-  , row_ [
+dianlogButtons address cancel ok =
+  row_ [
      div [class "text-center"] [
        div [class "btn-group col-md-offset-5 col-md-10"] [
            button [class "btn btn-danger btn-sm col-md-1 col-md-offset-1", onClick address cancel ] [
@@ -67,16 +55,35 @@ dialogPanel type' address message body cancel ok =
       ]
     ]
   ]
- ]
+
+dialogPanel : String -> List Html -> Html -> List Html
+dialogPanel type' message body = 
+  [ row_ [
+     div [class "col-md-offset-1 col-md-10"] [
+      div [ class ("callout callout-" ++ type') ] message
+     ]
+   ] 
+  , row_ [
+      div [class "col-md-offset-1 col-md-10"] [
+        body
+      ]
+    ]
+  ]
+
+withButtons address cancel ok panel = 
+  List.append panel (asList (dianlogButtons address cancel ok))
 
 infoCallout address message body cancel ok = 
-  dialogPanel "info" address message body cancel ok
+  (dialogPanel "info" message body)
+    |> withButtons address cancel ok
 
 dangerCallout address message body cancel ok = 
-  dialogPanel "danger" address message body cancel ok
+  dialogPanel "danger" message body 
+    |> withButtons address cancel ok
 
 warningCallout address message body cancel ok = 
-  dialogPanel "warning" address message body cancel ok
+  dialogPanel "warning" message body
+    |> withButtons address cancel ok
 
 withError : List Error -> String -> String
 withError errors class =
@@ -162,4 +169,13 @@ withErrors : Dict String (List Error) -> String ->  Html -> Html
 withErrors errors key widget =
   group key widget (defaultEmpty (Dict.get key errors))
 
+message title content =
+  [ h4 [] [ text title ]
+  , span [] [ text content ]
+  ]
 
+info msg =
+    message "Info" msg
+
+error msg = 
+   message "Error!" msg

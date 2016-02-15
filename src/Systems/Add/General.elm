@@ -100,9 +100,9 @@ general address {admin, type', types, hypervisors, hypervisor} =
           ]
         )
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Action -> Model -> Html
 view address model =
-  asList (fixedPanel (Html.form [] (asList (general address model))))
+  fixedPanel (Html.form [] (asList (general address model)))
 
 
 

@@ -9,7 +9,7 @@ import Common.Utils exposing (none)
 import Debug
 import Html.Events exposing (onClick)
 import Common.Componentsz exposing (..)
-import Common.Components exposing (infoCallout, dangerCallout)
+import Common.Components exposing (infoCallout, dangerCallout, panelContents, panel)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Admin.Core as Admin 
 import Environments.List exposing (Environments, Environment, getEnvironments)
@@ -163,10 +163,10 @@ errorMessage =
 view : Signal.Address Action -> Model -> List Html
 view address ({name, saveErrors} as model) =
   let
-    errorsView = div [class "panel-body"][(Errors.view (Signal.forwardTo address ErrorsView) saveErrors)]
+    errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
   in
     if Errors.hasErrors saveErrors then
-      dangerCallout address errorMessage errorsView Cancel Done
+      dangerCallout address errorMessage (panel (panelContents errorsView)) Cancel Done
     else 
       infoCallout address (infoMessage name) (launchView address model) Cancel Launch
 

@@ -3,7 +3,7 @@ module Systems.Add where
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
 import Common.Http exposing (postJson, SaveResponse, saveResponse)
-import Common.Errors as Errors exposing (successHandler)
+import Common.Errors as Errors exposing (errorsSuccessHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -28,7 +28,7 @@ import Common.Utils exposing (none)
 import Systems.Add.Persistency exposing (persistModel)
 import Systems.Model.Common exposing (System, Machine, emptyMachine)
 import Common.Wizard as Wizard
-import Common.Components exposing (asList, fixedPanel)
+import Common.Components exposing (asList, panelContents, panel, dialogPanel, error, notImplemented)
 
 type Stage = 
   General 
@@ -227,16 +227,16 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
 
     Saved next result -> 
       let
-        (({saveErrors} as newModel), effects) = successHandler result model (setSaved next model) NoOp
+        ({saveErrors} as newModel, effects) = errorsSuccessHandler result model (setSaved next model) NoOp
       in
-       if not (Dict.isEmpty saveErrors.errors.keyValues) then
-          ({newModel | stage = Error} , Effects.none)
+       if Errors.hasErrors saveErrors then
+          ({newModel | stage = Error} , effects)
        else
           (model, effects)
 
     _ -> (model, Effects.none)
 
-currentView : Signal.Address Action -> Model -> List Html
+currentView : Signal.Address Action -> Model -> Html
 currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, saveErrors, general} as model)=
   case model.stage of 
     General -> 
@@ -257,11 +257,8 @@ currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstack
     Openstack -> 
       (Openstack.view (Signal.forwardTo address OpenstackView) openstackModel)
 
-    Error -> 
-      asList (fixedPanel (Errors.view (Signal.forwardTo address ErrorsView) saveErrors))
-
     _ -> 
-      asList (div [] [])
+      notImplemented
 
 saveDropdown : Signal.Address Action -> Html 
 saveDropdown address =
@@ -295,13 +292,22 @@ buttons address ({hasNext} as model) =
   ]
        
 
+errorsView address {saveErrors} = 
+   let
+     body = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+   in
+     dialogPanel "danger" (error "Failed to save system") (panel (panelContents body))
+
+
 view : Signal.Address Action -> Model -> List Html
-view address model =
+view address ({stage} as model) =
  [ row_ [
-     div [class "col-md-offset-2 col-md-8"] [
-       div [class "panel panel-default"] 
-         (currentView address model)
-     ]
+     (if stage /= Error then
+        div [class "col-md-offset-2 col-md-8"] [
+          (panel (currentView address model))
+        ]
+       else
+         div [] (errorsView address model))
    ]
  , row_ (buttons address model)
  ]

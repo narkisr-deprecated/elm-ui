@@ -469,6 +469,6 @@ stepView address ({wizard, aws, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Action -> Model -> Html
 view address model =
-  asList (fixedPanel (Html.form [] (stepView address model)))
+  fixedPanel (Html.form [] (stepView address model))

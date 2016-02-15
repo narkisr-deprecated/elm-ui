@@ -130,30 +130,15 @@ editing address {template, editDefaults} =
           ])
         )
 
-
-infoMessage : List Html
-infoMessage =
-  [  h4 [] [ text "Info" ]
-  ,  span [] [ text "Save a new template"]
-  ]
-
-
-errorMessage : List Html
-errorMessage =
-  [ h4 [] [ text "Error!" ]
-  , span [] [ text "Failed to save template"]
-  ]
-
-
 view : Signal.Address Action -> Model -> List Html
 view address ({saveErrors} as model) =
   let
     errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
   in
     if Errors.hasErrors saveErrors then
-      dangerCallout address errorMessage errorsView Cancel Done
+      dangerCallout address (error "Failed to save template") (panel (panelContents errorsView)) Cancel Done
     else 
-      infoCallout address infoMessage (editing address model) Cancel Save
+      infoCallout address (info "Save template") (editing address model) Cancel Save
 
 
 -- Effects

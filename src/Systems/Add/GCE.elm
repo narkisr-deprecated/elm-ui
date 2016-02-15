@@ -207,7 +207,7 @@ instance address ({gce, machine, errors} as model) =
        , check "Tags" (inputText address TagsInput " " tags)]
    ]
 
-stepView :  Signal.Address Action -> Model -> List Html
+stepView:  Signal.Address Action -> Model -> List Html
 stepView address ({wizard, gce, machine} as model) =
   case wizard.step of
     Instance -> 
@@ -223,6 +223,6 @@ stepView address ({wizard, gce, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Action -> Model -> Html
 view address model =
-  asList (fixedPanel (Html.form [] (stepView address model)))
+  (fixedPanel (Html.form [] (stepView address model)))
