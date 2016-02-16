@@ -1,11 +1,12 @@
 module Templates.Persistency where
 
 import Templates.Model.Common exposing (Template, emptyOpenstackDefaults, Defaults, OpenstackDefaults)
-import Systems.Add.Encoders exposing (encoderOf, machineEncoder)
+import Systems.Add.Encoders exposing (encoderOf, machineEncoder, optional)
 import Effects exposing (Effects)
 import Json.Encode as E exposing (..)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)
+import Systems.Model.Common exposing (Machine)
 
 openstackDefaultsEncoder : OpenstackDefaults -> Value
 openstackDefaultsEncoder openstack =
@@ -30,6 +31,14 @@ encodeDefaults : Dict String Defaults -> String -> String
 encodeDefaults defaults hyp =
   E.encode 0 (defaultsDictEncoder defaults hyp)
 
+partialEncoder : Machine -> Value
+partialEncoder machine =
+  object [
+      ("ip", optional string machine.ip)
+    , ("os", string machine.os)
+    , ("user", string machine.user)
+  ]
+
 encode: Template -> String -> Value
 encode ({type', machine, defaults, name, description} as template) hyp =
  object [
@@ -37,7 +46,7 @@ encode ({type', machine, defaults, name, description} as template) hyp =
   , ("name" , string name)
   , ("description" , string description)
   , (encoderOf template hyp)
-  , ("machine" , machineEncoder machine)
+  , ("machine" , partialEncoder machine)
   , ("defaults", (defaultsDictEncoder (withDefault Dict.empty defaults) hyp))
  ] 
 

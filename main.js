@@ -23791,6 +23791,7 @@ Elm.Templates.Persistency.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Systems$Add$Encoders = Elm.Systems.Add.Encoders.make(_elm),
+   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Templates$Model$Common = Elm.Templates.Model.Common.make(_elm);
    var _op = {};
    var encodeMachine = function (_p0) {
@@ -23805,6 +23806,11 @@ Elm.Templates.Persistency.make = function (_elm) {
    });
    var persistModel = F2(function (f,value) {    return f(A2($Json$Encode.encode,0,value));});
    var persistProvided = F3(function (f,machine,admin) {    return A2(persistModel,f,A2(encodeProvided,machine,admin));});
+   var partialEncoder = function (machine) {
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "ip",_1: A2($Systems$Add$Encoders.optional,$Json$Encode.string,machine.ip)}
+                                         ,{ctor: "_Tuple2",_0: "os",_1: $Json$Encode.string(machine.os)}
+                                         ,{ctor: "_Tuple2",_0: "user",_1: $Json$Encode.string(machine.user)}]));
+   };
    var openstackDefaultsEncoder = function (openstack) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2"
                                           ,_0: "networks"
@@ -23833,7 +23839,7 @@ Elm.Templates.Persistency.make = function (_elm) {
                                          ,{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(_p7.name)}
                                          ,{ctor: "_Tuple2",_0: "description",_1: $Json$Encode.string(_p7.description)}
                                          ,A2($Systems$Add$Encoders.encoderOf,_p7,hyp)
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: $Systems$Add$Encoders.machineEncoder(_p7.machine)}
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: partialEncoder(_p7.machine)}
                                          ,{ctor: "_Tuple2",_0: "defaults",_1: A2(defaultsDictEncoder,A2($Maybe.withDefault,$Dict.empty,_p7.defaults),hyp)}]));
    });
    var persistTemplate = F3(function (f,template,hyp) {    return A2(persistModel,f,A2(encode,template,hyp));});
@@ -23842,6 +23848,7 @@ Elm.Templates.Persistency.make = function (_elm) {
                                               ,defaultsEncoder: defaultsEncoder
                                               ,defaultsDictEncoder: defaultsDictEncoder
                                               ,encodeDefaults: encodeDefaults
+                                              ,partialEncoder: partialEncoder
                                               ,encode: encode
                                               ,persistModel: persistModel
                                               ,persistTemplate: persistTemplate
