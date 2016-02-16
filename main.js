@@ -18964,7 +18964,7 @@ Elm.Systems.View.make = function (_elm) {
                             ,A3(toHtml,_p6,$Systems$View$Openstack.summarize,_p7.openstack)
                             ,A3(toHtml,_p6,$Systems$View$Digital.summarize,_p7.digital)]);
       return A2($Maybe.withDefault,
-      $Common$Components.notImplemented,
+      $Common$Components.asList($Common$Components.notImplemented),
       $List.head(A2($List.filter,function (_p5) {    return $Basics.not($List.isEmpty(_p5));},options)));
    });
    var setSystem = F2(function (model,system) {    return {ctor: "_Tuple2",_0: _U.update(model,{system: system}),_1: $Effects.none};});
@@ -19064,7 +19064,7 @@ Elm.Systems.Launch.make = function (_elm) {
    var view = F2(function (address,_p8) {
       var _p9 = _p8;
       var systemsTable = $Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p9.table));
-      return A6($Common$Components.dialogPanel,"danger",address,message(_p9.job),systemsTable,Cancel,Run);
+      return A5($Common$Components.dangerCallout,address,message(_p9.job),systemsTable,Cancel,Run);
    });
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
    var Model = F2(function (a,b) {    return {job: a,table: b};});

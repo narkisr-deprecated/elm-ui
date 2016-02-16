@@ -72,7 +72,7 @@ view address ({system} as model) =
       
 
     in 
-      withDefault notImplemented (List.head (List.filter (not << List.isEmpty) options))
+      withDefault (asList notImplemented) (List.head (List.filter (not << List.isEmpty) options))
 
 -- Effects
 

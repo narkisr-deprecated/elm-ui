@@ -13,7 +13,7 @@ import Bootstrap.Html exposing (..)
 import Debug
 import Systems.Model.Common exposing (System)
 import Jobs.Common exposing (runJob, JobResponse)
-import Common.Components exposing (dialogPanel)
+import Common.Components exposing (dangerCallout)
 
 import Set exposing (Set)
 -- Model 
@@ -103,7 +103,7 @@ view address {table, job} =
  let 
    systemsTable = (panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table))
  in
-   dialogPanel "danger" address (message job) systemsTable  Cancel Run
+   dangerCallout address (message job) systemsTable  Cancel Run
 
 
 
