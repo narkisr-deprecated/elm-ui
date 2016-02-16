@@ -71,13 +71,50 @@ jobListing ({navSide} as model) =
   in 
     ({model | jobsList = newJobs}, Effects.map JobsList effects)
 
-goto : Active -> Section -> Model -> Model
-goto active section ({navSide} as model)  =
-  {model | navSide = NavSide.update (NavSide.Goto active section) navSide}
+goto : Active -> Section -> (Model, Effects Action) -> (Model, Effects Action)
+goto active section (({navSide} as model), effects)  =
+  ({model | navSide = NavSide.update (NavSide.Goto active section) navSide}, effects)
+
+navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
+navigate action ({systems, templates} as model , effects) =
+  case action of
+    SystemsAction action -> 
+      case systems.navChange  of
+         Just (Jobs, List) -> 
+           let
+             (withJobs, jobEffects) = (jobListing model)
+           in
+             goto Jobs List (withJobs, jobEffects)
+ 
+         Just (Systems, section) -> 
+            goto Systems section (model , effects)
+
+         Just (Templates, section) -> 
+            let
+               (hyp, system) = (Systems.addedSystem systems)
+               add = (Templates.add hyp system)
+               (newTemplates, effects) = Templates.update add model.templates 
+            in
+              goto Templates section ({model | templates = newTemplates}, Effects.map TemplatesAction effects)
+         _ -> 
+            (model, effects) 
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({navSide, types, jobsList, jobsStats, systems, templates} as model) =
+
+    TemplatesAction action -> 
+        case templates.navChange of
+          Just (active, dest) -> 
+            goto active dest (model, effects)
+
+          _ -> 
+            (model, effects) 
+
+    _ -> 
+      (model, effects)
+
+
+route : Action ->  Model -> (Model , Effects Action)
+route action ({navSide, types, jobsList, jobsStats, systems, templates, stacks} as model) =
   case action of 
     JobsList jobAction -> 
       if jobAction == Polling && navSide.active /= Jobs then
@@ -113,47 +150,31 @@ update action ({navSide, types, jobsList, jobsStats, systems, templates} as mode
       in
        ({ model | types = newTypes}, Effects.map TypesAction effects) 
 
+    StacksAction action -> 
+      let 
+       (newStacks, effects) = Stacks.update action stacks
+      in
+       ({ model | stacks = newStacks}, Effects.map StacksAction effects) 
+
     TemplatesAction action -> 
       let 
-         (newTemplates, effects) = Templates.update action templates
-         newModel = { model | templates = newTemplates }
+        (newTemplates, effects) = Templates.update action templates
       in
-        case newTemplates.navChange of
-          Just (active, dest) -> 
-            (goto active dest newModel, Effects.map TemplatesAction effects)
-
-          _ -> 
-            (newModel , Effects.map TemplatesAction effects) 
+        ({ model | templates = newTemplates} , Effects.map TemplatesAction effects)
 
     SystemsAction action -> 
       let 
         (newSystems, effects) = Systems.update action systems
-        newModel = { model | systems = newSystems}
-        newEffects = Effects.map SystemsAction effects
       in
-        case newSystems.navChange  of
-          Just (Jobs, List) -> 
-            let
-             (withJobs, jobEffects) = (jobListing newModel)
-            in
-             (goto Jobs List withJobs, jobEffects)
-
-          Just (Systems, section) -> 
-             (goto Systems section newModel , newEffects)
-
-          Just (Templates, section) -> 
-            let
-             (hyp, system) = (Systems.addedSystem newModel.systems)
-             add = (Templates.add hyp system)
-             (newTemplates, effects) = Templates.update add model.templates 
-            in
-             (goto Templates section {newModel | templates = newTemplates} , Effects.map TemplatesAction effects)
-
-          _ -> 
-            (newModel, newEffects)
+        ({ model | systems = newSystems}, Effects.map SystemsAction effects)
 
     _ -> 
-          none model
+        none model
+
+
+update : Action ->  Model -> (Model , Effects Action)
+update action model = 
+   navigate action (route action model)
 
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats} as model) =
