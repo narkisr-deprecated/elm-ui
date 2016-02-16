@@ -80,6 +80,7 @@ optional enc value =
   case value of
     Just v -> 
       enc v
+
     Nothing -> 
        null
 
@@ -104,6 +105,7 @@ maybeString optional =
   case optional of 
     Just value -> 
       (string value)
+
     Nothing -> 
       null
 
