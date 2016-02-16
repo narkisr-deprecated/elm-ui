@@ -13,6 +13,7 @@ type Active =
     | Types 
     | Jobs
     | Templates
+    | Stacks
 
 type Section = 
   Add 
@@ -69,6 +70,7 @@ menus address =
    , drop address Templates [List] "fa fa-clone"
    , drop address Types [List, Add] "fa fa-archive"
    , drop address Jobs [List, Stats] "fa fa-tasks"
+   , drop address Stacks [List, Add] "fa fa-object-group"
    ]
 
 view : Signal.Address Action -> Model -> List Html

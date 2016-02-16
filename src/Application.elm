@@ -4,12 +4,13 @@ import Html exposing (..)
 import Effects exposing (Effects, Never, batch, map)
 
 import Systems.Core as Systems 
+import Stacks.Core as Stacks
 import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
 import Common.Utils exposing (none)
 import Types.Core as Types
 import Templates.Core as Templates
-import Nav.Side as NavSide exposing (Active(Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
+import Nav.Side as NavSide exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Nav.Header as NavHeader
 
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
@@ -25,20 +26,23 @@ init =
     (types, typesAction) = Types.init
     (templates, templatesAction) = Templates.init
     (systems, systemsAction) = Systems.init
+    (stacks, stacksAction) = Stacks.init
     effects = [ 
                 Effects.map TemplatesAction templatesAction
               , Effects.map TypesAction typesAction
               , Effects.map SystemsAction systemsAction
+              , Effects.map StacksAction stacksAction
               , Effects.map NavHeaderAction navHeaderAction
               , Effects.map JobsList jobsListAction
               , Effects.map JobsStats jobsStatAction
               ]
   in
-    (Model systems jobsList jobsStat types templates NavSide.init navHeaderModel, Effects.batch effects) 
+    (Model systems stacks jobsList jobsStat types templates NavSide.init navHeaderModel, Effects.batch effects) 
 
 type alias Model = 
   { 
     systems : Systems.Model
+  , stacks : Stacks.Model
   , jobsList : Jobs.List.Model
   , jobsStats : Jobs.Stats.Model
   , types : Types.Model
@@ -50,6 +54,7 @@ type alias Model =
 
 type Action = 
   SystemsAction Systems.Action
+    | StacksAction Stacks.Action
     | JobsList Jobs.List.Action
     | JobsStats Jobs.Stats.Action
     | NavSideAction NavSide.Action
@@ -172,6 +177,9 @@ activeView address ({jobsList, jobsStats} as model) =
 
         _ ->
            []
+
+    Stacks -> 
+       Stacks.view (Signal.forwardTo address StacksAction) model.stacks model.navSide.section 
 
 view : Signal.Address Action -> Model -> Html
 view address model = 
