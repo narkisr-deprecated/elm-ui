@@ -172,6 +172,7 @@ update : Action ->  Model -> (Model , Effects Action)
 update action ({add, launch, list} as model) =
    navigate action (route action model)
 
+-- Used in application Nav change
 add hyp system = 
   TemplatesAdd (Add.SetSystem hyp system)
 

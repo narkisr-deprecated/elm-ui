@@ -66,7 +66,7 @@
 
   main.ports.editorOutPort.subscribe(function(event) {
 	if(event === "get") {
-       main.ports.editorInPort.send(JSON.stringify(editor.get()));
+        main.ports.editorInPort.send(JSON.stringify(editor.get()));
 	} else {
         var container = document.getElementById('jsoneditor');
 	  var options = {
@@ -74,10 +74,17 @@
 	    modes: ['tree','code'], // allowed modes
 	  };
 	  if(editor === undefined) {
-	   editor = new JSONEditor(container, options, JSON.parse(event));
+	    editor = new JSONEditor(container, options, JSON.parse(event));
 	  }
 	}
   });
+
+  main.ports.listOutPort.subscribe(function(event) {
+     $(".dualList").bootstrapDualListbox({
+	       // see next for specifications
+     });
+  });
+
 
   main.ports.parserPort.subscribe(function(event) {
    try { 

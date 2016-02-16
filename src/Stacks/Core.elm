@@ -5,7 +5,7 @@ import Html exposing (..)
 import Stacks.Add as Add
 import Nav.Side as NavSide exposing (Active(Jobs), Section(Stats, Launch, Add, List, View))
 import Common.Components exposing (asList, notImplemented)
-
+import Debug
 
 type alias Model = 
   {
@@ -30,11 +30,16 @@ type Action =
     | StacksAdd Add.Action
 
 update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
-
-   _ -> 
-     (model, Effects.none)
+update action ({add} as model) =
+  case (Debug.log "" action) of 
+    StacksAdd addAction -> 
+      let
+        (newAdd, effects) = Add.update addAction add
+      in
+        ({model | add = newAdd}, Effects.map StacksAdd effects)
+    
+    _ -> 
+      (model, Effects.none)
 
 -- View
 

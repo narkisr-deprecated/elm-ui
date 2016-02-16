@@ -5,6 +5,7 @@ import Signal exposing (map, filter)
 import Common.Redirect as Redirect exposing (redirectActions)
 import Common.NewTab as NewTab exposing (newtabActions)
 import Common.Editor as Editor exposing (editorActions)
+import Common.DualList as DualList exposing (listActions)
 import Search exposing (searchActions)
 import Application exposing (init, view, update)
 import Systems.List
@@ -12,6 +13,7 @@ import Systems.Launch as SystemsLaunch
 import Systems.Core as SystemsCore
 import Templates.Launch as TemplatesLaunch
 import Templates.Core as TemplatesCore
+import Json.Encode as E exposing (list, string)
 
 import Templates.Add as TemplatesAdd
 import Templates.Core as TemplatesCore
@@ -61,13 +63,12 @@ port newtabPort =
      |> filter (\s -> s /= NewTab.NoOp ) NewTab.NoOp
      |> map toUrl
 
-
-toJson action = 
+editJson action = 
   case action of 
     Editor.Load s -> 
       s
-    _ -> ""
 
+    _ -> ""
 
 port editorInPort : Signal String
 
@@ -79,8 +80,21 @@ port editorOutPort : Signal String
 port editorOutPort =
    editorActions.signal
       |> filter (\s -> s /= Editor.NoOp ) Editor.NoOp
-      |> map toJson
+      |> map editJson
 
+
+listJson action = 
+  case action of 
+    DualList.Load items -> 
+      E.encode 0 (list (List.map string items))
+
+    _ -> ""
+
+port listOutPort : Signal String
+port listOutPort =
+   listActions.signal
+      |> filter (\s -> s /= DualList.NoOp ) DualList.NoOp
+      |> map listJson
 
 toQuery : (Search.Action -> String)
 toQuery action =
