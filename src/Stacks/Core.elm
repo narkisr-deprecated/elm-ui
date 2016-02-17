@@ -52,3 +52,10 @@ view address model section =
     _ -> 
       asList notImplemented
 
+
+loadStacks ({add} as model) =
+  let
+   (newAdd, effects) = Add.update Add.LoadList add
+  in
+   ({model | add = newAdd }, Effects.map StacksAdd effects)
+

@@ -15,8 +15,13 @@ import Templates.Launch as TemplatesLaunch
 import Templates.Core as TemplatesCore
 import Json.Encode as E exposing (list, string)
 
+-- Templates
 import Templates.Add as TemplatesAdd
 import Templates.Core as TemplatesCore
+
+-- Stacks
+import Stacks.Add as StacksAdd
+import Stacks.Core as StacksCore
 
 import Time exposing (every, second)
 import Jobs.List exposing (Action(Polling))
@@ -32,6 +37,7 @@ app =
         parsingInput (Search.Result False) parsingErr,
         menuClick menuPort,
         editorValue editorInPort,
+        listValue listInPort,
         jobsListPolling,
         jobsStatsPolling
       ]
@@ -82,20 +88,6 @@ port editorOutPort =
       |> filter (\s -> s /= Editor.NoOp ) Editor.NoOp
       |> map editJson
 
-
-listJson action = 
-  case action of 
-    DualList.Load items -> 
-      E.encode 0 (list (List.map string items))
-
-    _ -> ""
-
-port listOutPort : Signal String
-port listOutPort =
-   listActions.signal
-      |> filter (\s -> s /= DualList.NoOp ) DualList.NoOp
-      |> map listJson
-
 toQuery : (Search.Action -> String)
 toQuery action =
    case action of
@@ -143,4 +135,24 @@ intoActions (dest, job, target) =
 
 menuClick p =
  Signal.map intoActions p
+
+port listInPort : Signal (String, List String)
+
+intoListAction (action, value) = 
+   case action of 
+     "Select" ->  
+        Application.StacksAction (StacksCore.StacksAdd (StacksAdd.Select value)) 
+
+     _ -> 
+      Application.StacksAction (StacksCore.StacksAdd (StacksAdd.LoadList)) 
+
+listValue p =
+ Signal.map intoListAction p
+
+port listOutPort : Signal String
+port listOutPort =
+   listActions.signal
+      |> filter (\s -> s /= DualList.NoOp ) DualList.NoOp
+      |> map (\_ -> "" )
+
 

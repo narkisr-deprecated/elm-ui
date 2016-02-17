@@ -7,15 +7,15 @@ import Task
 
 type Action = 
   NoOp
-    | Load (List String)
+    | Load 
 
 listActions : Signal.Mailbox Action
 listActions =
   Signal.mailbox NoOp
 
-loadList: a -> List String -> Effects a
-loadList noop items = 
-  (Signal.send listActions.address (Load items))
+loadList: a -> Effects a
+loadList noop = 
+  (Signal.send listActions.address Load)
      |> Task.map (always noop)
      |> Effects.task 
 

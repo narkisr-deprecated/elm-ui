@@ -6,7 +6,7 @@ import Html.Events exposing (onClick)
 import Bootstrap.Html exposing (..)
 import Html.Attributes exposing (class, for, placeholder, attribute, type', checked, value, style, id)
 import Systems.Add.Validations exposing (Error(Invalid,None))
-import Json.Decode as Json exposing (at, string)
+import Json.Decode as Json exposing (at, string, list)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
 import Dict exposing (Dict)
@@ -132,6 +132,12 @@ selected value default =
 onSelect : Signal.Address a -> (String -> a) -> Attribute
 onSelect address action = 
   Html.Events.on "change" (at ["target", "value"] string) (Signal.message address << action)
+
+onMultiSelect : Signal.Address a -> (String -> a) -> Attribute
+onMultiSelect address action = 
+  Html.Events.on "change" (at ["target"] string) 
+    (\str -> Debug.log str ((Signal.message address << action) str))
+
 
 selector : Signal.Address a -> (String -> a) -> List String -> String -> Html
 selector address action options default =

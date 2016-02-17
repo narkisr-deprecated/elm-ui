@@ -13,7 +13,7 @@
   <link href="bower_components/jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
 
   <!-- This will be minified into a single file in the future -->
-  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="bower_components/jquery/jquery.min.js"></script>
   <script src="bower_components/jquery-contextmenu/dist/jquery.contextMenu.min.js"></script>
   <script src="bower_components/jquery-contextmenu/dist/jquery.ui.position.min.js"></script>
   <script src="bower_components/pegjs/peg-0.8.0.js"></script>
@@ -22,6 +22,10 @@
   <script src="assets/bootstrap-3.3.5/js/bootstrap.min.js"></script>
   <script src="bower_components/admin-lte/dist/js/app.min.js"></script>
   <script src="bower_components/jsoneditor/dist/jsoneditor.min.js"></script>
+
+  <script src="bower_components/bootstrap-duallistbox/dist/jquery.bootstrap-duallistbox.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="bower_components/bootstrap-duallistbox/src/bootstrap-duallistbox.css">
+
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
   <!-- Ionicons -->
@@ -44,8 +48,10 @@
   var outPorts = {
     parsingOk: empty,
     parsingErr: empty,
-    menuPort: ["","", ""],
-    editorInPort: ""
+    menuPort: ['','',''],
+    editorInPort: '',
+    listInPort: ['', ['']]
+
   }
   var main = Elm.embed(Elm.Main, elmDiv, outPorts);
 
@@ -80,9 +86,19 @@
   });
 
   main.ports.listOutPort.subscribe(function(event) {
-     $(".dualList").bootstrapDualListbox({
-	       // see next for specifications
-     });
+	if ($('.dualList')[0] !== undefined) {
+        $('.dualList').bootstrapDualListbox({
+	    selectedListLabel : 'Stack', 
+	    nonSelectedListLabel : 'Templates', 
+	  });
+	} else {
+	  // trigger view load
+	  main.ports.listInPort.send(['LoadList', []]);
+	}
+	$('.dualList').change(function(){
+	  value = $(this).val() || []
+        main.ports.listInPort.send(['Select',value]);
+      });
   });
 
 

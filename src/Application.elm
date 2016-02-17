@@ -3,8 +3,10 @@ module Application where
 import Html exposing (..)
 import Effects exposing (Effects, Never, batch, map)
 
+import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Systems.Core as Systems 
-import Stacks.Core as Stacks
+import Stacks.Core as Stacks 
+import Stacks.Add exposing (Action(LoadList))
 import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
 import Common.Utils exposing (none)
@@ -13,7 +15,6 @@ import Templates.Core as Templates
 import Nav.Side as NavSide exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Nav.Header as NavHeader
 
-import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Bootstrap.Html exposing (..)
 import Debug
 
@@ -76,7 +77,7 @@ goto active section (({navSide} as model), effects)  =
   ({model | navSide = NavSide.update (NavSide.Goto active section) navSide}, effects)
 
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ({systems, templates} as model , effects) =
+navigate action ({systems, templates, stacks} as model , effects) =
   case action of
     SystemsAction action -> 
       case systems.navChange  of
@@ -99,8 +100,6 @@ navigate action ({systems, templates} as model , effects) =
          _ -> 
             (model, effects) 
 
-
-
     TemplatesAction action -> 
         case templates.navChange of
           Just (active, dest) -> 
@@ -108,6 +107,17 @@ navigate action ({systems, templates} as model , effects) =
 
           _ -> 
             (model, effects) 
+
+    NavSideAction navAction -> 
+      case navAction of 
+        NavSide.Goto Stacks Add -> 
+          let
+            (newStacks, effects) = Stacks.loadStacks stacks
+          in
+            ({ model | stacks = newStacks }, Effects.map StacksAction effects)
+
+        _ -> 
+         (model, effects)
 
     _ -> 
       (model, effects)
@@ -136,7 +146,7 @@ route action ({navSide, types, jobsList, jobsStats, systems, templates, stacks} 
         newNavSide = NavSide.update navAction model.navSide
         (newModel, effects) = init
       in
-        ({ newModel | jobsStats = jobsStats, navSide = newNavSide }, effects)
+        ({ newModel | navSide = newNavSide }, effects)
 
     NavHeaderAction navAction -> 
       let 
