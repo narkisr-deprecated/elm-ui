@@ -32,7 +32,7 @@ update action model =
     (model, loadList NoOp)
 
    Select templates -> 
-     Debug.log (toString templates) (none model)  
+     none model  
 
    _ -> 
      none model

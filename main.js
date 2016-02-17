@@ -19385,7 +19385,7 @@ Elm.Stacks.Add.make = function (_elm) {
       var _p0 = action;
       switch (_p0.ctor)
       {case "LoadList": return {ctor: "_Tuple2",_0: model,_1: $Common$DualList.loadList(NoOp)};
-         case "Select": return A2($Debug.log,$Basics.toString(_p0._0),$Common$Utils.none(model));
+         case "Select": return $Common$Utils.none(model);
          default: return $Common$Utils.none(model);}
    });
    var Cancel = {ctor: "Cancel"};

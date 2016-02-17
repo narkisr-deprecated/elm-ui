@@ -7,7 +7,7 @@
     "bootstrap-duallistbox": "3.0.5",
     "admin-lte":"2.3.2",
     "pegjs": "v0.8.0",
-    "jquery": "v1.11.3",
+    "jquery": "2.0.3",
     "jsoneditor":"5.1.5",
     "jquery-contextmenu":"git://github.com/swisnl/jQuery-contextMenu.git#v2.0.0"
   }
