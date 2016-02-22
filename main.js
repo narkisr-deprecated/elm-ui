@@ -14884,10 +14884,13 @@ Elm.Common.Components.make = function (_elm) {
    });
    var group$ = F2(function (title,widget) {    return A3(group,title,widget,_U.list([]));});
    var withErrors = F3(function (errors,key,widget) {    return A3(group,key,widget,$Common$Utils.defaultEmpty(A2($Dict.get,key,errors)));});
+   var callout = F2(function (type$,message) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+      _U.list([A2($Html.div,_U.list([$Html$Attributes.$class(A2($Basics._op["++"],"callout callout-",type$))]),message)]));
+   });
    var dialogPanel = F3(function (type$,message,body) {
-      return _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
-                     _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-                     _U.list([A2($Html.div,_U.list([$Html$Attributes.$class(A2($Basics._op["++"],"callout callout-",type$))]),message)]))]))
+      return _U.list([$Bootstrap$Html.row_(_U.list([A2(callout,type$,message)]))
                      ,$Bootstrap$Html.row_(_U.list([A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),_U.list([body]))]))]);
    });
    var dianlogButtons = F3(function (address,cancel,ok) {
@@ -14925,6 +14928,7 @@ Elm.Common.Components.make = function (_elm) {
                                           ,asList: asList
                                           ,fixedPanel: fixedPanel
                                           ,dianlogButtons: dianlogButtons
+                                          ,callout: callout
                                           ,dialogPanel: dialogPanel
                                           ,withButtons: withButtons
                                           ,infoCallout: infoCallout
@@ -15892,6 +15896,7 @@ Elm.Systems.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -15928,8 +15933,8 @@ Elm.Systems.List.make = function (_elm) {
       var _p0 = model.error;
       switch (_p0.ctor)
       {case "NoError": return A2($Html.div,_U.list([]),_U.list([]));
-         case "NoSystemSelected": return result(_U.list([A2($Html.p,_U.list([]),_U.list([$Html.text("Please select a system first")]))]));
-         default: return result(_U.list([$Html.text(_p0._0)]));}
+         case "NoSystemSelected": return A2($Common$Components.callout,"danger",$Common$Components.info("Please select a system first"));
+         default: return A2($Common$Components.callout,"danger",$Common$Components.info(_p0._0));}
    };
    var systemRow = F2(function (id,_p1) {
       var _p2 = _p1;

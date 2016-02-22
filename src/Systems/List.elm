@@ -23,6 +23,7 @@ import String exposing (isEmpty)
 import Set exposing (Set)
 
 -- Components
+import Common.Components exposing (info, callout)
 import Pager exposing (..)
 import Table 
 import Search
@@ -143,10 +144,10 @@ flash model =
         div [] []
 
       NoSystemSelected ->
-        result [p [] [text "Please select a system first"]]
+        callout "danger" (info "Please select a system first")
 
       SearchParseFailed error ->
-        result [text error]
+        callout "danger" (info error)
 
 
 view : Signal.Address Action -> Model -> List Html

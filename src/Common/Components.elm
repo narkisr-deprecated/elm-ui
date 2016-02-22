@@ -56,13 +56,16 @@ dianlogButtons address cancel ok =
     ]
   ]
 
+callout type' message =
+  div [class "col-md-offset-1 col-md-10"] [
+    div [ class ("callout callout-" ++ type') ] message
+  ]
+
 dialogPanel : String -> List Html -> Html -> List Html
 dialogPanel type' message body = 
   [ row_ [
-     div [class "col-md-offset-1 col-md-10"] [
-      div [ class ("callout callout-" ++ type') ] message
-     ]
-   ] 
+      callout type' message
+    ] 
   , row_ [
       div [class "col-md-offset-1 col-md-10"] [
         body
@@ -74,7 +77,7 @@ withButtons address cancel ok panel =
   List.append panel (asList (dianlogButtons address cancel ok))
 
 infoCallout address message body cancel ok = 
-  (dialogPanel "info" message body)
+  dialogPanel "info" message body
     |> withButtons address cancel ok
 
 dangerCallout address message body cancel ok = 
