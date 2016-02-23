@@ -18174,14 +18174,44 @@ Elm.Types.Model.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var PuppetStd = function (a) {    return {module$: a};};
-   var Module = F2(function (a,b) {    return {name: a,src: b};});
-   return _elm.Types.Model.values = {_op: _op,Module: Module,PuppetStd: PuppetStd};
+   var Type = F3(function (a,b,c) {    return {type$: a,description: b,puppetStd: c};});
+   var PuppetStd = F3(function (a,b,c) {    return {module$: a,args: b,classes: c};});
+   var Module = F3(function (a,b,c) {    return {name: a,src: b,options: c};});
+   var StringOption = function (a) {    return {ctor: "StringOption",_0: a};};
+   var BoolOption = function (a) {    return {ctor: "BoolOption",_0: a};};
+   var option = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool),A2($Json$Decode.map,StringOption,$Json$Decode.string)]));
+   var module$ = A4($Json$Decode.object3,
+   Module,
+   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"src",$Json$Decode.string),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"options",$Json$Decode.dict(option))));
+   var puppetStd = A4($Json$Decode.object3,
+   PuppetStd,
+   A2($Json$Decode._op[":="],"module",module$),
+   A2($Json$Decode._op[":="],"args",$Json$Decode.list($Json$Decode.string)),
+   A2($Json$Decode._op[":="],"classes",$Json$Decode.dict($Json$Decode.dict(option))));
+   var type$ = A4($Json$Decode.object3,
+   Type,
+   A2($Json$Decode._op[":="],"type",$Json$Decode.string),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string)),
+   A2($Json$Decode._op[":="],"puppet-std",$Json$Decode.dict(puppetStd)));
+   return _elm.Types.Model.values = {_op: _op
+                                    ,BoolOption: BoolOption
+                                    ,StringOption: StringOption
+                                    ,Module: Module
+                                    ,PuppetStd: PuppetStd
+                                    ,Type: Type
+                                    ,option: option
+                                    ,module$: module$
+                                    ,puppetStd: puppetStd
+                                    ,type$: type$};
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.List = Elm.Types.List || {};
@@ -18196,7 +18226,6 @@ Elm.Types.List.make = function (_elm) {
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
@@ -18211,11 +18240,8 @@ Elm.Types.List.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Types$Model = Elm.Types.Model.make(_elm);
    var _op = {};
-   var module$ = A3($Json$Decode.object2,
-   $Types$Model.Module,
-   A2($Json$Decode._op[":="],"name",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"src",$Json$Decode.string));
-   var puppetStd = A2($Json$Decode.object1,$Types$Model.PuppetStd,A2($Json$Decode._op[":="],"module",module$));
+   var typesList = A2($Json$Decode.at,_U.list(["types"]),$Json$Decode.list($Types$Model.type$));
+   var getTypes = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,typesList,"/types"))));};
    var setTypes = F2(function (model,types) {
       var typePairs = A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1.type$,_1: _p1};},types);
       var newTable = A2($Table.update,$Table.UpdateRows(typePairs),model.table);
@@ -18251,20 +18277,11 @@ Elm.Types.List.make = function (_elm) {
                      ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($Maybe.withDefault,"",_p6.description))]))]);
    });
    var Model = F3(function (a,b,c) {    return {types: a,table: b,pager: c};});
-   var Type = F3(function (a,b,c) {    return {type$: a,description: b,puppetStd: c};});
-   var type$ = A4($Json$Decode.object3,
-   Type,
-   A2($Json$Decode._op[":="],"type",$Json$Decode.string),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string)),
-   A2($Json$Decode._op[":="],"puppet-std",$Json$Decode.dict(puppetStd)));
-   var typesList = A2($Json$Decode.at,_U.list(["types"]),$Json$Decode.list(type$));
-   var getTypes = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,typesList,"/types"))));};
    var init = function () {
       var table = A5($Table.init,"typesListing",true,_U.list(["Name","Provisioner","Description"]),typeRow,"Types");
       return {ctor: "_Tuple2",_0: A3(Model,_U.list([]),table,$Pager.init),_1: getTypes(SetTypes)};
    }();
    return _elm.Types.List.values = {_op: _op
-                                   ,Type: Type
                                    ,Model: Model
                                    ,typeRow: typeRow
                                    ,init: init
@@ -18275,9 +18292,6 @@ Elm.Types.List.make = function (_elm) {
                                    ,setTypes: setTypes
                                    ,update: update
                                    ,view: view
-                                   ,module$: module$
-                                   ,puppetStd: puppetStd
-                                   ,type$: type$
                                    ,typesList: typesList
                                    ,getTypes: getTypes};
 };

@@ -17,13 +17,8 @@ import Effects exposing (Effects)
 import Task
 import Maybe exposing (withDefault)
 import Common.Errors exposing (successHandler)
+import Types.Model as Model exposing (Type)
 import Debug
-
-type alias Type = 
-  { type' : String
-  , description : Maybe String
-  , puppetStd : Dict String PuppetStd
-  }
 
 type alias Model = 
   { types : List Type
@@ -85,27 +80,9 @@ view address ({types, pager, table} as model) =
 
 -- Decoding
 
-module' : Decoder Module
-module' = 
-  object2 Module
-   ("name" := string)
-   ("src" := string)
-
-puppetStd : Decoder PuppetStd
-puppetStd =
-  object1 PuppetStd
-  ("module" :=  module')
-
-type': Decoder Type
-type' = 
-  object3 Type
-    ("type" := string)
-    (maybe ("description" := string))
-    ("puppet-std" := dict puppetStd)
-
 typesList : Decoder (List Type)
 typesList =
-   at ["types"] (list type')
+   at ["types"] (list Model.type')
 
 -- Effects
 getTypes action = 
