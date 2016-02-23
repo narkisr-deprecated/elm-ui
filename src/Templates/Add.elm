@@ -10,7 +10,6 @@ import Html.Events exposing (onClick)
 import Http exposing (Error(BadResponse))
 import Task exposing (Task)
 import Json.Decode exposing (..)
-import Json.Encode as E
 import Effects exposing (Effects, batch)
 import Dict exposing (Dict)
 import Systems.Model.Common exposing (System)

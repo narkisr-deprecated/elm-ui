@@ -54,3 +54,5 @@ type' =
     ("puppet-std" := dict puppetStd)
 
 
+emptyType = 
+  Type "" Nothing Dict.empty
