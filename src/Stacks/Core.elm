@@ -31,7 +31,7 @@ type Action =
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({add} as model) =
-  case (Debug.log "" action) of 
+  case action of 
     StacksAdd addAction -> 
       let
         (newAdd, effects) = Add.update addAction add
@@ -53,9 +53,9 @@ view address model section =
       asList notImplemented
 
 
-loadStacks ({add} as model) =
+loadTemplates ({add} as model) =
   let
-   (newAdd, effects) = Add.update Add.LoadList add
+   (newAdd, effects) = Add.update Add.LoadTemplates add
   in
    ({model | add = newAdd }, Effects.map StacksAdd effects)
 

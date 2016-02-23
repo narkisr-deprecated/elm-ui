@@ -6,7 +6,6 @@ import Effects exposing (Effects, Never, batch, map)
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Systems.Core as Systems 
 import Stacks.Core as Stacks 
-import Stacks.Add exposing (Action(LoadList))
 import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
 import Common.Utils exposing (none)
@@ -112,7 +111,7 @@ navigate action ({systems, templates, stacks} as model , effects) =
       case navAction of 
         NavSide.Goto Stacks Add -> 
           let
-            (newStacks, effects) = Stacks.loadStacks stacks
+            (newStacks, effects) = Stacks.loadTemplates stacks
           in
             ({ model | stacks = newStacks }, Effects.map StacksAction effects)
 

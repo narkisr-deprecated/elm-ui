@@ -5,7 +5,6 @@ import Signal exposing (map, filter)
 import Common.Redirect as Redirect exposing (redirectActions)
 import Common.NewTab as NewTab exposing (newtabActions)
 import Common.Editor as Editor exposing (editorActions)
-import Common.DualList as DualList exposing (listActions)
 import Search exposing (searchActions)
 import Application exposing (init, view, update)
 import Systems.List
@@ -37,7 +36,6 @@ app =
         parsingInput (Search.Result False) parsingErr,
         menuClick menuPort,
         editorValue editorInPort,
-        listValue listInPort,
         jobsListPolling,
         jobsStatsPolling
       ]
@@ -135,24 +133,4 @@ intoActions (dest, job, target) =
 
 menuClick p =
  Signal.map intoActions p
-
-port listInPort : Signal (String, List String)
-
-intoListAction (action, value) = 
-   case action of 
-     "Select" ->  
-        Application.StacksAction (StacksCore.StacksAdd (StacksAdd.Select value)) 
-
-     _ -> 
-      Application.StacksAction (StacksCore.StacksAdd (StacksAdd.LoadList)) 
-
-listValue p =
- Signal.map intoListAction p
-
-port listOutPort : Signal String
-port listOutPort =
-   listActions.signal
-      |> filter (\s -> s /= DualList.NoOp ) DualList.NoOp
-      |> map (\_ -> "" )
-
 

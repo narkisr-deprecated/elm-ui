@@ -49,9 +49,7 @@
     parsingOk: empty,
     parsingErr: empty,
     menuPort: ['','',''],
-    editorInPort: '',
-    listInPort: ['', ['']]
-
+    editorInPort: ''
   }
   var main = Elm.embed(Elm.Main, elmDiv, outPorts);
 
@@ -85,23 +83,7 @@
 	}
   });
 
-  main.ports.listOutPort.subscribe(function(event) {
-	if ($('.dualList')[0] !== undefined) {
-        $('.dualList').bootstrapDualListbox({
-	    selectedListLabel : 'Stack', 
-	    nonSelectedListLabel : 'Templates', 
-	  });
-	} else {
-	  // trigger view load
-	  main.ports.listInPort.send(['LoadList', []]);
-	}
-	$('.dualList').change(function(){
-	  value = $(this).val() || []
-        main.ports.listInPort.send(['Select',value]);
-      });
-  });
-
-
+ 
   main.ports.parserPort.subscribe(function(event) {
    try { 
      var result = parseQuery(event);
