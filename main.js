@@ -18185,6 +18185,8 @@ Elm.Types.Model.make = function (_elm) {
    var emptyType = A3(Type,"",$Maybe.Nothing,$Dict.empty);
    var PuppetStd = F3(function (a,b,c) {    return {module$: a,args: b,classes: c};});
    var Module = F3(function (a,b,c) {    return {name: a,src: b,options: c};});
+   var emptyModule = A3(Module,"","",$Maybe.Nothing);
+   var emptyPuppet = A3(PuppetStd,emptyModule,_U.list([]),$Dict.empty);
    var StringOption = function (a) {    return {ctor: "StringOption",_0: a};};
    var BoolOption = function (a) {    return {ctor: "BoolOption",_0: a};};
    var option = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool),A2($Json$Decode.map,StringOption,$Json$Decode.string)]));
@@ -18213,7 +18215,9 @@ Elm.Types.Model.make = function (_elm) {
                                     ,module$: module$
                                     ,puppetStd: puppetStd
                                     ,type$: type$
-                                    ,emptyType: emptyType};
+                                    ,emptyType: emptyType
+                                    ,emptyModule: emptyModule
+                                    ,emptyPuppet: emptyPuppet};
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.List = Elm.Types.List || {};
@@ -18322,7 +18326,8 @@ Elm.Systems.Add.General.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Types$List = Elm.Types.List.make(_elm);
+   $Types$List = Elm.Types.List.make(_elm),
+   $Types$Model = Elm.Types.Model.make(_elm);
    var _op = {};
    var setTypes = F2(function (model,types) {
       var typesList = A2($List.map,function (_) {    return _.type$;},types);
@@ -24010,16 +24015,17 @@ Elm.Common.Editor.make = function (_elm) {
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.Add = Elm.Types.Add || {};
-Elm.Types.Add.make = function (_elm) {
+Elm.Types.Add.Puppet = Elm.Types.Add.Puppet || {};
+Elm.Types.Add.Puppet.make = function (_elm) {
    "use strict";
    _elm.Types = _elm.Types || {};
    _elm.Types.Add = _elm.Types.Add || {};
-   if (_elm.Types.Add.values) return _elm.Types.Add.values;
+   _elm.Types.Add.Puppet = _elm.Types.Add.Puppet || {};
+   if (_elm.Types.Add.Puppet.values) return _elm.Types.Add.Puppet.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Editor = Elm.Common.Editor.make(_elm),
-   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -24036,69 +24042,173 @@ Elm.Types.Add.make = function (_elm) {
       var _p1 = _p0;
       var _p3 = _p1;
       var _p2 = action;
-      switch (_p2.ctor)
-      {case "LoadEditor": return {ctor: "_Tuple2",_0: _U.update(_p3,{editClasses: $Basics.not(_p1.editClasses)}),_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
-         case "SetClasses": return $Common$Utils.none(_p3);
-         default: return $Common$Utils.none(_p3);}
+      if (_p2.ctor === "LoadEditor") {
+            return {ctor: "_Tuple2",_0: _U.update(_p3,{editClasses: $Basics.not(_p1.editClasses)}),_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
+         } else {
+            return {ctor: "_Tuple2",_0: _p3,_1: $Effects.none};
+         }
    });
-   var Done = {ctor: "Done"};
-   var Cancel = {ctor: "Cancel"};
-   var Save = {ctor: "Save"};
-   var SetClasses = function (a) {    return {ctor: "SetClasses",_0: a};};
-   var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
-   var DescriptionInput = function (a) {    return {ctor: "DescriptionInput",_0: a};};
    var LoadEditor = {ctor: "LoadEditor"};
-   var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
-   var editing = F2(function (address,_p4) {
+   var view = F2(function (address,_p4) {
       var _p5 = _p4;
-      var _p6 = _p5.type$;
-      return $Common$Components.panel($Common$Components.panelContents(A2($Html.form,
+      return A2($Html.form,
       _U.list([]),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A2($Common$Components.group$,"Name",A4($Common$Components.inputText,address,NameInput," ",_p6.type$))
-              ,A2($Common$Components.group$,
-              "Description",
-              A4($Common$Components.inputText,address,DescriptionInput," ",A2($Maybe.withDefault,"",_p6.description)))
-              ,A2($Common$Components.group$,"Edit classes",A3($Common$Components.checkbox,address,LoadEditor,_p5.editClasses))
+      _U.list([A2($Common$Components.group$,"Edit classes",A3($Common$Components.checkbox,address,LoadEditor,_p5.editClasses))
               ,A2($Html.div,
               _U.list([$Html$Attributes.id("jsoneditor")
                       ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "50%"}
                                                       ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
                                                       ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
-              _U.list([]))]))]))));
+              _U.list([]))]))]));
    });
-   var view = F2(function (address,_p7) {
-      var _p8 = _p7;
-      var _p9 = _p8.saveErrors;
-      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p9);
-      return $Common$Errors.hasErrors(_p9) ? A5($Common$Components.dangerCallout,
+   var Model = F2(function (a,b) {    return {puppet: a,editClasses: b};});
+   var init = $Common$Utils.none(A2(Model,$Types$Model.emptyPuppet,false));
+   return _elm.Types.Add.Puppet.values = {_op: _op,Model: Model,init: init,LoadEditor: LoadEditor,NoOp: NoOp,update: update,view: view};
+};
+Elm.Types = Elm.Types || {};
+Elm.Types.Add = Elm.Types.Add || {};
+Elm.Types.Add.Main = Elm.Types.Add.Main || {};
+Elm.Types.Add.Main.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.Add = _elm.Types.Add || {};
+   _elm.Types.Add.Main = _elm.Types.Add.Main || {};
+   if (_elm.Types.Add.Main.values) return _elm.Types.Add.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var update = F2(function (action,model) {    var _p0 = action;return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
+   var DescriptionInput = function (a) {    return {ctor: "DescriptionInput",_0: a};};
+   var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
+   var view = F2(function (address,_p1) {
+      var _p2 = _p1;
+      return A2($Html.form,
+      _U.list([]),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
+      _U.list([A2($Common$Components.group$,"Name",A4($Common$Components.inputText,address,NameInput," ",_p2.type$))
+              ,A2($Common$Components.group$,
+              "Description",
+              A4($Common$Components.inputText,address,DescriptionInput," ",A2($Maybe.withDefault,"",_p2.description)))]))]));
+   });
+   var NoOp = {ctor: "NoOp"};
+   var Model = F2(function (a,b) {    return {type$: a,description: b};});
+   var init = {ctor: "_Tuple2",_0: A2(Model,"",$Maybe.Nothing),_1: $Effects.none};
+   return _elm.Types.Add.Main.values = {_op: _op
+                                       ,Model: Model
+                                       ,init: init
+                                       ,NoOp: NoOp
+                                       ,NameInput: NameInput
+                                       ,DescriptionInput: DescriptionInput
+                                       ,update: update
+                                       ,view: view};
+};
+Elm.Types = Elm.Types || {};
+Elm.Types.Add = Elm.Types.Add || {};
+Elm.Types.Add.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.Add = _elm.Types.Add || {};
+   if (_elm.Types.Add.values) return _elm.Types.Add.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Types$Add$Main = Elm.Types.Add.Main.make(_elm),
+   $Types$Add$Puppet = Elm.Types.Add.Puppet.make(_elm);
+   var _op = {};
+   var update = F2(function (action,model) {    var _p0 = action;return $Common$Utils.none(model);});
+   var NoOp = {ctor: "NoOp"};
+   var Next = {ctor: "Next"};
+   var Cancel = {ctor: "Cancel"};
+   var Done = {ctor: "Done"};
+   var Save = {ctor: "Save"};
+   var Back = {ctor: "Back"};
+   var MainAction = function (a) {    return {ctor: "MainAction",_0: a};};
+   var PuppetAction = function (a) {    return {ctor: "PuppetAction",_0: a};};
+   var currentView = F2(function (address,_p1) {
+      var _p2 = _p1;
+      var _p3 = _p2.stage;
+      if (_p3.ctor === "Puppet") {
+            return A5($Common$Components.infoCallout,
+            address,
+            $Common$Components.info("Puppet standalone"),
+            $Common$Components.panel($Common$Components.panelContents(A2($Types$Add$Puppet.view,A2($Signal.forwardTo,address,PuppetAction),_p2.puppet))),
+            Back,
+            Save);
+         } else {
+            return A5($Common$Components.infoCallout,
+            address,
+            $Common$Components.info("Add a new Type"),
+            $Common$Components.panel($Common$Components.panelContents(A2($Types$Add$Main.view,A2($Signal.forwardTo,address,MainAction),_p2.main))),
+            Cancel,
+            Next);
+         }
+   });
+   var SetClasses = function (a) {    return {ctor: "SetClasses",_0: a};};
+   var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
+   var view = F2(function (address,_p4) {
+      var _p5 = _p4;
+      var _p6 = _p5.saveErrors;
+      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p6);
+      return $Common$Errors.hasErrors(_p6) ? A5($Common$Components.dangerCallout,
       address,
       $Common$Components.error("Failed to save type"),
       $Common$Components.panel($Common$Components.panelContents(errorsView)),
       Cancel,
-      Done) : A5($Common$Components.infoCallout,address,$Common$Components.info("Add a new Type"),A2(editing,address,_p8),Cancel,Save);
+      Done) : A2(currentView,address,_p5);
    });
-   var Model = F3(function (a,b,c) {    return {type$: a,saveErrors: b,editClasses: c};});
+   var Puppet = {ctor: "Puppet"};
+   var Main = {ctor: "Main"};
+   var Model = F4(function (a,b,c,d) {    return {stage: a,puppet: b,main: c,saveErrors: d};});
    var init = function () {
-      var _p10 = $Common$Errors.init;
-      var errorsModel = _p10._0;
-      return $Common$Utils.none(A3(Model,$Types$Model.emptyType,errorsModel,false));
+      var effects = _U.list([]);
+      var _p7 = $Types$Add$Puppet.init;
+      var puppet = _p7._0;
+      var puppetEffects = _p7._1;
+      var _p8 = $Types$Add$Main.init;
+      var main = _p8._0;
+      var mainEffects = _p8._1;
+      var _p9 = $Common$Errors.init;
+      var errors = _p9._0;
+      return {ctor: "_Tuple2",_0: A4(Model,Main,puppet,main,errors),_1: $Effects.batch(effects)};
    }();
    return _elm.Types.Add.values = {_op: _op
                                   ,Model: Model
                                   ,init: init
-                                  ,NameInput: NameInput
-                                  ,LoadEditor: LoadEditor
-                                  ,DescriptionInput: DescriptionInput
+                                  ,Main: Main
+                                  ,Puppet: Puppet
                                   ,ErrorsView: ErrorsView
                                   ,SetClasses: SetClasses
+                                  ,PuppetAction: PuppetAction
+                                  ,MainAction: MainAction
+                                  ,Back: Back
                                   ,Save: Save
-                                  ,Cancel: Cancel
                                   ,Done: Done
+                                  ,Cancel: Cancel
+                                  ,Next: Next
                                   ,NoOp: NoOp
                                   ,update: update
-                                  ,editing: editing
+                                  ,currentView: currentView
                                   ,view: view};
 };
 Elm.Types = Elm.Types || {};

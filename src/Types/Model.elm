@@ -7,6 +7,7 @@ type Options =
   BoolOption Bool 
     | StringOption String
 
+
 type alias Module = 
   {
     name : String 
@@ -56,3 +57,9 @@ type' =
 
 emptyType = 
   Type "" Nothing Dict.empty
+
+emptyModule = 
+  Module "" "" Nothing
+
+emptyPuppet =
+  PuppetStd emptyModule [] Dict.empty
