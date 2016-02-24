@@ -182,5 +182,5 @@
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
 ;; (digital-partial-save)
-;; (openstack-partial-template)
-(openstack-partial-save)
+(openstack-partial-template)
+;; (openstack-partial-save)

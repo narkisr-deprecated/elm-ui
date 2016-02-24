@@ -23980,6 +23980,34 @@ Elm.Jobs.Stats.make = function (_elm) {
                                    ,metricsDecoder: metricsDecoder
                                    ,getMetrics: getMetrics};
 };
+Elm.Common = Elm.Common || {};
+Elm.Common.Editor = Elm.Common.Editor || {};
+Elm.Common.Editor.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Editor = _elm.Common.Editor || {};
+   if (_elm.Common.Editor.values) return _elm.Common.Editor.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var Load = function (a) {    return {ctor: "Load",_0: a};};
+   var NoOp = {ctor: "NoOp"};
+   var editorActions = $Signal.mailbox(NoOp);
+   var loadEditor = F2(function (noop,json) {
+      return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load({ctor: "_Tuple2",_0: json,_1: ""}))));
+   });
+   var getEditor = F2(function (target,noop) {
+      return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load({ctor: "_Tuple2",_0: "get",_1: target}))));
+   });
+   return _elm.Common.Editor.values = {_op: _op,NoOp: NoOp,Load: Load,editorActions: editorActions,loadEditor: loadEditor,getEditor: getEditor};
+};
 Elm.Types = Elm.Types || {};
 Elm.Types.Add = Elm.Types.Add || {};
 Elm.Types.Add.make = function (_elm) {
@@ -23990,6 +24018,7 @@ Elm.Types.Add.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Editor = Elm.Common.Editor.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -24002,49 +24031,68 @@ Elm.Types.Add.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Types$Model = Elm.Types.Model.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    return $Common$Utils.none(model);});
    var NoOp = {ctor: "NoOp"};
+   var update = F2(function (action,_p0) {
+      var _p1 = _p0;
+      var _p3 = _p1;
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "LoadEditor": return {ctor: "_Tuple2",_0: _U.update(_p3,{editClasses: $Basics.not(_p1.editClasses)}),_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
+         case "SetClasses": return $Common$Utils.none(_p3);
+         default: return $Common$Utils.none(_p3);}
+   });
    var Done = {ctor: "Done"};
    var Cancel = {ctor: "Cancel"};
    var Save = {ctor: "Save"};
+   var SetClasses = function (a) {    return {ctor: "SetClasses",_0: a};};
    var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
    var DescriptionInput = function (a) {    return {ctor: "DescriptionInput",_0: a};};
+   var LoadEditor = {ctor: "LoadEditor"};
    var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
-   var editing = F2(function (address,_p0) {
-      var _p1 = _p0;
-      var _p2 = _p1.type$;
+   var editing = F2(function (address,_p4) {
+      var _p5 = _p4;
+      var _p6 = _p5.type$;
       return $Common$Components.panel($Common$Components.panelContents(A2($Html.form,
       _U.list([]),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A2($Common$Components.group$,"Name",A4($Common$Components.inputText,address,NameInput," ",_p2.type$))
+      _U.list([A2($Common$Components.group$,"Name",A4($Common$Components.inputText,address,NameInput," ",_p6.type$))
               ,A2($Common$Components.group$,
               "Description",
-              A4($Common$Components.inputText,address,DescriptionInput," ",A2($Maybe.withDefault,"",_p2.description)))]))]))));
+              A4($Common$Components.inputText,address,DescriptionInput," ",A2($Maybe.withDefault,"",_p6.description)))
+              ,A2($Common$Components.group$,"Edit classes",A3($Common$Components.checkbox,address,LoadEditor,_p5.editClasses))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.id("jsoneditor")
+                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "50%"}
+                                                      ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
+                                                      ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
+              _U.list([]))]))]))));
    });
-   var view = F2(function (address,_p3) {
-      var _p4 = _p3;
-      var _p5 = _p4.saveErrors;
-      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p5);
-      return $Common$Errors.hasErrors(_p5) ? A5($Common$Components.dangerCallout,
+   var view = F2(function (address,_p7) {
+      var _p8 = _p7;
+      var _p9 = _p8.saveErrors;
+      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p9);
+      return $Common$Errors.hasErrors(_p9) ? A5($Common$Components.dangerCallout,
       address,
       $Common$Components.error("Failed to save type"),
       $Common$Components.panel($Common$Components.panelContents(errorsView)),
       Cancel,
-      Done) : A5($Common$Components.infoCallout,address,$Common$Components.info("Add a new Type"),A2(editing,address,_p4),Cancel,Save);
+      Done) : A5($Common$Components.infoCallout,address,$Common$Components.info("Add a new Type"),A2(editing,address,_p8),Cancel,Save);
    });
-   var Model = F2(function (a,b) {    return {type$: a,saveErrors: b};});
+   var Model = F3(function (a,b,c) {    return {type$: a,saveErrors: b,editClasses: c};});
    var init = function () {
-      var _p6 = $Common$Errors.init;
-      var errorsModel = _p6._0;
-      return $Common$Utils.none(A2(Model,$Types$Model.emptyType,errorsModel));
+      var _p10 = $Common$Errors.init;
+      var errorsModel = _p10._0;
+      return $Common$Utils.none(A3(Model,$Types$Model.emptyType,errorsModel,false));
    }();
    return _elm.Types.Add.values = {_op: _op
                                   ,Model: Model
                                   ,init: init
                                   ,NameInput: NameInput
+                                  ,LoadEditor: LoadEditor
                                   ,DescriptionInput: DescriptionInput
                                   ,ErrorsView: ErrorsView
+                                  ,SetClasses: SetClasses
                                   ,Save: Save
                                   ,Cancel: Cancel
                                   ,Done: Done
@@ -24073,43 +24121,44 @@ Elm.Types.Core.make = function (_elm) {
    $Types$Add = Elm.Types.Add.make(_elm),
    $Types$List = Elm.Types.List.make(_elm);
    var _op = {};
-   var TypesAdding = function (a) {    return {ctor: "TypesAdding",_0: a};};
-   var TypesListing = function (a) {    return {ctor: "TypesListing",_0: a};};
+   var Adding = function (a) {    return {ctor: "Adding",_0: a};};
+   var Listing = function (a) {    return {ctor: "Listing",_0: a};};
    var update = F2(function (action,_p0) {
       var _p1 = _p0;
       var _p5 = _p1;
       var _p2 = action;
-      if (_p2.ctor === "TypesListing") {
-            var _p3 = A2($Types$List.update,_p2._0,_p1.typesList);
+      if (_p2.ctor === "Listing") {
+            var _p3 = A2($Types$List.update,_p2._0,_p1.list);
             var newTypes = _p3._0;
             var effect = _p3._1;
-            return {ctor: "_Tuple2",_0: _U.update(_p5,{typesList: newTypes}),_1: A2($Effects.map,TypesListing,effect)};
+            return {ctor: "_Tuple2",_0: _U.update(_p5,{list: newTypes}),_1: A2($Effects.map,Listing,effect)};
          } else {
-            var _p4 = A2($Types$Add.update,_p2._0,_p1.typesAdd);
+            var _p4 = A2($Types$Add.update,_p2._0,_p1.add);
             var newTypes = _p4._0;
             var effect = _p4._1;
-            return {ctor: "_Tuple2",_0: _U.update(_p5,{typesAdd: newTypes}),_1: A2($Effects.map,TypesAdding,effect)};
+            return {ctor: "_Tuple2",_0: _U.update(_p5,{add: newTypes}),_1: A2($Effects.map,Adding,effect)};
          }
    });
-   var view = F3(function (address,model,section) {
-      var _p6 = section;
-      switch (_p6.ctor)
-      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,TypesListing),model.typesList);
-         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,TypesAdding),model.typesAdd);
+   var view = F3(function (address,_p6,section) {
+      var _p7 = _p6;
+      var _p8 = section;
+      switch (_p8.ctor)
+      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p7.list);
+         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p7.add);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
-   var Model = F2(function (a,b) {    return {typesList: a,typesAdd: b};});
+   var Model = F2(function (a,b) {    return {list: a,add: b};});
    var init = function () {
-      var _p7 = $Types$Add.init;
-      var typesAdd = _p7._0;
-      var typesAddAction = _p7._1;
-      var _p8 = $Types$List.init;
-      var typesList = _p8._0;
-      var typesListAction = _p8._1;
-      var effects = _U.list([A2($Effects.map,TypesListing,typesListAction),A2($Effects.map,TypesAdding,typesAddAction)]);
-      return {ctor: "_Tuple2",_0: A2(Model,typesList,typesAdd),_1: $Effects.batch(effects)};
+      var _p9 = $Types$Add.init;
+      var add = _p9._0;
+      var addAction = _p9._1;
+      var _p10 = $Types$List.init;
+      var list = _p10._0;
+      var listAction = _p10._1;
+      var effects = _U.list([A2($Effects.map,Listing,listAction),A2($Effects.map,Adding,addAction)]);
+      return {ctor: "_Tuple2",_0: A2(Model,list,add),_1: $Effects.batch(effects)};
    }();
-   return _elm.Types.Core.values = {_op: _op,Model: Model,init: init,TypesListing: TypesListing,TypesAdding: TypesAdding,update: update,view: view};
+   return _elm.Types.Core.values = {_op: _op,Model: Model,init: init,Listing: Listing,Adding: Adding,update: update,view: view};
 };
 Elm.Templates = Elm.Templates || {};
 Elm.Templates.Persistency = Elm.Templates.Persistency || {};
@@ -24194,30 +24243,6 @@ Elm.Templates.Persistency.make = function (_elm) {
                                               ,encodeProvided: encodeProvided
                                               ,persistProvided: persistProvided};
 };
-Elm.Common = Elm.Common || {};
-Elm.Common.Editor = Elm.Common.Editor || {};
-Elm.Common.Editor.make = function (_elm) {
-   "use strict";
-   _elm.Common = _elm.Common || {};
-   _elm.Common.Editor = _elm.Common.Editor || {};
-   if (_elm.Common.Editor.values) return _elm.Common.Editor.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var Load = function (a) {    return {ctor: "Load",_0: a};};
-   var NoOp = {ctor: "NoOp"};
-   var editorActions = $Signal.mailbox(NoOp);
-   var loadEditor = F2(function (noop,json) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load(json))));});
-   var getEditor = function (noop) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load("get"))));};
-   return _elm.Common.Editor.values = {_op: _op,NoOp: NoOp,Load: Load,editorActions: editorActions,loadEditor: loadEditor,getEditor: getEditor};
-};
 Elm.Templates = Elm.Templates || {};
 Elm.Templates.Add = Elm.Templates.Add || {};
 Elm.Templates.Add.make = function (_elm) {
@@ -24284,7 +24309,7 @@ Elm.Templates.Add.make = function (_elm) {
               ,A2($Common$Components.group$,"Edit defaults",A3($Common$Components.checkbox,address,LoadEditor,_p6.editDefaults))
               ,A2($Html.div,
               _U.list([$Html$Attributes.id("jsoneditor")
-                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "550px"}
+                      ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "width",_1: "50%"}
                                                       ,{ctor: "_Tuple2",_0: "height",_1: "400px"}
                                                       ,{ctor: "_Tuple2",_0: "margin-left",_1: "25%"}]))]),
               _U.list([]))]))]))));
@@ -24303,7 +24328,9 @@ Elm.Templates.Add.make = function (_elm) {
                                                ,_0: _p13
                                                ,_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p14,_p12)} : {ctor: "_Tuple2"
                                                                                                                          ,_0: _p13
-                                                                                                                         ,_1: $Common$Editor.getEditor(NoOp)};
+                                                                                                                         ,_1: A2($Common$Editor.getEditor,
+                                                                                                                         "templates",
+                                                                                                                         NoOp)};
          case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p13,_p10._1,_p10._0));
          case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p9.environments),_p12);
            return {ctor: "_Tuple2",_0: _U.update(_p13,{editDefaults: $Basics.not(_p11)}),_1: A2($Common$Editor.loadEditor,NoOp,encoded)};
@@ -25265,7 +25292,9 @@ Elm.Main.make = function (_elm) {
    $Task = Elm.Task.make(_elm),
    $Templates$Add = Elm.Templates.Add.make(_elm),
    $Templates$Core = Elm.Templates.Core.make(_elm),
-   $Time = Elm.Time.make(_elm);
+   $Time = Elm.Time.make(_elm),
+   $Types$Add = Elm.Types.Add.make(_elm),
+   $Types$Core = Elm.Types.Core.make(_elm);
    var _op = {};
    var intoActions = function (_p0) {
       var _p1 = _p0;
@@ -25328,22 +25357,36 @@ Elm.Main.make = function (_elm) {
    },
    A2($Signal.map,toQuery,A3($Signal.filter,function (s) {    return !_U.eq(s,$Search.NoOp);},$Search.NoOp,$Search.searchActions.signal)));
    var editorValue = function (p) {
-      return A2($Signal.map,function (json) {    return $Application.TemplatesAction($Templates$Core.TemplatesAdd($Templates$Add.SetDefaults(json)));},p);
+      return A2($Signal.map,
+      function (_p7) {
+         var _p8 = _p7;
+         var _p10 = _p8._1;
+         var _p9 = A2($Debug.log,"",_p8._0);
+         switch (_p9)
+         {case "templates": return $Application.TemplatesAction($Templates$Core.TemplatesAdd($Templates$Add.SetDefaults(_p10)));
+            case "types": return $Application.TypesAction($Types$Core.Adding($Types$Add.SetClasses(_p10)));
+            default: return $Application.NoOp;}
+      },
+      p);
    };
    var editorInPort = Elm.Native.Port.make(_elm).inboundSignal("editorInPort",
-   "String",
+   "( String, String )",
    function (v) {
-      return typeof v === "string" || typeof v === "object" && v instanceof String ? v : _U.badPort("a string",v);
+      return typeof v === "object" && v instanceof Array ? {ctor: "_Tuple2"
+                                                           ,_0: typeof v[0] === "string" || typeof v[0] === "object" && v[0] instanceof String ? v[0] : _U.badPort("a string",
+                                                           v[0])
+                                                           ,_1: typeof v[1] === "string" || typeof v[1] === "object" && v[1] instanceof String ? v[1] : _U.badPort("a string",
+                                                           v[1])} : _U.badPort("an array",v);
    });
-   var editJson = function (action) {    var _p7 = action;if (_p7.ctor === "Load") {    return _p7._0;} else {    return "";}};
+   var editJson = function (action) {    var _p11 = action;if (_p11.ctor === "Load") {    return _p11._0;} else {    return {ctor: "_Tuple2",_0: "",_1: ""};}};
    var editorOutPort = Elm.Native.Port.make(_elm).outboundSignal("editorOutPort",
    function (v) {
-      return v;
+      return [v._0,v._1];
    },
    A2($Signal.map,
    editJson,
    A3($Signal.filter,function (s) {    return !_U.eq(s,$Common$Editor.NoOp);},$Common$Editor.NoOp,$Common$Editor.editorActions.signal)));
-   var toUrl = function (action) {    var _p8 = action;if (_p8.ctor === "Open") {    return _p8._0;} else {    return "";}};
+   var toUrl = function (action) {    var _p12 = action;if (_p12.ctor === "Open") {    return _p12._0;} else {    return "";}};
    var newtabPort = Elm.Native.Port.make(_elm).outboundSignal("newtabPort",
    function (v) {
       return v;

@@ -74,7 +74,7 @@ update action ({template, hyp, editDefaults, environments} as model) =
       if editDefaults == False then
         (model, persistTemplate saveTemplate template hyp)
       else
-        (model, getEditor NoOp)
+        (model, getEditor "templates" NoOp)
 
     SetSystem hyp system -> 
       none (intoTemplate model system hyp)
@@ -124,7 +124,7 @@ editing address {template, editDefaults} =
             , group' "Description" (inputText address DescriptionInput " "  template.description)
             , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
             , div [ id "jsoneditor"
-                  , style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
+                  , style [("width", "50%"), ("height", "400px"), ("margin-left", "25%")]] []
            ]
           ])
         )
@@ -143,7 +143,9 @@ view address ({saveErrors} as model) =
 -- Effects
 
 type alias SaveResponse = 
-  { message : String } 
+  {
+    message : String
+  } 
 
 saveResponse : Decoder SaveResponse
 saveResponse = 

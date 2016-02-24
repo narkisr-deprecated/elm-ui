@@ -7,7 +7,7 @@ import Task
 -- SIGNALS 
 type Action = 
   NoOp 
-  | Load String
+  | Load (String, String)
 
 editorActions : Signal.Mailbox Action
 editorActions =
@@ -15,13 +15,13 @@ editorActions =
 
 loadEditor : a -> String -> Effects a
 loadEditor noop json = 
-  (Signal.send editorActions.address (Load json))
+  (Signal.send editorActions.address (Load (json, "")))
      |> Task.map (always noop)
      |> Effects.task 
 
-getEditor : a -> Effects a
-getEditor noop = 
-  (Signal.send editorActions.address (Load "get"))
+getEditor : String -> a -> Effects a
+getEditor target noop = 
+  (Signal.send editorActions.address (Load ("get", target)))
      |> Task.map (always noop)
      |> Effects.task 
 

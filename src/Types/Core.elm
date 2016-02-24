@@ -9,47 +9,47 @@ import Effects exposing (Effects, Never, batch, map)
 
 type alias Model = 
   {
-    typesList : TypesList.Model
-  , typesAdd  : TypesAdd.Model
+    list : TypesList.Model
+  , add  : TypesAdd.Model
   }
   
 init : (Model , Effects Action)
 init =
    let
-     (typesList, typesListAction)  = TypesList.init 
-     (typesAdd, typesAddAction)  = TypesAdd.init 
-     effects = [ Effects.map TypesListing typesListAction , Effects.map TypesAdding typesAddAction]
+     (list, listAction)  = TypesList.init 
+     (add, addAction)  = TypesAdd.init 
+     effects = [ Effects.map Listing listAction , Effects.map Adding addAction]
    in
-     (Model typesList typesAdd, Effects.batch effects) 
+     (Model list add, Effects.batch effects) 
 
 type Action = 
-  TypesListing TypesList.Action
-    | TypesAdding TypesAdd.Action
+  Listing TypesList.Action
+    | Adding TypesAdd.Action
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({typesList, typesAdd} as model) =
+update action ({list, add} as model) =
   case action of
-    TypesListing action -> 
+    Listing action -> 
       let 
-        (newTypes, effect ) = TypesList.update action typesList
+        (newTypes, effect ) = TypesList.update action list
       in
-        ({ model | typesList = newTypes }, Effects.map TypesListing effect)
+        ({ model | list = newTypes }, Effects.map Listing effect)
 
-    TypesAdding action -> 
+    Adding action -> 
       let 
-        (newTypes, effect ) = TypesAdd.update action typesAdd
+        (newTypes, effect ) = TypesAdd.update action add
       in
-        ({ model | typesAdd = newTypes }, Effects.map TypesAdding effect)
+        ({ model | add = newTypes }, Effects.map Adding effect)
 
 
 view : Signal.Address Action -> Model -> Section -> List Html
-view address model section =
+view address ({list, add} as model) section =
    case section of
      List -> 
-        TypesList.view (Signal.forwardTo address TypesListing) model.typesList
+        TypesList.view (Signal.forwardTo address Listing) list
 
      Add -> 
-        TypesAdd.view (Signal.forwardTo address TypesAdding) model.typesAdd
+        TypesAdd.view (Signal.forwardTo address Adding) add
 
      _ -> 
        [div  [] [text "not implemented" ]]

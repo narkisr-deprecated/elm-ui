@@ -12,6 +12,8 @@ import Systems.Launch as SystemsLaunch
 import Systems.Core as SystemsCore
 import Templates.Launch as TemplatesLaunch
 import Templates.Core as TemplatesCore
+import Types.Core as TypesCore
+import Types.Add as TypesAdd
 import Json.Encode as E exposing (list, string)
 
 -- Templates
@@ -59,6 +61,7 @@ toUrl action =
   case action of 
     NewTab.Open s -> 
       s
+
     _ -> ""
 
 port newtabPort : Signal String
@@ -69,18 +72,30 @@ port newtabPort =
 
 editJson action = 
   case action of 
-    Editor.Load s -> 
-      s
+    Editor.Load v -> 
+      v
 
-    _ -> ""
+    _ -> 
+      ("", "")
 
-port editorInPort : Signal String
+port editorInPort : Signal (String, String)
 
 editorValue p =
- Signal.map (\json -> Application.TemplatesAction (TemplatesCore.TemplatesAdd (TemplatesAdd.SetDefaults json))) p
+ Signal.map (\(target, json) ->
+    case (Debug.log "" target) of 
+      "templates" -> 
+         Application.TemplatesAction (TemplatesCore.TemplatesAdd (TemplatesAdd.SetDefaults json))
+      
+      "types" ->   
+         Application.TypesAction (TypesCore.Adding (TypesAdd.SetClasses json))
+
+      _ -> 
+        Application.NoOp
+
+    ) p
 
 
-port editorOutPort : Signal String
+port editorOutPort : Signal (String, String)
 port editorOutPort =
    editorActions.signal
       |> filter (\s -> s /= Editor.NoOp ) Editor.NoOp
@@ -116,7 +131,7 @@ jobsStatsPolling =
   let
     (model, _)= Stats.init
   in
-  Signal.map (\t -> Application.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
+    Signal.map (\t -> Application.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
  
 port menuPort : Signal (String, String, String)
 

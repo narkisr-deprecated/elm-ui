@@ -49,7 +49,7 @@
     parsingOk: empty,
     parsingErr: empty,
     menuPort: ['','',''],
-    editorInPort: ''
+    editorInPort: ['', '']
   }
   var main = Elm.embed(Elm.Main, elmDiv, outPorts);
 
@@ -69,16 +69,17 @@
   var editor = undefined;
 
   main.ports.editorOutPort.subscribe(function(event) {
-	if(event === "get") {
-        main.ports.editorInPort.send(JSON.stringify(editor.get()));
+  	var action = event[0], target = event[1]
+	if(action === "get") {
+        main.ports.editorInPort.send([target, JSON.stringify(editor.get())]);
 	} else {
         var container = document.getElementById('jsoneditor');
 	  var options = {
 	    mode : 'tree',
 	    modes: ['tree','code'], // allowed modes
-	  };
+	  }
 	  if(editor === undefined) {
-	    editor = new JSONEditor(container, options, JSON.parse(event));
+	    editor = new JSONEditor(container, options, JSON.parse(event[0]));
 	  }
 	}
   });
