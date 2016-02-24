@@ -15,7 +15,7 @@ import Dict exposing (Dict)
 import Systems.Model.Common exposing (System)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
-import Common.Utils exposing (none)
+import Common.Utils exposing (none, setEnvironments)
 import Templates.Persistency exposing (persistTemplate, encodeDefaults)
 import Common.Editor exposing (loadEditor, getEditor)
 import Common.Errors as Errors exposing (..)
@@ -61,10 +61,6 @@ intoTemplate ({template} as model) {type', machine, openstack, physical, aws, di
       newTemplate = {withHyp | name = machine.hostname, type' = type', machine = machine}
     in 
       {model | template = newTemplate, hyp = hyp}
-
-setEnvironments : Model -> Environments -> (Model, Effects Action)
-setEnvironments model es =
-   none {model | environments = Dict.keys es}
 
 
 update : Action ->  Model-> (Model , Effects Action)

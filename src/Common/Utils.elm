@@ -1,6 +1,9 @@
 module Common.Utils where
 
 import Effects exposing (Effects, Never, batch, map)
+import Dict exposing (Dict)
+import Maybe exposing (withDefault)
+import Dict exposing (Dict)
 
 partition n list =
   let
@@ -31,3 +34,11 @@ defaultEmpty list =
 none : a -> (a, Effects b)
 none a =
   (a, Effects.none)
+
+setEnvironments model es =
+   none {model | environments = Dict.keys es}
+
+setEnvironment ({environments} as model) es =
+   none {model |  environment = (Maybe.withDefault "" (List.head (Dict.keys es)))}
+
+

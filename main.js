@@ -14760,6 +14760,7 @@ Elm.Common.Utils.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
@@ -14767,11 +14768,16 @@ Elm.Common.Utils.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
    var none = function (a) {    return {ctor: "_Tuple2",_0: a,_1: $Effects.none};};
-   var defaultEmpty = function (list) {    var _p0 = list;if (_p0.ctor === "Just") {    return _p0._0;} else {    return _U.list([]);}};
+   var setEnvironments = F2(function (model,es) {    return none(_U.update(model,{environments: $Dict.keys(es)}));});
+   var setEnvironment = F2(function (_p0,es) {
+      var _p1 = _p0;
+      return none(_U.update(_p1,{environment: A2($Maybe.withDefault,"",$List.head($Dict.keys(es)))}));
+   });
+   var defaultEmpty = function (list) {    var _p2 = list;if (_p2.ctor === "Just") {    return _p2._0;} else {    return _U.list([]);}};
    var withDefaultProp = F3(function (parent,$default,prop) {
-      var _p1 = parent;
-      if (_p1.ctor === "Just") {
-            return prop(_p1._0);
+      var _p3 = parent;
+      if (_p3.ctor === "Just") {
+            return prop(_p3._0);
          } else {
             return $default;
          }
@@ -14780,7 +14786,13 @@ Elm.Common.Utils.make = function (_elm) {
       var $catch = A2($List.take,n,list);
       return _U.eq(n,$List.length($catch)) ? A2($Basics._op["++"],_U.list([$catch]),A2(partition,n,A2($List.drop,n,list))) : _U.list([$catch]);
    });
-   return _elm.Common.Utils.values = {_op: _op,partition: partition,withDefaultProp: withDefaultProp,defaultEmpty: defaultEmpty,none: none};
+   return _elm.Common.Utils.values = {_op: _op
+                                     ,partition: partition
+                                     ,withDefaultProp: withDefaultProp
+                                     ,defaultEmpty: defaultEmpty
+                                     ,none: none
+                                     ,setEnvironments: setEnvironments
+                                     ,setEnvironment: setEnvironment};
 };
 Elm.Common = Elm.Common || {};
 Elm.Common.Components = Elm.Common.Components || {};
@@ -24079,16 +24091,20 @@ Elm.Types.Add.Main.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
+   $Environments$List = Elm.Environments.List.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    var _p0 = action;return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
+   var update = F2(function (action,model) {    var _p0 = action;return $Common$Utils.none(model);});
+   var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
    var DescriptionInput = function (a) {    return {ctor: "DescriptionInput",_0: a};};
    var NameInput = function (a) {    return {ctor: "NameInput",_0: a};};
    var view = F2(function (address,_p1) {
@@ -24103,14 +24119,15 @@ Elm.Types.Add.Main.make = function (_elm) {
               A4($Common$Components.inputText,address,DescriptionInput," ",A2($Maybe.withDefault,"",_p2.description)))]))]));
    });
    var NoOp = {ctor: "NoOp"};
-   var Model = F2(function (a,b) {    return {type$: a,description: b};});
-   var init = {ctor: "_Tuple2",_0: A2(Model,"",$Maybe.Nothing),_1: $Effects.none};
+   var Model = F4(function (a,b,c,d) {    return {type$: a,description: b,environment: c,environments: d};});
+   var init = {ctor: "_Tuple2",_0: A4(Model,"",$Maybe.Nothing,"",_U.list([])),_1: $Environments$List.getEnvironments(SetEnvironments)};
    return _elm.Types.Add.Main.values = {_op: _op
                                        ,Model: Model
                                        ,init: init
                                        ,NoOp: NoOp
                                        ,NameInput: NameInput
                                        ,DescriptionInput: DescriptionInput
+                                       ,SetEnvironments: SetEnvironments
                                        ,update: update
                                        ,view: view};
 };
@@ -24368,7 +24385,6 @@ Elm.Templates.Add.make = function (_elm) {
    $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Environments$List = Elm.Environments.List.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -24386,7 +24402,6 @@ Elm.Templates.Add.make = function (_elm) {
    var _op = {};
    var SaveResponse = function (a) {    return {message: a};};
    var saveResponse = A2($Json$Decode.object1,SaveResponse,A2($Json$Decode._op[":="],"message",$Json$Decode.string));
-   var setEnvironments = F2(function (model,es) {    return $Common$Utils.none(_U.update(model,{environments: $Dict.keys(es)}));});
    var intoTemplate = F3(function (_p1,_p0,hyp) {
       var _p2 = _p1;
       var _p3 = _p0;
@@ -24451,7 +24466,7 @@ Elm.Templates.Add.make = function (_elm) {
          case "SetDefaults": var newTemplate = _U.update(_p14,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p10._0))});
            return {ctor: "_Tuple2",_0: _U.update(_p13,{template: newTemplate}),_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p14,_p12)};
          case "Saved": return A3($Common$Errors.errorsHandler,_p10._0,_p13,NoOp);
-         case "SetEnvironments": return A4($Common$Errors.successHandler,_p10._0,_p13,setEnvironments(_p13),NoOp);
+         case "SetEnvironments": return A4($Common$Errors.successHandler,_p10._0,_p13,$Common$Utils.setEnvironments(_p13),NoOp);
          default: return {ctor: "_Tuple2",_0: _p13,_1: $Effects.none};}
    });
    var Done = {ctor: "Done"};
@@ -24492,7 +24507,6 @@ Elm.Templates.Add.make = function (_elm) {
                                       ,ErrorsView: ErrorsView
                                       ,init: init
                                       ,intoTemplate: intoTemplate
-                                      ,setEnvironments: setEnvironments
                                       ,update: update
                                       ,editing: editing
                                       ,view: view
