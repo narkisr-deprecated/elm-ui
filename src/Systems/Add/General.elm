@@ -14,7 +14,8 @@ import Html exposing (..)
 import Systems.Add.Common exposing (..)
 import Environments.List exposing (Environments, Environment, getEnvironments)
 import Users.List exposing (User, getUsers)
-import Types.List exposing (Type, getTypes)
+import Types.List exposing (getTypes)
+import Types.Model exposing (Type)
 import Common.Components exposing (fixedPanel, asList)
 
 import Debug
@@ -42,8 +43,7 @@ init : (Model , Effects Action)
 init =
   let
     (admin, effects) = Admin.init
-    loadEffects = [getTypes SetTypes, (Effects.map AdminAction effects)]
-  in
+    loadEffects = [getTypes SetTypes, (Effects.map AdminAction effects)] in
    (Model "" [] "" [] admin, batch loadEffects)
 
 -- Update
