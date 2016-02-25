@@ -25,6 +25,8 @@ type Hypervisor =
   OSTemplates (Dict String Template)
     | Proxmox (Dict String (Dict String String))  (Dict String Template)
     | Openstack (Dict String String)  (Dict String Template)
+    | AWS
+    | GCE
     | Physical 
     | Empty 
 

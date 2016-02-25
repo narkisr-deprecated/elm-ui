@@ -28,7 +28,7 @@ import Common.Utils exposing (none)
 import Systems.Add.Persistency exposing (persistModel)
 import Systems.Model.Common exposing (System, Machine, emptyMachine)
 import Common.Wizard as Wizard
-import Common.Components exposing (asList, panelContents, panel, dialogPanel, error, notImplemented)
+import Common.Components exposing (asList, panelContents, panel, dialogPanel, error, notImplemented, buttons)
 
 type Stage = 
   General 
@@ -158,7 +158,6 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
             in
               none { model | stage = Digital , digitalModel = newDigital , hasNext = Wizard.hasNext newDigital}
 
-
           "physical" -> 
             let
               newPhysical = Physical.next physicalModel current 
@@ -260,37 +259,23 @@ currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstack
     _ -> 
       notImplemented
 
-saveDropdown : Signal.Address Action -> Html 
-saveDropdown address =
+saveMenu : Signal.Address Action -> Html 
+saveMenu address =
   ul [class "dropdown-menu"] [
     li [] [a [class "SaveSystem", href "#", onClick address SaveSystem ] [text "Save system"]]
   , li [] [a [class "SaveTemplate", href "#", onClick address SaveTemplate ] [text "Save as template"]]
   , li [] [a [class "Create", href "#", onClick address Create ] [text "Create System"]]
   ]
     
-buttons : Signal.Address Action -> Model -> List Html
-buttons address ({hasNext} as model) =
-  let
-    margin = style [("margin-left", "30%")]
-    click = onClick address
-  in 
-    [ 
-      button [id "Back", class "btn btn-primary", margin, click Back] [text "<< Back"]
-    , if hasNext then
-       div [class "btn-group", margin]
-           [button [id "Next", class "btn btn-primary", click Next] [text "Next >>"]]
-      else
-        div [class "btn-group", margin]
-         [  button [type' "button", class "btn btn-primary", click Stage] [text "Stage"]
-         ,  button [class "btn btn-primary dropdown-toggle"
-                   , attribute "data-toggle" "dropdown"
-                   , attribute "aria-haspopup" "true"
-                   , attribute "aria-expanded" "false"] 
-             [ span [class "caret"] [] , span [class "sr-only"] [] ]
-          , saveDropdown address
-        ]
+dropdown address = 
+  [  button [type' "button", class "btn btn-primary", onClick address Stage] [text "Stage"]
+  ,  button [class "btn btn-primary dropdown-toggle"
+          , attribute "data-toggle" "dropdown"
+          , attribute "aria-haspopup" "true"
+          , attribute "aria-expanded" "false"] 
+    [ span [class "caret"] [] , span [class "sr-only"] [] ]
+  , saveMenu address
   ]
-       
 
 errorsView address {saveErrors} = 
    let
@@ -309,7 +294,7 @@ view address ({stage} as model) =
        else
          div [] (errorsView address model))
    ]
- , row_ (buttons address model)
+ , row_ (buttons address model Next Back (dropdown address))
  ]
 
 -- Effects

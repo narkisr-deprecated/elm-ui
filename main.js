@@ -14597,6 +14597,8 @@ Elm.Environments.List.make = function (_elm) {
    var template = $Json$Decode.dict($Json$Decode.string);
    var Empty = {ctor: "Empty"};
    var Physical = {ctor: "Physical"};
+   var GCE = {ctor: "GCE"};
+   var AWS = {ctor: "AWS"};
    var Openstack = F2(function (a,b) {    return {ctor: "Openstack",_0: a,_1: b};});
    var Proxmox = F2(function (a,b) {    return {ctor: "Proxmox",_0: a,_1: b};});
    var OSTemplates = function (a) {    return {ctor: "OSTemplates",_0: a};};
@@ -14619,6 +14621,8 @@ Elm.Environments.List.make = function (_elm) {
                                           ,OSTemplates: OSTemplates
                                           ,Proxmox: Proxmox
                                           ,Openstack: Openstack
+                                          ,AWS: AWS
+                                          ,GCE: GCE
                                           ,Physical: Physical
                                           ,Empty: Empty
                                           ,template: template
@@ -14817,6 +14821,19 @@ Elm.Common.Components.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm);
    var _op = {};
+   var buttons = F5(function (address,_p0,next,back,last) {
+      var _p1 = _p0;
+      var click = $Html$Events.onClick(address);
+      var margin = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "30%"}]));
+      return _U.list([A2($Html.button,
+                     _U.list([$Html$Attributes.id("Back"),$Html$Attributes.$class("btn btn-primary"),margin,click(back)]),
+                     _U.list([$Html.text("<< Back")]))
+                     ,_p1.hasNext ? A2($Html.div,
+                     _U.list([$Html$Attributes.$class("btn-group"),margin]),
+                     _U.list([A2($Html.button,
+                     _U.list([$Html$Attributes.id("Next"),$Html$Attributes.$class("btn btn-primary"),click(next)]),
+                     _U.list([$Html.text("Next >>")]))])) : A2($Html.div,_U.list([$Html$Attributes.$class("btn-group"),margin]),last)]);
+   });
    var message = F2(function (title,content) {
       return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text(title)])),A2($Html.span,_U.list([]),_U.list([$Html.text(content)]))]);
    });
@@ -14835,8 +14852,8 @@ Elm.Common.Components.make = function (_elm) {
       return A3($Html$Events.on,
       "input",
       A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
-      function (_p0) {
-         return A2($Signal.message,address,action(_p0));
+      function (_p2) {
+         return A2($Signal.message,address,action(_p2));
       });
    });
    var typedInput = F5(function (address,action,place,currentValue,typed) {
@@ -14855,15 +14872,15 @@ Elm.Common.Components.make = function (_elm) {
       "change",
       A2($Json$Decode.at,_U.list(["target"]),$Json$Decode.string),
       function (str) {
-         return A2($Debug.log,str,function (_p1) {    return A2($Signal.message,address,action(_p1));}(str));
+         return A2($Debug.log,str,function (_p3) {    return A2($Signal.message,address,action(_p3));}(str));
       });
    });
    var onSelect = F2(function (address,action) {
       return A3($Html$Events.on,
       "change",
       A2($Json$Decode.at,_U.list(["target","value"]),$Json$Decode.string),
-      function (_p2) {
-         return A2($Signal.message,address,action(_p2));
+      function (_p4) {
+         return A2($Signal.message,address,action(_p4));
       });
    });
    var selected = F2(function (value,$default) {    return _U.eq(value,$default) ? _U.list([A2($Html$Attributes.attribute,"selected","true")]) : _U.list([]);});
@@ -14873,9 +14890,9 @@ Elm.Common.Components.make = function (_elm) {
       A2($List.map,function (opt) {    return A2($Html.option,A2(selected,opt,$default),_U.list([$Html.text(opt)]));},options));
    });
    var toHtml = function (error) {
-      var _p3 = error;
-      if (_p3.ctor === "Invalid") {
-            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([$Html.text(_p3._0)]));
+      var _p5 = error;
+      if (_p5.ctor === "Invalid") {
+            return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([$Html.text(_p5._0)]));
          } else {
             return A2($Html.span,_U.list([$Html$Attributes.$class("help-block")]),_U.list([]));
          }
@@ -14963,7 +14980,8 @@ Elm.Common.Components.make = function (_elm) {
                                           ,withErrors: withErrors
                                           ,message: message
                                           ,info: info
-                                          ,error: error};
+                                          ,error: error
+                                          ,buttons: buttons};
 };
 Elm.Common = Elm.Common || {};
 Elm.Common.Errors = Elm.Common.Errors || {};
@@ -18748,7 +18766,7 @@ Elm.Systems.Add.make = function (_elm) {
    var Create = {ctor: "Create"};
    var SaveTemplate = {ctor: "SaveTemplate"};
    var SaveSystem = {ctor: "SaveSystem"};
-   var saveDropdown = function (address) {
+   var saveMenu = function (address) {
       return A2($Html.ul,
       _U.list([$Html$Attributes.$class("dropdown-menu")]),
       _U.list([A2($Html.li,
@@ -18767,32 +18785,20 @@ Elm.Systems.Add.make = function (_elm) {
               _U.list([$Html$Attributes.$class("Create"),$Html$Attributes.href("#"),A2($Html$Events.onClick,address,Create)]),
               _U.list([$Html.text("Create System")]))]))]));
    };
-   var Next = {ctor: "Next"};
-   var buttons = F2(function (address,_p12) {
-      var _p13 = _p12;
-      var click = $Html$Events.onClick(address);
-      var margin = $Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "margin-left",_1: "30%"}]));
+   var dropdown = function (address) {
       return _U.list([A2($Html.button,
-                     _U.list([$Html$Attributes.id("Back"),$Html$Attributes.$class("btn btn-primary"),margin,click(Back)]),
-                     _U.list([$Html.text("<< Back")]))
-                     ,_p13.hasNext ? A2($Html.div,
-                     _U.list([$Html$Attributes.$class("btn-group"),margin]),
-                     _U.list([A2($Html.button,
-                     _U.list([$Html$Attributes.id("Next"),$Html$Attributes.$class("btn btn-primary"),click(Next)]),
-                     _U.list([$Html.text("Next >>")]))])) : A2($Html.div,
-                     _U.list([$Html$Attributes.$class("btn-group"),margin]),
-                     _U.list([A2($Html.button,
-                             _U.list([$Html$Attributes.type$("button"),$Html$Attributes.$class("btn btn-primary"),click(Stage)]),
-                             _U.list([$Html.text("Stage")]))
-                             ,A2($Html.button,
-                             _U.list([$Html$Attributes.$class("btn btn-primary dropdown-toggle")
-                                     ,A2($Html$Attributes.attribute,"data-toggle","dropdown")
-                                     ,A2($Html$Attributes.attribute,"aria-haspopup","true")
-                                     ,A2($Html$Attributes.attribute,"aria-expanded","false")]),
-                             _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("caret")]),_U.list([]))
-                                     ,A2($Html.span,_U.list([$Html$Attributes.$class("sr-only")]),_U.list([]))]))
-                             ,saveDropdown(address)]))]);
-   });
+                     _U.list([$Html$Attributes.type$("button"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Stage)]),
+                     _U.list([$Html.text("Stage")]))
+                     ,A2($Html.button,
+                     _U.list([$Html$Attributes.$class("btn btn-primary dropdown-toggle")
+                             ,A2($Html$Attributes.attribute,"data-toggle","dropdown")
+                             ,A2($Html$Attributes.attribute,"aria-haspopup","true")
+                             ,A2($Html$Attributes.attribute,"aria-expanded","false")]),
+                     _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("caret")]),_U.list([]))
+                             ,A2($Html.span,_U.list([$Html$Attributes.$class("sr-only")]),_U.list([]))]))
+                     ,saveMenu(address)]);
+   };
+   var Next = {ctor: "Next"};
    var Model = F9(function (a,b,c,d,e,f,g,h,i) {
       return {stage: a,awsModel: b,gceModel: c,physicalModel: d,digitalModel: e,openstackModel: f,general: g,hasNext: h,saveErrors: i};
    });
@@ -18803,127 +18809,127 @@ Elm.Systems.Add.make = function (_elm) {
    var AWS = {ctor: "AWS"};
    var Proxmox = {ctor: "Proxmox"};
    var Error = {ctor: "Error"};
-   var view = F2(function (address,_p14) {
-      var _p15 = _p14;
-      var _p16 = _p15;
-      return _U.list([$Bootstrap$Html.row_(_U.list([!_U.eq(_p15.stage,Error) ? A2($Html.div,
+   var view = F2(function (address,_p12) {
+      var _p13 = _p12;
+      var _p14 = _p13;
+      return _U.list([$Bootstrap$Html.row_(_U.list([!_U.eq(_p13.stage,Error) ? A2($Html.div,
                      _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
-                     _U.list([$Common$Components.panel(A2(currentView,address,_p16))])) : A2($Html.div,_U.list([]),A2(errorsView,address,_p16))]))
-                     ,$Bootstrap$Html.row_(A2(buttons,address,_p16))]);
+                     _U.list([$Common$Components.panel(A2(currentView,address,_p14))])) : A2($Html.div,_U.list([]),A2(errorsView,address,_p14))]))
+                     ,$Bootstrap$Html.row_(A5($Common$Components.buttons,address,_p14,Next,Back,dropdown(address)))]);
    });
    var General = {ctor: "General"};
    var init = function () {
-      var _p17 = $Systems$Add$General.init;
-      var general = _p17._0;
-      var effects = _p17._1;
-      var _p18 = $Common$Errors.init;
-      var errors = _p18._0;
-      var _p19 = $Systems$Add$Digital.init;
-      var digital = _p19._0;
-      var _p20 = $Systems$Add$Physical.init;
-      var physical = _p20._0;
-      var _p21 = $Systems$Add$GCE.init;
-      var gce = _p21._0;
-      var _p22 = $Systems$Add$Openstack.init;
-      var openstack = _p22._0;
-      var _p23 = $Systems$Add$AWS.init;
-      var aws = _p23._0;
+      var _p15 = $Systems$Add$General.init;
+      var general = _p15._0;
+      var effects = _p15._1;
+      var _p16 = $Common$Errors.init;
+      var errors = _p16._0;
+      var _p17 = $Systems$Add$Digital.init;
+      var digital = _p17._0;
+      var _p18 = $Systems$Add$Physical.init;
+      var physical = _p18._0;
+      var _p19 = $Systems$Add$GCE.init;
+      var gce = _p19._0;
+      var _p20 = $Systems$Add$Openstack.init;
+      var openstack = _p20._0;
+      var _p21 = $Systems$Add$AWS.init;
+      var aws = _p21._0;
       return {ctor: "_Tuple2",_0: A9(Model,General,aws,gce,physical,digital,openstack,general,true,errors),_1: A2($Effects.map,GeneralView,effects)};
    }();
    var back = F2(function (hasPrev,model) {
       var newModel = _U.update(model,{hasNext: true});
       return hasPrev ? newModel : _U.update(newModel,{stage: General});
    });
-   var getBack = F2(function (_p24,hyp) {
-      var _p25 = _p24;
-      var _p31 = _p25.physicalModel;
-      var _p30 = _p25.openstackModel;
-      var _p29 = _p25;
-      var _p28 = _p25.gceModel;
-      var _p27 = _p25.digitalModel;
-      var _p26 = _p25.awsModel;
+   var getBack = F2(function (_p22,hyp) {
+      var _p23 = _p22;
+      var _p29 = _p23.physicalModel;
+      var _p28 = _p23.openstackModel;
+      var _p27 = _p23;
+      var _p26 = _p23.gceModel;
+      var _p25 = _p23.digitalModel;
+      var _p24 = _p23.awsModel;
       var backs = $Dict.fromList(_U.list([{ctor: "_Tuple2"
                                           ,_0: "aws"
-                                          ,_1: A2(back,$Common$Wizard.hasPrev(_p26),_U.update(_p29,{stage: AWS,awsModel: $Systems$Add$AWS.back(_p26)}))}
+                                          ,_1: A2(back,$Common$Wizard.hasPrev(_p24),_U.update(_p27,{stage: AWS,awsModel: $Systems$Add$AWS.back(_p24)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "gce"
-                                          ,_1: A2(back,$Common$Wizard.hasPrev(_p28),_U.update(_p29,{stage: GCE,gceModel: $Systems$Add$GCE.back(_p28)}))}
+                                          ,_1: A2(back,$Common$Wizard.hasPrev(_p26),_U.update(_p27,{stage: GCE,gceModel: $Systems$Add$GCE.back(_p26)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "openstack"
                                           ,_1: A2(back,
-                                          $Common$Wizard.hasPrev(_p30),
-                                          _U.update(_p29,{stage: Openstack,openstackModel: $Systems$Add$Openstack.back(_p30)}))}
+                                          $Common$Wizard.hasPrev(_p28),
+                                          _U.update(_p27,{stage: Openstack,openstackModel: $Systems$Add$Openstack.back(_p28)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "digital-ocean"
                                           ,_1: A2(back,
-                                          $Common$Wizard.hasPrev(_p27),
-                                          _U.update(_p29,{stage: Digital,digitalModel: $Systems$Add$Digital.back(_p27)}))}
+                                          $Common$Wizard.hasPrev(_p25),
+                                          _U.update(_p27,{stage: Digital,digitalModel: $Systems$Add$Digital.back(_p25)}))}
                                          ,{ctor: "_Tuple2"
                                           ,_0: "physical"
                                           ,_1: A2(back,
-                                          $Common$Wizard.hasPrev(_p31),
-                                          _U.update(_p29,{stage: Physical,physicalModel: $Systems$Add$Physical.back(_p31)}))}]));
-      return A2($Maybe.withDefault,_p29,A2($Dict.get,hyp,backs));
+                                          $Common$Wizard.hasPrev(_p29),
+                                          _U.update(_p27,{stage: Physical,physicalModel: $Systems$Add$Physical.back(_p29)}))}]));
+      return A2($Maybe.withDefault,_p27,A2($Dict.get,hyp,backs));
    });
-   var update = F2(function (action,_p32) {
-      var _p33 = _p32;
-      var _p45 = _p33.stage;
-      var _p44 = _p33.physicalModel;
-      var _p43 = _p33.openstackModel;
-      var _p42 = _p33;
-      var _p41 = _p33.general;
-      var _p40 = _p33.gceModel;
-      var _p39 = _p33.digitalModel;
-      var _p38 = _p33.awsModel;
-      var _p34 = action;
-      switch (_p34.ctor)
-      {case "Next": var _p35 = _p41;
-           var admin = _p35.admin;
+   var update = F2(function (action,_p30) {
+      var _p31 = _p30;
+      var _p43 = _p31.stage;
+      var _p42 = _p31.physicalModel;
+      var _p41 = _p31.openstackModel;
+      var _p40 = _p31;
+      var _p39 = _p31.general;
+      var _p38 = _p31.gceModel;
+      var _p37 = _p31.digitalModel;
+      var _p36 = _p31.awsModel;
+      var _p32 = action;
+      switch (_p32.ctor)
+      {case "Next": var _p33 = _p39;
+           var admin = _p33.admin;
            var current = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,admin.environment,admin.rawEnvironments));
-           var _p36 = _p41.hypervisor;
-           switch (_p36)
-           {case "aws": var newAws = A2($Systems$Add$AWS.next,_p38,current);
-                return $Common$Utils.none(_U.update(_p42,{stage: AWS,awsModel: newAws,hasNext: $Common$Wizard.hasNext(newAws)}));
-              case "gce": var newGce = A2($Systems$Add$GCE.next,_p40,current);
-                return $Common$Utils.none(_U.update(_p42,{stage: GCE,gceModel: newGce,hasNext: $Common$Wizard.hasNext(newGce)}));
-              case "digital-ocean": var newDigital = A2($Systems$Add$Digital.next,_p39,current);
-                return $Common$Utils.none(_U.update(_p42,{stage: Digital,digitalModel: newDigital,hasNext: $Common$Wizard.hasNext(newDigital)}));
-              case "physical": var newPhysical = A2($Systems$Add$Physical.next,_p44,current);
-                return $Common$Utils.none(_U.update(_p42,{stage: Physical,physicalModel: newPhysical,hasNext: $Common$Wizard.hasNext(newPhysical)}));
-              case "openstack": var newOpenstack = A2($Systems$Add$Openstack.next,_p43,current);
-                return $Common$Utils.none(_U.update(_p42,{stage: Openstack,openstackModel: newOpenstack,hasNext: $Common$Wizard.hasNext(newOpenstack)}));
-              default: return {ctor: "_Tuple2",_0: _p42,_1: $Effects.none};}
-         case "Back": return $Common$Utils.none(A2(getBack,_p42,_p41.hypervisor));
-         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p34._0,_p38);
-           return $Common$Utils.none(_U.update(_p42,{awsModel: newAws}));
-         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p34._0,_p40);
-           return $Common$Utils.none(_U.update(_p42,{gceModel: newGce}));
-         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p34._0,_p39);
-           return $Common$Utils.none(_U.update(_p42,{digitalModel: newDigital}));
-         case "PhysicalView": var newPhysical = A2($Systems$Add$Physical.update,_p34._0,_p44);
-           return $Common$Utils.none(_U.update(_p42,{physicalModel: newPhysical}));
-         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p34._0,_p43);
-           return $Common$Utils.none(_U.update(_p42,{openstackModel: newOpenstack}));
-         case "GeneralView": var newGeneral = A2($Systems$Add$General.update,_p34._0,_p41);
-           return $Common$Utils.none(_U.update(_p42,{general: newGeneral}));
+           var _p34 = _p39.hypervisor;
+           switch (_p34)
+           {case "aws": var newAws = A2($Systems$Add$AWS.next,_p36,current);
+                return $Common$Utils.none(_U.update(_p40,{stage: AWS,awsModel: newAws,hasNext: $Common$Wizard.hasNext(newAws)}));
+              case "gce": var newGce = A2($Systems$Add$GCE.next,_p38,current);
+                return $Common$Utils.none(_U.update(_p40,{stage: GCE,gceModel: newGce,hasNext: $Common$Wizard.hasNext(newGce)}));
+              case "digital-ocean": var newDigital = A2($Systems$Add$Digital.next,_p37,current);
+                return $Common$Utils.none(_U.update(_p40,{stage: Digital,digitalModel: newDigital,hasNext: $Common$Wizard.hasNext(newDigital)}));
+              case "physical": var newPhysical = A2($Systems$Add$Physical.next,_p42,current);
+                return $Common$Utils.none(_U.update(_p40,{stage: Physical,physicalModel: newPhysical,hasNext: $Common$Wizard.hasNext(newPhysical)}));
+              case "openstack": var newOpenstack = A2($Systems$Add$Openstack.next,_p41,current);
+                return $Common$Utils.none(_U.update(_p40,{stage: Openstack,openstackModel: newOpenstack,hasNext: $Common$Wizard.hasNext(newOpenstack)}));
+              default: return {ctor: "_Tuple2",_0: _p40,_1: $Effects.none};}
+         case "Back": return $Common$Utils.none(A2(getBack,_p40,_p39.hypervisor));
+         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p32._0,_p36);
+           return $Common$Utils.none(_U.update(_p40,{awsModel: newAws}));
+         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p32._0,_p38);
+           return $Common$Utils.none(_U.update(_p40,{gceModel: newGce}));
+         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p32._0,_p37);
+           return $Common$Utils.none(_U.update(_p40,{digitalModel: newDigital}));
+         case "PhysicalView": var newPhysical = A2($Systems$Add$Physical.update,_p32._0,_p42);
+           return $Common$Utils.none(_U.update(_p40,{physicalModel: newPhysical}));
+         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p32._0,_p41);
+           return $Common$Utils.none(_U.update(_p40,{openstackModel: newOpenstack}));
+         case "GeneralView": var newGeneral = A2($Systems$Add$General.update,_p32._0,_p39);
+           return $Common$Utils.none(_U.update(_p40,{general: newGeneral}));
          case "Stage": return {ctor: "_Tuple2"
-                              ,_0: _p42
-                              ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Stage),intoSystem(_p42),$Basics.toString(_p45))};
+                              ,_0: _p40
+                              ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Stage),intoSystem(_p40),$Basics.toString(_p43))};
          case "SaveSystem": return {ctor: "_Tuple2"
-                                   ,_0: _p42
-                                   ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(NoOp),intoSystem(_p42),$Basics.toString(_p45))};
+                                   ,_0: _p40
+                                   ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(NoOp),intoSystem(_p40),$Basics.toString(_p43))};
          case "Create": return {ctor: "_Tuple2"
-                               ,_0: _p42
-                               ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Create),intoSystem(_p42),$Basics.toString(_p45))};
-         case "SaveTemplate": return $Common$Utils.none(_p42);
-         case "Saved": var _p37 = A4($Common$Errors.errorsSuccessHandler,_p34._1,_p42,A2(setSaved,_p34._0,_p42),NoOp);
-           var newModel = _p37._0;
-           var saveErrors = _p37._0.saveErrors;
-           var effects = _p37._1;
+                               ,_0: _p40
+                               ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Create),intoSystem(_p40),$Basics.toString(_p43))};
+         case "SaveTemplate": return $Common$Utils.none(_p40);
+         case "Saved": var _p35 = A4($Common$Errors.errorsSuccessHandler,_p32._1,_p40,A2(setSaved,_p32._0,_p40),NoOp);
+           var newModel = _p35._0;
+           var saveErrors = _p35._0.saveErrors;
+           var effects = _p35._1;
            return $Common$Errors.hasErrors(saveErrors) ? {ctor: "_Tuple2",_0: _U.update(newModel,{stage: Error}),_1: effects} : {ctor: "_Tuple2"
-                                                                                                                                ,_0: _p42
+                                                                                                                                ,_0: _p40
                                                                                                                                 ,_1: effects};
-         default: return {ctor: "_Tuple2",_0: _p42,_1: $Effects.none};}
+         default: return {ctor: "_Tuple2",_0: _p40,_1: $Effects.none};}
    });
    return _elm.Systems.Add.values = {_op: _op
                                     ,General: General
@@ -18959,8 +18965,8 @@ Elm.Systems.Add.make = function (_elm) {
                                     ,intoSystem: intoSystem
                                     ,update: update
                                     ,currentView: currentView
-                                    ,saveDropdown: saveDropdown
-                                    ,buttons: buttons
+                                    ,saveMenu: saveMenu
+                                    ,dropdown: dropdown
                                     ,errorsView: errorsView
                                     ,view: view
                                     ,saveSystem: saveSystem};
@@ -24140,12 +24146,16 @@ Elm.Types.Add.make = function (_elm) {
    if (_elm.Types.Add.values) return _elm.Types.Add.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Common$Wizard = Elm.Common.Wizard.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -24153,79 +24163,98 @@ Elm.Types.Add.make = function (_elm) {
    $Types$Add$Main = Elm.Types.Add.Main.make(_elm),
    $Types$Add$Puppet = Elm.Types.Add.Puppet.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    var _p0 = action;return $Common$Utils.none(model);});
    var NoOp = {ctor: "NoOp"};
-   var Next = {ctor: "Next"};
-   var Cancel = {ctor: "Cancel"};
-   var Done = {ctor: "Done"};
    var Save = {ctor: "Save"};
+   var saveButton = function (address) {
+      return _U.list([A2($Html.button,
+      _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Save)]),
+      _U.list([$Html.text("Save")]))]);
+   };
+   var Next = {ctor: "Next"};
    var Back = {ctor: "Back"};
    var MainAction = function (a) {    return {ctor: "MainAction",_0: a};};
    var PuppetAction = function (a) {    return {ctor: "PuppetAction",_0: a};};
-   var currentView = F2(function (address,_p1) {
-      var _p2 = _p1;
-      var _p3 = _p2.stage;
-      if (_p3.ctor === "Puppet") {
-            return A5($Common$Components.infoCallout,
-            address,
-            $Common$Components.info("Puppet standalone"),
-            $Common$Components.panel($Common$Components.panelContents(A2($Types$Add$Puppet.view,A2($Signal.forwardTo,address,PuppetAction),_p2.puppet))),
-            Back,
-            Save);
-         } else {
-            return A5($Common$Components.infoCallout,
-            address,
-            $Common$Components.info("Add a new Type"),
-            $Common$Components.panel($Common$Components.panelContents(A2($Types$Add$Main.view,A2($Signal.forwardTo,address,MainAction),_p2.main))),
-            Cancel,
-            Next);
-         }
+   var currentView = F2(function (address,_p0) {
+      var _p1 = _p0;
+      var _p2 = _p1.wizard.step;
+      switch (_p2.ctor)
+      {case "Puppet": return A3($Common$Components.dialogPanel,
+           "info",
+           $Common$Components.info("Puppet standalone"),
+           $Common$Components.panel($Common$Components.panelContents(A2($Types$Add$Puppet.view,A2($Signal.forwardTo,address,PuppetAction),_p1.puppet))));
+         case "Main": return A3($Common$Components.dialogPanel,
+           "info",
+           $Common$Components.info("Add a new Type"),
+           $Common$Components.panel($Common$Components.panelContents(A2($Types$Add$Main.view,A2($Signal.forwardTo,address,MainAction),_p1.main))));
+         default: return $Common$Components.asList($Common$Components.notImplemented);}
    });
    var SetClasses = function (a) {    return {ctor: "SetClasses",_0: a};};
+   var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
+   var update = F2(function (action,model) {
+      update: while (true) {
+         var _p3 = action;
+         switch (_p3.ctor)
+         {case "Next": return A2($Debug.log,"",A2(update,WizardAction($Common$Wizard.Next),model));
+            case "Back": var _v3 = WizardAction($Common$Wizard.Back),_v4 = model;
+              action = _v3;
+              model = _v4;
+              continue update;
+            default: return $Common$Utils.none(model);}
+      }
+   });
    var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
-   var view = F2(function (address,_p4) {
+   var errorsView = F2(function (address,_p4) {
       var _p5 = _p4;
-      var _p6 = _p5.saveErrors;
-      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p6);
-      return $Common$Errors.hasErrors(_p6) ? A5($Common$Components.dangerCallout,
-      address,
+      var body = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p5.saveErrors);
+      return A3($Common$Components.dialogPanel,
+      "danger",
       $Common$Components.error("Failed to save type"),
-      $Common$Components.panel($Common$Components.panelContents(errorsView)),
-      Cancel,
-      Done) : A2(currentView,address,_p5);
+      $Common$Components.panel($Common$Components.panelContents(body)));
+   });
+   var Error = {ctor: "Error"};
+   var view = F2(function (address,_p6) {
+      var _p7 = _p6;
+      var _p8 = _p7;
+      return _U.list([$Bootstrap$Html.row_(_U.list([!_U.eq(_p7.wizard.step,Error) ? A2($Html.div,
+                     _U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),
+                     A2(currentView,address,_p8)) : A2($Html.div,_U.list([]),A2(errorsView,address,_p8))]))
+                     ,$Bootstrap$Html.row_(A5($Common$Components.buttons,address,_p8,Next,Back,saveButton(address)))]);
    });
    var Puppet = {ctor: "Puppet"};
    var Main = {ctor: "Main"};
-   var Model = F4(function (a,b,c,d) {    return {stage: a,puppet: b,main: c,saveErrors: d};});
+   var Model = F5(function (a,b,c,d,e) {    return {wizard: a,puppet: b,main: c,saveErrors: d,hasNext: e};});
    var init = function () {
       var effects = _U.list([]);
-      var _p7 = $Types$Add$Puppet.init;
-      var puppet = _p7._0;
-      var puppetEffects = _p7._1;
-      var _p8 = $Types$Add$Main.init;
-      var main = _p8._0;
-      var mainEffects = _p8._1;
-      var _p9 = $Common$Errors.init;
-      var errors = _p9._0;
-      return {ctor: "_Tuple2",_0: A4(Model,Main,puppet,main,errors),_1: $Effects.batch(effects)};
+      var _p9 = $Types$Add$Puppet.init;
+      var puppet = _p9._0;
+      var puppetEffects = _p9._1;
+      var _p10 = $Types$Add$Main.init;
+      var main = _p10._0;
+      var mainEffects = _p10._1;
+      var _p11 = $Common$Errors.init;
+      var errors = _p11._0;
+      var wizard = A3($Common$Wizard.init,Main,Main,_U.list([Main,Puppet]));
+      return {ctor: "_Tuple2",_0: A5(Model,wizard,puppet,main,errors,true),_1: $Effects.batch(effects)};
    }();
    return _elm.Types.Add.values = {_op: _op
                                   ,Model: Model
                                   ,init: init
                                   ,Main: Main
                                   ,Puppet: Puppet
+                                  ,Error: Error
                                   ,ErrorsView: ErrorsView
+                                  ,WizardAction: WizardAction
                                   ,SetClasses: SetClasses
                                   ,PuppetAction: PuppetAction
                                   ,MainAction: MainAction
                                   ,Back: Back
-                                  ,Save: Save
-                                  ,Done: Done
-                                  ,Cancel: Cancel
                                   ,Next: Next
+                                  ,Save: Save
                                   ,NoOp: NoOp
                                   ,update: update
                                   ,currentView: currentView
+                                  ,errorsView: errorsView
+                                  ,saveButton: saveButton
                                   ,view: view};
 };
 Elm.Types = Elm.Types || {};

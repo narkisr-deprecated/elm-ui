@@ -188,3 +188,19 @@ info msg =
 
 error msg = 
    message "Error!" msg
+
+
+buttons address ({hasNext} as model) next back last =
+  let
+    margin = style [("margin-left", "30%")]
+    click = onClick address
+  in 
+    [ 
+      button [id "Back", class "btn btn-primary", margin, click back] [text "<< Back"]
+    , if hasNext then
+       div [class "btn-group", margin]
+           [button [id "Next", class "btn btn-primary", click next] [text "Next >>"]]
+      else
+        div [class "btn-group", margin] last
+    ]
+ 
