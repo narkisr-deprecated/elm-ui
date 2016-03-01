@@ -1,4 +1,4 @@
-module Common.Componentsz where
+module Common.FormComponents where
 
 import Effects exposing (Effects)
 import Html exposing (..)
@@ -21,14 +21,20 @@ withError field class =
   case field.error of
     Just _ ->
      class ++ " has-error"
+
     Nothing ->
      class
 
-group title widget field address = 
+formControl title widget field address  = 
+  formGroup title widget field address [class "form-control"]
+
+formGroup title widget field address attrs = 
   div [class (withError field "form-group"), id title] 
-    [ label [for title, class "col-sm-3 control-label"] [(text title)]
-    , div [class "col-sm-6"] [widget field address [class "form-control"]]
+    [ label [for title, class "col-sm-3 control-label"] [
+       (text title)
+      ]
+    , div [class "col-sm-6"] [
+       widget field address attrs
+      ]
     , errorFor field
     ]
-
-

@@ -53,6 +53,9 @@ a.jsoneditor-poweredBy {
   visibility : hidden
 }
 
+input[type='checkbox'] {
+ margin : 10px 0 0
+}
 /* .navbar-custom-menu>.navbar-nav>li>.dropdown-menu { */
 /*  position: absolute; */
 /*  right: 0; */

@@ -3,48 +3,49 @@ module Types.Add.Main where
 import Effects exposing (Effects)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
-import Common.Components exposing (..)
-import Common.Utils exposing (none, setEnvironments)
-import Environments.List exposing (Environments, getEnvironments)
-import Http exposing (Error(BadResponse))
+import Common.FormComponents exposing (formControl)
 import Maybe exposing (withDefault)
-
+import Form exposing (Form)
+import Form.Validate as Validate exposing (..)
+import Form.Input as Input
+import Types.Add.Common as Common exposing (Type(Main))
+import Form.Field as Field exposing (Field)
 
 type alias Model = 
   {
-    type' : String
-  , description :  Maybe String
-  , environment : String
-  , environments : List String
+    form : Form () Common.Type
   }
  
-init : (Model , Effects Action)
+validate : Validation () Type
+validate =
+  form3 Main
+     ("type" := string)
+     ("description" := string)
+     ("environment" := string)
+ 
+initialFields : List (String, Field)
+initialFields =
+  [ ("environment", Field.text "dev") ]
+
 init =
-  (Model "" Nothing "" [], getEnvironments SetEnvironments)
-
--- Update 
-
-type Action = 
-  NoOp
-   | NameInput String
-   | DescriptionInput String
-   | SetEnvironments (Result Http.Error Environments)
-
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
-    _ -> 
-     none model
+  Model (Form.initial initialFields validate)
 
 -- View
 
-view : Signal.Address Action -> Model -> Html
-view address ({type', description} as model) =
-  (Html.form [] [
-       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-           group' "Name" (inputText address NameInput " "  type')
-         , group' "Description" (inputText address DescriptionInput " " (withDefault ""  description))
+view environments address ({form} as model) =
+  let 
+    type' = (Form.getFieldAsString "type" form)
+    description = (Form.getFieldAsString "description" form)
+    environment = (Form.getFieldAsString "environment" form)
+  in 
+   (Html.form [] [
+      div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
+        formControl "Type" Input.textInput type' address
+      , formControl "Description" Input.textInput description address 
+      , formControl "Environment"  (Input.selectInput environments) environment address
+      ]
+    ])
 
-         ]
-   ])
+
+
 

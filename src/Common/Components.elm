@@ -172,7 +172,7 @@ inputText address action place currentValue =
 
 checkbox : Signal.Address a -> a -> Bool -> Html
 checkbox address action currentValue= 
-   input [type' "checkbox", attribute "aria-label" "...", style [("margin","10px 0 0")], onClick address action, checked currentValue] []
+   input [type' "checkbox", onClick address action, checked currentValue] []
 
 withErrors : Dict String (List Error) -> String ->  Html -> Html
 withErrors errors key widget =

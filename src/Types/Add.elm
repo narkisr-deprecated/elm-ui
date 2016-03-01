@@ -6,78 +6,117 @@ import Types.Model exposing (..)
 import Dict exposing (Dict)
 import Effects exposing (Effects)
 import Common.Errors exposing (errorsHandler, successHandler)
+import Environments.List exposing (Environments, getEnvironments)
 import Common.Components exposing (..)
-import Common.Utils exposing (none)
+import Common.Utils exposing (none, setEnvironments)
 import Common.Errors as Errors exposing (..)
 import Maybe exposing (withDefault)
 import Html.Events exposing (onClick)
-import Common.Wizard as Wizard
+import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
+import Http exposing (Error(BadResponse))
+import Common.Editor exposing (loadEditor, getEditor)
 
 import Types.Model exposing (Type, emptyType)
+import Types.Add.Common as TypeCommon
 import Types.Add.Puppet as Puppet
 import Types.Add.Main as Main
+import Form exposing (Form)
 
 type alias Model = 
   {
-    wizard : (Wizard.Model Step)
-  , puppet : Puppet.Model
-  , main : Main.Model
+    wizard : (Wizard.Model Step TypeCommon.Type)
   , saveErrors : Errors.Model
   , hasNext : Bool
+  , environments : List String
+  , editClasses : Bool
+  }
+
+type Step = 
+  Main
+    | Puppet
+
+step model value = 
+  {
+    form = model.form
+  , value = value
   }
 
 init : (Model , Effects Action)
 init =
   let
-    wizard = Wizard.init Main Main [Main, Puppet]
     (errors, _ ) = Errors.init
-    (main, mainEffects ) = Main.init
-    (puppet, puppetEffects ) = Puppet.init
-    effects = [
-    ]
+    mainStep = (step Main.init Main)
+    steps = [(step Puppet.init Puppet)]
+    wizard = Wizard.init mainStep steps
   in
-    (Model wizard puppet main errors True, Effects.batch effects)
-
-type Step = 
-    Main
-     | Puppet
-     | Error
+    (Model wizard errors True [] False, getEnvironments SetEnvironments)
 
 type Action = 
    ErrorsView Errors.Action
     | WizardAction Wizard.Action
+    | FormAction Form.Action
+    | SetEnvironments (Result Http.Error Environments)
+    | LoadEditor
     | SetClasses String
-    | PuppetAction Puppet.Action 
-    | MainAction Main.Action 
     | Back
     | Next
     | Save
     | NoOp
 
 update : Action ->  Model -> (Model , Effects Action)
-update action model =
+update action ({wizard, editClasses} as model) =
   case action of 
     Next -> 
-      Debug.log "" (update (WizardAction Wizard.Next) model)
+      update (WizardAction Wizard.Next) model
 
     Back -> 
-       update (WizardAction Wizard.Back) model
+      update (WizardAction Wizard.Back) model
+
+    WizardAction wizardAction -> 
+      let 
+        newWizard = Wizard.update wizardAction wizard
+      in
+        none { model | wizard = newWizard }
+
+    FormAction formAction -> 
+      let 
+        newWizard = Wizard.update (Wizard.FormAction formAction) wizard
+      in
+        none { model | wizard = newWizard }
+
+    SetEnvironments result ->
+       (successHandler result model (setEnvironments model) NoOp)
+
+    LoadEditor -> 
+      ({ model | editClasses = not editClasses}, loadEditor NoOp "{}")
 
     _ -> 
-      none model
+      (none model)
 
 currentView : Signal.Address Action -> Model -> List Html
-currentView address ({wizard, puppet, main} as model) =
-  case wizard.step of 
-    Puppet -> 
-      dialogPanel "info" (info "Puppet standalone") (panel (panelContents (Puppet.view (Signal.forwardTo address PuppetAction) puppet)))
+currentView address ({wizard, environments, editClasses} as model) =
+  let 
+    environmentList = List.map (\e -> (e,e)) environments
+  in 
+    case wizard.step of 
+      Just ({value} as current) ->
+        case value of 
+          Main -> 
+           dialogPanel "info" (info "Add a new Type") 
+            (panel (panelContents (Main.view environmentList (Signal.forwardTo address FormAction) current))) 
 
-    Main -> 
-      dialogPanel "info" (info "Add a new Type") (panel (panelContents (Main.view (Signal.forwardTo address MainAction) main))) 
-      
-    _ -> 
-       asList notImplemented
+          Puppet -> 
+            let
+             check = (checkbox address LoadEditor editClasses)
+            in 
+             dialogPanel "info" (info "Module properties") 
+               (panel (panelContents (Puppet.view check (Signal.forwardTo address FormAction) current))) 
+
+      Nothing -> 
+        asList (div [] [text "we are done"])
+
+
 
 errorsView address {saveErrors} = 
    let
@@ -89,13 +128,16 @@ saveButton address =
     [button [id "Save", class "btn btn-primary", onClick address Save] [text "Save"]]
 
 view : Signal.Address Action -> Model -> List Html
-view address ({wizard} as model) =
+view address ({wizard, saveErrors} as model) =
  [ row_ [
-     (if wizard.step /= Error then
-        div [class "col-md-offset-2 col-md-8"] 
-          (currentView address model) 
+     (if Errors.hasErrors saveErrors then
+        div [] 
+          (errorsView address model)
        else
-         div [] (errorsView address model))
+        div [class "col-md-offset-2 col-md-8"]
+          (currentView address model)
+       
+       )
    ]
  , row_ (buttons address model Next Back (saveButton address))
  ]

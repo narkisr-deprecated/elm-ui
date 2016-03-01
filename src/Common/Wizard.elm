@@ -52,7 +52,6 @@ update noErrors action ({next, prev, default, zero, step} as model)  =
         else 
           model
 
-
     NoOp -> 
       model
 

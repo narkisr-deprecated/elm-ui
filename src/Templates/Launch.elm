@@ -8,7 +8,7 @@ import Templates.Model.Common exposing (emptyTemplate, Template)
 import Common.Utils exposing (none)
 import Debug
 import Html.Events exposing (onClick)
-import Common.Componentsz exposing (..)
+import Common.FormComponents exposing (..)
 import Common.Components exposing (infoCallout, dangerCallout, panelContents, panel)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Admin.Core as Admin 
@@ -59,7 +59,6 @@ init =
   let 
     (admin, effects) = Admin.init
     (errors, _) = Errors.init
-    provided = Provided (PartialMachine "" "") 
   in 
     (Model "" (Form.initial [] validate) admin errors, Effects.map AdminAction effects)
 
@@ -136,8 +135,8 @@ machineView address form =
     hostname = (Form.getFieldAsString "machine.hostname" form)
     domain = (Form.getFieldAsString "machine.domain" form)
   in 
-   [ group "Hostname" Input.textInput hostname formAddress
-   , group "Domain" Input.textInput domain formAddress 
+   [ formControl "Hostname" Input.textInput hostname formAddress
+   , formControl "Domain" Input.textInput domain formAddress 
    ]
 
 launchView address {name, form, admin} =
