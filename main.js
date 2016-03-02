@@ -24074,7 +24074,8 @@ Elm.Common.FormWizard.make = function (_elm) {
            var nextSteps = A2(prepend,_p18,_p16);
            var prevSteps = A2($List.take,$List.length(_p17) - 1,_p17);
            var prevStep = $List.head($List.reverse(_p17));
-           return noErrors(newModel) ? _U.update(newModel,{step: prevStep,next: nextSteps,prev: prevSteps}) : newModel;
+           return noErrors(newModel) && !_U.eq(prevStep,$Maybe.Nothing) ? _U.update(newModel,
+           {step: prevStep,next: nextSteps,prev: A2($Debug.log,"",prevSteps)}) : newModel;
          case "FormAction": var _p14 = _p18;
            if (_p14.ctor === "Just") {
                  var newForm = A2($Form.update,_p13._0,_p14._0.form);
@@ -24087,7 +24088,7 @@ Elm.Common.FormWizard.make = function (_elm) {
    });
    var Next = {ctor: "Next"};
    var Model = F3(function (a,b,c) {    return {step: a,prev: b,next: c};});
-   var init = F2(function (first,steps) {    return A3(Model,$Maybe.Just(first),_U.list([first]),steps);});
+   var init = F2(function (first,steps) {    return A3(Model,$Maybe.Just(first),_U.list([]),steps);});
    var Step = F2(function (a,b) {    return {form: a,value: b};});
    return _elm.Common.FormWizard.values = {_op: _op
                                           ,Step: Step

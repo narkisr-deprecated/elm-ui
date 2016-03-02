@@ -26,7 +26,7 @@ type alias Model s f =
   }
  
 init first steps =
-   Model (Just first) [first] steps 
+   Model (Just first) [] steps 
 
 -- Update 
 
@@ -83,8 +83,8 @@ update action ({next, prev, step} as model)  =
         nextSteps = prepend step next
         newModel = update (FormAction Form.validate) model
       in
-        if noErrors newModel then
-          {newModel | step = prevStep, next = nextSteps, prev = prevSteps}
+        if (noErrors newModel && prevStep /= Nothing) then
+          {newModel | step = prevStep, next = nextSteps, prev = Debug.log "" prevSteps}
         else 
           newModel
 
@@ -111,4 +111,4 @@ hasPrev {wizard}  =
   not (List.isEmpty wizard.prev)
 
 notDone {wizard} = 
-  wizard.step /= Nothing
+  wizard.step /= Nothing 
