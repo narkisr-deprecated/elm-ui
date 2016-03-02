@@ -23,12 +23,12 @@ validate =
      ("description" := string)
      ("environment" := string)
  
-initialFields : List (String, Field)
-initialFields =
-  [ ("environment", Field.text "dev") ]
+initialFields : String ->  List (String, Field)
+initialFields default =
+  [ ("environment", Field.text default) ]
 
-init =
-  Model (Form.initial initialFields validate)
+init env =
+  Model (Form.initial (initialFields env) validate)
 
 -- View
 

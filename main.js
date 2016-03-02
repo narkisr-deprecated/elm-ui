@@ -24300,14 +24300,14 @@ Elm.Types.Add.Main.make = function (_elm) {
               ,A4($Common$FormComponents.formControl,"Description",$Form$Input.textInput,description,address)
               ,A4($Common$FormComponents.formControl,"Environment",$Form$Input.selectInput(environments),environment,address)]))]));
    });
-   var initialFields = _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.text("dev")}]);
+   var initialFields = function ($default) {    return _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.text($default)}]);};
    var validate = A4($Form$Validate.form3,
    $Types$Model.typeBase,
    A2($Form$Validate._op[":="],"type",$Form$Validate.string),
    A2($Form$Validate._op[":="],"description",$Form$Validate.string),
    A2($Form$Validate._op[":="],"environment",$Form$Validate.string));
    var Model = function (a) {    return {form: a};};
-   var init = Model(A2($Form.initial,initialFields,validate));
+   var init = function (env) {    return Model(A2($Form.initial,initialFields(env),validate));};
    return _elm.Types.Add.Main.values = {_op: _op,Model: Model,validate: validate,initialFields: initialFields,init: init,view: view};
 };
 Elm.Types = Elm.Types || {};
@@ -24326,6 +24326,7 @@ Elm.Types.Add.make = function (_elm) {
    $Common$FormWizard = Elm.Common.FormWizard.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Environments$List = Elm.Environments.List.make(_elm),
    $Form = Elm.Form.make(_elm),
@@ -24384,50 +24385,24 @@ Elm.Types.Add.make = function (_elm) {
          }
    });
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
-   var update = F2(function (action,_p5) {
-      update: while (true) {
-         var _p6 = _p5;
-         var _p9 = _p6.wizard;
-         var _p8 = _p6;
-         var _p7 = action;
-         switch (_p7.ctor)
-         {case "Next": var _v5 = WizardAction($Common$FormWizard.Next),_v6 = _p8;
-              action = _v5;
-              _p5 = _v6;
-              continue update;
-            case "Back": var _v7 = WizardAction($Common$FormWizard.Back),_v8 = _p8;
-              action = _v7;
-              _p5 = _v8;
-              continue update;
-            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p7._0,_p9);
-              return $Common$Utils.none(_U.update(_p8,{wizard: newWizard}));
-            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p7._0),_p9);
-              return $Common$Utils.none(_U.update(_p8,{wizard: newWizard}));
-            case "SetEnvironments": return A4($Common$Errors.successHandler,_p7._0,_p8,$Common$Utils.setEnvironments(_p8),NoOp);
-            case "LoadEditor": return {ctor: "_Tuple2"
-                                      ,_0: _U.update(_p8,{editClasses: $Basics.not(_p6.editClasses)})
-                                      ,_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
-            default: return $Common$Utils.none(_p8);}
-      }
-   });
    var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
-   var errorsView = F2(function (address,_p10) {
-      var _p11 = _p10;
-      var body = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p11.saveErrors);
+   var errorsView = F2(function (address,_p5) {
+      var _p6 = _p5;
+      var body = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p6.saveErrors);
       return A3($Common$Components.dialogPanel,
       "danger",
       $Common$Components.error("Failed to save type"),
       $Common$Components.panel($Common$Components.panelContents(body)));
    });
-   var view = F2(function (address,_p12) {
-      var _p13 = _p12;
-      var _p14 = _p13;
-      return _U.list([$Bootstrap$Html.row_(_U.list([$Common$Errors.hasErrors(_p13.saveErrors) ? A2($Html.div,
+   var view = F2(function (address,_p7) {
+      var _p8 = _p7;
+      var _p9 = _p8;
+      return _U.list([$Bootstrap$Html.row_(_U.list([$Common$Errors.hasErrors(_p8.saveErrors) ? A2($Html.div,
                      _U.list([]),
-                     A2(errorsView,address,_p14)) : A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),A2(currentView,address,_p14))]))
+                     A2(errorsView,address,_p9)) : A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),A2(currentView,address,_p9))]))
                      ,$Bootstrap$Html.row_(A5($Common$Components.buttons,
                      address,
-                     _U.update(_p14,{hasNext: $Common$FormWizard.notDone(_p14)}),
+                     _U.update(_p9,{hasNext: $Common$FormWizard.notDone(_p9)}),
                      Next,
                      Back,
                      saveButton(address)))]);
@@ -24435,13 +24410,47 @@ Elm.Types.Add.make = function (_elm) {
    var step = F2(function (model,value) {    return {form: model.form,value: value};});
    var Puppet = {ctor: "Puppet"};
    var Main = {ctor: "Main"};
+   var setEnvironment = F2(function (_p10,es) {
+      var _p11 = _p10;
+      var environments = $Dict.keys(es);
+      var env = A2($Maybe.withDefault,"",$List.head($Dict.keys(es)));
+      var mainStep = A2(step,$Types$Add$Main.init(env),Main);
+      return $Common$Utils.none(_U.update(_p11,{environments: environments,wizard: _U.update(_p11.wizard,{step: $Maybe.Just(mainStep)})}));
+   });
+   var update = F2(function (action,_p12) {
+      update: while (true) {
+         var _p13 = _p12;
+         var _p16 = _p13.wizard;
+         var _p15 = _p13;
+         var _p14 = action;
+         switch (_p14.ctor)
+         {case "Next": var _v8 = WizardAction($Common$FormWizard.Next),_v9 = _p15;
+              action = _v8;
+              _p12 = _v9;
+              continue update;
+            case "Back": var _v10 = WizardAction($Common$FormWizard.Back),_v11 = _p15;
+              action = _v10;
+              _p12 = _v11;
+              continue update;
+            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p14._0,_p16);
+              return $Common$Utils.none(_U.update(_p15,{wizard: newWizard}));
+            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p14._0),_p16);
+              return $Common$Utils.none(_U.update(_p15,{wizard: newWizard}));
+            case "SetEnvironments": return A4($Common$Errors.successHandler,_p14._0,_p15,setEnvironment(_p15),NoOp);
+            case "LoadEditor": return {ctor: "_Tuple2"
+                                      ,_0: _U.update(_p15,{editClasses: $Basics.not(_p13.editClasses)})
+                                      ,_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
+            case "Save": return A2($Debug.log,"saving",$Common$Utils.none(_p15));
+            default: return $Common$Utils.none(_p15);}
+      }
+   });
    var Model = F5(function (a,b,c,d,e) {    return {wizard: a,saveErrors: b,hasNext: c,environments: d,editClasses: e};});
    var init = function () {
+      var mainStep = A2(step,$Types$Add$Main.init(""),Main);
       var steps = _U.list([A2(step,$Types$Add$Puppet.init,Puppet)]);
-      var mainStep = A2(step,$Types$Add$Main.init,Main);
       var wizard = A2($Common$FormWizard.init,mainStep,steps);
-      var _p15 = $Common$Errors.init;
-      var errors = _p15._0;
+      var _p17 = $Common$Errors.init;
+      var errors = _p17._0;
       return {ctor: "_Tuple2",_0: A5(Model,wizard,errors,true,_U.list([]),false),_1: $Environments$List.getEnvironments(SetEnvironments)};
    }();
    return _elm.Types.Add.values = {_op: _op
@@ -24460,6 +24469,7 @@ Elm.Types.Add.make = function (_elm) {
                                   ,Next: Next
                                   ,Save: Save
                                   ,NoOp: NoOp
+                                  ,setEnvironment: setEnvironment
                                   ,update: update
                                   ,currentView: currentView
                                   ,errorsView: errorsView

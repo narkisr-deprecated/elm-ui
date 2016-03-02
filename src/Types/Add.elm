@@ -46,8 +46,8 @@ init : (Model , Effects Action)
 init =
   let
     (errors, _ ) = Errors.init
-    mainStep = (step Main.init Main)
     steps = [(step Puppet.init Puppet)]
+    mainStep = (step (Main.init "") Main)
     wizard = Wizard.init mainStep steps
   in
     (Model wizard errors True [] False, getEnvironments SetEnvironments)
@@ -63,6 +63,14 @@ type Action =
     | Next
     | Save
     | NoOp
+
+setEnvironment ({environments, wizard} as model) es =
+  let
+   env = (Maybe.withDefault "" (List.head (Dict.keys es)))
+   environments = Dict.keys es
+   mainStep = (step (Main.init env) Main)
+  in 
+   none {model |  environments = environments, wizard = { wizard | step = Just mainStep}}
 
 update : Action ->  Model -> (Model , Effects Action)
 update action ({wizard, editClasses} as model) =
@@ -86,11 +94,13 @@ update action ({wizard, editClasses} as model) =
         none { model | wizard = newWizard }
 
     SetEnvironments result ->
-       (successHandler result model (setEnvironments model) NoOp)
+       (successHandler result model (setEnvironment model) NoOp)
 
     LoadEditor -> 
       ({ model | editClasses = not editClasses}, loadEditor NoOp "{}")
 
+    Save -> 
+      Debug.log "saving" (none model)
     _ -> 
       (none model)
 
