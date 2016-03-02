@@ -63,3 +63,13 @@ emptyModule =
 
 emptyPuppet =
   PuppetStd emptyModule [] Dict.empty
+
+typeBase type' description environment = 
+  Type type' (Just description) (Dict.fromList [(environment, emptyPuppet)])
+
+puppetBase name src unsecure args = 
+  let
+    module' = Module name src (Just (Dict.fromList [("unsecure", unsecure)]))
+    puppet = PuppetStd module' args Dict.empty
+  in
+    { emptyType | puppetStd = Dict.fromList [("temp", puppet)] }

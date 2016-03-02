@@ -8,17 +8,17 @@ import Maybe exposing (withDefault)
 import Form exposing (Form)
 import Form.Validate as Validate exposing (..)
 import Form.Input as Input
-import Types.Add.Common as Common exposing (Type(Main))
+import Types.Model exposing (Type, typeBase)
 import Form.Field as Field exposing (Field)
 
 type alias Model = 
   {
-    form : Form () Common.Type
+    form : Form () Type
   }
  
 validate : Validation () Type
 validate =
-  form3 Main
+  form3 typeBase
      ("type" := string)
      ("description" := string)
      ("environment" := string)

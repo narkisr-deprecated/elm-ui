@@ -10,18 +10,18 @@ import Common.FormComponents exposing (formControl, formGroup)
 import Form exposing (Form)
 import Form.Validate as Validate exposing (..)
 import Form.Input as Input
-import Types.Add.Common as Common exposing (Type(Puppet))
+import Types.Model exposing (Type, puppetBase)
 
 
 
 type alias Model = 
   {
-    form : Form () Common.Type
+    form : Form () Type
   }
  
 validate : Validation () Type
 validate =
-  form4 Puppet
+  form4 puppetBase
      ("name" := string)
      ("source" := string)
      ("unsecure" := bool)
