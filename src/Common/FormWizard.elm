@@ -42,7 +42,7 @@ noErrors ({step} as model) =
       (List.isEmpty (Form.getErrors form))
 
     Nothing -> 
-      False
+      True
 
 append step target = 
   case step of 
@@ -72,19 +72,19 @@ update action ({next, prev, step} as model)  =
         newModel = update (FormAction Form.validate) model
       in
         if noErrors newModel then
-           {model | step = nextStep, next = nextSteps, prev = prevSteps}
+           { newModel | step = nextStep, next = nextSteps, prev = prevSteps}
         else 
            newModel
 
     Back -> 
       let
-        prevStep = (List.head (List.reverse prev))
+        prevStep = List.head (List.reverse prev)
         prevSteps = List.take ((List.length prev) - 1) prev
         nextSteps = prepend step next
         newModel = update (FormAction Form.validate) model
       in
         if noErrors newModel then
-          {model | step = prevStep, next = nextSteps, prev = prevSteps}
+          {newModel | step = prevStep, next = nextSteps, prev = prevSteps}
         else 
           newModel
 
@@ -104,12 +104,11 @@ update action ({next, prev, step} as model)  =
     _  -> 
       model
 
--- View
-
 hasNext {wizard} =
   not (List.isEmpty wizard.next)
 
 hasPrev {wizard}  =
   not (List.isEmpty wizard.prev)
 
-
+notDone {wizard} = 
+  wizard.step /= Nothing
