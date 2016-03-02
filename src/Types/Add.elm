@@ -16,6 +16,10 @@ import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Http exposing (Error(BadResponse))
 import Common.Editor exposing (loadEditor, getEditor)
+import Json.Decode exposing (..)
+import Common.Http exposing (postJson)
+import Task exposing (Task)
+import Types.Persistency exposing (persistType)
 
 import Types.Model exposing (Type, emptyType, emptyPuppet)
 import Types.Add.Common as TypeCommon
@@ -62,6 +66,7 @@ type Action =
     | Back
     | Next
     | Save
+    | Saved (Result Http.Error SaveResponse)
     | NoOp
 
 setEnvironment ({environments, wizard} as model) es =
@@ -71,8 +76,6 @@ setEnvironment ({environments, wizard} as model) es =
     mainStep = (step (Main.init env) Main)
   in 
     none {model |  environments = environments, wizard = { wizard | step = Just mainStep}}
-
-
 
 merge ({value, form} as step) acc = 
   let 
@@ -121,8 +124,12 @@ update action ({wizard, editClasses} as model) =
       let
         merged = List.foldl merge emptyType wizard.prev 
       in 
-        Debug.log (toString merged) (none model)
-      
+        if editClasses == False then
+          (model, persistType saveType merged)
+        else
+          (model, getEditor "classes" NoOp)
+
+ 
     _ -> 
       (none model)
 
@@ -172,3 +179,23 @@ view address ({wizard, saveErrors} as model) =
    ]
  , row_ (buttons address { model | hasNext = Wizard.notDone model} Next Back (saveButton address))
  ]
+
+
+type alias SaveResponse = 
+  {
+    message : String
+  } 
+
+saveResponse : Decoder SaveResponse
+saveResponse = 
+  object1 SaveResponse
+    ("message" := string) 
+
+saveType: String -> Effects Action
+saveType json = 
+  postJson (Http.string json) saveResponse "/types"  
+    |> Task.toResult
+    |> Task.map Saved
+    |> Effects.task
+
+

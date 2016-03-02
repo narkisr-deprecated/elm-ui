@@ -25,7 +25,9 @@ defaultsEncoder {openstack} hyp =
 
 
 defaultsDictEncoder defaults hyp = 
-   Dict.toList defaults |> List.map (\(k,v) -> (k, defaultsEncoder v hyp)) |> object 
+   Dict.toList defaults 
+     |> List.map (\(k,v) -> (k, defaultsEncoder v hyp)) 
+     |> object 
 
 encodeDefaults : Dict String Defaults -> String -> String
 encodeDefaults defaults hyp =
