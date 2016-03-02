@@ -17,7 +17,7 @@ import Html.Attributes exposing (class, id, href, placeholder, attribute, type',
 import Http exposing (Error(BadResponse))
 import Common.Editor exposing (loadEditor, getEditor)
 
-import Types.Model exposing (Type, emptyType)
+import Types.Model exposing (Type)
 import Types.Add.Common as TypeCommon
 import Types.Add.Puppet as Puppet
 import Types.Add.Main as Main
@@ -25,7 +25,7 @@ import Form exposing (Form)
 
 type alias Model = 
   {
-    wizard : (Wizard.Model Step TypeCommon.Type)
+    wizard : (Wizard.Model Step Type)
   , saveErrors : Errors.Model
   , hasNext : Bool
   , environments : List String
@@ -104,18 +104,18 @@ currentView address ({wizard, environments, editClasses} as model) =
         case value of 
           Main -> 
            dialogPanel "info" (info "Add a new Type") 
-            (panel (panelContents (Main.view environmentList (Signal.forwardTo address FormAction) current))) 
+            (panel (fixedPanel (Main.view environmentList (Signal.forwardTo address FormAction) current)) )
 
           Puppet -> 
             let
              check = (checkbox address LoadEditor editClasses)
             in 
              dialogPanel "info" (info "Module properties") 
-               (panel (panelContents (Puppet.view check (Signal.forwardTo address FormAction) current))) 
-
+               (panel (fixedPanel (Puppet.view check (Signal.forwardTo address FormAction) current)))
+          
       Nothing -> 
-        asList (div [] [text "we are done"])
-
+        dialogPanel "info" (info "Save new type") 
+           (panel (fixedPanel (div [] [text "we are done"])))
 
 
 errorsView address {saveErrors} = 
@@ -125,7 +125,7 @@ errorsView address {saveErrors} =
      dialogPanel "danger" (error "Failed to save type") (panel (panelContents body))
 
 saveButton address =
-    [button [id "Save", class "btn btn-primary", onClick address Save] [text "Save"]]
+    [button [id "Save", class "btn btn-primary", onClick address Save] [text "Save  "]]
 
 view : Signal.Address Action -> Model -> List Html
 view address ({wizard, saveErrors} as model) =
@@ -136,8 +136,7 @@ view address ({wizard, saveErrors} as model) =
        else
         div [class "col-md-offset-2 col-md-8"]
           (currentView address model)
-       
        )
    ]
- , row_ (buttons address model Next Back (saveButton address))
+ , row_ (buttons address { model | hasNext = Wizard.notDone model} Next Back (saveButton address))
  ]
