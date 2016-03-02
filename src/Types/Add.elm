@@ -17,7 +17,7 @@ import Html.Attributes exposing (class, id, href, placeholder, attribute, type',
 import Http exposing (Error(BadResponse))
 import Common.Editor exposing (loadEditor, getEditor)
 
-import Types.Model exposing (Type)
+import Types.Model exposing (Type, emptyType, emptyPuppet)
 import Types.Add.Common as TypeCommon
 import Types.Add.Puppet as Puppet
 import Types.Add.Main as Main
@@ -66,11 +66,29 @@ type Action =
 
 setEnvironment ({environments, wizard} as model) es =
   let
-   env = (Maybe.withDefault "" (List.head (Dict.keys es)))
-   environments = Dict.keys es
-   mainStep = (step (Main.init env) Main)
+    env = (Maybe.withDefault "" (List.head (Dict.keys es)))
+    environments = Dict.keys es
+    mainStep = (step (Main.init env) Main)
   in 
-   none {model |  environments = environments, wizard = { wizard | step = Just mainStep}}
+    none {model |  environments = environments, wizard = { wizard | step = Just mainStep}}
+
+
+
+merge ({value, form} as step) acc = 
+  let 
+    type' = withDefault acc (Form.getOutput form)
+  in 
+  case value of
+    Main ->  
+      type'  
+
+    Puppet -> 
+      let 
+        env = withDefault "" (List.head (Debug.log "" (Dict.keys acc.puppetStd)))
+        puppet = withDefault emptyPuppet (Dict.get "--" type'.puppetStd)
+      in 
+       { type' | puppetStd = Dict.insert env puppet acc.puppetStd }
+
 
 update : Action ->  Model -> (Model , Effects Action)
 update action ({wizard, editClasses} as model) =
@@ -100,7 +118,10 @@ update action ({wizard, editClasses} as model) =
       ({ model | editClasses = not editClasses}, loadEditor NoOp "{}")
 
     Save -> 
-      Debug.log "saving" (none model)
+      let
+        merged = List.foldl merge emptyType wizard.prev 
+      in 
+        Debug.log (toString merged) (none model)
       
     _ -> 
       (none model)

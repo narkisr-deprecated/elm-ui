@@ -2,6 +2,7 @@ module Types.Model where
 
 import Json.Decode as Json exposing (..)
 import Dict exposing (Dict)
+import String
 
 type Options = 
   BoolOption Bool 
@@ -69,7 +70,7 @@ typeBase type' description environment =
 
 puppetBase name src unsecure args = 
   let
-    module' = Module name src (Just (Dict.fromList [("unsecure", unsecure)]))
-    puppet = PuppetStd module' args Dict.empty
+    module' = Module name src (Just (Dict.fromList [("unsecure", BoolOption unsecure)]))
+    puppet = PuppetStd module' (String.split args " ") Dict.empty
   in
-    { emptyType | puppetStd = Dict.fromList [("temp", puppet)] }
+    { emptyType | puppetStd = Dict.fromList [("--", puppet)] }
