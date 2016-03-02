@@ -24058,16 +24058,16 @@ Elm.Common.FormWizard.make = function (_elm) {
            var prevSteps = A2(append,_p16,_p15);
            var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p14));
            var nextStep = $List.head(_p14);
-           return noErrors(newModel) ? _U.update(_p13,{step: nextStep,next: nextSteps,prev: prevSteps}) : _p13;
+           return noErrors(newModel) ? _U.update(_p13,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
          case "Back": var newModel = A2(update,FormAction($Form.validate),_p13);
            var nextSteps = A2(prepend,_p16,_p14);
            var prevSteps = A2($List.take,$List.length(_p15) - 1,_p15);
            var prevStep = $List.head($List.reverse(_p15));
-           return noErrors(newModel) ? _U.update(_p13,{step: prevStep,next: nextSteps,prev: prevSteps}) : _p13;
+           return noErrors(newModel) ? _U.update(_p13,{step: prevStep,next: nextSteps,prev: prevSteps}) : newModel;
          case "FormAction": var _p12 = _p16;
            if (_p12.ctor === "Just") {
                  var newForm = A2($Form.update,_p11._0,_p12._0.form);
-                 var newStep = _U.update(_p12._0,{form: newForm});
+                 var newStep = _U.update(_p12._0,{form: A2($Form.update,$Form.validate,newForm)});
                  return _U.update(_p13,{step: $Maybe.Just(newStep)});
               } else {
                  return _p13;

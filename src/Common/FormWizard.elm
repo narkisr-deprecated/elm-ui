@@ -74,7 +74,7 @@ update action ({next, prev, step} as model)  =
         if noErrors newModel then
            {model | step = nextStep, next = nextSteps, prev = prevSteps}
         else 
-           model
+           newModel
 
     Back -> 
       let
@@ -86,14 +86,14 @@ update action ({next, prev, step} as model)  =
         if noErrors newModel then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}
         else 
-          model
+          newModel
 
     FormAction formAction ->
       case step of 
         Just ({form} as currStep) -> 
          let 
            newForm = Form.update formAction form
-           newStep = { currStep | form = newForm }
+           newStep = { currStep | form = Form.update Form.validate newForm }
          in
            { model | step = Just newStep }
 
