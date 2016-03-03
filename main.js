@@ -19949,7 +19949,6 @@ Elm.Jobs.List.make = function (_elm) {
    }();
    var update = F2(function (action,_p20) {
       var _p21 = _p20;
-      var _p34 = _p21.running;
       var _p33 = _p21;
       var _p22 = action;
       _v9_6: do {
@@ -19981,9 +19980,9 @@ Elm.Jobs.List.make = function (_elm) {
                     var emptyRow = A7(RunningJob,"","","","","","","");
                     var _p29 = A2($Maybe.withDefault,
                     {ctor: "_Tuple2",_0: _p32,_1: emptyRow},
-                    $List.head(A2($List.filter,function (_p30) {    var _p31 = _p30;return _U.eq(_p31._1.tid,_p32);},_p34.rows)));
+                    $List.head(A2($List.filter,function (_p30) {    var _p31 = _p30;return _U.eq(_p31._1.tid,_p32);},_p21.running.rows)));
                     var job = _p29._1;
-                    return A2($Debug.log,$Basics.toString(_p34),{ctor: "_Tuple2",_0: _p33,_1: A2($Common$NewTab.newtab,NoOp,job.tid_link)});
+                    return {ctor: "_Tuple2",_0: _p33,_1: A2($Common$NewTab.newtab,NoOp,job.tid_link)};
                  } else {
                     break _v9_6;
                  }
