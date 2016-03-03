@@ -13,7 +13,7 @@
 (def c (chan (dropping-buffer 1) 
   (filter 
     (fn [{:keys [file]}] 
-      (first (filter identity (map #(.contains (.getPath file) %) ["index.html" "main.js" "add.clj"])))))))
+      (first (filter identity (map #(.contains (.getPath file) %) ["index.html" "main.js" ".clj"])))))))
 
 (defn run-facts [e] 
   (go (>! c e)))
@@ -21,11 +21,11 @@
 (watch-dir run-facts (clojure.java.io/file "."))
 
 (go-loop []
-   (let [x (<! (async/merge [(timeout 1000) c] (dropping-buffer 1)))]
+   (let [ns- (System/getenv "NS") x (<! (async/merge [(timeout 1000) c] (dropping-buffer 1)))]
      (timbre/info x)
      (try 
       (timbre/info "Starting to run suite")
-      (let [{:keys [out err exit]} (sh "lein" "midje" "elm.ui.add")]
+      (let [{:keys [out err exit]} (sh "lein" "midje" ns-)]
         (if-not (= exit 0)
            (timbre/error err)
            (timbre/info out)))
