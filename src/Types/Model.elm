@@ -23,6 +23,19 @@ type alias PuppetStd =
   , classes : Dict String (Dict String Options)
   }
 
+classesDictDecoder: Decoder (Dict String (Dict String Options))
+classesDictDecoder = 
+   (dict (dict option))
+
+
+decodeClasses : String -> (Dict String (Dict String Options))
+decodeClasses json =
+  case Json.decodeString classesDictDecoder json of 
+    Ok value -> 
+       value
+    Err error -> 
+      Debug.log error Dict.empty
+
 
 type alias Type = 
   {
@@ -74,3 +87,5 @@ puppetBase name src unsecure args =
     puppet = PuppetStd module' (String.split args " ") Dict.empty
   in
     { emptyType | puppetStd = Dict.fromList [("--", puppet)] }
+
+
