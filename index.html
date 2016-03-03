@@ -72,11 +72,13 @@
   	var action = event[0], target = event[1]
 	if(action === "get") {
         main.ports.editorInPort.send([target, JSON.stringify(editor.get())]);
+        editor = undefined
+	} else if (action === "unload"){
+	  editor = undefined
 	} else {
         var container = document.getElementById('jsoneditor');
 	  var options = {
-	    mode : 'tree',
-	    modes: ['tree','code'], // allowed modes
+	    mode : 'code'
 	  }
 	  if(editor === undefined) {
 	    editor = new JSONEditor(container, options, JSON.parse(event[0]));
