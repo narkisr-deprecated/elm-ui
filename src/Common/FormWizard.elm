@@ -84,7 +84,7 @@ update action ({next, prev, step} as model)  =
         newModel = update (FormAction Form.validate) model
       in
         if (noErrors newModel && prevStep /= Nothing) then
-          {newModel | step = prevStep, next = nextSteps, prev = Debug.log "" prevSteps}
+          {newModel | step = prevStep, next = nextSteps, prev = prevSteps}
         else 
           newModel
 
