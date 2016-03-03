@@ -82,7 +82,7 @@ port editorInPort : Signal (String, String)
 
 editorValue p =
  Signal.map (\(target, json) ->
-    case (Debug.log "" target) of 
+    case target of 
       "templates" -> 
          Application.TemplatesAction (TemplatesCore.TemplatesAdd (TemplatesAdd.SetDefaults json))
       
