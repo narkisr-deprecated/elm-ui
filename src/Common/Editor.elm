@@ -25,4 +25,10 @@ getEditor target noop =
      |> Task.map (always noop)
      |> Effects.task 
 
+unloadEditor : a -> Effects a
+unloadEditor noop = 
+  (Signal.send editorActions.address (Load ("unload", "")))
+     |> Task.map (always noop)
+     |> Effects.task 
+
 
