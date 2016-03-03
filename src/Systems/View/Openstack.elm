@@ -8,7 +8,7 @@ import Systems.Model.Openstack exposing (Openstack)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
-import Systems.View.Common exposing (..)
+import Common.Summary exposing (..)
 import Effects exposing (Effects, Never, map)
 import String
 

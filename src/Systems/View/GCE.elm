@@ -8,9 +8,9 @@ import Systems.Model.GCE exposing (GCE)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
-import Systems.View.Common exposing (..)
+import Common.Summary exposing (..)
 import Effects exposing (Effects, Never, map)
-import Systems.View.Common exposing (..)
+import Common.Summary exposing (..)
 import String
 
 -- Model 

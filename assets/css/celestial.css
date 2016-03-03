@@ -43,6 +43,9 @@ div.progress-bar#processing {
   background-color: #e7e7e7;
 }
 
+#typesListing tr:hover {
+  background-color: #e7e7e7;
+}
 /* Json editor */
 div.jsoneditor-menu {
   border-color: #4b4b4b;

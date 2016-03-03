@@ -5,11 +5,11 @@ import Common.Utils exposing (partition, withDefaultProp)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Systems.Model.Common exposing (Machine)
 import Systems.Model.Digital exposing (Digital)
-import Systems.View.Common exposing (..)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
 import Effects exposing (Effects, Never, map)
+import Common.Summary exposing (..)
 import String
 
 -- Model 
