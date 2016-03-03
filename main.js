@@ -24158,23 +24158,37 @@ Elm.Types.Persistency.make = function (_elm) {
    var dictEncoder = F2(function (enc,dict) {
       return $Json$Encode.object(A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1._0,_1: enc(_p1._1)};},$Dict.toList(dict)));
    });
-   var option = $Json$Encode.object(_U.list([]));
-   var moduleEncoder = function (module$) {    return $Json$Encode.object(_U.list([]));};
-   var puppetEncoder = function (_p2) {
-      var _p3 = _p2;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "module",_1: moduleEncoder(_p3.module$)}
-                                         ,{ctor: "_Tuple2",_0: "args",_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,_p3.args))}]));
+   var option = function (o) {
+      var _p2 = o;
+      if (_p2.ctor === "BoolOption") {
+            return $Json$Encode.bool(_p2._0);
+         } else {
+            return $Json$Encode.string(_p2._0);
+         }
    };
-   var encode = function (_p4) {
-      var _p5 = _p4;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p5.type$)}
-                                         ,{ctor: "_Tuple2",_0: "description",_1: $Json$Encode.string(A2($Maybe.withDefault,"",_p5.description))}
-                                         ,{ctor: "_Tuple2",_0: "puppet-std",_1: A2(dictEncoder,puppetEncoder,_p5.puppetStd)}]));
+   var $class = function (c) {    return A2(dictEncoder,option,c);};
+   var moduleEncoder = function (_p3) {
+      var _p4 = _p3;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(_p4.name)}
+                                         ,{ctor: "_Tuple2",_0: "src",_1: $Json$Encode.string(_p4.src)}]));
+   };
+   var puppetEncoder = function (_p5) {
+      var _p6 = _p5;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "module",_1: moduleEncoder(_p6.module$)}
+                                         ,{ctor: "_Tuple2",_0: "args",_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,_p6.args))}
+                                         ,{ctor: "_Tuple2",_0: "classes",_1: A2(dictEncoder,$class,_p6.classes)}]));
+   };
+   var encode = function (_p7) {
+      var _p8 = _p7;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p8.type$)}
+                                         ,{ctor: "_Tuple2",_0: "description",_1: $Json$Encode.string(A2($Maybe.withDefault,"",_p8.description))}
+                                         ,{ctor: "_Tuple2",_0: "puppet-std",_1: A2(dictEncoder,puppetEncoder,_p8.puppetStd)}]));
    };
    var persistType = F2(function (f,type$) {    return A2(persistModel,f,encode(type$));});
    return _elm.Types.Persistency.values = {_op: _op
                                           ,moduleEncoder: moduleEncoder
                                           ,option: option
+                                          ,$class: $class
                                           ,puppetEncoder: puppetEncoder
                                           ,dictEncoder: dictEncoder
                                           ,encode: encode
@@ -24404,8 +24418,8 @@ Elm.Types.Add.make = function (_elm) {
             return type$;
          } else {
             var puppet = A2($Maybe.withDefault,$Types$Model.emptyPuppet,A2($Dict.get,"--",type$.puppetStd));
-            var env = A2($Maybe.withDefault,"",$List.head(A2($Debug.log,"",$Dict.keys(acc.puppetStd))));
-            return _U.update(type$,{puppetStd: A3($Dict.insert,env,puppet,acc.puppetStd)});
+            var env = A2($Maybe.withDefault,"",$List.head($Dict.keys(acc.puppetStd)));
+            return _U.update(acc,{puppetStd: A3($Dict.insert,env,puppet,acc.puppetStd)});
          }
    });
    var NoOp = {ctor: "NoOp"};
