@@ -15,7 +15,7 @@ import Html.Events exposing (onClick)
 import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Http exposing (Error(BadResponse))
-import Common.Editor exposing (loadEditor, getEditor)
+import Common.Editor exposing (loadEditor, getEditor, unloadEditor)
 import Json.Decode exposing (..)
 import Common.Http exposing (postJson)
 import Task exposing (Task)
@@ -77,7 +77,7 @@ setEnvironment ({environments, wizard} as model) es =
   in 
     none {model |  environments = environments, wizard = { wizard | step = Just mainStep}}
 
-merge ({value, form} as step) acc = 
+merge classes ({value, form} as step) acc = 
   let 
     type' = withDefault acc (Form.getOutput form)
   in 
@@ -89,9 +89,12 @@ merge ({value, form} as step) acc =
        let 
          env = withDefault "" (List.head (Dict.keys acc.puppetStd))
          puppet = withDefault emptyPuppet (Dict.get "--" type'.puppetStd)
+         withClasses = { puppet | classes = classes }
        in 
-         { acc | puppetStd = Dict.insert env puppet acc.puppetStd }
+         { acc | puppetStd = Dict.insert env withClasses acc.puppetStd }
 
+merged {wizard} classes =
+  List.foldl (merge classes) emptyType wizard.prev 
 
 update : Action ->  Model -> (Model , Effects Action)
 update action ({wizard, editClasses} as model) =
@@ -100,7 +103,10 @@ update action ({wizard, editClasses} as model) =
       update (WizardAction Wizard.Next) model
 
     Back -> 
-      update (WizardAction Wizard.Back) model
+      let
+        (back,_) = (update (WizardAction Wizard.Back) model)
+      in
+       ({ back | editClasses = False}, unloadEditor NoOp)
 
     WizardAction wizardAction -> 
       let 
@@ -120,16 +126,18 @@ update action ({wizard, editClasses} as model) =
     LoadEditor -> 
       ({ model | editClasses = not editClasses}, loadEditor NoOp "{}")
 
-    Save -> 
+    SetClasses json -> 
       let
-        merged = List.foldl merge emptyType wizard.prev 
-      in 
-        if editClasses == False then
-          (model, persistType saveType merged)
-        else
-          (model, getEditor "classes" NoOp)
+         classes = Debug.log "" (decodeClasses json)
+      in
+        (model, persistType saveType (merged model classes))
 
- 
+    Save -> 
+      if editClasses == False then
+        (model, persistType saveType (merged model Dict.empty))
+      else
+        (model, getEditor "types" NoOp)
+
     _ -> 
       (none model)
 
