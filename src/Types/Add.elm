@@ -81,16 +81,16 @@ merge ({value, form} as step) acc =
   let 
     type' = withDefault acc (Form.getOutput form)
   in 
-  case value of
-    Main ->  
-      type'  
-
-    Puppet -> 
-      let 
-        env = withDefault "" (List.head (Debug.log "" (Dict.keys acc.puppetStd)))
-        puppet = withDefault emptyPuppet (Dict.get "--" type'.puppetStd)
-      in 
-       { type' | puppetStd = Dict.insert env puppet acc.puppetStd }
+   case value of
+     Main ->  
+       type'  
+ 
+     Puppet -> 
+       let 
+         env = withDefault "" (List.head (Dict.keys acc.puppetStd))
+         puppet = withDefault emptyPuppet (Dict.get "--" type'.puppetStd)
+       in 
+         { acc | puppetStd = Dict.insert env puppet acc.puppetStd }
 
 
 update : Action ->  Model -> (Model , Effects Action)
