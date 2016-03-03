@@ -120,7 +120,7 @@ update action ({running, done, pager} as model) =
          emptyRow = RunningJob "" "" "" "" "" "" ""
          (_, job) = Maybe.withDefault (tid, emptyRow) (List.head (List.filter (\(_,job) -> job.tid == tid ) running.rows))
        in
-        Debug.log (toString running) (model, (newtab NoOp job.tid_link))
+         (model, (newtab NoOp job.tid_link))
 
     _ -> 
       (model , Effects.none)
