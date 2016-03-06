@@ -14763,25 +14763,35 @@ Elm.Common.Utils.make = function (_elm) {
    if (_elm.Common.Utils.values) return _elm.Common.Utils.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Char = Elm.Char.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
    var _op = {};
+   var capitalize = function (s) {
+      var _p0 = $String.uncons(s);
+      if (_p0.ctor === "Just") {
+            return A2($String.cons,$Char.toUpper(_p0._0._0),_p0._0._1);
+         } else {
+            return s;
+         }
+   };
    var none = function (a) {    return {ctor: "_Tuple2",_0: a,_1: $Effects.none};};
    var setEnvironments = F2(function (model,es) {    return none(_U.update(model,{environments: $Dict.keys(es)}));});
-   var setEnvironment = F2(function (_p0,es) {
-      var _p1 = _p0;
-      return none(_U.update(_p1,{environment: A2($Maybe.withDefault,"",$List.head($Dict.keys(es)))}));
+   var setEnvironment = F2(function (_p1,es) {
+      var _p2 = _p1;
+      return none(_U.update(_p2,{environment: A2($Maybe.withDefault,"",$List.head($Dict.keys(es)))}));
    });
-   var defaultEmpty = function (list) {    var _p2 = list;if (_p2.ctor === "Just") {    return _p2._0;} else {    return _U.list([]);}};
+   var defaultEmpty = function (list) {    var _p3 = list;if (_p3.ctor === "Just") {    return _p3._0;} else {    return _U.list([]);}};
    var withDefaultProp = F3(function (parent,$default,prop) {
-      var _p3 = parent;
-      if (_p3.ctor === "Just") {
-            return prop(_p3._0);
+      var _p4 = parent;
+      if (_p4.ctor === "Just") {
+            return prop(_p4._0);
          } else {
             return $default;
          }
@@ -14796,7 +14806,8 @@ Elm.Common.Utils.make = function (_elm) {
                                      ,defaultEmpty: defaultEmpty
                                      ,none: none
                                      ,setEnvironments: setEnvironments
-                                     ,setEnvironment: setEnvironment};
+                                     ,setEnvironment: setEnvironment
+                                     ,capitalize: capitalize};
 };
 Elm.Common = Elm.Common || {};
 Elm.Common.Components = Elm.Common.Components || {};
@@ -24643,7 +24654,7 @@ Elm.Types.View.make = function (_elm) {
       var os = optionsList(_p3.options);
       var cs = A2($String.join,"",$Dict.keys(_p2.classes));
       return _U.list([A3($Common$Summary.overviewSection,
-      env,
+      $Common$Utils.capitalize(env),
       _U.list(["name","source","arguemnts","options","classes"]),
       _U.list([_p3.name,_p3.src,args$,os,cs]))]);
    });

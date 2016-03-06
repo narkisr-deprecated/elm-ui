@@ -4,6 +4,8 @@ import Effects exposing (Effects, Never, batch, map)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)
+import String
+import Char
 
 partition n list =
   let
@@ -41,4 +43,11 @@ setEnvironments model es =
 setEnvironment ({environments} as model) es =
    none {model |  environment = (Maybe.withDefault "" (List.head (Dict.keys es)))}
 
+capitalize : String -> String 
+capitalize s = 
+  case String.uncons s of 
+    Just (c,ss) ->
+      String.cons (Char.toUpper c) ss 
 
+    Nothing ->
+      s 

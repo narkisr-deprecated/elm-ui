@@ -9,7 +9,7 @@ import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, t
 import Common.Summary exposing (..)
 import Maybe exposing (withDefault)
 import Http exposing (Error(BadResponse))
-import Common.Utils exposing (none)
+import Common.Utils exposing (none, capitalize)
 import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
 import Task
@@ -67,7 +67,7 @@ moduleSection env {args, module', classes} =
     os = optionsList module'.options
     args' = String.join "" args
   in 
-  [overviewSection env 
+  [overviewSection (capitalize env)
      ["name", "source", "arguemnts", "options", "classes"]
      [module'.name, module'.src, args', os, cs]]
 
