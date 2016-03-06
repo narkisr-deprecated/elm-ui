@@ -45,7 +45,7 @@ update : Action ->  Model-> (Model , Effects Action)
 update action model =
   case action of
     ViewSystem id -> 
-      (model, getSystem id )
+      (model, getSystem id)
 
     SetSystem result -> 
       successHandler result model (setSystem model) NoOp

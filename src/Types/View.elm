@@ -2,29 +2,49 @@ module Types.View where
 
 import Effects exposing (Effects)
 import Html exposing (..)
-import Types.Model exposing (Type)
+import Types.Model as Model exposing (Type, emptyType)
 import Common.Utils exposing (partition, withDefaultProp)
 import Bootstrap.Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Common.Summary exposing (..)
 import Maybe exposing (withDefault)
+import Http exposing (Error(BadResponse))
+import Common.Utils exposing (none)
+import Common.Errors exposing (successHandler)
+import Common.Http exposing (getJson)
+import Task
 
 
 type alias Model = 
-  {}
+  {
+   type' : Type 
+  }
  
 init : (Model , Effects Action)
 init =
-  (Model, Effects.none)
+  none (Model emptyType)
 
 -- Update 
 
 type Action = 
-  NoOp
+  ViewType String
+    | SetType (Result Http.Error Type)
+    | NoOp
+
+setType : Model -> Type -> (Model , Effects Action)
+setType model type' =
+  none {model | type' = type'}
+
 
 update : Action ->  Model-> (Model , Effects Action)
 update action model =
   case action of 
+   ViewType id -> 
+     (model, getType id)
+
+   SetType result -> 
+      successHandler result model (setType model) NoOp
+ 
    NoOp -> 
      (model, Effects.none)
 
@@ -49,9 +69,15 @@ summarize model =
           ]
   ]
 
-view : Signal.Address Action -> Model -> Html
+view : Signal.Address Action -> Model -> List Html
 view address model =
-  div [] [
-  ]
+  (summarize model.type')
+  
 
+getType : String -> Effects Action
+getType id = 
+  getJson Model.type' ("/types/" ++ id)
+    |> Task.toResult
+    |> Task.map SetType
+    |> Effects.task
 

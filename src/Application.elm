@@ -76,7 +76,7 @@ goto active section (({navSide} as model), effects)  =
   ({model | navSide = NavSide.update (NavSide.Goto active section) navSide}, effects)
 
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ({systems, templates, stacks} as model , effects) =
+navigate action ({systems, templates, stacks, types} as model , effects) =
   case action of
     SystemsAction action -> 
       case systems.navChange  of
@@ -107,6 +107,13 @@ navigate action ({systems, templates, stacks} as model , effects) =
           _ -> 
             (model, effects) 
 
+    TypesAction action -> 
+        case types.navChange of
+          Just (active, dest) -> 
+            goto active dest (model, effects)
+
+          _ -> 
+            (model, effects) 
     NavSideAction navAction -> 
       case navAction of 
         NavSide.Goto Stacks Add -> 
