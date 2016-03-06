@@ -18212,16 +18212,24 @@ Elm.Types.Model.make = function (_elm) {
    var typeBase = F3(function (type$,description,environment) {
       return A3(Type,type$,$Maybe.Just(description),$Dict.fromList(_U.list([{ctor: "_Tuple2",_0: environment,_1: emptyPuppet}])));
    });
+   var valueOf = function (option) {
+      var _p0 = option;
+      if (_p0.ctor === "BoolOption") {
+            return $String.toLower($Basics.toString(_p0._0));
+         } else {
+            return _p0._0;
+         }
+   };
    var StringOption = function (a) {    return {ctor: "StringOption",_0: a};};
    var BoolOption = function (a) {    return {ctor: "BoolOption",_0: a};};
    var option = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool),A2($Json$Decode.map,StringOption,$Json$Decode.string)]));
    var classesDictDecoder = $Json$Decode.dict($Json$Decode.dict(option));
    var decodeClasses = function (json) {
-      var _p0 = A2($Json$Decode.decodeString,classesDictDecoder,json);
-      if (_p0.ctor === "Ok") {
-            return _p0._0;
+      var _p1 = A2($Json$Decode.decodeString,classesDictDecoder,json);
+      if (_p1.ctor === "Ok") {
+            return _p1._0;
          } else {
-            return A2($Debug.log,_p0._0,$Dict.empty);
+            return A2($Debug.log,_p1._0,$Dict.empty);
          }
    };
    var module$ = A4($Json$Decode.object3,
@@ -18247,11 +18255,12 @@ Elm.Types.Model.make = function (_elm) {
    return _elm.Types.Model.values = {_op: _op
                                     ,BoolOption: BoolOption
                                     ,StringOption: StringOption
+                                    ,valueOf: valueOf
                                     ,Module: Module
                                     ,PuppetStd: PuppetStd
+                                    ,Type: Type
                                     ,classesDictDecoder: classesDictDecoder
                                     ,decodeClasses: decodeClasses
-                                    ,Type: Type
                                     ,option: option
                                     ,module$: module$
                                     ,puppetStd: puppetStd
@@ -24602,6 +24611,7 @@ Elm.Types.View.make = function (_elm) {
    $Common$Summary = Elm.Common.Summary.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
@@ -24610,16 +24620,41 @@ Elm.Types.View.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm),
    $Types$Model = Elm.Types.Model.make(_elm);
    var _op = {};
-   var summarySections = function (_p0) {
-      var _p1 = _p0;
-      return A2($List.filter,
-      function (_p2) {
-         return $Basics.not($List.isEmpty(_p2));
-      },
-      _U.list([A3($Common$Summary.overviewSection,"Type",_U.list(["type","description"]),_U.list([_p1.type$,A2($Maybe.withDefault,"",_p1.description)]))]));
+   var optionsList = function (options) {
+      var _p0 = options;
+      if (_p0.ctor === "Just") {
+            return A2($String.join,
+            ",",
+            $Dict.values(A2($Dict.map,
+            F2(function (k,o) {    return A2($Basics._op["++"],k,A2($Basics._op["++"],": ",A2($Basics._op["++"],$Types$Model.valueOf(o),", ")));}),
+            _p0._0)));
+         } else {
+            return "";
+         }
+   };
+   var moduleSection = F2(function (env,_p1) {
+      var _p2 = _p1;
+      var _p3 = _p2.module$;
+      var args$ = A2($String.join,"",_p2.args);
+      var os = optionsList(_p3.options);
+      var cs = A2($String.join,"",$Dict.keys(_p2.classes));
+      return _U.list([A3($Common$Summary.overviewSection,
+      env,
+      _U.list(["name","source","arguemnts","options","classes"]),
+      _U.list([_p3.name,_p3.src,args$,os,cs]))]);
+   });
+   var puppetSummary = function (puppetStd) {
+      return A3($Dict.foldl,F3(function (env,std,res) {    return A2($List.append,A2(moduleSection,env,std),res);}),_U.list([]),puppetStd);
+   };
+   var summarySections = function (_p4) {
+      var _p5 = _p4;
+      return A2($List.append,
+      _U.list([A3($Common$Summary.overviewSection,"Type",_U.list(["type","description"]),_U.list([_p5.type$,A2($Maybe.withDefault,"",_p5.description)]))]),
+      puppetSummary(_p5.puppetStd));
    };
    var summarize = function (model) {
       return _U.list([A2($Html.div,
@@ -24639,10 +24674,10 @@ Elm.Types.View.make = function (_elm) {
       return $Effects.task(A2($Task.map,SetType,$Task.toResult(A2($Common$Http.getJson,$Types$Model.type$,A2($Basics._op["++"],"/types/",id)))));
    };
    var update = F2(function (action,model) {
-      var _p3 = action;
-      switch (_p3.ctor)
-      {case "ViewType": return {ctor: "_Tuple2",_0: model,_1: getType(_p3._0)};
-         case "SetType": return A4($Common$Errors.successHandler,_p3._0,model,setType(model),NoOp);
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "ViewType": return {ctor: "_Tuple2",_0: model,_1: getType(_p6._0)};
+         case "SetType": return A4($Common$Errors.successHandler,_p6._0,model,setType(model),NoOp);
          default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
    });
    var ViewType = function (a) {    return {ctor: "ViewType",_0: a};};
@@ -24656,6 +24691,9 @@ Elm.Types.View.make = function (_elm) {
                                    ,NoOp: NoOp
                                    ,setType: setType
                                    ,update: update
+                                   ,optionsList: optionsList
+                                   ,moduleSection: moduleSection
+                                   ,puppetSummary: puppetSummary
                                    ,summarySections: summarySections
                                    ,summarize: summarize
                                    ,view: view

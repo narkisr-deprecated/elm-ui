@@ -8,6 +8,13 @@ type Options =
   BoolOption Bool 
     | StringOption String
 
+valueOf option = 
+  case option of 
+    BoolOption bool -> 
+      (String.toLower (toString bool))
+
+    StringOption str -> 
+      str
 
 type alias Module = 
   {
@@ -23,10 +30,18 @@ type alias PuppetStd =
   , classes : Dict String (Dict String Options)
   }
 
+type alias Type = 
+  {
+    type' : String 
+  , description : Maybe String
+  , puppetStd : Dict String PuppetStd
+  }
+
+-- Decoders
+
 classesDictDecoder: Decoder (Dict String (Dict String Options))
 classesDictDecoder = 
    (dict (dict option))
-
 
 decodeClasses : String -> (Dict String (Dict String Options))
 decodeClasses json =
@@ -35,14 +50,6 @@ decodeClasses json =
        value
     Err error -> 
       Debug.log error Dict.empty
-
-
-type alias Type = 
-  {
-    type' : String 
-  , description : Maybe String
-  , puppetStd : Dict String PuppetStd
-  }
 
 option = 
   (oneOf [map BoolOption bool, map StringOption string])
@@ -68,6 +75,8 @@ type' =
     (maybe ("description" := string))
     ("puppet-std" := dict puppetStd)
 
+
+-- Builders 
 
 emptyType = 
   Type "" Nothing Dict.empty
