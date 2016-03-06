@@ -7,6 +7,7 @@ import Common.Utils exposing (partition, withDefaultProp)
 import Bootstrap.Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Common.Summary exposing (..)
+import Common.Components exposing (asList)
 import Maybe exposing (withDefault)
 import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none, capitalize)
@@ -82,20 +83,17 @@ summarySections {type', description, puppetStd} =
      [overviewSection "Type" ["type", "description"] [type', withDefault "" description]]
      (puppetSummary puppetStd)
 
-summarize: Type -> List Html
+summarize: Type -> Html
 summarize model =
-  [div [] [ h4 [] [(text "Type")] 
-          , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
-             (summarySections model |> List.map summaryPanel
-                                    |> partition 2 
-                                    |> (List.map List.concat) 
-                                    |> (List.map row_))
-          ]
-  ]
+   div [style [("line-height", "1.8"), ("list-style-type","none")]] 
+     (summarySections model |> List.map summaryPanel
+                            |> partition 2 
+                            |> (List.map List.concat) 
+                            |> (List.map row_))
 
 view : Signal.Address Action -> Model -> List Html
 view address model =
-  (summarize model.type')
+  asList (div [] [h4 [] [(text "Type")], (summarize model.type')])
   
 
 getType : String -> Effects Action

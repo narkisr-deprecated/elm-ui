@@ -20,6 +20,7 @@ import Json.Decode exposing (..)
 import Common.Http exposing (postJson)
 import Task exposing (Task)
 import Types.Persistency exposing (persistType)
+import Types.View exposing (summarize)
 
 import Types.Model exposing (Type, emptyType, emptyPuppet)
 import Types.Add.Common as TypeCommon
@@ -63,6 +64,8 @@ type Action =
     | SetEnvironments (Result Http.Error Environments)
     | LoadEditor
     | SetClasses String
+    | Cancel
+    | Done
     | Back
     | Next
     | Save
@@ -128,7 +131,7 @@ update action ({wizard, editClasses} as model) =
 
     SetClasses json -> 
       let
-         classes = Debug.log "" (decodeClasses json)
+         classes = decodeClasses json
       in
         (model, persistType saveType (merged model classes))
 
@@ -137,6 +140,9 @@ update action ({wizard, editClasses} as model) =
         (model, persistType saveType (merged model Dict.empty))
       else
         (model, getEditor "types" NoOp)
+
+    Saved result -> 
+       errorsHandler result model NoOp
 
     _ -> 
       (none model)
@@ -162,7 +168,7 @@ currentView address ({wizard, environments, editClasses} as model) =
           
       Nothing -> 
         dialogPanel "info" (info "Save new type") 
-           (panel (fixedPanel (div [] [text "we are done"])))
+           (panel (fixedPanel (summarize (merged model Dict.empty))))
 
 
 errorsView address {saveErrors} = 
@@ -174,20 +180,27 @@ errorsView address {saveErrors} =
 saveButton address =
     [button [id "Save", class "btn btn-primary", onClick address Save] [text "Save  "]]
 
-view : Signal.Address Action -> Model -> List Html
-view address ({wizard, saveErrors} as model) =
- [ row_ [
-     (if Errors.hasErrors saveErrors then
-        div [] 
-          (errorsView address model)
-       else
-        div [class "col-md-offset-2 col-md-8"]
-          (currentView address model)
-       )
-   ]
- , row_ (buttons address { model | hasNext = Wizard.notDone model} Next Back (saveButton address))
+rows contents buttons = 
+ [ 
+  row_ [
+    contents
+  ]
+ ,row_ buttons
  ]
 
+view : Signal.Address Action -> Model -> List Html
+view address ({wizard, saveErrors} as model) =
+  let 
+    buttons' = (buttons address { model | hasNext = Wizard.notDone model})
+  in 
+   if Errors.hasErrors saveErrors then
+    rows 
+     (div [] (errorsView address model))
+     (buttons' Cancel Done (saveButton address))
+    else
+     rows 
+      (div [class "col-md-offset-2 col-md-8"] (currentView address model))
+      (buttons' Next Back (saveButton address))
 
 type alias SaveResponse = 
   {

@@ -24229,6 +24229,109 @@ Elm.Types.Persistency.make = function (_elm) {
                                           ,persistType: persistType};
 };
 Elm.Types = Elm.Types || {};
+Elm.Types.View = Elm.Types.View || {};
+Elm.Types.View.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.View = _elm.Types.View || {};
+   if (_elm.Types.View.values) return _elm.Types.View.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Summary = Elm.Common.Summary.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Types$Model = Elm.Types.Model.make(_elm);
+   var _op = {};
+   var optionsList = function (options) {
+      var _p0 = options;
+      if (_p0.ctor === "Just") {
+            return A2($String.join,
+            ",",
+            $Dict.values(A2($Dict.map,
+            F2(function (k,o) {    return A2($Basics._op["++"],k,A2($Basics._op["++"],": ",A2($Basics._op["++"],$Types$Model.valueOf(o),", ")));}),
+            _p0._0)));
+         } else {
+            return "";
+         }
+   };
+   var moduleSection = F2(function (env,_p1) {
+      var _p2 = _p1;
+      var _p3 = _p2.module$;
+      var args$ = A2($String.join,"",_p2.args);
+      var os = optionsList(_p3.options);
+      var cs = A2($String.join,"",$Dict.keys(_p2.classes));
+      return _U.list([A3($Common$Summary.overviewSection,
+      $Common$Utils.capitalize(env),
+      _U.list(["name","source","arguemnts","options","classes"]),
+      _U.list([_p3.name,_p3.src,args$,os,cs]))]);
+   });
+   var puppetSummary = function (puppetStd) {
+      return A3($Dict.foldl,F3(function (env,std,res) {    return A2($List.append,A2(moduleSection,env,std),res);}),_U.list([]),puppetStd);
+   };
+   var summarySections = function (_p4) {
+      var _p5 = _p4;
+      return A2($List.append,
+      _U.list([A3($Common$Summary.overviewSection,"Type",_U.list(["type","description"]),_U.list([_p5.type$,A2($Maybe.withDefault,"",_p5.description)]))]),
+      puppetSummary(_p5.puppetStd));
+   };
+   var summarize = function (model) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+      A2($List.map,
+      $Bootstrap$Html.row_,
+      A2($List.map,$List.concat,A2($Common$Utils.partition,2,A2($List.map,$Common$Summary.summaryPanel,summarySections(model))))));
+   };
+   var view = F2(function (address,model) {
+      return $Common$Components.asList(A2($Html.div,_U.list([]),_U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Type")])),summarize(model.type$)])));
+   });
+   var setType = F2(function (model,type$) {    return $Common$Utils.none(_U.update(model,{type$: type$}));});
+   var NoOp = {ctor: "NoOp"};
+   var SetType = function (a) {    return {ctor: "SetType",_0: a};};
+   var getType = function (id) {
+      return $Effects.task(A2($Task.map,SetType,$Task.toResult(A2($Common$Http.getJson,$Types$Model.type$,A2($Basics._op["++"],"/types/",id)))));
+   };
+   var update = F2(function (action,model) {
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "ViewType": return {ctor: "_Tuple2",_0: model,_1: getType(_p6._0)};
+         case "SetType": return A4($Common$Errors.successHandler,_p6._0,model,setType(model),NoOp);
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var ViewType = function (a) {    return {ctor: "ViewType",_0: a};};
+   var Model = function (a) {    return {type$: a};};
+   var init = $Common$Utils.none(Model($Types$Model.emptyType));
+   return _elm.Types.View.values = {_op: _op
+                                   ,Model: Model
+                                   ,init: init
+                                   ,ViewType: ViewType
+                                   ,SetType: SetType
+                                   ,NoOp: NoOp
+                                   ,setType: setType
+                                   ,update: update
+                                   ,optionsList: optionsList
+                                   ,moduleSection: moduleSection
+                                   ,puppetSummary: puppetSummary
+                                   ,summarySections: summarySections
+                                   ,summarize: summarize
+                                   ,view: view
+                                   ,getType: getType};
+};
+Elm.Types = Elm.Types || {};
 Elm.Types.Add = Elm.Types.Add || {};
 Elm.Types.Add.Common = Elm.Types.Add.Common || {};
 Elm.Types.Add.Common.make = function (_elm) {
@@ -24439,10 +24542,12 @@ Elm.Types.Add.make = function (_elm) {
    $Types$Add$Main = Elm.Types.Add.Main.make(_elm),
    $Types$Add$Puppet = Elm.Types.Add.Puppet.make(_elm),
    $Types$Model = Elm.Types.Model.make(_elm),
-   $Types$Persistency = Elm.Types.Persistency.make(_elm);
+   $Types$Persistency = Elm.Types.Persistency.make(_elm),
+   $Types$View = Elm.Types.View.make(_elm);
    var _op = {};
    var SaveResponse = function (a) {    return {message: a};};
    var saveResponse = A2($Json$Decode.object1,SaveResponse,A2($Json$Decode._op[":="],"message",$Json$Decode.string));
+   var rows = F2(function (contents,buttons) {    return _U.list([$Bootstrap$Html.row_(_U.list([contents])),$Bootstrap$Html.row_(buttons)]);});
    var merge = F3(function (classes,_p0,acc) {
       var _p1 = _p0;
       var type$ = A2($Maybe.withDefault,acc,$Form.getOutput(_p1.form));
@@ -24470,6 +24575,8 @@ Elm.Types.Add.make = function (_elm) {
    };
    var Next = {ctor: "Next"};
    var Back = {ctor: "Back"};
+   var Done = {ctor: "Done"};
+   var Cancel = {ctor: "Cancel"};
    var SetClasses = function (a) {    return {ctor: "SetClasses",_0: a};};
    var LoadEditor = {ctor: "LoadEditor"};
    var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
@@ -24500,7 +24607,7 @@ Elm.Types.Add.make = function (_elm) {
             return A3($Common$Components.dialogPanel,
             "info",
             $Common$Components.info("Save new type"),
-            $Common$Components.panel($Common$Components.fixedPanel(A2($Html.div,_U.list([]),_U.list([$Html.text("we are done")])))));
+            $Common$Components.panel($Common$Components.fixedPanel($Types$View.summarize(A2(merged,_p6,$Dict.empty)))));
          }
    });
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
@@ -24516,15 +24623,12 @@ Elm.Types.Add.make = function (_elm) {
    var view = F2(function (address,_p12) {
       var _p13 = _p12;
       var _p14 = _p13;
-      return _U.list([$Bootstrap$Html.row_(_U.list([$Common$Errors.hasErrors(_p13.saveErrors) ? A2($Html.div,
-                     _U.list([]),
-                     A2(errorsView,address,_p14)) : A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),A2(currentView,address,_p14))]))
-                     ,$Bootstrap$Html.row_(A5($Common$Components.buttons,
-                     address,
-                     _U.update(_p14,{hasNext: $Common$FormWizard.notDone(_p14)}),
-                     Next,
-                     Back,
-                     saveButton(address)))]);
+      var buttons$ = A2($Common$Components.buttons,address,_U.update(_p14,{hasNext: $Common$FormWizard.notDone(_p14)}));
+      return $Common$Errors.hasErrors(_p13.saveErrors) ? A2(rows,
+      A2($Html.div,_U.list([]),A2(errorsView,address,_p14)),
+      A3(buttons$,Cancel,Done,saveButton(address))) : A2(rows,
+      A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),A2(currentView,address,_p14)),
+      A3(buttons$,Next,Back,saveButton(address)));
    });
    var step = F2(function (model,value) {    return {form: model.form,value: value};});
    var Puppet = {ctor: "Puppet"};
@@ -24557,7 +24661,7 @@ Elm.Types.Add.make = function (_elm) {
               return $Common$Utils.none(_U.update(_p22,{wizard: newWizard}));
             case "SetEnvironments": return A4($Common$Errors.successHandler,_p19._0,_p22,setEnvironment(_p22),NoOp);
             case "LoadEditor": return {ctor: "_Tuple2",_0: _U.update(_p22,{editClasses: $Basics.not(_p21)}),_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
-            case "SetClasses": var classes = A2($Debug.log,"",$Types$Model.decodeClasses(_p19._0));
+            case "SetClasses": var classes = $Types$Model.decodeClasses(_p19._0);
               return {ctor: "_Tuple2",_0: _p22,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p22,classes))};
             case "Save": return _U.eq(_p21,false) ? {ctor: "_Tuple2"
                                                     ,_0: _p22
@@ -24566,6 +24670,7 @@ Elm.Types.Add.make = function (_elm) {
                                                                                                                                     ,_1: A2($Common$Editor.getEditor,
                                                                                                                                     "types",
                                                                                                                                     NoOp)};
+            case "Saved": return A3($Common$Errors.errorsHandler,_p19._0,_p22,NoOp);
             default: return $Common$Utils.none(_p22);}
       }
    });
@@ -24590,6 +24695,8 @@ Elm.Types.Add.make = function (_elm) {
                                   ,SetEnvironments: SetEnvironments
                                   ,LoadEditor: LoadEditor
                                   ,SetClasses: SetClasses
+                                  ,Cancel: Cancel
+                                  ,Done: Done
                                   ,Back: Back
                                   ,Next: Next
                                   ,Save: Save
@@ -24602,113 +24709,11 @@ Elm.Types.Add.make = function (_elm) {
                                   ,currentView: currentView
                                   ,errorsView: errorsView
                                   ,saveButton: saveButton
+                                  ,rows: rows
                                   ,view: view
                                   ,SaveResponse: SaveResponse
                                   ,saveResponse: saveResponse
                                   ,saveType: saveType};
-};
-Elm.Types = Elm.Types || {};
-Elm.Types.View = Elm.Types.View || {};
-Elm.Types.View.make = function (_elm) {
-   "use strict";
-   _elm.Types = _elm.Types || {};
-   _elm.Types.View = _elm.Types.View || {};
-   if (_elm.Types.View.values) return _elm.Types.View.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
-   $Common$Errors = Elm.Common.Errors.make(_elm),
-   $Common$Http = Elm.Common.Http.make(_elm),
-   $Common$Summary = Elm.Common.Summary.make(_elm),
-   $Common$Utils = Elm.Common.Utils.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm),
-   $Task = Elm.Task.make(_elm),
-   $Types$Model = Elm.Types.Model.make(_elm);
-   var _op = {};
-   var optionsList = function (options) {
-      var _p0 = options;
-      if (_p0.ctor === "Just") {
-            return A2($String.join,
-            ",",
-            $Dict.values(A2($Dict.map,
-            F2(function (k,o) {    return A2($Basics._op["++"],k,A2($Basics._op["++"],": ",A2($Basics._op["++"],$Types$Model.valueOf(o),", ")));}),
-            _p0._0)));
-         } else {
-            return "";
-         }
-   };
-   var moduleSection = F2(function (env,_p1) {
-      var _p2 = _p1;
-      var _p3 = _p2.module$;
-      var args$ = A2($String.join,"",_p2.args);
-      var os = optionsList(_p3.options);
-      var cs = A2($String.join,"",$Dict.keys(_p2.classes));
-      return _U.list([A3($Common$Summary.overviewSection,
-      $Common$Utils.capitalize(env),
-      _U.list(["name","source","arguemnts","options","classes"]),
-      _U.list([_p3.name,_p3.src,args$,os,cs]))]);
-   });
-   var puppetSummary = function (puppetStd) {
-      return A3($Dict.foldl,F3(function (env,std,res) {    return A2($List.append,A2(moduleSection,env,std),res);}),_U.list([]),puppetStd);
-   };
-   var summarySections = function (_p4) {
-      var _p5 = _p4;
-      return A2($List.append,
-      _U.list([A3($Common$Summary.overviewSection,"Type",_U.list(["type","description"]),_U.list([_p5.type$,A2($Maybe.withDefault,"",_p5.description)]))]),
-      puppetSummary(_p5.puppetStd));
-   };
-   var summarize = function (model) {
-      return _U.list([A2($Html.div,
-      _U.list([]),
-      _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Type")]))
-              ,A2($Html.div,
-              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
-              A2($List.map,
-              $Bootstrap$Html.row_,
-              A2($List.map,$List.concat,A2($Common$Utils.partition,2,A2($List.map,$Common$Summary.summaryPanel,summarySections(model))))))]))]);
-   };
-   var view = F2(function (address,model) {    return summarize(model.type$);});
-   var setType = F2(function (model,type$) {    return $Common$Utils.none(_U.update(model,{type$: type$}));});
-   var NoOp = {ctor: "NoOp"};
-   var SetType = function (a) {    return {ctor: "SetType",_0: a};};
-   var getType = function (id) {
-      return $Effects.task(A2($Task.map,SetType,$Task.toResult(A2($Common$Http.getJson,$Types$Model.type$,A2($Basics._op["++"],"/types/",id)))));
-   };
-   var update = F2(function (action,model) {
-      var _p6 = action;
-      switch (_p6.ctor)
-      {case "ViewType": return {ctor: "_Tuple2",_0: model,_1: getType(_p6._0)};
-         case "SetType": return A4($Common$Errors.successHandler,_p6._0,model,setType(model),NoOp);
-         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
-   });
-   var ViewType = function (a) {    return {ctor: "ViewType",_0: a};};
-   var Model = function (a) {    return {type$: a};};
-   var init = $Common$Utils.none(Model($Types$Model.emptyType));
-   return _elm.Types.View.values = {_op: _op
-                                   ,Model: Model
-                                   ,init: init
-                                   ,ViewType: ViewType
-                                   ,SetType: SetType
-                                   ,NoOp: NoOp
-                                   ,setType: setType
-                                   ,update: update
-                                   ,optionsList: optionsList
-                                   ,moduleSection: moduleSection
-                                   ,puppetSummary: puppetSummary
-                                   ,summarySections: summarySections
-                                   ,summarize: summarize
-                                   ,view: view
-                                   ,getType: getType};
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.Core = Elm.Types.Core || {};
