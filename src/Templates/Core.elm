@@ -87,7 +87,7 @@ navigate action ((({launch, delete} as model), effects) as result) =
     TemplatesDelete deleteAction -> 
        case deleteAction of 
           Delete.Deleted _  -> 
-           if delete.error == "" then
+           if delete.errorMsg == "" then
              ({ model | navChange = Just (Templates, List)}, effects)
            else
              result

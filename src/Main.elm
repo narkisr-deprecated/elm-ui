@@ -146,7 +146,6 @@ intoActions (dest, job, target) =
     "Types" ->
        Application.TypesAction (TypesCore.SetupJob (job, target))
 
-
     _ -> 
        Application.NoOp
 

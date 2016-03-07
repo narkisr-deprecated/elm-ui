@@ -24,6 +24,8 @@ fixedSize height =
   , ("height", height)
   ]
 
+-- panels 
+
 panelContents body =
   div [class "panel-body"] [
     body
@@ -42,7 +44,20 @@ fixedPanel body =
     body
   ] 
 
-dianlogButtons address cancel ok =
+-- Dialogs
+
+message title content =
+  [ h4 [] [ text title ]
+  , span [] content
+  ]
+
+info msg =
+    message "Info" [text msg]
+
+error msg = 
+   message "Error!" [text msg]
+
+dialogButtons address cancel ok =
   row_ [
      div [class "text-center"] [
        div [class "btn-group col-md-offset-5 col-md-10"] [
@@ -74,7 +89,7 @@ dialogPanel type' message body =
   ]
 
 withButtons address cancel ok panel = 
-  List.append panel (asList (dianlogButtons address cancel ok))
+  List.append panel (asList (dialogButtons address cancel ok))
 
 infoCallout address message body cancel ok = 
   dialogPanel "info" message body
@@ -87,6 +102,9 @@ dangerCallout address message body cancel ok =
 warningCallout address message body cancel ok = 
   dialogPanel "warning" message body
     |> withButtons address cancel ok
+
+
+-- Form groups
 
 withError : List Error -> String -> String
 withError errors class =
@@ -177,18 +195,6 @@ checkbox address action currentValue=
 withErrors : Dict String (List Error) -> String ->  Html -> Html
 withErrors errors key widget =
   group key widget (defaultEmpty (Dict.get key errors))
-
-message title content =
-  [ h4 [] [ text title ]
-  , span [] [ text content ]
-  ]
-
-info msg =
-    message "Info" msg
-
-error msg = 
-   message "Error!" msg
-
 
 buttons address ({hasNext} as model) next back last =
   let

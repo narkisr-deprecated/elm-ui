@@ -14845,11 +14845,6 @@ Elm.Common.Components.make = function (_elm) {
                      _U.list([$Html$Attributes.id("Next"),$Html$Attributes.$class("btn btn-primary"),click(next)]),
                      _U.list([$Html.text("Next >>")]))])) : A2($Html.div,_U.list([$Html$Attributes.$class("btn-group"),margin]),last)]);
    });
-   var message = F2(function (title,content) {
-      return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text(title)])),A2($Html.span,_U.list([]),_U.list([$Html.text(content)]))]);
-   });
-   var info = function (msg) {    return A2(message,"Info",msg);};
-   var error = function (msg) {    return A2(message,"Error!",msg);};
    var checkbox = F3(function (address,action,currentValue) {
       return A2($Html.input,
       _U.list([$Html$Attributes.type$("checkbox"),A2($Html$Events.onClick,address,action),$Html$Attributes.checked(currentValue)]),
@@ -14929,7 +14924,7 @@ Elm.Common.Components.make = function (_elm) {
       return _U.list([$Bootstrap$Html.row_(_U.list([A2(callout,type$,message)]))
                      ,$Bootstrap$Html.row_(_U.list([A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),_U.list([body]))]))]);
    });
-   var dianlogButtons = F3(function (address,cancel,ok) {
+   var dialogButtons = F3(function (address,cancel,ok) {
       return $Bootstrap$Html.row_(_U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("text-center")]),
       _U.list([A2($Html.div,
@@ -14941,8 +14936,11 @@ Elm.Common.Components.make = function (_elm) {
               _U.list([$Html$Attributes.$class("btn btn-primary btn-sm col-md-1"),A2($Html$Events.onClick,address,ok)]),
               _U.list([$Html.text($Basics.toString(ok))]))]))]))]));
    });
+   var message = F2(function (title,content) {    return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text(title)])),A2($Html.span,_U.list([]),content)]);});
+   var info = function (msg) {    return A2(message,"Info",_U.list([$Html.text(msg)]));};
+   var error = function (msg) {    return A2(message,"Error!",_U.list([$Html.text(msg)]));};
    var asList = function (body) {    return _U.list([body]);};
-   var withButtons = F4(function (address,cancel,ok,panel) {    return A2($List.append,panel,asList(A3(dianlogButtons,address,cancel,ok)));});
+   var withButtons = F4(function (address,cancel,ok,panel) {    return A2($List.append,panel,asList(A3(dialogButtons,address,cancel,ok)));});
    var infoCallout = F5(function (address,message,body,cancel,ok) {    return A4(withButtons,address,cancel,ok,A3(dialogPanel,"info",message,body));});
    var dangerCallout = F5(function (address,message,body,cancel,ok) {    return A4(withButtons,address,cancel,ok,A3(dialogPanel,"danger",message,body));});
    var warningCallout = F5(function (address,message,body,cancel,ok) {    return A4(withButtons,address,cancel,ok,A3(dialogPanel,"warning",message,body));});
@@ -14963,7 +14961,10 @@ Elm.Common.Components.make = function (_elm) {
                                           ,panel: panel
                                           ,asList: asList
                                           ,fixedPanel: fixedPanel
-                                          ,dianlogButtons: dianlogButtons
+                                          ,message: message
+                                          ,info: info
+                                          ,error: error
+                                          ,dialogButtons: dialogButtons
                                           ,callout: callout
                                           ,dialogPanel: dialogPanel
                                           ,withButtons: withButtons
@@ -14985,9 +14986,6 @@ Elm.Common.Components.make = function (_elm) {
                                           ,inputText: inputText
                                           ,checkbox: checkbox
                                           ,withErrors: withErrors
-                                          ,message: message
-                                          ,info: info
-                                          ,error: error
                                           ,buttons: buttons};
 };
 Elm.Common = Elm.Common || {};
@@ -24724,6 +24722,118 @@ Elm.Types.Add.make = function (_elm) {
                                   ,saveResponse: saveResponse
                                   ,saveType: saveType};
 };
+Elm.Common = Elm.Common || {};
+Elm.Common.Delete = Elm.Common.Delete || {};
+Elm.Common.Delete.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Delete = _elm.Common.Delete || {};
+   if (_elm.Common.Delete.values) return _elm.Common.Delete.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var DeleteResponse = function (a) {    return {message: a};};
+   var deleteResponse = A2($Json$Decode.object1,DeleteResponse,A2($Json$Decode._op[":="],"message",$Json$Decode.string));
+   var deleteMessage = F2(function (item,name) {
+      return A2($Common$Components.message,
+      "Notice!",
+      _U.list([$Html.text(A2($Basics._op["++"],item," ")),A2($Html.strong,_U.list([]),_U.list([$Html.text(name)])),$Html.text(" will be deleted! ")]));
+   });
+   var deleteView = F5(function (address,_p0,type$,cancel,$delete) {
+      var _p1 = _p0;
+      return A5($Common$Components.dangerCallout,address,A2(deleteMessage,_p1.name,type$),A2($Html.div,_U.list([]),_U.list([])),cancel,$delete);
+   });
+   var view = F6(function (address,_p2,type$,cancel,$delete,done) {
+      var _p3 = _p2;
+      var _p4 = _p3.errorMsg;
+      return !_U.eq(_p4,"") ? A5($Common$Components.dangerCallout,
+      address,
+      $Common$Components.error(_p4),
+      A2($Html.div,_U.list([]),_U.list([])),
+      cancel,
+      done) : A5(deleteView,address,_p3,type$,cancel,$delete);
+   });
+   return _elm.Common.Delete.values = {_op: _op
+                                      ,deleteMessage: deleteMessage
+                                      ,deleteView: deleteView
+                                      ,view: view
+                                      ,DeleteResponse: DeleteResponse
+                                      ,deleteResponse: deleteResponse};
+};
+Elm.Types = Elm.Types || {};
+Elm.Types.Delete = Elm.Types.Delete || {};
+Elm.Types.Delete.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.Delete = _elm.Types.Delete || {};
+   if (_elm.Types.Delete.values) return _elm.Types.Delete.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Delete = Elm.Common.Delete.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var Error = function (a) {    return {ctor: "Error",_0: a};};
+   var Deleted = function (a) {    return {ctor: "Deleted",_0: a};};
+   var deleteType = function (name) {
+      return $Effects.task(A2($Task.map,Deleted,$Task.toResult(A2($Common$Http.$delete,$Common$Delete.deleteResponse,A2($Basics._op["++"],"/types/",name)))));
+   };
+   var succeeded = F2(function (action,_p0) {    var _p1 = _p0;return _U.eq(action,Deleted($Result.Ok({message: "Type deleted"}))) ? true : false;});
+   var Done = {ctor: "Done"};
+   var Delete = {ctor: "Delete"};
+   var Cancel = {ctor: "Cancel"};
+   var view = F2(function (address,model) {    return A6($Common$Delete.view,address,model,"Type",Cancel,Delete,Done);});
+   var NoOp = {ctor: "NoOp"};
+   var update = F2(function (action,_p2) {
+      var _p3 = _p2;
+      var _p7 = _p3;
+      var _p4 = action;
+      switch (_p4.ctor)
+      {case "Deleted": return A4($Common$Errors.failHandler,
+           _p4._0,
+           _p7,
+           function (_p5) {
+              var _p6 = _p5;
+              return $Common$Utils.none(_U.update(_p7,{errorMsg: A2($Maybe.withDefault,"Failed to delete template",_p6.message)}));
+           },
+           NoOp);
+         case "Delete": return {ctor: "_Tuple2",_0: _p7,_1: deleteType(_p3.name)};
+         default: return {ctor: "_Tuple2",_0: _p7,_1: $Effects.none};}
+   });
+   var Model = F2(function (a,b) {    return {name: a,errorMsg: b};});
+   var init = $Common$Utils.none(A2(Model,"",""));
+   return _elm.Types.Delete.values = {_op: _op
+                                     ,Model: Model
+                                     ,init: init
+                                     ,NoOp: NoOp
+                                     ,Cancel: Cancel
+                                     ,Delete: Delete
+                                     ,Done: Done
+                                     ,Deleted: Deleted
+                                     ,Error: Error
+                                     ,update: update
+                                     ,view: view
+                                     ,deleteType: deleteType
+                                     ,succeeded: succeeded};
+};
 Elm.Types = Elm.Types || {};
 Elm.Types.Core = Elm.Types.Core || {};
 Elm.Types.Core.make = function (_elm) {
@@ -24744,9 +24854,11 @@ Elm.Types.Core.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Table = Elm.Table.make(_elm),
    $Types$Add = Elm.Types.Add.make(_elm),
+   $Types$Delete = Elm.Types.Delete.make(_elm),
    $Types$List = Elm.Types.List.make(_elm),
    $Types$View = Elm.Types.View.make(_elm);
    var _op = {};
+   var Deleting = function (a) {    return {ctor: "Deleting",_0: a};};
    var Viewing = function (a) {    return {ctor: "Viewing",_0: a};};
    var navigate = F2(function (action,_p0) {
       var _p1 = _p0;
@@ -24754,32 +24866,41 @@ Elm.Types.Core.make = function (_elm) {
       var _p8 = _p1._0;
       var _p7 = _p1._1;
       var _p2 = action;
-      switch (_p2.ctor)
-      {case "Listing": var _p3 = _p2._0;
-           if (_p3.ctor === "LoadPage" && _p3._0.ctor === "View") {
-                 var _p4 = A2($Types$View.update,$Types$View.ViewType(_p3._0._0),_p9);
-                 var newSystems = _p4._0;
-                 var effects = _p4._1;
-                 return {ctor: "_Tuple2"
-                        ,_0: _U.update(_p8,{view: _p9,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.View})})
-                        ,_1: A2($Effects.map,Viewing,effects)};
-              } else {
-                 return {ctor: "_Tuple2",_0: _p8,_1: _p7};
-              }
-         case "Adding": var _p5 = _p2._0;
-           if (_p5.ctor === "Saved" && _p5._0.ctor === "Ok") {
-                 return {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p7};
-              } else {
-                 return {ctor: "_Tuple2",_0: _p8,_1: _p7};
-              }
-         case "SetupJob": var _p6 = _p2._0._0;
-           switch (_p6)
-           {case "edit": return {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Edit})}),_1: _p7};
-              case "clear": return {ctor: "_Tuple2"
-                                   ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Delete})})
-                                   ,_1: _p7};
-              default: return _p1;}
-         default: return {ctor: "_Tuple2",_0: _p8,_1: _p7};}
+      _v1_3: do {
+         switch (_p2.ctor)
+         {case "Listing": var _p3 = _p2._0;
+              if (_p3.ctor === "LoadPage" && _p3._0.ctor === "View") {
+                    var _p4 = A2($Types$View.update,$Types$View.ViewType(_p3._0._0),_p9);
+                    var newSystems = _p4._0;
+                    var effects = _p4._1;
+                    return {ctor: "_Tuple2"
+                           ,_0: _U.update(_p8,{view: _p9,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.View})})
+                           ,_1: A2($Effects.map,Viewing,effects)};
+                 } else {
+                    return {ctor: "_Tuple2",_0: _p8,_1: _p7};
+                 }
+            case "Adding": var _p5 = _p2._0;
+              if (_p5.ctor === "Saved" && _p5._0.ctor === "Ok") {
+                    return {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p7};
+                 } else {
+                    return {ctor: "_Tuple2",_0: _p8,_1: _p7};
+                 }
+            case "SetupJob": if (_p2._0.ctor === "_Tuple2") {
+                    var _p6 = _p2._0._0;
+                    switch (_p6)
+                    {case "edit": return {ctor: "_Tuple2"
+                                         ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Edit})})
+                                         ,_1: _p7};
+                       case "clear": return {ctor: "_Tuple2"
+                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Delete})})
+                                            ,_1: _p7};
+                       default: return _p1;}
+                 } else {
+                    break _v1_3;
+                 }
+            default: break _v1_3;}
+      } while (false);
+      return {ctor: "_Tuple2",_0: _p8,_1: _p7};
    });
    var Adding = function (a) {    return {ctor: "Adding",_0: a};};
    var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
@@ -24811,21 +24932,28 @@ Elm.Types.Core.make = function (_elm) {
       {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p20.list);
          case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p20.add);
          case "View": return A2($Types$View.view,A2($Signal.forwardTo,address,Viewing),_p20.view);
+         case "Delete": return A2($Types$Delete.view,A2($Signal.forwardTo,address,Deleting),_p20.$delete);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
-   var Model = F4(function (a,b,c,d) {    return {list: a,add: b,view: c,navChange: d};});
+   var Model = F5(function (a,b,c,d,e) {    return {list: a,add: b,view: c,$delete: d,navChange: e};});
    var init = function () {
-      var _p22 = $Types$View.init;
-      var view = _p22._0;
-      var viewAction = _p22._1;
-      var _p23 = $Types$Add.init;
-      var add = _p23._0;
-      var addAction = _p23._1;
-      var _p24 = $Types$List.init;
-      var list = _p24._0;
-      var listAction = _p24._1;
-      var effects = _U.list([A2($Effects.map,Listing,listAction),A2($Effects.map,Adding,addAction),A2($Effects.map,Viewing,viewAction)]);
-      return {ctor: "_Tuple2",_0: A4(Model,list,add,view,$Maybe.Nothing),_1: $Effects.batch(effects)};
+      var _p22 = $Types$Delete.init;
+      var $delete = _p22._0;
+      var deleteAction = _p22._1;
+      var _p23 = $Types$View.init;
+      var view = _p23._0;
+      var viewAction = _p23._1;
+      var _p24 = $Types$Add.init;
+      var add = _p24._0;
+      var addAction = _p24._1;
+      var _p25 = $Types$List.init;
+      var list = _p25._0;
+      var listAction = _p25._1;
+      var effects = _U.list([A2($Effects.map,Listing,listAction)
+                            ,A2($Effects.map,Adding,addAction)
+                            ,A2($Effects.map,Viewing,viewAction)
+                            ,A2($Effects.map,Deleting,deleteAction)]);
+      return {ctor: "_Tuple2",_0: A5(Model,list,add,view,$delete,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();
    return _elm.Types.Core.values = {_op: _op
                                    ,Model: Model
@@ -24834,6 +24962,7 @@ Elm.Types.Core.make = function (_elm) {
                                    ,SetupJob: SetupJob
                                    ,Adding: Adding
                                    ,Viewing: Viewing
+                                   ,Deleting: Deleting
                                    ,navigate: navigate
                                    ,route: route
                                    ,update: update
@@ -25230,7 +25359,7 @@ Elm.Templates.Delete.make = function (_elm) {
    if (_elm.Templates.Delete.values) return _elm.Templates.Delete.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Delete = Elm.Common.Delete.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
@@ -25238,62 +25367,42 @@ Elm.Templates.Delete.make = function (_elm) {
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var DeleteResponse = function (a) {    return {message: a};};
-   var deleteResponse = A2($Json$Decode.object1,DeleteResponse,A2($Json$Decode._op[":="],"message",$Json$Decode.string));
-   var errorMessage = function (message) {
-      return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Error!")])),A2($Html.span,_U.list([]),_U.list([$Html.text(message)]))]);
-   };
-   var deleteMessage = function (name) {
-      return _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("Notice!")]))
-                     ,A2($Html.span,
-                     _U.list([]),
-                     _U.list([$Html.text("Template "),A2($Html.strong,_U.list([]),_U.list([$Html.text(name)])),$Html.text(" will be deleted! ")]))]);
-   };
    var Error = function (a) {    return {ctor: "Error",_0: a};};
    var Deleted = function (a) {    return {ctor: "Deleted",_0: a};};
    var deleteTemplate = function (name) {
-      return $Effects.task(A2($Task.map,Deleted,$Task.toResult(A2($Common$Http.$delete,deleteResponse,A2($Basics._op["++"],"/templates/",name)))));
+      return $Effects.task(A2($Task.map,
+      Deleted,
+      $Task.toResult(A2($Common$Http.$delete,$Common$Delete.deleteResponse,A2($Basics._op["++"],"/templates/",name)))));
    };
    var succeeded = F2(function (action,_p0) {    var _p1 = _p0;return _U.eq(action,Deleted($Result.Ok({message: "Template deleted"}))) ? true : false;});
    var Done = {ctor: "Done"};
    var Delete = {ctor: "Delete"};
    var Cancel = {ctor: "Cancel"};
-   var deleteView = F2(function (address,_p2) {
-      var _p3 = _p2;
-      return A5($Common$Components.dangerCallout,address,deleteMessage(_p3.name),A2($Html.div,_U.list([]),_U.list([])),Cancel,Delete);
-   });
-   var view = F2(function (address,_p4) {
-      var _p5 = _p4;
-      var _p6 = _p5.error;
-      return !_U.eq(_p6,"") ? A5($Common$Components.dangerCallout,address,errorMessage(_p6),A2($Html.div,_U.list([]),_U.list([])),Cancel,Done) : A2(deleteView,
-      address,
-      _p5);
-   });
+   var view = F2(function (address,model) {    return A6($Common$Delete.view,address,model,"Template",Cancel,Delete,Done);});
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p7) {
-      var _p8 = _p7;
-      var _p12 = _p8;
-      var _p9 = action;
-      switch (_p9.ctor)
+   var update = F2(function (action,_p2) {
+      var _p3 = _p2;
+      var _p7 = _p3;
+      var _p4 = action;
+      switch (_p4.ctor)
       {case "Deleted": return A4($Common$Errors.failHandler,
-           _p9._0,
-           _p12,
-           function (_p10) {
-              var _p11 = _p10;
-              return $Common$Utils.none(_U.update(_p12,{error: A2($Maybe.withDefault,"Failed to delete template",_p11.message)}));
+           _p4._0,
+           _p7,
+           function (_p5) {
+              var _p6 = _p5;
+              return $Common$Utils.none(_U.update(_p7,{errorMsg: A2($Maybe.withDefault,"Failed to delete template",_p6.message)}));
            },
            NoOp);
-         case "Delete": return {ctor: "_Tuple2",_0: _p12,_1: deleteTemplate(_p8.name)};
-         default: return $Common$Utils.none(_p12);}
+         case "Delete": return {ctor: "_Tuple2",_0: _p7,_1: deleteTemplate(_p3.name)};
+         default: return $Common$Utils.none(_p7);}
    });
-   var Model = F2(function (a,b) {    return {name: a,error: b};});
+   var Model = F2(function (a,b) {    return {name: a,errorMsg: b};});
    var init = $Common$Utils.none(A2(Model,"",""));
    return _elm.Templates.Delete.values = {_op: _op
                                          ,Model: Model
@@ -25305,12 +25414,7 @@ Elm.Templates.Delete.make = function (_elm) {
                                          ,Deleted: Deleted
                                          ,Error: Error
                                          ,update: update
-                                         ,deleteMessage: deleteMessage
-                                         ,errorMessage: errorMessage
-                                         ,deleteView: deleteView
                                          ,view: view
-                                         ,DeleteResponse: DeleteResponse
-                                         ,deleteResponse: deleteResponse
                                          ,deleteTemplate: deleteTemplate
                                          ,succeeded: succeeded};
 };
@@ -25403,10 +25507,12 @@ Elm.Templates.Core.make = function (_elm) {
                  default: return _p12;}
             case "TemplatesDelete": var _p9 = _p5._0;
               switch (_p9.ctor)
-              {case "Deleted": return _U.eq(_p4._0.$delete.error,"") ? {ctor: "_Tuple2"
-                                                                       ,_0: _U.update(_p11,
-                                                                       {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
-                                                                       ,_1: _p10} : _p12;
+              {case "Deleted": return _U.eq(_p4._0.$delete.errorMsg,"") ? {ctor: "_Tuple2"
+                                                                          ,_0: _U.update(_p11,
+                                                                          {navChange: $Maybe.Just({ctor: "_Tuple2"
+                                                                                                  ,_0: $Nav$Side.Templates
+                                                                                                  ,_1: $Nav$Side.List})})
+                                                                          ,_1: _p10} : _p12;
                  case "Cancel": return A2(refreshList,
                    true,
                    {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}),_1: _p10});

@@ -4,6 +4,7 @@ import Html exposing (..)
 import Types.List as TypesList
 import Types.Add as TypesAdd
 import Types.View as TypesView
+import Types.Delete as TypesDelete
 import Nav.Side exposing (Section(Add, List, View, Edit, Delete), Active(Types))
 import Effects exposing (Effects, Never, batch, map)
 import Http exposing (Error(BadResponse))
@@ -16,6 +17,7 @@ type alias Model =
     list : TypesList.Model
   , add  : TypesAdd.Model
   , view : TypesView.Model
+  , delete : TypesDelete.Model
   , navChange : Maybe (Active, Section)
   }
   
@@ -25,19 +27,22 @@ init =
      (list, listAction)  = TypesList.init 
      (add, addAction)  = TypesAdd.init 
      (view, viewAction)  = TypesView.init 
+     (delete, deleteAction)  = TypesDelete.init 
      effects = [
         Effects.map Listing listAction
       , Effects.map Adding addAction
       , Effects.map Viewing viewAction
+      , Effects.map Deleting deleteAction
      ]
    in
-     (Model list add view Nothing, Effects.batch effects) 
+     (Model list add view delete Nothing, Effects.batch effects) 
 
 type Action = 
   Listing TypesList.Action
     | SetupJob (String, String)
     | Adding TypesAdd.Action
     | Viewing TypesView.Action
+    | Deleting TypesDelete.Action
 
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
 navigate action ((({list, add, view} as model), effects) as result) =
@@ -62,7 +67,7 @@ navigate action ((({list, add, view} as model), effects) as result) =
             (model, effects)
 
       SetupJob (job,_) -> 
-       case job of 
+        case job of 
          "edit" -> 
             ({ model | navChange = Just (Types, Edit) }, effects)
           
@@ -72,7 +77,7 @@ navigate action ((({list, add, view} as model), effects) as result) =
          _ -> 
            result
      
-      Viewing viewing -> 
+      _ -> 
         (model, effects)
 
 
@@ -107,7 +112,7 @@ update action ({list, add, view} as model) =
   navigate action (route action model)
 
 view : Signal.Address Action -> Model -> Section -> List Html
-view address ({list, add, view} as model) section =
+view address ({list, add, view, delete} as model) section =
    case section of
      List -> 
         TypesList.view (Signal.forwardTo address Listing) list
@@ -118,6 +123,8 @@ view address ({list, add, view} as model) section =
      View -> 
         TypesView.view (Signal.forwardTo address Viewing) view
 
+     Delete -> 
+        TypesDelete.view (Signal.forwardTo address Deleting) delete
 
      _ -> 
        [div  [] [text "not implemented" ]]

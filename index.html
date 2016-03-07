@@ -140,9 +140,9 @@
 
   typesAction = function (e) {
     return function(key, opt){
-      templateName = $(this).context.cells[0].innerHTML;
-	if (templateName !== undefined) {
-	  main.ports.menuPort.send(["Type",e, templateName]); 
+      typeName = $(this).context.cells[0].innerHTML;
+	if (typeName !== undefined) {
+	  main.ports.menuPort.send(["Types",e, typeName]); 
 	}
     }
   }
