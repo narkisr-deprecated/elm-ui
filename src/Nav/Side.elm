@@ -19,6 +19,7 @@ type Section =
   Add 
     | Launch 
     | Delete
+    | Edit
     | List 
     | View
     | Stats

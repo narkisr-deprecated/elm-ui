@@ -51,9 +51,9 @@ type Action =
 
 init =
   let
-    (errorsModel, _ ) = Errors.init
+    errors = Errors.init
   in
-    (Model emptyTemplate "" False errorsModel [], getEnvironments SetEnvironments)   
+    (Model emptyTemplate "" False errors [], getEnvironments SetEnvironments)   
 
 intoTemplate ({template} as model) {type', machine, openstack, physical, aws, digital, gce} hyp = 
     let 

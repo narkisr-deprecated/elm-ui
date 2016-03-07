@@ -4,9 +4,10 @@ import Html exposing (..)
 import Types.List as TypesList
 import Types.Add as TypesAdd
 import Types.View as TypesView
-import Nav.Side exposing (Section(Stats, Launch, Add, List, View), Active(Types))
+import Nav.Side exposing (Section(Add, List, View, Edit, Delete), Active(Types))
 import Effects exposing (Effects, Never, batch, map)
 import Http exposing (Error(BadResponse))
+import Common.Utils exposing (none)
 import Table as Table
 
 
@@ -34,6 +35,7 @@ init =
 
 type Action = 
   Listing TypesList.Action
+    | SetupJob (String, String)
     | Adding TypesAdd.Action
     | Viewing TypesView.Action
 
@@ -59,6 +61,17 @@ navigate action ((({list, add, view} as model), effects) as result) =
           _ -> 
             (model, effects)
 
+      SetupJob (job,_) -> 
+       case job of 
+         "edit" -> 
+            ({ model | navChange = Just (Types, Edit) }, effects)
+          
+         "clear" -> 
+            ({ model | navChange = Just (Types, Delete) }, effects)
+
+         _ -> 
+           result
+     
       Viewing viewing -> 
         (model, effects)
 
@@ -84,6 +97,9 @@ route action ({list, add, view} as model) =
         (newTypes, effect ) = TypesView.update action view
       in
         ({ model | view = newTypes }, Effects.map Viewing effect)
+
+    _ -> 
+      none model
 
 
 update : Action ->  Model-> (Model , Effects Action)

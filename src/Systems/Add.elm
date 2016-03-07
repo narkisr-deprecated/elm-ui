@@ -78,7 +78,7 @@ init =
     (gce, _) = GCE.init 
     (physical, _) = Physical.init 
     (digital, _) = Digital.init 
-    (errors, _) = Errors.init
+    errors = Errors.init
     (general, effects) = General.init 
   in 
    (Model General aws gce physical digital openstack general True errors, Effects.map GeneralView effects)

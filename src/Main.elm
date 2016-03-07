@@ -143,6 +143,10 @@ intoActions (dest, job, target) =
     "Templates" ->
        Application.TemplatesAction (TemplatesCore.SetupJob (job, target))
 
+    "Types" ->
+       Application.TypesAction (TypesCore.SetupJob (job, target))
+
+
     _ -> 
        Application.NoOp
 

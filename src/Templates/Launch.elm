@@ -58,7 +58,7 @@ init : (Model , Effects Action)
 init =
   let 
     (admin, effects) = Admin.init
-    (errors, _) = Errors.init
+    errors = Errors.init
   in 
     (Model "" (Form.initial [] validate) admin errors, Effects.map AdminAction effects)
 

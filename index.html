@@ -137,6 +137,23 @@
         clear: { name: "Clear", callback: templateAction("clear") }
     }
   }); 
+
+  typesAction = function (e) {
+    return function(key, opt){
+      templateName = $(this).context.cells[0].innerHTML;
+	if (templateName !== undefined) {
+	  main.ports.menuPort.send(["Type",e, templateName]); 
+	}
+    }
+  }
+
+  $.contextMenu({
+    selector: "#typesListing tr",
+    items: {
+        launch: { name: "Edit", callback: typesAction("edit")},
+        clear: { name: "Clear", callback: typesAction("clear") }
+    }
+  });
 </script>
 
 </html>
