@@ -50,7 +50,7 @@ step model value =
 init : (Model , Effects Action)
 init =
   let
-    (errors, _ ) = Errors.init
+    errors = Errors.init
     steps = [(step Puppet.init Puppet)]
     mainStep = (step (Main.init "") Main)
     wizard = Wizard.init mainStep steps
@@ -64,7 +64,7 @@ type Action =
     | SetEnvironments (Result Http.Error Environments)
     | LoadEditor
     | SetClasses String
-    | Cancel
+    | Reset
     | Done
     | Back
     | Next
@@ -110,6 +110,13 @@ update action ({wizard, editClasses} as model) =
         (back,_) = (update (WizardAction Wizard.Back) model)
       in
        ({ back | editClasses = False}, unloadEditor NoOp)
+
+    Reset -> 
+      let
+        (back,_) = (update (WizardAction Wizard.Back) model)
+      in
+       ({ back | editClasses = False, saveErrors = Errors.init }, unloadEditor NoOp)
+
 
     WizardAction wizardAction -> 
       let 
@@ -180,6 +187,10 @@ errorsView address {saveErrors} =
 saveButton address =
     [button [id "Save", class "btn btn-primary", onClick address Save] [text "Save  "]]
 
+doneButton address =
+    [button [id "Done", class "btn btn-primary", onClick address Save] [text "Done "]]
+
+
 rows contents buttons = 
  [ 
   row_ [
@@ -196,7 +207,7 @@ view address ({wizard, saveErrors} as model) =
    if Errors.hasErrors saveErrors then
     rows 
      (div [] (errorsView address model))
-     (buttons' Cancel Done (saveButton address))
+     (buttons' Done Reset (doneButton address))
     else
      rows 
       (div [class "col-md-offset-2 col-md-8"] (currentView address model))
