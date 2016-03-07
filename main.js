@@ -15021,7 +15021,7 @@ Elm.Common.Errors.make = function (_elm) {
       return A2($Debug.log,A2($Basics._op["++"],"request failed ",$Basics.toString(res)),{ctor: "_Tuple2",_0: model,_1: $Effects.none});
    });
    var identitySuccess = F2(function (model,res) {    return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
-   var errorsList = function (errors) {    return $Basics.not($Dict.isEmpty(errors.keyValues));};
+   var errorsList = function (errors) {    return $Basics.not(_U.eq(errors.keyValues,$Maybe.Nothing));};
    var hasErrors = function (_p2) {    var _p3 = _p2;var _p4 = _p3.errors;return errorsList(_p4) || !_U.eq(_p4.message,$Maybe.Nothing);};
    var mapValues = F2(function (f,d) {    return $Dict.values(A2($Dict.map,f,d));});
    var nestedSection = F2(function (key,errors) {
@@ -15061,9 +15061,9 @@ Elm.Common.Errors.make = function (_elm) {
    var errorsText = function (errors) {
       return errorsList(errors) ? A2($Html.ul,
       _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
-      $Dict.values(A2($Dict.map,F2(function (k,v) {    return A2($Html.li,_U.list([]),_U.list([A2(toText,k,v)]));}),errors.keyValues))) : A2($Html.div,
-      _U.list([]),
-      _U.list([$Html.text(A2($Maybe.withDefault,"",errors.message))]));
+      $Dict.values(A2($Dict.map,
+      F2(function (k,v) {    return A2($Html.li,_U.list([]),_U.list([A2(toText,k,v)]));}),
+      A2($Maybe.withDefault,$Dict.empty,errors.keyValues)))) : A2($Html.div,_U.list([]),_U.list([$Html.text(A2($Maybe.withDefault,"",errors.message))]));
    };
    var view = F2(function (address,_p6) {
       var _p7 = _p6;
@@ -15074,8 +15074,8 @@ Elm.Common.Errors.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    var Model = function (a) {    return {errors: a};};
    var Errors = F3(function (a,b,c) {    return {type$: a,keyValues: b,message: c};});
-   var init = {ctor: "_Tuple2",_0: Model(A3(Errors,"",$Dict.empty,$Maybe.Nothing)),_1: $Effects.none};
-   var messageDecoder = A2($Json$Decode.object1,A2(Errors,"",$Dict.empty),$Json$Decode.maybe(A2($Json$Decode._op[":="],"message",$Json$Decode.string)));
+   var init = Model(A3(Errors,"",$Maybe.Nothing,$Maybe.Nothing));
+   var messageDecoder = A2($Json$Decode.object1,A2(Errors,"",$Maybe.Nothing),$Json$Decode.maybe(A2($Json$Decode._op[":="],"message",$Json$Decode.string)));
    var Value = function (a) {    return {ctor: "Value",_0: a};};
    var NestedList = function (a) {    return {ctor: "NestedList",_0: a};};
    var DeepNestedList = function (a) {    return {ctor: "DeepNestedList",_0: a};};
@@ -15088,11 +15088,11 @@ Elm.Common.Errors.make = function (_elm) {
       return A4($Json$Decode.object3,
       Errors,
       A2($Json$Decode.at,_U.list(["object","type"]),$Json$Decode.string),
-      A2($Json$Decode.at,_U.list(["object","errors"]),$Json$Decode.dict($Json$Decode.oneOf(options))),
+      $Json$Decode.maybe(A2($Json$Decode.at,_U.list(["object","errors"]),$Json$Decode.dict($Json$Decode.oneOf(options)))),
       $Json$Decode.maybe(A2($Json$Decode._op[":="],"message",$Json$Decode.string)));
    }();
    var decodeError = function (error) {
-      var emptyErrors = A3(Errors,"",$Dict.empty,$Maybe.Nothing);
+      var emptyErrors = A3(Errors,"",$Maybe.Nothing,$Maybe.Nothing);
       var _p8 = error;
       if (_p8.ctor === "Text") {
             var _p11 = _p8._0;
@@ -24573,10 +24573,15 @@ Elm.Types.Add.make = function (_elm) {
       _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Save)]),
       _U.list([$Html.text("Save  ")]))]);
    };
+   var doneButton = function (address) {
+      return _U.list([A2($Html.button,
+      _U.list([$Html$Attributes.id("Done"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Save)]),
+      _U.list([$Html.text("Done ")]))]);
+   };
    var Next = {ctor: "Next"};
    var Back = {ctor: "Back"};
    var Done = {ctor: "Done"};
-   var Cancel = {ctor: "Cancel"};
+   var Reset = {ctor: "Reset"};
    var SetClasses = function (a) {    return {ctor: "SetClasses",_0: a};};
    var LoadEditor = {ctor: "LoadEditor"};
    var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
@@ -24626,7 +24631,7 @@ Elm.Types.Add.make = function (_elm) {
       var buttons$ = A2($Common$Components.buttons,address,_U.update(_p14,{hasNext: $Common$FormWizard.notDone(_p14)}));
       return $Common$Errors.hasErrors(_p13.saveErrors) ? A2(rows,
       A2($Html.div,_U.list([]),A2(errorsView,address,_p14)),
-      A3(buttons$,Cancel,Done,saveButton(address))) : A2(rows,
+      A3(buttons$,Done,Reset,doneButton(address))) : A2(rows,
       A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),A2(currentView,address,_p14)),
       A3(buttons$,Next,Back,saveButton(address)));
    });
@@ -24643,35 +24648,38 @@ Elm.Types.Add.make = function (_elm) {
    var update = F2(function (action,_p17) {
       update: while (true) {
          var _p18 = _p17;
-         var _p23 = _p18.wizard;
-         var _p22 = _p18;
-         var _p21 = _p18.editClasses;
+         var _p24 = _p18.wizard;
+         var _p23 = _p18;
+         var _p22 = _p18.editClasses;
          var _p19 = action;
          switch (_p19.ctor)
-         {case "Next": var _v11 = WizardAction($Common$FormWizard.Next),_v12 = _p22;
+         {case "Next": var _v11 = WizardAction($Common$FormWizard.Next),_v12 = _p23;
               action = _v11;
               _p17 = _v12;
               continue update;
-            case "Back": var _p20 = A2(update,WizardAction($Common$FormWizard.Back),_p22);
+            case "Back": var _p20 = A2(update,WizardAction($Common$FormWizard.Back),_p23);
               var back = _p20._0;
               return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false}),_1: $Common$Editor.unloadEditor(NoOp)};
-            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p19._0,_p23);
-              return $Common$Utils.none(_U.update(_p22,{wizard: newWizard}));
-            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p19._0),_p23);
-              return $Common$Utils.none(_U.update(_p22,{wizard: newWizard}));
-            case "SetEnvironments": return A4($Common$Errors.successHandler,_p19._0,_p22,setEnvironment(_p22),NoOp);
-            case "LoadEditor": return {ctor: "_Tuple2",_0: _U.update(_p22,{editClasses: $Basics.not(_p21)}),_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
+            case "Reset": var _p21 = A2(update,WizardAction($Common$FormWizard.Back),_p23);
+              var back = _p21._0;
+              return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false,saveErrors: $Common$Errors.init}),_1: $Common$Editor.unloadEditor(NoOp)};
+            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p19._0,_p24);
+              return $Common$Utils.none(_U.update(_p23,{wizard: newWizard}));
+            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p19._0),_p24);
+              return $Common$Utils.none(_U.update(_p23,{wizard: newWizard}));
+            case "SetEnvironments": return A4($Common$Errors.successHandler,_p19._0,_p23,setEnvironment(_p23),NoOp);
+            case "LoadEditor": return {ctor: "_Tuple2",_0: _U.update(_p23,{editClasses: $Basics.not(_p22)}),_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
             case "SetClasses": var classes = $Types$Model.decodeClasses(_p19._0);
-              return {ctor: "_Tuple2",_0: _p22,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p22,classes))};
-            case "Save": return _U.eq(_p21,false) ? {ctor: "_Tuple2"
-                                                    ,_0: _p22
-                                                    ,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p22,$Dict.empty))} : {ctor: "_Tuple2"
-                                                                                                                                    ,_0: _p22
+              return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,classes))};
+            case "Save": return _U.eq(_p22,false) ? {ctor: "_Tuple2"
+                                                    ,_0: _p23
+                                                    ,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,$Dict.empty))} : {ctor: "_Tuple2"
+                                                                                                                                    ,_0: _p23
                                                                                                                                     ,_1: A2($Common$Editor.getEditor,
                                                                                                                                     "types",
                                                                                                                                     NoOp)};
-            case "Saved": return A3($Common$Errors.errorsHandler,_p19._0,_p22,NoOp);
-            default: return $Common$Utils.none(_p22);}
+            case "Saved": return A3($Common$Errors.errorsHandler,_p19._0,_p23,NoOp);
+            default: return $Common$Utils.none(_p23);}
       }
    });
    var Model = F5(function (a,b,c,d,e) {    return {wizard: a,saveErrors: b,hasNext: c,environments: d,editClasses: e};});
@@ -24679,8 +24687,7 @@ Elm.Types.Add.make = function (_elm) {
       var mainStep = A2(step,$Types$Add$Main.init(""),Main);
       var steps = _U.list([A2(step,$Types$Add$Puppet.init,Puppet)]);
       var wizard = A2($Common$FormWizard.init,mainStep,steps);
-      var _p24 = $Common$Errors.init;
-      var errors = _p24._0;
+      var errors = $Common$Errors.init;
       return {ctor: "_Tuple2",_0: A5(Model,wizard,errors,true,_U.list([]),false),_1: $Environments$List.getEnvironments(SetEnvironments)};
    }();
    return _elm.Types.Add.values = {_op: _op
@@ -24695,7 +24702,7 @@ Elm.Types.Add.make = function (_elm) {
                                   ,SetEnvironments: SetEnvironments
                                   ,LoadEditor: LoadEditor
                                   ,SetClasses: SetClasses
-                                  ,Cancel: Cancel
+                                  ,Reset: Reset
                                   ,Done: Done
                                   ,Back: Back
                                   ,Next: Next
@@ -24709,6 +24716,7 @@ Elm.Types.Add.make = function (_elm) {
                                   ,currentView: currentView
                                   ,errorsView: errorsView
                                   ,saveButton: saveButton
+                                  ,doneButton: doneButton
                                   ,rows: rows
                                   ,view: view
                                   ,SaveResponse: SaveResponse
@@ -24738,62 +24746,86 @@ Elm.Types.Core.make = function (_elm) {
    $Types$View = Elm.Types.View.make(_elm);
    var _op = {};
    var Viewing = function (a) {    return {ctor: "Viewing",_0: a};};
-   var Adding = function (a) {    return {ctor: "Adding",_0: a};};
-   var Listing = function (a) {    return {ctor: "Listing",_0: a};};
-   var update = F2(function (action,_p0) {
+   var navigate = F2(function (action,_p0) {
       var _p1 = _p0;
-      var _p10 = _p1.view;
-      var _p9 = _p1;
+      var _p8 = _p1._0.view;
+      var _p7 = _p1._0;
+      var _p6 = _p1._1;
       var _p2 = action;
       switch (_p2.ctor)
-      {case "Listing": var _p6 = _p2._0;
-           var _p3 = _p6;
+      {case "Listing": var _p3 = _p2._0;
            if (_p3.ctor === "LoadPage" && _p3._0.ctor === "View") {
-                 var _p4 = A2($Types$View.update,$Types$View.ViewType(_p3._0._0),_p10);
+                 var _p4 = A2($Types$View.update,$Types$View.ViewType(_p3._0._0),_p8);
                  var newSystems = _p4._0;
                  var effects = _p4._1;
                  return {ctor: "_Tuple2"
-                        ,_0: _U.update(_p9,{view: _p10,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.View})})
+                        ,_0: _U.update(_p7,{view: _p8,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.View})})
                         ,_1: A2($Effects.map,Viewing,effects)};
               } else {
-                 var _p5 = A2($Types$List.update,_p6,_p1.list);
-                 var newTypes = _p5._0;
-                 var effect = _p5._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p9,{list: newTypes}),_1: A2($Effects.map,Listing,effect)};
+                 return {ctor: "_Tuple2",_0: _p7,_1: _p6};
               }
-         case "Adding": var _p7 = A2($Types$Add.update,_p2._0,_p1.add);
-           var newTypes = _p7._0;
-           var effect = _p7._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p9,{add: newTypes}),_1: A2($Effects.map,Adding,effect)};
-         default: var _p8 = A2($Types$View.update,_p2._0,_p10);
-           var newTypes = _p8._0;
-           var effect = _p8._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p9,{view: newTypes}),_1: A2($Effects.map,Viewing,effect)};}
+         case "Adding": var _p5 = _p2._0;
+           if (_p5.ctor === "Saved" && _p5._0.ctor === "Ok") {
+                 return {ctor: "_Tuple2",_0: _U.update(_p7,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p6};
+              } else {
+                 return {ctor: "_Tuple2",_0: _p7,_1: _p6};
+              }
+         default: return {ctor: "_Tuple2",_0: _p7,_1: _p6};}
    });
-   var view = F3(function (address,_p11,section) {
-      var _p12 = _p11;
-      var _p13 = section;
-      switch (_p13.ctor)
-      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p12.list);
-         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p12.add);
-         case "View": return A2($Types$View.view,A2($Signal.forwardTo,address,Viewing),_p12.view);
+   var Adding = function (a) {    return {ctor: "Adding",_0: a};};
+   var Listing = function (a) {    return {ctor: "Listing",_0: a};};
+   var route = F2(function (action,_p9) {
+      var _p10 = _p9;
+      var _p15 = _p10;
+      var _p11 = action;
+      switch (_p11.ctor)
+      {case "Listing": var _p12 = A2($Types$List.update,_p11._0,_p10.list);
+           var newTypes = _p12._0;
+           var effect = _p12._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p15,{list: newTypes}),_1: A2($Effects.map,Listing,effect)};
+         case "Adding": var _p13 = A2($Types$Add.update,_p11._0,_p10.add);
+           var newTypes = _p13._0;
+           var effect = _p13._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p15,{add: newTypes}),_1: A2($Effects.map,Adding,effect)};
+         default: var _p14 = A2($Types$View.update,_p11._0,_p10.view);
+           var newTypes = _p14._0;
+           var effect = _p14._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p15,{view: newTypes}),_1: A2($Effects.map,Viewing,effect)};}
+   });
+   var update = F2(function (action,_p16) {    var _p17 = _p16;return A2(navigate,action,A2(route,action,_p17));});
+   var view = F3(function (address,_p18,section) {
+      var _p19 = _p18;
+      var _p20 = section;
+      switch (_p20.ctor)
+      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p19.list);
+         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p19.add);
+         case "View": return A2($Types$View.view,A2($Signal.forwardTo,address,Viewing),_p19.view);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
    var Model = F4(function (a,b,c,d) {    return {list: a,add: b,view: c,navChange: d};});
    var init = function () {
-      var _p14 = $Types$View.init;
-      var view = _p14._0;
-      var viewAction = _p14._1;
-      var _p15 = $Types$Add.init;
-      var add = _p15._0;
-      var addAction = _p15._1;
-      var _p16 = $Types$List.init;
-      var list = _p16._0;
-      var listAction = _p16._1;
+      var _p21 = $Types$View.init;
+      var view = _p21._0;
+      var viewAction = _p21._1;
+      var _p22 = $Types$Add.init;
+      var add = _p22._0;
+      var addAction = _p22._1;
+      var _p23 = $Types$List.init;
+      var list = _p23._0;
+      var listAction = _p23._1;
       var effects = _U.list([A2($Effects.map,Listing,listAction),A2($Effects.map,Adding,addAction),A2($Effects.map,Viewing,viewAction)]);
       return {ctor: "_Tuple2",_0: A4(Model,list,add,view,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();
-   return _elm.Types.Core.values = {_op: _op,Model: Model,init: init,Listing: Listing,Adding: Adding,Viewing: Viewing,update: update,view: view};
+   return _elm.Types.Core.values = {_op: _op
+                                   ,Model: Model
+                                   ,init: init
+                                   ,Listing: Listing
+                                   ,Adding: Adding
+                                   ,Viewing: Viewing
+                                   ,navigate: navigate
+                                   ,route: route
+                                   ,update: update
+                                   ,view: view};
 };
 Elm.Templates = Elm.Templates || {};
 Elm.Templates.Persistency = Elm.Templates.Persistency || {};
