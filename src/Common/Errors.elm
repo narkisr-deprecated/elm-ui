@@ -20,16 +20,16 @@ type Error =
 
 type alias Errors = 
   {  type' : String
-  ,  keyValues : Dict String Error
+  ,  keyValues : Maybe (Dict String Error)
   ,  message : Maybe String
   } 
 
 type alias Model = 
   {errors : Errors}
 
-init : (Model , Effects Action)
+init : Model
 init =
-  (Model (Errors "" Dict.empty Nothing), Effects.none)
+  Model (Errors "" Nothing Nothing)
 
 type Action = 
   NoOp
@@ -75,7 +75,7 @@ toText key error =
 
 errorsList : Errors -> Bool
 errorsList errors =
-   not (Dict.isEmpty errors.keyValues)
+   not (errors.keyValues == Nothing)
 
 hasErrors {errors} = 
    errorsList errors || (errors.message /= Nothing)
@@ -84,7 +84,7 @@ errorsText : Errors -> Html
 errorsText errors =
  if errorsList errors then 
     ul [style [("list-style-type", "none")]]
-      (Dict.values (Dict.map (\k v -> li [] [toText k v] ) errors.keyValues))
+      (Dict.values (Dict.map (\k v -> li [] [toText k v] ) (withDefault Dict.empty errors.keyValues)))
  else
     div [] [ 
       text (withDefault "" errors.message)
@@ -111,19 +111,19 @@ errorsDecoder  =
   in
     (object3 Errors
       (at ["object", "type"] string)
-      (at ["object", "errors"] (dict (oneOf options)))
+      (maybe (at ["object", "errors"] (dict (oneOf options))))
       (maybe ("message" := string))
       )
 
 messageDecoder : Decoder Errors
 messageDecoder  =
-    (object1 (Errors "" Dict.empty)
+    (object1 (Errors "" Nothing)
       (maybe ("message" := string)))
 
 decodeError : Http.Value -> Errors
 decodeError error = 
   let 
-    emptyErrors = (Errors "" Dict.empty Nothing)
+    emptyErrors = (Errors "" Nothing Nothing)
   in 
   case error of
     Http.Text value -> 
