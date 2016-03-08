@@ -9,6 +9,7 @@ import Nav.Side exposing (Section(Add, List, View, Edit, Delete), Active(Types))
 import Effects exposing (Effects, Never, batch, map)
 import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none)
+import Common.Delete exposing (refresh, succeeded)
 import Table as Table
 
 
@@ -45,7 +46,7 @@ type Action =
     | Deleting TypesDelete.Action
 
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ((({list, add, view} as model), effects) as result) =
+navigate action ((({list, add, view, delete} as model), effects) as result) =
     case action of 
       Listing listing -> 
         case listing of 
@@ -66,6 +67,23 @@ navigate action ((({list, add, view} as model), effects) as result) =
           _ -> 
             (model, effects)
 
+      Deleting deleting -> 
+        case deleting of 
+           TypesDelete.Deleted _  -> 
+            if delete.errorMsg == "" then
+              ({ model | navChange = Just (Types, List)}, effects)
+            else
+              result
+
+           TypesDelete.Cancel -> 
+             refreshList True ({ model | navChange = Just (Types, List)}, effects)
+
+           TypesDelete.Done -> 
+             refreshList True ({ model | navChange = Just (Types, List)}, effects)
+         
+           _ -> 
+            result
+
       SetupJob (job,_) -> 
         case job of 
          "edit" -> 
@@ -80,10 +98,15 @@ navigate action ((({list, add, view} as model), effects) as result) =
       _ -> 
         (model, effects)
 
+refreshList = 
+  refresh TypesList.init Listing
+
+setName model name = 
+  { model | name = name } 
 
 
 route : Action ->  Model -> (Model , Effects Action)
-route action ({list, add, view} as model) =
+route action ({list, add, view, delete} as model) =
   case action of
     Listing action -> 
       let 
@@ -103,8 +126,21 @@ route action ({list, add, view} as model) =
       in
         ({ model | view = newTypes }, Effects.map Viewing effect)
 
-    _ -> 
-      none model
+    Deleting action -> 
+      let 
+        (newDelete, effects) = (TypesDelete.update action delete)
+        success = (succeeded action TypesDelete.Deleted "Type deleted")
+      in
+        refreshList success ({ model | delete = newDelete } , Effects.map Deleting effects)
+
+    SetupJob (job, name) -> 
+      case job of
+        "clear" -> 
+          none { model | delete = setName delete name }
+         
+        _ -> 
+          none model
+
 
 
 update : Action ->  Model-> (Model , Effects Action)

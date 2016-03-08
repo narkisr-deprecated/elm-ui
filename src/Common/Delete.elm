@@ -32,4 +32,18 @@ deleteResponse =
   object1 DeleteResponse
     ("message" := string) 
 
+refresh init action succeeded ((model, effect) as original)  =
+  if succeeded then
+    let 
+      (_ , listEffects) = init
+      effects = [effect , Effects.map action listEffects ]
+    in
+      (model ,Effects.batch effects)
+  else 
+    original
 
+succeeded action deleted expected = 
+  if action == (deleted (Result.Ok { message = expected } )) then
+    True
+  else
+    False

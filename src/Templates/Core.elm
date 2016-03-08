@@ -2,6 +2,7 @@ module Templates.Core where
 
 import String
 import Common.Utils exposing (none)
+import Common.Delete exposing (refresh, succeeded)
 import Effects exposing (Effects)
 import Html exposing (..)
 import Templates.Add as Add
@@ -106,17 +107,8 @@ navigate action ((({launch, delete} as model), effects) as result) =
 setName model name = 
   { model | name = name } 
 
-refreshList : Bool -> (Model , Effects Action) -> (Model , Effects Action)
-refreshList succeeded ((model, effect) as original) =
-  if succeeded then
-    let 
-      (_ , listEffects) = List.init
-      effects = [effect , Effects.map TemplatesList listEffects ]
-    in
-      (model ,Effects.batch effects)
-  else 
-    original
-
+refreshList = 
+  refresh List.init TemplatesList
 
 route : Action ->  Model -> (Model , Effects Action)
 route action ({add, launch, list, delete} as model) =
@@ -161,8 +153,9 @@ route action ({add, launch, list, delete} as model) =
     TemplatesDelete action -> 
       let 
         (newDelete, effects) = (Delete.update action delete)
+        success = (succeeded action Delete.Deleted "Template deleted")
       in
-        refreshList (Delete.succeeded action newDelete) ({ model | delete = newDelete } , Effects.map TemplatesDelete effects)
+        refreshList success ({ model | delete = newDelete } , Effects.map TemplatesDelete effects)
 
     _ -> 
       none model
