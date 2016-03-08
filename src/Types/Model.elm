@@ -7,6 +7,7 @@ import String
 type Options = 
   BoolOption Bool 
     | StringOption String
+    | IntOption Int
 
 valueOf option = 
   case option of 
@@ -15,6 +16,9 @@ valueOf option =
 
     StringOption str -> 
       str
+
+    IntOption int -> 
+      (toString int)
 
 type alias Module = 
   {
@@ -48,11 +52,12 @@ decodeClasses json =
   case Json.decodeString classesDictDecoder json of 
     Ok value -> 
        value
+
     Err error -> 
       Debug.log error Dict.empty
 
 option = 
-  (oneOf [map BoolOption bool, map StringOption string])
+  (oneOf [map BoolOption bool, map StringOption string, map IntOption int])
 
 module' : Decoder Module
 module' = 
