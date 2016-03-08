@@ -17,7 +17,7 @@ import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none, setEnvironments)
 import Templates.Persistency exposing (persistTemplate, encodeDefaults)
-import Common.Editor exposing (loadEditor, getEditor)
+import Common.Editor exposing (loadEditor)
 import Common.Errors as Errors exposing (..)
 import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
 import Environments.List exposing (Environments, getEnvironments)
@@ -67,10 +67,7 @@ update : Action ->  Model-> (Model , Effects Action)
 update action ({template, hyp, editDefaults, environments} as model) =
   case action of
     Save -> 
-      if editDefaults == False then
-        (model, persistTemplate saveTemplate template hyp)
-      else
-        (model, getEditor "templates" NoOp)
+      (model, persistTemplate saveTemplate template hyp)
 
     SetSystem hyp system -> 
       none (intoTemplate model system hyp)
@@ -79,7 +76,7 @@ update action ({template, hyp, editDefaults, environments} as model) =
       let
         encoded = (encodeDefaults (defaultsByEnv environments) hyp)
       in 
-      ({ model | editDefaults = not editDefaults}, loadEditor NoOp encoded)
+      ({ model | editDefaults = not editDefaults}, loadEditor "templates" NoOp encoded)
     
     NameInput name -> 
       let 
@@ -98,7 +95,7 @@ update action ({template, hyp, editDefaults, environments} as model) =
        let 
          newTemplate = { template | defaults = Just (decodeDefaults json) }
        in 
-         ({ model | template = newTemplate}, persistTemplate saveTemplate template hyp)
+         none { model | template = newTemplate}
     
     Saved result -> 
        errorsHandler result model NoOp

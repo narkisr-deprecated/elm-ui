@@ -15,11 +15,11 @@ import Html.Events exposing (onClick)
 import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Http exposing (Error(BadResponse))
-import Common.Editor exposing (loadEditor, getEditor, unloadEditor)
+import Common.Editor exposing (loadEditor, unloadEditor)
 import Json.Decode exposing (..)
 import Common.Http exposing (postJson)
 import Task exposing (Task)
-import Types.Persistency exposing (persistType)
+import Types.Persistency exposing (persistType, encodeClasses)
 import Types.View exposing (summarize)
 
 import Types.Model exposing (Type, emptyType, emptyPuppet)
@@ -35,6 +35,7 @@ type alias Model =
   , hasNext : Bool
   , environments : List String
   , editClasses : Bool
+  , classes : Dict String (Dict String Options)
   }
 
 type Step = 
@@ -55,7 +56,7 @@ init =
     mainStep = (step (Main.init "") Main)
     wizard = Wizard.init mainStep steps
   in
-    (Model wizard errors True [] False, getEnvironments SetEnvironments)
+    (Model wizard errors True [] False Dict.empty, getEnvironments SetEnvironments)
 
 type Action = 
    ErrorsView Errors.Action
@@ -67,6 +68,7 @@ type Action =
     | Reset
     | Done
     | Back
+    | Persist
     | Next
     | Save
     | Saved (Result Http.Error SaveResponse)
@@ -100,14 +102,14 @@ merged {wizard} classes =
   List.foldl (merge classes) emptyType wizard.prev 
 
 update : Action ->  Model -> (Model , Effects Action)
-update action ({wizard, editClasses} as model) =
+update action ({wizard, editClasses, classes} as model) =
   case action of 
     Next -> 
-      update (WizardAction Wizard.Next) model
+       update (WizardAction Wizard.Next) model
 
     Back -> 
       let
-        (back,_) = (update (WizardAction Wizard.Back) model)
+        (back, _) = (update (WizardAction Wizard.Back) model)
       in
        ({ back | editClasses = False}, unloadEditor NoOp)
 
@@ -134,19 +136,16 @@ update action ({wizard, editClasses} as model) =
        (successHandler result model (setEnvironment model) NoOp)
 
     LoadEditor -> 
-      ({ model | editClasses = not editClasses}, loadEditor NoOp "{}")
+      ({ model | editClasses = not editClasses}, loadEditor "types" NoOp (encodeClasses classes))
 
     SetClasses json -> 
-      let
-         classes = decodeClasses json
-      in
-        (model, persistType saveType (merged model classes))
+        none { model | classes = (Debug.log "" (decodeClasses json)) }
+
+    Persist -> 
+      (model, persistType saveType (merged model classes))
 
     Save -> 
-      if editClasses == False then
-        (model, persistType saveType (merged model Dict.empty))
-      else
-        (model, getEditor "types" NoOp)
+      (model, persistType saveType (merged model classes))
 
     Saved result -> 
        errorsHandler result model NoOp
@@ -155,7 +154,7 @@ update action ({wizard, editClasses} as model) =
       (none model)
 
 currentView : Signal.Address Action -> Model -> List Html
-currentView address ({wizard, environments, editClasses} as model) =
+currentView address ({wizard, environments, editClasses, classes} as model) =
   let 
     environmentList = List.map (\e -> (e,e)) environments
   in 
@@ -175,7 +174,7 @@ currentView address ({wizard, environments, editClasses} as model) =
           
       Nothing -> 
         dialogPanel "info" (info "Save new type") 
-           (panel (fixedPanel (summarize (merged model Dict.empty))))
+           (panel (fixedPanel (summarize (merged model classes))))
 
 
 errorsView address {saveErrors} = 

@@ -18223,15 +18223,17 @@ Elm.Types.Model.make = function (_elm) {
    });
    var valueOf = function (option) {
       var _p0 = option;
-      if (_p0.ctor === "BoolOption") {
-            return $String.toLower($Basics.toString(_p0._0));
-         } else {
-            return _p0._0;
-         }
+      switch (_p0.ctor)
+      {case "BoolOption": return $String.toLower($Basics.toString(_p0._0));
+         case "StringOption": return _p0._0;
+         default: return $Basics.toString(_p0._0);}
    };
+   var IntOption = function (a) {    return {ctor: "IntOption",_0: a};};
    var StringOption = function (a) {    return {ctor: "StringOption",_0: a};};
    var BoolOption = function (a) {    return {ctor: "BoolOption",_0: a};};
-   var option = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool),A2($Json$Decode.map,StringOption,$Json$Decode.string)]));
+   var option = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool)
+                                           ,A2($Json$Decode.map,StringOption,$Json$Decode.string)
+                                           ,A2($Json$Decode.map,IntOption,$Json$Decode.$int)]));
    var classesDictDecoder = $Json$Decode.dict($Json$Decode.dict(option));
    var decodeClasses = function (json) {
       var _p1 = A2($Json$Decode.decodeString,classesDictDecoder,json);
@@ -18264,6 +18266,7 @@ Elm.Types.Model.make = function (_elm) {
    return _elm.Types.Model.values = {_op: _op
                                     ,BoolOption: BoolOption
                                     ,StringOption: StringOption
+                                    ,IntOption: IntOption
                                     ,valueOf: valueOf
                                     ,Module: Module
                                     ,PuppetStd: PuppetStd
@@ -24150,22 +24153,13 @@ Elm.Common.Editor.make = function (_elm) {
    var Load = function (a) {    return {ctor: "Load",_0: a};};
    var NoOp = {ctor: "NoOp"};
    var editorActions = $Signal.mailbox(NoOp);
-   var loadEditor = F2(function (noop,json) {
-      return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load({ctor: "_Tuple2",_0: json,_1: ""}))));
-   });
-   var getEditor = F2(function (target,noop) {
-      return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load({ctor: "_Tuple2",_0: "get",_1: target}))));
+   var loadEditor = F3(function (target,noop,json) {
+      return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load({ctor: "_Tuple2",_0: json,_1: target}))));
    });
    var unloadEditor = function (noop) {
       return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,editorActions.address,Load({ctor: "_Tuple2",_0: "unload",_1: ""}))));
    };
-   return _elm.Common.Editor.values = {_op: _op
-                                      ,NoOp: NoOp
-                                      ,Load: Load
-                                      ,editorActions: editorActions
-                                      ,loadEditor: loadEditor
-                                      ,getEditor: getEditor
-                                      ,unloadEditor: unloadEditor};
+   return _elm.Common.Editor.values = {_op: _op,NoOp: NoOp,Load: Load,editorActions: editorActions,loadEditor: loadEditor,unloadEditor: unloadEditor};
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.Persistency = Elm.Types.Persistency || {};
@@ -24192,13 +24186,13 @@ Elm.Types.Persistency.make = function (_elm) {
    });
    var option = function (o) {
       var _p2 = o;
-      if (_p2.ctor === "BoolOption") {
-            return $Json$Encode.bool(_p2._0);
-         } else {
-            return $Json$Encode.string(_p2._0);
-         }
+      switch (_p2.ctor)
+      {case "BoolOption": return $Json$Encode.bool(_p2._0);
+         case "StringOption": return $Json$Encode.string(_p2._0);
+         default: return $Json$Encode.$int(_p2._0);}
    };
    var $class = function (c) {    return A2(dictEncoder,option,c);};
+   var encodeClasses = function (classes) {    return A2($Json$Encode.encode,0,A2(dictEncoder,$class,classes));};
    var moduleEncoder = function (_p3) {
       var _p4 = _p3;
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(_p4.name)}
@@ -24221,6 +24215,7 @@ Elm.Types.Persistency.make = function (_elm) {
                                           ,moduleEncoder: moduleEncoder
                                           ,option: option
                                           ,$class: $class
+                                          ,encodeClasses: encodeClasses
                                           ,puppetEncoder: puppetEncoder
                                           ,dictEncoder: dictEncoder
                                           ,encode: encode
@@ -24578,6 +24573,7 @@ Elm.Types.Add.make = function (_elm) {
       _U.list([$Html.text("Done ")]))]);
    };
    var Next = {ctor: "Next"};
+   var Persist = {ctor: "Persist"};
    var Back = {ctor: "Back"};
    var Done = {ctor: "Done"};
    var Reset = {ctor: "Reset"};
@@ -24611,7 +24607,7 @@ Elm.Types.Add.make = function (_elm) {
             return A3($Common$Components.dialogPanel,
             "info",
             $Common$Components.info("Save new type"),
-            $Common$Components.panel($Common$Components.fixedPanel($Types$View.summarize(A2(merged,_p6,$Dict.empty)))));
+            $Common$Components.panel($Common$Components.fixedPanel($Types$View.summarize(A2(merged,_p6,_p6.classes)))));
          }
    });
    var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
@@ -24649,7 +24645,7 @@ Elm.Types.Add.make = function (_elm) {
          var _p18 = _p17;
          var _p24 = _p18.wizard;
          var _p23 = _p18;
-         var _p22 = _p18.editClasses;
+         var _p22 = _p18.classes;
          var _p19 = action;
          switch (_p19.ctor)
          {case "Next": var _v11 = WizardAction($Common$FormWizard.Next),_v12 = _p23;
@@ -24667,27 +24663,23 @@ Elm.Types.Add.make = function (_elm) {
             case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p19._0),_p24);
               return $Common$Utils.none(_U.update(_p23,{wizard: newWizard}));
             case "SetEnvironments": return A4($Common$Errors.successHandler,_p19._0,_p23,setEnvironment(_p23),NoOp);
-            case "LoadEditor": return {ctor: "_Tuple2",_0: _U.update(_p23,{editClasses: $Basics.not(_p22)}),_1: A2($Common$Editor.loadEditor,NoOp,"{}")};
-            case "SetClasses": var classes = $Types$Model.decodeClasses(_p19._0);
-              return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,classes))};
-            case "Save": return _U.eq(_p22,false) ? {ctor: "_Tuple2"
-                                                    ,_0: _p23
-                                                    ,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,$Dict.empty))} : {ctor: "_Tuple2"
-                                                                                                                                    ,_0: _p23
-                                                                                                                                    ,_1: A2($Common$Editor.getEditor,
-                                                                                                                                    "types",
-                                                                                                                                    NoOp)};
+            case "LoadEditor": return {ctor: "_Tuple2"
+                                      ,_0: _U.update(_p23,{editClasses: $Basics.not(_p18.editClasses)})
+                                      ,_1: A3($Common$Editor.loadEditor,"types",NoOp,$Types$Persistency.encodeClasses(_p22))};
+            case "SetClasses": return $Common$Utils.none(_U.update(_p23,{classes: A2($Debug.log,"",$Types$Model.decodeClasses(_p19._0))}));
+            case "Persist": return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,_p22))};
+            case "Save": return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,_p22))};
             case "Saved": return A3($Common$Errors.errorsHandler,_p19._0,_p23,NoOp);
             default: return $Common$Utils.none(_p23);}
       }
    });
-   var Model = F5(function (a,b,c,d,e) {    return {wizard: a,saveErrors: b,hasNext: c,environments: d,editClasses: e};});
+   var Model = F6(function (a,b,c,d,e,f) {    return {wizard: a,saveErrors: b,hasNext: c,environments: d,editClasses: e,classes: f};});
    var init = function () {
       var mainStep = A2(step,$Types$Add$Main.init(""),Main);
       var steps = _U.list([A2(step,$Types$Add$Puppet.init,Puppet)]);
       var wizard = A2($Common$FormWizard.init,mainStep,steps);
       var errors = $Common$Errors.init;
-      return {ctor: "_Tuple2",_0: A5(Model,wizard,errors,true,_U.list([]),false),_1: $Environments$List.getEnvironments(SetEnvironments)};
+      return {ctor: "_Tuple2",_0: A6(Model,wizard,errors,true,_U.list([]),false,$Dict.empty),_1: $Environments$List.getEnvironments(SetEnvironments)};
    }();
    return _elm.Types.Add.values = {_op: _op
                                   ,Model: Model
@@ -24704,6 +24696,7 @@ Elm.Types.Add.make = function (_elm) {
                                   ,Reset: Reset
                                   ,Done: Done
                                   ,Back: Back
+                                  ,Persist: Persist
                                   ,Next: Next
                                   ,Save: Save
                                   ,Saved: Saved
@@ -25168,44 +25161,39 @@ Elm.Templates.Add.make = function (_elm) {
    var NoOp = {ctor: "NoOp"};
    var update = F2(function (action,_p8) {
       var _p9 = _p8;
-      var _p14 = _p9.template;
-      var _p13 = _p9;
-      var _p12 = _p9.hyp;
-      var _p11 = _p9.editDefaults;
+      var _p13 = _p9.template;
+      var _p12 = _p9;
+      var _p11 = _p9.hyp;
       var _p10 = action;
       switch (_p10.ctor)
-      {case "Save": return _U.eq(_p11,false) ? {ctor: "_Tuple2"
-                                               ,_0: _p13
-                                               ,_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p14,_p12)} : {ctor: "_Tuple2"
-                                                                                                                         ,_0: _p13
-                                                                                                                         ,_1: A2($Common$Editor.getEditor,
-                                                                                                                         "templates",
-                                                                                                                         NoOp)};
-         case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p13,_p10._1,_p10._0));
-         case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p9.environments),_p12);
-           return {ctor: "_Tuple2",_0: _U.update(_p13,{editDefaults: $Basics.not(_p11)}),_1: A2($Common$Editor.loadEditor,NoOp,encoded)};
-         case "NameInput": var newTemplate = _U.update(_p14,{name: _p10._0});
-           return $Common$Utils.none(_U.update(_p13,{template: newTemplate}));
-         case "DescriptionInput": var newTemplate = _U.update(_p14,{description: _p10._0});
-           return $Common$Utils.none(_U.update(_p13,{template: newTemplate}));
-         case "SetDefaults": var newTemplate = _U.update(_p14,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p10._0))});
-           return {ctor: "_Tuple2",_0: _U.update(_p13,{template: newTemplate}),_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p14,_p12)};
-         case "Saved": return A3($Common$Errors.errorsHandler,_p10._0,_p13,NoOp);
-         case "SetEnvironments": return A4($Common$Errors.successHandler,_p10._0,_p13,$Common$Utils.setEnvironments(_p13),NoOp);
-         default: return {ctor: "_Tuple2",_0: _p13,_1: $Effects.none};}
+      {case "Save": return {ctor: "_Tuple2",_0: _p12,_1: A3($Templates$Persistency.persistTemplate,saveTemplate,_p13,_p11)};
+         case "SetSystem": return $Common$Utils.none(A3(intoTemplate,_p12,_p10._1,_p10._0));
+         case "LoadEditor": var encoded = A2($Templates$Persistency.encodeDefaults,$Templates$Model$Common.defaultsByEnv(_p9.environments),_p11);
+           return {ctor: "_Tuple2"
+                  ,_0: _U.update(_p12,{editDefaults: $Basics.not(_p9.editDefaults)})
+                  ,_1: A3($Common$Editor.loadEditor,"templates",NoOp,encoded)};
+         case "NameInput": var newTemplate = _U.update(_p13,{name: _p10._0});
+           return $Common$Utils.none(_U.update(_p12,{template: newTemplate}));
+         case "DescriptionInput": var newTemplate = _U.update(_p13,{description: _p10._0});
+           return $Common$Utils.none(_U.update(_p12,{template: newTemplate}));
+         case "SetDefaults": var newTemplate = _U.update(_p13,{defaults: $Maybe.Just($Templates$Model$Common.decodeDefaults(_p10._0))});
+           return $Common$Utils.none(_U.update(_p12,{template: newTemplate}));
+         case "Saved": return A3($Common$Errors.errorsHandler,_p10._0,_p12,NoOp);
+         case "SetEnvironments": return A4($Common$Errors.successHandler,_p10._0,_p12,$Common$Utils.setEnvironments(_p12),NoOp);
+         default: return {ctor: "_Tuple2",_0: _p12,_1: $Effects.none};}
    });
    var Done = {ctor: "Done"};
    var Save = {ctor: "Save"};
-   var view = F2(function (address,_p15) {
-      var _p16 = _p15;
-      var _p17 = _p16.saveErrors;
-      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p17);
-      return $Common$Errors.hasErrors(_p17) ? A5($Common$Components.dangerCallout,
+   var view = F2(function (address,_p14) {
+      var _p15 = _p14;
+      var _p16 = _p15.saveErrors;
+      var errorsView = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p16);
+      return $Common$Errors.hasErrors(_p16) ? A5($Common$Components.dangerCallout,
       address,
       $Common$Components.error("Failed to save template"),
       $Common$Components.panel($Common$Components.panelContents(errorsView)),
       Cancel,
-      Done) : A5($Common$Components.infoCallout,address,$Common$Components.info("Save template"),A2(editing,address,_p16),Cancel,Save);
+      Done) : A5($Common$Components.infoCallout,address,$Common$Components.info("Save template"),A2(editing,address,_p15),Cancel,Save);
    });
    var Model = F5(function (a,b,c,d,e) {    return {template: a,hyp: b,editDefaults: c,saveErrors: d,environments: e};});
    var init = function () {

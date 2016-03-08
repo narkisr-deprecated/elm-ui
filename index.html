@@ -68,17 +68,30 @@
 
   var editor = undefined;
 
+  var input = function(editor) {
+    if( editor !== undefined ){
+	try {
+	  return JSON.stringify(editor.get())
+	} catch (e) {
+	  return "{}"
+	}
+    } else {
+	return "{}"
+    }
+  }
+
   main.ports.editorOutPort.subscribe(function(event) {
   	var action = event[0], target = event[1]
 	if(action === "get") {
-        main.ports.editorInPort.send([target, JSON.stringify(editor.get())]);
+	  main.ports.editorInPort.send([target, input(editor)]);
         editor = undefined
 	} else if (action === "unload"){
 	  editor = undefined
 	} else {
         var container = document.getElementById('jsoneditor');
 	  var options = {
-	    mode : 'code'
+	      mode : 'code'
+	    , onChange : function(){main.ports.editorInPort.send([event[1], input(editor)]) }
 	  }
 	  if(editor === undefined) {
 	    editor = new JSONEditor(container, options, JSON.parse(event[0]));
