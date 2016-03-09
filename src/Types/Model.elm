@@ -8,6 +8,7 @@ type Options =
   BoolOption Bool 
     | StringOption String
     | IntOption Int
+    | DictOption (Dict String Options)
 
 valueOf option = 
   case option of 
@@ -20,6 +21,10 @@ valueOf option =
     IntOption int -> 
       (toString int)
 
+    DictOption dict -> 
+      (toString dict)
+      
+
 type alias Module = 
   {
     name : String 
@@ -31,7 +36,7 @@ type alias PuppetStd =
   {
     module' : Module
   , args : List String
-  , classes : Dict String (Dict String Options)
+  , classes : Dict String Options
   }
 
 type alias Type = 
@@ -43,35 +48,41 @@ type alias Type =
 
 -- Decoders
 
-classesDictDecoder: Decoder (Dict String (Dict String Options))
-classesDictDecoder = 
-   (dict (dict option))
+classesDecoder: Decoder (Dict String Options)
+classesDecoder = 
+   (dict (option ()))
 
-decodeClasses : String -> (Dict String (Dict String Options))
+decodeClasses : String -> (Dict String Options)
 decodeClasses json =
-  case Json.decodeString classesDictDecoder json of 
+  case Json.decodeString classesDecoder json of 
     Ok value -> 
        value
 
     Err error -> 
       Debug.log error Dict.empty
 
-option = 
-  (oneOf [map BoolOption bool, map StringOption string, map IntOption int])
+dictOption' : () -> Decoder Options
+dictOption' _ =
+  Json.succeed ()
+     `Json.andThen`
+         (option  >> Json.dict >> Json.map DictOption)
+
+option _ = 
+  (oneOf [map BoolOption bool, map StringOption string, map IntOption int,  (dictOption' ())])
 
 module' : Decoder Module
 module' = 
   object3 Module
    ("name" := string)
    ("src" := string)
-   (maybe ("options" := dict option))
+   (maybe ("options" := dict (option ())))
 
 puppetStd : Decoder PuppetStd
 puppetStd =
   object3 PuppetStd
      ("module" :=  module')
      ("args" := list string)
-     ("classes" := dict (dict option))
+     ("classes" := (dict (option ())))
 
 type': Decoder Type
 type' = 

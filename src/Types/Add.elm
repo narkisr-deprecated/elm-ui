@@ -35,7 +35,7 @@ type alias Model =
   , hasNext : Bool
   , environments : List String
   , editClasses : Bool
-  , classes : Dict String (Dict String Options)
+  , classes : (Dict String Options)
   }
 
 type Step = 

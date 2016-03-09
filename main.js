@@ -18226,33 +18226,45 @@ Elm.Types.Model.make = function (_elm) {
       switch (_p0.ctor)
       {case "BoolOption": return $String.toLower($Basics.toString(_p0._0));
          case "StringOption": return _p0._0;
+         case "IntOption": return $Basics.toString(_p0._0);
          default: return $Basics.toString(_p0._0);}
    };
+   var DictOption = function (a) {    return {ctor: "DictOption",_0: a};};
    var IntOption = function (a) {    return {ctor: "IntOption",_0: a};};
    var StringOption = function (a) {    return {ctor: "StringOption",_0: a};};
    var BoolOption = function (a) {    return {ctor: "BoolOption",_0: a};};
-   var option = $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool)
-                                           ,A2($Json$Decode.map,StringOption,$Json$Decode.string)
-                                           ,A2($Json$Decode.map,IntOption,$Json$Decode.$int)]));
-   var classesDictDecoder = $Json$Decode.dict($Json$Decode.dict(option));
+   var option = function (_p1) {
+      return $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool)
+                                        ,A2($Json$Decode.map,StringOption,$Json$Decode.string)
+                                        ,A2($Json$Decode.map,IntOption,$Json$Decode.$int)
+                                        ,dictOption$({ctor: "_Tuple0"})]));
+   };
+   var dictOption$ = function (_p2) {
+      return A2($Json$Decode.andThen,
+      $Json$Decode.succeed({ctor: "_Tuple0"}),
+      function (_p3) {
+         return A2($Json$Decode.map,DictOption,$Json$Decode.dict(option(_p3)));
+      });
+   };
+   var classesDecoder = $Json$Decode.dict(option({ctor: "_Tuple0"}));
    var decodeClasses = function (json) {
-      var _p1 = A2($Json$Decode.decodeString,classesDictDecoder,json);
-      if (_p1.ctor === "Ok") {
-            return _p1._0;
+      var _p4 = A2($Json$Decode.decodeString,classesDecoder,json);
+      if (_p4.ctor === "Ok") {
+            return _p4._0;
          } else {
-            return A2($Debug.log,_p1._0,$Dict.empty);
+            return A2($Debug.log,_p4._0,$Dict.empty);
          }
    };
    var module$ = A4($Json$Decode.object3,
    Module,
    A2($Json$Decode._op[":="],"name",$Json$Decode.string),
    A2($Json$Decode._op[":="],"src",$Json$Decode.string),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"options",$Json$Decode.dict(option))));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"options",$Json$Decode.dict(option({ctor: "_Tuple0"})))));
    var puppetStd = A4($Json$Decode.object3,
    PuppetStd,
    A2($Json$Decode._op[":="],"module",module$),
    A2($Json$Decode._op[":="],"args",$Json$Decode.list($Json$Decode.string)),
-   A2($Json$Decode._op[":="],"classes",$Json$Decode.dict($Json$Decode.dict(option))));
+   A2($Json$Decode._op[":="],"classes",$Json$Decode.dict(option({ctor: "_Tuple0"}))));
    var type$ = A4($Json$Decode.object3,
    Type,
    A2($Json$Decode._op[":="],"type",$Json$Decode.string),
@@ -18267,12 +18279,14 @@ Elm.Types.Model.make = function (_elm) {
                                     ,BoolOption: BoolOption
                                     ,StringOption: StringOption
                                     ,IntOption: IntOption
+                                    ,DictOption: DictOption
                                     ,valueOf: valueOf
                                     ,Module: Module
                                     ,PuppetStd: PuppetStd
                                     ,Type: Type
-                                    ,classesDictDecoder: classesDictDecoder
+                                    ,classesDecoder: classesDecoder
                                     ,decodeClasses: decodeClasses
+                                    ,dictOption$: dictOption$
                                     ,option: option
                                     ,module$: module$
                                     ,puppetStd: puppetStd
@@ -24189,10 +24203,10 @@ Elm.Types.Persistency.make = function (_elm) {
       switch (_p2.ctor)
       {case "BoolOption": return $Json$Encode.bool(_p2._0);
          case "StringOption": return $Json$Encode.string(_p2._0);
-         default: return $Json$Encode.$int(_p2._0);}
+         case "IntOption": return $Json$Encode.$int(_p2._0);
+         default: return A2(dictEncoder,option,_p2._0);}
    };
-   var $class = function (c) {    return A2(dictEncoder,option,c);};
-   var encodeClasses = function (classes) {    return A2($Json$Encode.encode,0,A2(dictEncoder,$class,classes));};
+   var encodeClasses = function (classes) {    return A2($Json$Encode.encode,0,A2(dictEncoder,option,classes));};
    var moduleEncoder = function (_p3) {
       var _p4 = _p3;
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "name",_1: $Json$Encode.string(_p4.name)}
@@ -24202,7 +24216,7 @@ Elm.Types.Persistency.make = function (_elm) {
       var _p6 = _p5;
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "module",_1: moduleEncoder(_p6.module$)}
                                          ,{ctor: "_Tuple2",_0: "args",_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,_p6.args))}
-                                         ,{ctor: "_Tuple2",_0: "classes",_1: A2(dictEncoder,$class,_p6.classes)}]));
+                                         ,{ctor: "_Tuple2",_0: "classes",_1: A2(dictEncoder,option,_p6.classes)}]));
    };
    var encode = function (_p7) {
       var _p8 = _p7;
@@ -24214,7 +24228,6 @@ Elm.Types.Persistency.make = function (_elm) {
    return _elm.Types.Persistency.values = {_op: _op
                                           ,moduleEncoder: moduleEncoder
                                           ,option: option
-                                          ,$class: $class
                                           ,encodeClasses: encodeClasses
                                           ,puppetEncoder: puppetEncoder
                                           ,dictEncoder: dictEncoder

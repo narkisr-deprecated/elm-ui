@@ -1,6 +1,6 @@
 module Types.Persistency where
 
-import Types.Model exposing (Type, Options(BoolOption, StringOption, IntOption)) 
+import Types.Model exposing (Type, Options(BoolOption, StringOption, IntOption, DictOption)) 
 import Effects exposing (Effects)
 import Json.Encode as E exposing (..)
 import Maybe exposing (withDefault)
@@ -24,17 +24,17 @@ option o =
     IntOption value -> 
        int value
 
-class c = 
-  dictEncoder option c 
+    DictOption dict -> 
+       dictEncoder option dict
 
 encodeClasses classes = 
-  (E.encode 0 (dictEncoder class classes))
+  (E.encode 0 (dictEncoder option classes))
 
 puppetEncoder {module', args, classes} = 
   object [
     ("module", moduleEncoder module')
   , ("args", list (List.map string args))
-  , ("classes", dictEncoder class classes)
+  , ("classes", dictEncoder option classes)
   ]
 
 dictEncoder enc dict = 
