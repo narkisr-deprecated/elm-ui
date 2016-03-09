@@ -4,6 +4,7 @@ import Html exposing (..)
 import Types.List as TypesList
 import Types.Add as TypesAdd
 import Types.View as TypesView
+import Types.Edit as TypesEdit
 import Types.Delete as TypesDelete
 import Nav.Side exposing (Section(Add, List, View, Edit, Delete), Active(Types))
 import Effects exposing (Effects, Never, batch, map)
@@ -19,6 +20,7 @@ type alias Model =
   , add  : TypesAdd.Model
   , view : TypesView.Model
   , delete : TypesDelete.Model
+  , edit : TypesEdit.Model
   , navChange : Maybe (Active, Section)
   }
   
@@ -28,6 +30,7 @@ init =
      (list, listAction)  = TypesList.init 
      (add, addAction)  = TypesAdd.init 
      (view, viewAction)  = TypesView.init 
+     (edit, editAction)  = TypesEdit.init 
      (delete, deleteAction)  = TypesDelete.init 
      effects = [
         Effects.map Listing listAction
@@ -36,7 +39,7 @@ init =
       , Effects.map Deleting deleteAction
      ]
    in
-     (Model list add view delete Nothing, Effects.batch effects) 
+     (Model list add view delete edit Nothing, Effects.batch effects) 
 
 type Action = 
   Listing TypesList.Action
@@ -44,9 +47,10 @@ type Action =
     | Adding TypesAdd.Action
     | Viewing TypesView.Action
     | Deleting TypesDelete.Action
+    | Editing TypesEdit.Action
 
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ((({list, add, view, delete} as model), effects) as result) =
+navigate action ((({list, add, view, delete, edit} as model), effects) as result) =
     case action of 
       Listing listing -> 
         case listing of 
@@ -62,10 +66,19 @@ navigate action ((({list, add, view, delete} as model), effects) as result) =
       Adding adding -> 
         case adding of 
           TypesAdd.Saved (Result.Ok _) -> 
+            refreshList True ({model | navChange = Just (Types, List)}, effects)
+
+          _ -> 
+            (model, effects)
+
+      Editing editing -> 
+        case editing of 
+          TypesEdit.Saved (Result.Ok _) -> 
              ({model | navChange = Just (Types, List)}, effects)
 
           _ -> 
             (model, effects)
+
 
       Deleting deleting -> 
         case deleting of 
@@ -106,7 +119,7 @@ setName model name =
 
 
 route : Action ->  Model -> (Model , Effects Action)
-route action ({list, add, view, delete} as model) =
+route action ({list, add, view, delete, edit} as model) =
   case action of
     Listing action -> 
       let 
@@ -119,6 +132,12 @@ route action ({list, add, view, delete} as model) =
         (newTypes, effect ) = TypesAdd.update action add
       in
         ({ model | add = newTypes }, Effects.map Adding effect)
+
+    Editing action -> 
+      let 
+        (newTypes, effect ) = TypesEdit.update action edit
+      in
+        ({ model | edit = newTypes }, Effects.map Editing effect)
 
     Viewing action -> 
       let 
@@ -141,20 +160,21 @@ route action ({list, add, view, delete} as model) =
         _ -> 
           none model
 
-
-
 update : Action ->  Model-> (Model , Effects Action)
 update action ({list, add, view} as model) =
   navigate action (route action model)
 
 view : Signal.Address Action -> Model -> Section -> List Html
-view address ({list, add, view, delete} as model) section =
+view address ({list, add, view, delete, edit} as model) section =
    case section of
      List -> 
         TypesList.view (Signal.forwardTo address Listing) list
 
      Add -> 
         TypesAdd.view (Signal.forwardTo address Adding) add
+
+     Edit -> 
+        TypesEdit.view (Signal.forwardTo address Editing) edit
 
      View -> 
         TypesView.view (Signal.forwardTo address Viewing) view

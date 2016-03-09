@@ -14551,7 +14551,7 @@ Elm.Common.Http.make = function (_elm) {
    var saveResponse = A3($Json$Decode.object2,
    SaveResponse,
    A2($Json$Decode._op[":="],"message",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"id",$Json$Decode.$int));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"id",$Json$Decode.$int)));
    var apply = F2(function (func,value) {    return A3($Json$Decode.object2,F2(function (x,y) {    return x(y);}),func,value);});
    var httpJson = F4(function (verb,body,decoder,url) {
       var request = {verb: verb
@@ -24728,6 +24728,34 @@ Elm.Types.Add.make = function (_elm) {
                                   ,saveResponse: saveResponse
                                   ,saveType: saveType};
 };
+Elm.Types = Elm.Types || {};
+Elm.Types.Edit = Elm.Types.Edit || {};
+Elm.Types.Edit.make = function (_elm) {
+   "use strict";
+   _elm.Types = _elm.Types || {};
+   _elm.Types.Edit = _elm.Types.Edit || {};
+   if (_elm.Types.Edit.values) return _elm.Types.Edit.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {    return $Common$Components.asList(A2($Html.div,_U.list([]),_U.list([$Html.text("editing type")])));});
+   var update = F2(function (action,model) {    var _p0 = action;return {ctor: "_Tuple2",_0: model,_1: $Effects.none};});
+   var Saved = function (a) {    return {ctor: "Saved",_0: a};};
+   var NoOp = {ctor: "NoOp"};
+   var Model = {};
+   var init = {ctor: "_Tuple2",_0: Model,_1: $Effects.none};
+   return _elm.Types.Edit.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,Saved: Saved,update: update,view: view};
+};
 Elm.Common = Elm.Common || {};
 Elm.Common.Delete = Elm.Common.Delete || {};
 Elm.Common.Delete.make = function (_elm) {
@@ -24875,10 +24903,12 @@ Elm.Types.Core.make = function (_elm) {
    $Table = Elm.Table.make(_elm),
    $Types$Add = Elm.Types.Add.make(_elm),
    $Types$Delete = Elm.Types.Delete.make(_elm),
+   $Types$Edit = Elm.Types.Edit.make(_elm),
    $Types$List = Elm.Types.List.make(_elm),
    $Types$View = Elm.Types.View.make(_elm);
    var _op = {};
    var setName = F2(function (model,name) {    return _U.update(model,{name: name});});
+   var Editing = function (a) {    return {ctor: "Editing",_0: a};};
    var Deleting = function (a) {    return {ctor: "Deleting",_0: a};};
    var Viewing = function (a) {    return {ctor: "Viewing",_0: a};};
    var Adding = function (a) {    return {ctor: "Adding",_0: a};};
@@ -24887,121 +24917,137 @@ Elm.Types.Core.make = function (_elm) {
    var refreshList = A2($Common$Delete.refresh,$Types$List.init,Listing);
    var navigate = F2(function (action,_p0) {
       var _p1 = _p0;
-      var _p11 = _p1._0.view;
-      var _p10 = _p1;
-      var _p9 = _p1._0;
-      var _p8 = _p1._1;
+      var _p12 = _p1._0.view;
+      var _p11 = _p1;
+      var _p10 = _p1._0;
+      var _p9 = _p1._1;
       var _p2 = action;
-      _v1_4: do {
+      _v1_5: do {
          switch (_p2.ctor)
          {case "Listing": var _p3 = _p2._0;
               if (_p3.ctor === "LoadPage" && _p3._0.ctor === "View") {
-                    var _p4 = A2($Types$View.update,$Types$View.ViewType(_p3._0._0),_p11);
+                    var _p4 = A2($Types$View.update,$Types$View.ViewType(_p3._0._0),_p12);
                     var newSystems = _p4._0;
                     var effects = _p4._1;
                     return {ctor: "_Tuple2"
-                           ,_0: _U.update(_p9,{view: _p11,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.View})})
+                           ,_0: _U.update(_p10,{view: _p12,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.View})})
                            ,_1: A2($Effects.map,Viewing,effects)};
                  } else {
-                    return {ctor: "_Tuple2",_0: _p9,_1: _p8};
+                    return {ctor: "_Tuple2",_0: _p10,_1: _p9};
                  }
             case "Adding": var _p5 = _p2._0;
               if (_p5.ctor === "Saved" && _p5._0.ctor === "Ok") {
-                    return {ctor: "_Tuple2",_0: _U.update(_p9,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p8};
+                    return A2(refreshList,
+                    true,
+                    {ctor: "_Tuple2",_0: _U.update(_p10,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p9});
                  } else {
-                    return {ctor: "_Tuple2",_0: _p9,_1: _p8};
+                    return {ctor: "_Tuple2",_0: _p10,_1: _p9};
                  }
-            case "Deleting": var _p6 = _p2._0;
-              switch (_p6.ctor)
+            case "Editing": var _p6 = _p2._0;
+              if (_p6.ctor === "Saved" && _p6._0.ctor === "Ok") {
+                    return {ctor: "_Tuple2",_0: _U.update(_p10,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p9};
+                 } else {
+                    return {ctor: "_Tuple2",_0: _p10,_1: _p9};
+                 }
+            case "Deleting": var _p7 = _p2._0;
+              switch (_p7.ctor)
               {case "Deleted": return _U.eq(_p1._0.$delete.errorMsg,"") ? {ctor: "_Tuple2"
-                                                                          ,_0: _U.update(_p9,
+                                                                          ,_0: _U.update(_p10,
                                                                           {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})})
-                                                                          ,_1: _p8} : _p10;
+                                                                          ,_1: _p9} : _p11;
                  case "Cancel": return A2(refreshList,
                    true,
-                   {ctor: "_Tuple2",_0: _U.update(_p9,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p8});
+                   {ctor: "_Tuple2",_0: _U.update(_p10,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p9});
                  case "Done": return A2(refreshList,
                    true,
-                   {ctor: "_Tuple2",_0: _U.update(_p9,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p8});
-                 default: return _p10;}
+                   {ctor: "_Tuple2",_0: _U.update(_p10,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p9});
+                 default: return _p11;}
             case "SetupJob": if (_p2._0.ctor === "_Tuple2") {
-                    var _p7 = _p2._0._0;
-                    switch (_p7)
+                    var _p8 = _p2._0._0;
+                    switch (_p8)
                     {case "edit": return {ctor: "_Tuple2"
-                                         ,_0: _U.update(_p9,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Edit})})
-                                         ,_1: _p8};
+                                         ,_0: _U.update(_p10,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Edit})})
+                                         ,_1: _p9};
                        case "clear": return {ctor: "_Tuple2"
-                                            ,_0: _U.update(_p9,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Delete})})
-                                            ,_1: _p8};
-                       default: return _p10;}
+                                            ,_0: _U.update(_p10,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Delete})})
+                                            ,_1: _p9};
+                       default: return _p11;}
                  } else {
-                    break _v1_4;
+                    break _v1_5;
                  }
-            default: break _v1_4;}
+            default: break _v1_5;}
       } while (false);
-      return {ctor: "_Tuple2",_0: _p9,_1: _p8};
+      return {ctor: "_Tuple2",_0: _p10,_1: _p9};
    });
-   var route = F2(function (action,_p12) {
-      var _p13 = _p12;
-      var _p22 = _p13;
-      var _p21 = _p13.$delete;
-      var _p14 = action;
-      switch (_p14.ctor)
-      {case "Listing": var _p15 = A2($Types$List.update,_p14._0,_p13.list);
-           var newTypes = _p15._0;
-           var effect = _p15._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p22,{list: newTypes}),_1: A2($Effects.map,Listing,effect)};
-         case "Adding": var _p16 = A2($Types$Add.update,_p14._0,_p13.add);
+   var route = F2(function (action,_p13) {
+      var _p14 = _p13;
+      var _p24 = _p14;
+      var _p23 = _p14.$delete;
+      var _p15 = action;
+      switch (_p15.ctor)
+      {case "Listing": var _p16 = A2($Types$List.update,_p15._0,_p14.list);
            var newTypes = _p16._0;
            var effect = _p16._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p22,{add: newTypes}),_1: A2($Effects.map,Adding,effect)};
-         case "Viewing": var _p17 = A2($Types$View.update,_p14._0,_p13.view);
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{list: newTypes}),_1: A2($Effects.map,Listing,effect)};
+         case "Adding": var _p17 = A2($Types$Add.update,_p15._0,_p14.add);
            var newTypes = _p17._0;
            var effect = _p17._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p22,{view: newTypes}),_1: A2($Effects.map,Viewing,effect)};
-         case "Deleting": var _p19 = _p14._0;
-           var success = A3($Common$Delete.succeeded,_p19,$Types$Delete.Deleted,"Type deleted");
-           var _p18 = A2($Types$Delete.update,_p19,_p21);
-           var newDelete = _p18._0;
-           var effects = _p18._1;
-           return A2(refreshList,success,{ctor: "_Tuple2",_0: _U.update(_p22,{$delete: newDelete}),_1: A2($Effects.map,Deleting,effects)});
-         default: var _p20 = _p14._0._0;
-           if (_p20 === "clear") {
-                 return $Common$Utils.none(_U.update(_p22,{$delete: A2(setName,_p21,_p14._0._1)}));
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{add: newTypes}),_1: A2($Effects.map,Adding,effect)};
+         case "Editing": var _p18 = A2($Types$Edit.update,_p15._0,_p14.edit);
+           var newTypes = _p18._0;
+           var effect = _p18._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{edit: newTypes}),_1: A2($Effects.map,Editing,effect)};
+         case "Viewing": var _p19 = A2($Types$View.update,_p15._0,_p14.view);
+           var newTypes = _p19._0;
+           var effect = _p19._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{view: newTypes}),_1: A2($Effects.map,Viewing,effect)};
+         case "Deleting": var _p21 = _p15._0;
+           var success = A3($Common$Delete.succeeded,_p21,$Types$Delete.Deleted,"Type deleted");
+           var _p20 = A2($Types$Delete.update,_p21,_p23);
+           var newDelete = _p20._0;
+           var effects = _p20._1;
+           return A2(refreshList,success,{ctor: "_Tuple2",_0: _U.update(_p24,{$delete: newDelete}),_1: A2($Effects.map,Deleting,effects)});
+         default: var _p22 = _p15._0._0;
+           if (_p22 === "clear") {
+                 return $Common$Utils.none(_U.update(_p24,{$delete: A2(setName,_p23,_p15._0._1)}));
               } else {
-                 return $Common$Utils.none(_p22);
+                 return $Common$Utils.none(_p24);
               }}
    });
-   var update = F2(function (action,_p23) {    var _p24 = _p23;return A2(navigate,action,A2(route,action,_p24));});
-   var view = F3(function (address,_p25,section) {
-      var _p26 = _p25;
-      var _p27 = section;
-      switch (_p27.ctor)
-      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p26.list);
-         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p26.add);
-         case "View": return A2($Types$View.view,A2($Signal.forwardTo,address,Viewing),_p26.view);
-         case "Delete": return A2($Types$Delete.view,A2($Signal.forwardTo,address,Deleting),_p26.$delete);
+   var update = F2(function (action,_p25) {    var _p26 = _p25;return A2(navigate,action,A2(route,action,_p26));});
+   var view = F3(function (address,_p27,section) {
+      var _p28 = _p27;
+      var _p29 = section;
+      switch (_p29.ctor)
+      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p28.list);
+         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p28.add);
+         case "Edit": return A2($Types$Edit.view,A2($Signal.forwardTo,address,Editing),_p28.edit);
+         case "View": return A2($Types$View.view,A2($Signal.forwardTo,address,Viewing),_p28.view);
+         case "Delete": return A2($Types$Delete.view,A2($Signal.forwardTo,address,Deleting),_p28.$delete);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
-   var Model = F5(function (a,b,c,d,e) {    return {list: a,add: b,view: c,$delete: d,navChange: e};});
+   var Model = F6(function (a,b,c,d,e,f) {    return {list: a,add: b,view: c,$delete: d,edit: e,navChange: f};});
    var init = function () {
-      var _p28 = $Types$Delete.init;
-      var $delete = _p28._0;
-      var deleteAction = _p28._1;
-      var _p29 = $Types$View.init;
-      var view = _p29._0;
-      var viewAction = _p29._1;
-      var _p30 = $Types$Add.init;
-      var add = _p30._0;
-      var addAction = _p30._1;
-      var _p31 = $Types$List.init;
-      var list = _p31._0;
-      var listAction = _p31._1;
+      var _p30 = $Types$Delete.init;
+      var $delete = _p30._0;
+      var deleteAction = _p30._1;
+      var _p31 = $Types$Edit.init;
+      var edit = _p31._0;
+      var editAction = _p31._1;
+      var _p32 = $Types$View.init;
+      var view = _p32._0;
+      var viewAction = _p32._1;
+      var _p33 = $Types$Add.init;
+      var add = _p33._0;
+      var addAction = _p33._1;
+      var _p34 = $Types$List.init;
+      var list = _p34._0;
+      var listAction = _p34._1;
       var effects = _U.list([A2($Effects.map,Listing,listAction)
                             ,A2($Effects.map,Adding,addAction)
                             ,A2($Effects.map,Viewing,viewAction)
                             ,A2($Effects.map,Deleting,deleteAction)]);
-      return {ctor: "_Tuple2",_0: A5(Model,list,add,view,$delete,$Maybe.Nothing),_1: $Effects.batch(effects)};
+      return {ctor: "_Tuple2",_0: A6(Model,list,add,view,$delete,edit,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();
    return _elm.Types.Core.values = {_op: _op
                                    ,Model: Model
@@ -25011,6 +25057,7 @@ Elm.Types.Core.make = function (_elm) {
                                    ,Adding: Adding
                                    ,Viewing: Viewing
                                    ,Deleting: Deleting
+                                   ,Editing: Editing
                                    ,navigate: navigate
                                    ,refreshList: refreshList
                                    ,setName: setName

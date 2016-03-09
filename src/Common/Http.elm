@@ -32,13 +32,13 @@ apply func value =
 type alias SaveResponse = 
   {
     message : String 
-  , id : Int 
+  , id : Maybe Int 
   } 
 
 saveResponse : Decoder SaveResponse
 saveResponse = 
   object2 SaveResponse
     ("message" := string) 
-    ("id" := int)
+    (maybe ("id" := int))
 
 
