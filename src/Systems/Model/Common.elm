@@ -5,6 +5,7 @@ import Systems.Model.GCE exposing (GCE)
 import Systems.Model.Digital exposing (Digital)
 import Systems.Model.Openstack exposing (Openstack)
 import Systems.Model.Physical exposing (Physical)
+import Systems.Model.KVM exposing (KVM)
 import Dict exposing (Dict)
 
 type alias Machine = 
@@ -13,6 +14,8 @@ type alias Machine =
   , domain : String 
   , ip : Maybe String
   , os : String
+  , ram : Maybe Int
+  , cpu : Maybe Int
   }
 
 type alias System = 
@@ -25,15 +28,16 @@ type alias System =
   , digital : Maybe Digital
   , openstack : Maybe Openstack
   , physical : Maybe Physical
+  , kvm : Maybe KVM
   }
 
 emptyMachine : Machine
 emptyMachine =
-  Machine "" "" "" (Just "") ""
+  Machine "" "" "" (Just "") "" Nothing Nothing
 
 emptySystem : System
 emptySystem =
   let
    base = System "" "" ""
   in 
-   base emptyMachine Nothing Nothing Nothing Nothing Nothing
+   base emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing

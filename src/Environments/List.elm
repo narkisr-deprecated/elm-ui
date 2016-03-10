@@ -15,6 +15,9 @@ import Task
 type alias Template = 
   (Dict String String)
 
+type alias Node = 
+  (Dict String String)
+
 type alias Environment = 
   (Dict String Hypervisor)
 
@@ -25,6 +28,7 @@ type Hypervisor =
   OSTemplates (Dict String Template)
     | Proxmox (Dict String (Dict String String))  (Dict String Template)
     | Openstack (Dict String String)  (Dict String Template)
+    | KVM (Dict String String) (Dict String Node)
     | AWS
     | GCE
     | Physical 
@@ -44,8 +48,8 @@ hypervisor : Decoder Hypervisor
 hypervisor = 
   oneOf [
       object2 Openstack ("flavors" := dict string) ("ostemplates" := dict template)
+    , object2 KVM ("ostemplates" := dict string) ("nodes" := dict node)
     , object1 OSTemplates("ostemplates" := dict template)
-    , object2 Proxmox ("nodes" := dict node) ("ostemplates" := dict template)
     , succeed Physical
   ]
 

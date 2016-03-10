@@ -20,6 +20,7 @@ import Maybe exposing (withDefault)
 import Debug
 import Common.Wizard as Wizard
 import Common.Components exposing (..)
+import Common.Utils exposing (none)
 
 -- Model 
 
@@ -38,7 +39,7 @@ init =
   let 
     wizard = Wizard.init Zero Instance [ Instance, Networking, Cinder, Summary ]
   in 
-    (Model wizard emptyOpenstack emptyMachine Dict.empty Dict.empty emptyVolume , Effects.none)
+    none (Model wizard emptyOpenstack emptyMachine Dict.empty Dict.empty emptyVolume)
 
 type Action = 
   WizardAction Wizard.Action

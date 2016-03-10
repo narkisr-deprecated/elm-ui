@@ -6,6 +6,7 @@ import Systems.Model.GCE exposing (..)
 import Systems.Model.Digital exposing (..)
 import Systems.Model.Physical exposing (..)
 import Systems.Model.Openstack as Openstack exposing (..)
+import Systems.Model.KVM as KVM exposing (..)
 import Json.Decode as Json exposing (..)
 import Common.Http exposing (apply)
 
@@ -69,6 +70,10 @@ physicalDecoder =
     (maybe ("mac" := string))
     (maybe ("broadcast" := string))
 
+kvmDecoder: Decoder KVM
+kvmDecoder = 
+  object1 KVM
+    ("node" := string)
 
 openstackVolumeDecoder : Decoder Openstack.Volume
 openstackVolumeDecoder = 
@@ -92,12 +97,14 @@ openstackDecoder =
 
 machineDecoder: Decoder Machine
 machineDecoder = 
-  object5 Machine 
+  object7 Machine 
     ("user" := string)
     ("hostname" := string)
     ("domain" := string)
     (maybe ("ip" := string))
     ("os" := string)
+    (maybe ("ram" := int))
+    (maybe ("cpu" := int))
     
     
 systemDecoder : Decoder System
@@ -112,6 +119,7 @@ systemDecoder =
     `apply` (maybe ("digital-ocean" := digitalDecoder))
     `apply` (maybe ("openstack" := openstackDecoder))
     `apply` (maybe ("physical" := physicalDecoder))
+    `apply` (maybe ("kvm" := kvmDecoder))
  
 
 
