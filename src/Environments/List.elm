@@ -16,7 +16,7 @@ type alias Template =
   (Dict String String)
 
 type alias Node = 
-  (Dict String String)
+  (Dict String (Dict String String))
 
 type alias Environment = 
   (Dict String Hypervisor)
@@ -40,9 +40,9 @@ template : Decoder Template
 template =
   dict string
 
-node : Decoder (Dict String String)
+node : Decoder (Dict String (Dict String String))
 node =
-  dict string
+  dict dict
 
 hypervisor : Decoder Hypervisor
 hypervisor = 
