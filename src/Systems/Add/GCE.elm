@@ -32,12 +32,12 @@ type alias Model =
   , errors : Dict String (List Error)
   }
 
-init : (Model , Effects Action)
+init : Model
 init =
   let 
     wizard = Wizard.init Zero Instance [ Instance, Networking, Summary ]
   in 
-   (Model wizard emptyGce emptyMachine Dict.empty Dict.empty, Effects.none)
+    Model wizard emptyGce emptyMachine Dict.empty Dict.empty
 
 type Action = 
   WizardAction Wizard.Action

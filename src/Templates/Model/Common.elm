@@ -73,7 +73,7 @@ decodeDefaults json =
       Debug.log error emptyDefaults
 
 partialMachine user os = 
-  Machine user "" "" Nothing os
+  Machine user "" "" Nothing os Nothing Nothing
 
 partialMachineDecoder: Decoder Machine
 partialMachineDecoder = 

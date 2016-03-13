@@ -17,6 +17,7 @@ import Systems.Add.Common exposing (..)
 import Systems.Add.AWS as AWS exposing (..)
 import Systems.Add.Physical as Physical exposing (..)
 import Systems.Add.Openstack as Openstack exposing (..)
+import Systems.Add.KVM as KVM exposing (..)
 import Systems.Add.GCE as GCE exposing (..)
 import Systems.Add.Digital as Digital exposing (..)
 import Systems.Add.General as General exposing (..)
@@ -36,20 +37,23 @@ type Stage =
     | Proxmox
     | AWS
     | Openstack
+    | KVM
     | GCE
     | Digital
     | Physical
 
 type alias Model = 
-  { stage : Stage
-  , awsModel : AWS.Model
+  { 
+    awsModel : AWS.Model
   , gceModel : GCE.Model
   , physicalModel : Physical.Model
   , digitalModel : Digital.Model
   , openstackModel : Openstack.Model
   , general : General.Model
+  , kvmModel : KVM.Model
   , hasNext : Bool
   , saveErrors : Errors.Model
+  , stage : Stage
   }
 
 type Action = 
@@ -65,6 +69,7 @@ type Action =
   | PhysicalView Physical.Action
   | DigitalView Digital.Action
   | OpenstackView Openstack.Action
+  | KVMView KVM.Action
   | GeneralView General.Action
   | ErrorsView Errors.Action
   | Saved Action (Result Http.Error SaveResponse)
@@ -73,15 +78,10 @@ type Action =
 init : (Model, Effects Action)
 init =
   let 
-    (aws, _) = AWS.init 
-    (openstack, _) = Openstack.init 
-    (gce, _) = GCE.init 
-    (physical, _) = Physical.init 
-    (digital, _) = Digital.init 
-    errors = Errors.init
     (general, effects) = General.init 
+    withModels = Model AWS.init GCE.init Physical.init Digital.init Openstack.init general KVM.init 
   in 
-   (Model General aws gce physical digital openstack general True errors, Effects.map GeneralView effects)
+    (withModels True Errors.init General, Effects.map GeneralView effects)
 
 
 setSaved : Action -> Model -> SaveResponse -> (Model, Effects Action)
@@ -97,11 +97,12 @@ back hasPrev model =
      else 
        {newModel | stage = General}
 
-getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as model) hyp = 
+getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel} as model) hyp = 
   let
    backs = Dict.fromList [
       ("aws", (back (Wizard.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.back awsModel)}))
     , ("gce", (back (Wizard.hasPrev gceModel) {model | stage = GCE , gceModel = (GCE.back gceModel)}))
+    , ("kvm", (back (Wizard.hasPrev kvmModel) {model | stage = KVM , kvmModel = (KVM.back kvmModel)}))
     , ("openstack", (back (Wizard.hasPrev openstackModel) {model | stage = Openstack , openstackModel = (Openstack.back openstackModel)}))
     , ("digital-ocean", (back (Wizard.hasPrev digitalModel) {model | stage = Digital, digitalModel = Digital.back digitalModel}))
     , ("physical", (back (Wizard.hasPrev physicalModel) {model | stage = Physical, physicalModel = (Physical.back physicalModel)}))
@@ -110,13 +111,14 @@ getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel} as mo
    withDefault model (Dict.get hyp backs)
 
 machineFrom : String -> Model -> Machine
-machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalModel} =
+machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel} =
   let 
     machines =  Dict.fromList [
             ("aws", awsModel.machine)
           , ("gce", gceModel.machine)
           , ("openstack", openstackModel.machine)
           , ("digital", digitalModel.machine)
+          , ("kvm", kvmModel.machine)
           , ("physical", physicalModel.machine)
       ]
   in
@@ -124,15 +126,15 @@ machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalMod
 
   
 intoSystem : Model -> System
-intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, stage} as model) = 
+intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, kvmModel, physicalModel, stage} as model) = 
   let
     {admin, type'} =  general
     baseSystem = System admin.owner admin.environment type' (machineFrom (toString stage) model)
   in 
-    baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical)
+    baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical) (Just kvmModel.kvm)
   
 update : Action ->  Model-> (Model , Effects Action)
-update action ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, stage} as model) =
+update action ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel, stage} as model) =
   case action of
     Next -> 
       let 
@@ -170,6 +172,13 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
             in
               none { model | stage = Openstack , openstackModel = newOpenstack , hasNext = Wizard.hasNext newOpenstack}
 
+          "kvm" -> 
+            let
+              newKvm = KVM.next kvmModel current 
+            in
+              none { model | stage = KVM , kvmModel = newKvm , hasNext = Wizard.hasNext newKvm}
+
+
           _ -> 
             (model, Effects.none)
 
@@ -206,6 +215,12 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
       in
         none { model | openstackModel = newOpenstack }
 
+    KVMView action -> 
+      let
+        newKvm = KVM.update action kvmModel
+      in
+        none { model | kvmModel = newKvm }
+
     GeneralView action -> 
       let
         newGeneral= General.update action general
@@ -236,7 +251,7 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
     _ -> (model, Effects.none)
 
 currentView : Signal.Address Action -> Model -> Html
-currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, saveErrors, general} as model)=
+currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, kvmModel, saveErrors, general} as model)=
   case model.stage of 
     General -> 
       (General.view (Signal.forwardTo address GeneralView) general)
@@ -255,6 +270,9 @@ currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstack
 
     Openstack -> 
       (Openstack.view (Signal.forwardTo address OpenstackView) openstackModel)
+
+    KVM -> 
+      (KVM.view (Signal.forwardTo address KVMView) kvmModel)
 
     _ -> 
       notImplemented

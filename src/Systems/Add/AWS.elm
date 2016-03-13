@@ -34,12 +34,12 @@ type alias Model =
   , block : Block
   }
 
-init : (Model , Effects Action)
+init : Model
 init =
   let 
     wizard = Wizard.init Zero Instance [ Instance, Networking, EBS, Store, Summary ]
   in 
-    (Model wizard emptyAws emptyMachine Dict.empty Dict.empty emptyVolume emptyBlock, Effects.none)
+    Model wizard emptyAws emptyMachine Dict.empty Dict.empty emptyVolume emptyBlock
 
 type Action = 
   WizardAction Wizard.Action

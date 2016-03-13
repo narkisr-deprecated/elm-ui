@@ -34,12 +34,12 @@ type alias Model =
   , volume : Volume
   }
 
-init : (Model , Effects Action)
+init : Model
 init =
   let 
     wizard = Wizard.init Zero Instance [ Instance, Networking, Cinder, Summary ]
   in 
-    none (Model wizard emptyOpenstack emptyMachine Dict.empty Dict.empty emptyVolume)
+    Model wizard emptyOpenstack emptyMachine Dict.empty Dict.empty emptyVolume
 
 type Action = 
   WizardAction Wizard.Action
@@ -275,7 +275,7 @@ instance address ({openstack, machine, errors} as model) =
        , group' "OS" (selector address SelectOS oses machine.os)
        , check "Tenant" (inputText address TenantInput "" openstack.tenant) 
        , legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" model.machine.user) 
+       , check "User" (inputText address UserInput "" machine.user) 
        , check "Keypair" (inputText address KeyPairInput "" openstack.keyName)
        , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
    ]
