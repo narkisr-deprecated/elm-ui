@@ -3,6 +3,7 @@ module Environments.List where
 import Effects exposing (Effects)
 import Dict exposing (Dict)
 import Common.Http exposing (getJson)
+import Common.Model exposing (Options, option)
 
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
@@ -15,9 +16,6 @@ import Task
 type alias Template = 
   (Dict String String)
 
-type alias Node = 
-  (Dict String (Dict String String))
-
 type alias Environment = 
   (Dict String Hypervisor)
 
@@ -28,7 +26,7 @@ type Hypervisor =
   OSTemplates (Dict String Template)
     | Proxmox (Dict String (Dict String String))  (Dict String Template)
     | Openstack (Dict String String)  (Dict String Template)
-    | KVM (Dict String String) (Dict String Node)
+    | KVM (Dict String Template) (Dict String (Dict String Options))
     | AWS
     | GCE
     | Physical 
@@ -40,15 +38,11 @@ template : Decoder Template
 template =
   dict string
 
-node : Decoder (Dict String (Dict String String))
-node =
-  dict dict
-
 hypervisor : Decoder Hypervisor
 hypervisor = 
   oneOf [
       object2 Openstack ("flavors" := dict string) ("ostemplates" := dict template)
-    , object2 KVM ("ostemplates" := dict string) ("nodes" := dict node)
+    , object2 KVM ("ostemplates" := dict template) ("nodes" := dict (dict (option ())))
     , object1 OSTemplates("ostemplates" := dict template)
     , succeed Physical
   ]

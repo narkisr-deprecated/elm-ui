@@ -20,6 +20,10 @@ getOses hyp model =
 
       ENV.Openstack flavors oses -> 
         oses
+
+      ENV.KVM oses _ -> 
+        oses
+
       _ -> 
         Dict.empty
 

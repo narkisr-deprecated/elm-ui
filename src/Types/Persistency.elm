@@ -1,6 +1,7 @@
 module Types.Persistency where
 
-import Types.Model exposing (Type, Options(BoolOption, StringOption, IntOption, DictOption)) 
+import Common.Model exposing (..)
+import Types.Model exposing (Type) 
 import Effects exposing (Effects)
 import Json.Encode as E exposing (..)
 import Maybe exposing (withDefault)

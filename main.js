@@ -14573,6 +14573,58 @@ Elm.Common.Http.make = function (_elm) {
                                     ,SaveResponse: SaveResponse
                                     ,saveResponse: saveResponse};
 };
+Elm.Common = Elm.Common || {};
+Elm.Common.Model = Elm.Common.Model || {};
+Elm.Common.Model.make = function (_elm) {
+   "use strict";
+   _elm.Common = _elm.Common || {};
+   _elm.Common.Model = _elm.Common.Model || {};
+   if (_elm.Common.Model.values) return _elm.Common.Model.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var valueOf = function (option) {
+      var _p0 = option;
+      switch (_p0.ctor)
+      {case "BoolOption": return $String.toLower($Basics.toString(_p0._0));
+         case "StringOption": return _p0._0;
+         case "IntOption": return $Basics.toString(_p0._0);
+         default: return $Basics.toString(_p0._0);}
+   };
+   var DictOption = function (a) {    return {ctor: "DictOption",_0: a};};
+   var IntOption = function (a) {    return {ctor: "IntOption",_0: a};};
+   var StringOption = function (a) {    return {ctor: "StringOption",_0: a};};
+   var BoolOption = function (a) {    return {ctor: "BoolOption",_0: a};};
+   var option = function (_p1) {
+      return $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool)
+                                        ,A2($Json$Decode.map,StringOption,$Json$Decode.string)
+                                        ,A2($Json$Decode.map,IntOption,$Json$Decode.$int)
+                                        ,dictOption$({ctor: "_Tuple0"})]));
+   };
+   var dictOption$ = function (_p2) {
+      return A2($Json$Decode.andThen,
+      $Json$Decode.succeed({ctor: "_Tuple0"}),
+      function (_p3) {
+         return A2($Json$Decode.map,DictOption,$Json$Decode.dict(option(_p3)));
+      });
+   };
+   return _elm.Common.Model.values = {_op: _op
+                                     ,BoolOption: BoolOption
+                                     ,StringOption: StringOption
+                                     ,IntOption: IntOption
+                                     ,DictOption: DictOption
+                                     ,valueOf: valueOf
+                                     ,dictOption$: dictOption$
+                                     ,option: option};
+};
 Elm.Environments = Elm.Environments || {};
 Elm.Environments.List = Elm.Environments.List || {};
 Elm.Environments.List.make = function (_elm) {
@@ -14583,6 +14635,7 @@ Elm.Environments.List.make = function (_elm) {
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Model = Elm.Common.Model.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -14593,7 +14646,6 @@ Elm.Environments.List.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var node = $Json$Decode.dict($Json$Decode.string);
    var template = $Json$Decode.dict($Json$Decode.string);
    var Empty = {ctor: "Empty"};
    var Physical = {ctor: "Physical"};
@@ -14609,8 +14661,8 @@ Elm.Environments.List.make = function (_elm) {
                                                A2($Json$Decode._op[":="],"ostemplates",$Json$Decode.dict(template)))
                                                ,A3($Json$Decode.object2,
                                                KVM,
-                                               A2($Json$Decode._op[":="],"ostemplates",$Json$Decode.dict($Json$Decode.string)),
-                                               A2($Json$Decode._op[":="],"nodes",$Json$Decode.dict(node)))
+                                               A2($Json$Decode._op[":="],"ostemplates",$Json$Decode.dict(template)),
+                                               A2($Json$Decode._op[":="],"nodes",$Json$Decode.dict($Json$Decode.dict($Common$Model.option({ctor: "_Tuple0"})))))
                                                ,A2($Json$Decode.object1,OSTemplates,A2($Json$Decode._op[":="],"ostemplates",$Json$Decode.dict(template)))
                                                ,$Json$Decode.succeed(Physical)]));
    var environment = $Json$Decode.dict(hypervisor);
@@ -14628,7 +14680,6 @@ Elm.Environments.List.make = function (_elm) {
                                           ,Physical: Physical
                                           ,Empty: Empty
                                           ,template: template
-                                          ,node: node
                                           ,hypervisor: hypervisor
                                           ,environment: environment
                                           ,environmentsList: environmentsList
@@ -14661,6 +14712,7 @@ Elm.Systems.Add.Common.make = function (_elm) {
       switch (_p2.ctor)
       {case "OSTemplates": return _p2._0;
          case "Openstack": return _p2._1;
+         case "KVM": return _p2._0;
          default: return $Dict.empty;}
    });
    var setDefaultOS = F2(function (hyp,_p3) {
@@ -17684,6 +17736,56 @@ Elm.Systems.Add.Openstack.make = function (_elm) {
                                               ,view: view};
 };
 Elm.Systems = Elm.Systems || {};
+Elm.Systems.View = Elm.Systems.View || {};
+Elm.Systems.View.KVM = Elm.Systems.View.KVM || {};
+Elm.Systems.View.KVM.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.View = _elm.Systems.View || {};
+   _elm.Systems.View.KVM = _elm.Systems.View.KVM || {};
+   if (_elm.Systems.View.KVM.values) return _elm.Systems.View.KVM.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Summary = Elm.Common.Summary.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
+   $Systems$Model$KVM = Elm.Systems.Model.KVM.make(_elm);
+   var _op = {};
+   var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.div,_U.list([]),_U.list([])));});
+   var summarySections = function (_p0) {
+      var _p1 = _p0;
+      var _p2 = _p1._1;
+      return _U.list([A3($Common$Summary.overviewSection,
+      "Instance",
+      _U.list(["os","user","hostname","domain"]),
+      _U.list([_p2.os,_p2.user,_p2.hostname,_p2.domain]))]);
+   };
+   var summarize = function (model) {
+      return _U.list([A2($Html.div,
+      _U.list([]),
+      _U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("System overview")]))
+              ,A2($Html.div,
+              _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+              A2($List.map,
+              $Bootstrap$Html.row_,
+              A2($List.map,$List.concat,A2($Common$Utils.partition,2,A2($List.map,$Common$Summary.summaryPanel,summarySections(model))))))]))]);
+   };
+   var NoOp = {ctor: "NoOp"};
+   var Model = function (a) {    return {id: a};};
+   var init = {ctor: "_Tuple2",_0: Model(0),_1: $Effects.none};
+   return _elm.Systems.View.KVM.values = {_op: _op,Model: Model,init: init,NoOp: NoOp,summarySections: summarySections,summarize: summarize,view: view};
+};
+Elm.Systems = Elm.Systems || {};
 Elm.Systems.Add = Elm.Systems.Add || {};
 Elm.Systems.Add.KVM = Elm.Systems.Add.KVM || {};
 Elm.Systems.Add.KVM.make = function (_elm) {
@@ -17709,26 +17811,28 @@ Elm.Systems.Add.KVM.make = function (_elm) {
    $Systems$Add$Common = Elm.Systems.Add.Common.make(_elm),
    $Systems$Add$Validations = Elm.Systems.Add.Validations.make(_elm),
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
-   $Systems$Model$KVM = Elm.Systems.Model.KVM.make(_elm);
+   $Systems$Model$KVM = Elm.Systems.Model.KVM.make(_elm),
+   $Systems$View$KVM = Elm.Systems.View.KVM.make(_elm);
    var _op = {};
+   var setKVM = F2(function (f,_p0) {    var _p1 = _p0;var newKvm = f(_p1.kvm);return _U.update(_p1,{kvm: newKvm});});
    var getNodes = function (model) {
       var hypervisor = A2($Maybe.withDefault,$Environments$List.Empty,A2($Dict.get,"kvm",model.environment));
-      var _p0 = hypervisor;
-      if (_p0.ctor === "KVM") {
-            return _p0._0;
+      var _p2 = hypervisor;
+      if (_p2.ctor === "KVM") {
+            return _p2._1;
          } else {
             return $Dict.empty;
          }
    };
-   var setDefaultNode = F2(function (hyp,_p1) {
-      var _p2 = _p1;
-      var _p5 = _p2;
-      var _p4 = _p2.kvm;
-      var _p3 = $List.head($Dict.keys(getNodes(_p5)));
-      if (_p3.ctor === "Just") {
-            return $String.isEmpty(_p4.node) ? _U.update(_p5,{kvm: _U.update(_p4,{node: _p3._0})}) : _p5;
+   var setDefaultNode = F2(function (hyp,_p3) {
+      var _p4 = _p3;
+      var _p7 = _p4;
+      var _p6 = _p4.kvm;
+      var _p5 = $List.head($Dict.keys(getNodes(_p7)));
+      if (_p5.ctor === "Just") {
+            return $String.isEmpty(_p6.node) ? _U.update(_p7,{kvm: _U.update(_p6,{node: _p5._0})}) : _p7;
          } else {
-            return _p5;
+            return _p7;
          }
    });
    var Summary = {ctor: "Summary"};
@@ -17740,85 +17844,90 @@ Elm.Systems.Add.KVM.make = function (_elm) {
             ,_1: A3($Systems$Add$Validations.validationOf,
             "User",
             _U.list([$Systems$Add$Validations.notEmpty]),
-            function (_p6) {
-               var _p7 = _p6;
-               return _p7.machine.user;
+            function (_p8) {
+               var _p9 = _p8;
+               return _p9.machine.user;
             })}
            ,{ctor: "_Tuple2"
             ,_0: "Hostname"
             ,_1: A3($Systems$Add$Validations.validationOf,
             "Hostname",
             _U.list([$Systems$Add$Validations.notEmpty]),
-            function (_p8) {
-               var _p9 = _p8;
-               return _p9.machine.hostname;
+            function (_p10) {
+               var _p11 = _p10;
+               return _p11.machine.hostname;
             })}
            ,{ctor: "_Tuple2"
             ,_0: "Domain"
             ,_1: A3($Systems$Add$Validations.validationOf,
             "Domain",
             _U.list([$Systems$Add$Validations.notEmpty]),
-            function (_p10) {
-               var _p11 = _p10;
-               return _p11.machine.domain;
+            function (_p12) {
+               var _p13 = _p12;
+               return _p13.machine.domain;
             })}]))]));
    var validateKvm = $Systems$Add$Validations.validateAll(_U.list([stringValidations]));
-   var update = F2(function (action,_p12) {
-      var _p13 = _p12;
-      var _p17 = _p13.wizard;
-      var _p16 = _p13;
-      var _p14 = action;
-      switch (_p14.ctor)
-      {case "WizardAction": var _p15 = A2(validateKvm,_p17.step,_p16);
-           var newModel = _p15;
-           var errors = _p15.errors;
-           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p14._0,_p17);
+   var update = F2(function (action,_p14) {
+      var _p15 = _p14;
+      var _p19 = _p15.wizard;
+      var _p18 = _p15;
+      var _p16 = action;
+      switch (_p16.ctor)
+      {case "WizardAction": var _p17 = A2(validateKvm,_p19.step,_p18);
+           var newModel = _p17;
+           var errors = _p17.errors;
+           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p16._0,_p19);
            return _U.update(newModel,{wizard: newWizard});
-         case "Update": return A2(setDefaultNode,_p16,A2($Systems$Add$Common.setDefaultOS,"kvm",_U.update(_p16,{environment: _p14._0})));
+         case "Update": return A2(setDefaultNode,_p18,A2($Systems$Add$Common.setDefaultOS,"kvm",_U.update(_p18,{environment: _p16._0})));
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p16._0});},_p18);
+         case "SelectNode": return A2(setKVM,function (kvm) {    return _U.update(kvm,{node: _p16._0});},_p18);
          case "UserInput": return A4($Systems$Add$Validations.validate,
-           _p17.step,
+           _p19.step,
            "User",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p14._0});},_p16));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p16._0});},_p18));
          case "HostnameInput": return A4($Systems$Add$Validations.validate,
-           _p17.step,
+           _p19.step,
            "Hostname",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p14._0});},_p16));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p16._0});},_p18));
          case "DomainInput": return A4($Systems$Add$Validations.validate,
-           _p17.step,
+           _p19.step,
            "Domain",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p14._0});},_p16));
-         default: return _p16;}
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p16._0});},_p18));
+         default: return _p18;}
    });
    var Zero = {ctor: "Zero"};
    var NoOp = {ctor: "NoOp"};
    var DomainInput = function (a) {    return {ctor: "DomainInput",_0: a};};
    var HostnameInput = function (a) {    return {ctor: "HostnameInput",_0: a};};
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
+   var SelectNode = function (a) {    return {ctor: "SelectNode",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
-   var instance = F2(function (address,_p18) {
-      var _p19 = _p18;
-      var _p20 = _p19.machine;
-      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"kvm",_p19));
-      var check = $Common$Components.withErrors(_p19.errors);
+   var instance = F2(function (address,_p20) {
+      var _p21 = _p20;
+      var _p23 = _p21;
+      var _p22 = _p21.machine;
+      var nodes = $Dict.keys(getNodes(_p23));
+      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"kvm",_p23));
+      var check = $Common$Components.withErrors(_p21.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Domain")]))
-              ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,oses,_p20.os))
-              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p20.user))
-              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p20.hostname))
-              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p20.domain))]))]);
+      _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Instance")]))
+              ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,oses,_p22.os))
+              ,A2($Common$Components.group$,"Node",A4($Common$Components.selector,address,SelectNode,nodes,_p21.kvm.node))
+              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p22.user))
+              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p22.hostname))
+              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p22.domain))]))]);
    });
-   var stepView = F2(function (address,_p21) {
-      var _p22 = _p21;
-      var _p23 = _p22.wizard.step;
-      if (_p23.ctor === "Instance") {
-            return A2(instance,address,_p22);
-         } else {
-            return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);
-         }
+   var stepView = F2(function (address,_p24) {
+      var _p25 = _p24;
+      var _p26 = _p25.wizard.step;
+      switch (_p26.ctor)
+      {case "Instance": return A2(instance,address,_p25);
+         case "Summary": return $Systems$View$KVM.summarize({ctor: "_Tuple2",_0: _p25.kvm,_1: _p25.machine});
+         default: return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);}
    });
    var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
    var Update = function (a) {    return {ctor: "Update",_0: a};};
@@ -17836,6 +17945,7 @@ Elm.Systems.Add.KVM.make = function (_elm) {
                                         ,WizardAction: WizardAction
                                         ,Update: Update
                                         ,SelectOS: SelectOS
+                                        ,SelectNode: SelectNode
                                         ,UserInput: UserInput
                                         ,HostnameInput: HostnameInput
                                         ,DomainInput: DomainInput
@@ -17849,6 +17959,7 @@ Elm.Systems.Add.KVM.make = function (_elm) {
                                         ,validateKvm: validateKvm
                                         ,next: next
                                         ,back: back
+                                        ,setKVM: setKVM
                                         ,update: update
                                         ,instance: instance
                                         ,stepView: stepView
@@ -18413,6 +18524,7 @@ Elm.Types.Model.make = function (_elm) {
    if (_elm.Types.Model.values) return _elm.Types.Model.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Model = Elm.Common.Model.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
@@ -18422,82 +18534,50 @@ Elm.Types.Model.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm);
    var _op = {};
+   var classesDecoder = $Json$Decode.dict($Common$Model.option({ctor: "_Tuple0"}));
+   var decodeClasses = function (json) {
+      var _p0 = A2($Json$Decode.decodeString,classesDecoder,json);
+      if (_p0.ctor === "Ok") {
+            return _p0._0;
+         } else {
+            return A2($Debug.log,_p0._0,$Dict.empty);
+         }
+   };
    var Type = F3(function (a,b,c) {    return {type$: a,description: b,puppetStd: c};});
    var emptyType = A3(Type,"",$Maybe.Nothing,$Dict.empty);
    var PuppetStd = F3(function (a,b,c) {    return {module$: a,args: b,classes: c};});
    var Module = F3(function (a,b,c) {    return {name: a,src: b,options: c};});
-   var emptyModule = A3(Module,"","",$Maybe.Nothing);
-   var emptyPuppet = A3(PuppetStd,emptyModule,_U.list([]),$Dict.empty);
-   var typeBase = F3(function (type$,description,environment) {
-      return A3(Type,type$,$Maybe.Just(description),$Dict.fromList(_U.list([{ctor: "_Tuple2",_0: environment,_1: emptyPuppet}])));
-   });
-   var valueOf = function (option) {
-      var _p0 = option;
-      switch (_p0.ctor)
-      {case "BoolOption": return $String.toLower($Basics.toString(_p0._0));
-         case "StringOption": return _p0._0;
-         case "IntOption": return $Basics.toString(_p0._0);
-         default: return $Basics.toString(_p0._0);}
-   };
-   var DictOption = function (a) {    return {ctor: "DictOption",_0: a};};
-   var IntOption = function (a) {    return {ctor: "IntOption",_0: a};};
-   var StringOption = function (a) {    return {ctor: "StringOption",_0: a};};
-   var BoolOption = function (a) {    return {ctor: "BoolOption",_0: a};};
-   var option = function (_p1) {
-      return $Json$Decode.oneOf(_U.list([A2($Json$Decode.map,BoolOption,$Json$Decode.bool)
-                                        ,A2($Json$Decode.map,StringOption,$Json$Decode.string)
-                                        ,A2($Json$Decode.map,IntOption,$Json$Decode.$int)
-                                        ,dictOption$({ctor: "_Tuple0"})]));
-   };
-   var dictOption$ = function (_p2) {
-      return A2($Json$Decode.andThen,
-      $Json$Decode.succeed({ctor: "_Tuple0"}),
-      function (_p3) {
-         return A2($Json$Decode.map,DictOption,$Json$Decode.dict(option(_p3)));
-      });
-   };
-   var classesDecoder = $Json$Decode.dict(option({ctor: "_Tuple0"}));
-   var decodeClasses = function (json) {
-      var _p4 = A2($Json$Decode.decodeString,classesDecoder,json);
-      if (_p4.ctor === "Ok") {
-            return _p4._0;
-         } else {
-            return A2($Debug.log,_p4._0,$Dict.empty);
-         }
-   };
    var module$ = A4($Json$Decode.object3,
    Module,
    A2($Json$Decode._op[":="],"name",$Json$Decode.string),
    A2($Json$Decode._op[":="],"src",$Json$Decode.string),
-   $Json$Decode.maybe(A2($Json$Decode._op[":="],"options",$Json$Decode.dict(option({ctor: "_Tuple0"})))));
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"options",$Json$Decode.dict($Common$Model.option({ctor: "_Tuple0"})))));
    var puppetStd = A4($Json$Decode.object3,
    PuppetStd,
    A2($Json$Decode._op[":="],"module",module$),
    A2($Json$Decode._op[":="],"args",$Json$Decode.list($Json$Decode.string)),
-   A2($Json$Decode._op[":="],"classes",$Json$Decode.dict(option({ctor: "_Tuple0"}))));
+   A2($Json$Decode._op[":="],"classes",$Json$Decode.dict($Common$Model.option({ctor: "_Tuple0"}))));
    var type$ = A4($Json$Decode.object3,
    Type,
    A2($Json$Decode._op[":="],"type",$Json$Decode.string),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"description",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"puppet-std",$Json$Decode.dict(puppetStd)));
+   var emptyModule = A3(Module,"","",$Maybe.Nothing);
+   var emptyPuppet = A3(PuppetStd,emptyModule,_U.list([]),$Dict.empty);
+   var typeBase = F3(function (type$,description,environment) {
+      return A3(Type,type$,$Maybe.Just(description),$Dict.fromList(_U.list([{ctor: "_Tuple2",_0: environment,_1: emptyPuppet}])));
+   });
    var puppetBase = F4(function (name,src,unsecure,args) {
-      var module$ = A3(Module,name,src,$Maybe.Just($Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "unsecure",_1: BoolOption(unsecure)}]))));
+      var module$ = A3(Module,name,src,$Maybe.Just($Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "unsecure",_1: $Common$Model.BoolOption(unsecure)}]))));
       var puppet = A3(PuppetStd,module$,A2($String.split,args," "),$Dict.empty);
       return _U.update(emptyType,{puppetStd: $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "--",_1: puppet}]))});
    });
    return _elm.Types.Model.values = {_op: _op
-                                    ,BoolOption: BoolOption
-                                    ,StringOption: StringOption
-                                    ,IntOption: IntOption
-                                    ,DictOption: DictOption
-                                    ,valueOf: valueOf
                                     ,Module: Module
                                     ,PuppetStd: PuppetStd
                                     ,Type: Type
                                     ,classesDecoder: classesDecoder
                                     ,decodeClasses: decodeClasses
-                                    ,dictOption$: dictOption$
-                                    ,option: option
                                     ,module$: module$
                                     ,puppetStd: puppetStd
                                     ,type$: type$
@@ -24435,6 +24515,7 @@ Elm.Types.Persistency.make = function (_elm) {
    if (_elm.Types.Persistency.values) return _elm.Types.Persistency.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Model = Elm.Common.Model.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -24499,6 +24580,7 @@ Elm.Types.View.make = function (_elm) {
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Model = Elm.Common.Model.make(_elm),
    $Common$Summary = Elm.Common.Summary.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -24521,7 +24603,7 @@ Elm.Types.View.make = function (_elm) {
             return A2($String.join,
             ",",
             $Dict.values(A2($Dict.map,
-            F2(function (k,o) {    return A2($Basics._op["++"],k,A2($Basics._op["++"],": ",A2($Basics._op["++"],$Types$Model.valueOf(o),", ")));}),
+            F2(function (k,o) {    return A2($Basics._op["++"],k,A2($Basics._op["++"],": ",A2($Basics._op["++"],$Common$Model.valueOf(o),", ")));}),
             _p0._0)));
          } else {
             return "";
@@ -24781,6 +24863,7 @@ Elm.Types.Add.make = function (_elm) {
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$FormWizard = Elm.Common.FormWizard.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Model = Elm.Common.Model.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),

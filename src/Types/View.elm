@@ -2,7 +2,8 @@ module Types.View where
 
 import Effects exposing (Effects)
 import Html exposing (..)
-import Types.Model as Model exposing (Type, PuppetStd, emptyType, valueOf)
+import Types.Model as Model exposing (Type, PuppetStd, emptyType)
+import Common.Model exposing (valueOf)
 import Common.Utils exposing (partition, withDefaultProp)
 import Bootstrap.Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)

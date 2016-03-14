@@ -21,6 +21,7 @@ import Common.Http exposing (postJson)
 import Task exposing (Task)
 import Types.Persistency exposing (persistType, encodeClasses)
 import Types.View exposing (summarize)
+import Common.Model exposing (Options)
 
 import Types.Model exposing (Type, emptyType, emptyPuppet)
 import Types.Add.Common as TypeCommon

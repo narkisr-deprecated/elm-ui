@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Systems.Add.Common exposing (setDefaultOS, getOses, setMachine)
--- import Systems.View.Openstack exposing (summarize)
+import Systems.View.KVM exposing (summarize)
 import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor(KVM))
 import Dict as Dict exposing (Dict)
@@ -43,6 +43,7 @@ type Action =
   WizardAction Wizard.Action
    | Update Environment
    | SelectOS String
+   | SelectNode String
    | UserInput String
    | HostnameInput String
    | DomainInput String
@@ -70,7 +71,7 @@ getNodes model =
     hypervisor = withDefault ENV.Empty (Dict.get "kvm" model.environment)
   in 
     case hypervisor of
-      ENV.KVM nodes _ -> 
+      ENV.KVM _ nodes -> 
         nodes
 
       _ -> 
@@ -100,6 +101,12 @@ next model environment =
 back model =
   (update (WizardAction Wizard.Back) model)
 
+setKVM : (KVM -> KVM) -> Model -> Model
+setKVM f ({kvm, errors} as model) =
+  let
+    newKvm = f kvm
+  in
+   { model | kvm = newKvm }
 
 update : Action ->  Model -> Model
 update action ({wizard} as model) =
@@ -114,6 +121,12 @@ update action ({wizard} as model) =
     Update environment -> 
       setDefaultOS "kvm" { model | environment = environment} 
         |> setDefaultNode model
+
+    SelectOS os -> 
+      setMachine (\machine -> {machine | os = os }) model
+
+    SelectNode node -> 
+      setKVM (\kvm -> {kvm | node = node }) model
 
     UserInput user -> 
        model 
@@ -140,11 +153,13 @@ instance address ({kvm, machine, errors} as model) =
   let
     check = withErrors errors
     oses = (Dict.keys (getOses "kvm" model))
+    nodes = (Dict.keys (getNodes model))
   in
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
-         legend [] [text "Domain"]
+         legend [] [text "Instance"]
        , group' "OS" (selector address SelectOS oses machine.os)
+       , group' "Node" (selector address SelectNode nodes kvm.node)
        , check "User" (inputText address UserInput "" machine.user) 
        , check "Hostname" (inputText address HostnameInput "" machine.hostname)
        , check "Domain"  (inputText address DomainInput "" machine.domain)
@@ -156,10 +171,10 @@ stepView address ({wizard, kvm, machine} as model) =
   case wizard.step of
     Instance -> 
       instance address model 
-    --
-    -- Summary -> 
-    --   summarize (openstack, machine)
-    --
+ 
+    Summary -> 
+      summarize (kvm, machine)
+ 
     _ -> 
       [div [] []]
 
