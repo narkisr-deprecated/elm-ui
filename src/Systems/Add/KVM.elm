@@ -145,6 +145,25 @@ update action ({wizard} as model) =
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate wizard.step "Domain" stringValidations
 
+    CpuInput count -> 
+      case (String.toInt count) of
+        Ok num -> 
+          model 
+            |> setMachine (\machine -> {machine | cpu = Just num })
+
+        Err _ -> 
+          model
+
+    RamInput count -> 
+      case (String.toInt count) of
+        Ok num -> 
+          model 
+            |> setMachine (\machine -> {machine | ram = Just num})
+
+        Err _ -> 
+          model
+
+
     _ -> 
       model
 

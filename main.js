@@ -17867,34 +17867,46 @@ Elm.Systems.Add.KVM.make = function (_elm) {
    var validateKvm = $Systems$Add$Validations.validateAll(_U.list([stringValidations]));
    var update = F2(function (action,_p14) {
       var _p15 = _p14;
-      var _p19 = _p15.wizard;
-      var _p18 = _p15;
+      var _p21 = _p15.wizard;
+      var _p20 = _p15;
       var _p16 = action;
       switch (_p16.ctor)
-      {case "WizardAction": var _p17 = A2(validateKvm,_p19.step,_p18);
+      {case "WizardAction": var _p17 = A2(validateKvm,_p21.step,_p20);
            var newModel = _p17;
            var errors = _p17.errors;
-           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p16._0,_p19);
+           var newWizard = A3($Common$Wizard.update,$Systems$Add$Validations.notAny(errors),_p16._0,_p21);
            return _U.update(newModel,{wizard: newWizard});
-         case "Update": return A2(setDefaultNode,_p18,A2($Systems$Add$Common.setDefaultOS,"kvm",_U.update(_p18,{environment: _p16._0})));
-         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p16._0});},_p18);
-         case "SelectNode": return A2(setKVM,function (kvm) {    return _U.update(kvm,{node: _p16._0});},_p18);
+         case "Update": return A2(setDefaultNode,_p20,A2($Systems$Add$Common.setDefaultOS,"kvm",_U.update(_p20,{environment: _p16._0})));
+         case "SelectOS": return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{os: _p16._0});},_p20);
+         case "SelectNode": return A2(setKVM,function (kvm) {    return _U.update(kvm,{node: _p16._0});},_p20);
          case "UserInput": return A4($Systems$Add$Validations.validate,
-           _p19.step,
+           _p21.step,
            "User",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p16._0});},_p18));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{user: _p16._0});},_p20));
          case "HostnameInput": return A4($Systems$Add$Validations.validate,
-           _p19.step,
+           _p21.step,
            "Hostname",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p16._0});},_p18));
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{hostname: _p16._0});},_p20));
          case "DomainInput": return A4($Systems$Add$Validations.validate,
-           _p19.step,
+           _p21.step,
            "Domain",
            stringValidations,
-           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p16._0});},_p18));
-         default: return _p18;}
+           A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p16._0});},_p20));
+         case "CpuInput": var _p18 = $String.toInt(_p16._0);
+           if (_p18.ctor === "Ok") {
+                 return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{cpu: $Maybe.Just(_p18._0)});},_p20);
+              } else {
+                 return _p20;
+              }
+         case "RamInput": var _p19 = $String.toInt(_p16._0);
+           if (_p19.ctor === "Ok") {
+                 return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{ram: $Maybe.Just(_p19._0)});},_p20);
+              } else {
+                 return _p20;
+              }
+         default: return _p20;}
    });
    var Zero = {ctor: "Zero"};
    var NoOp = {ctor: "NoOp"};
@@ -17905,32 +17917,32 @@ Elm.Systems.Add.KVM.make = function (_elm) {
    var UserInput = function (a) {    return {ctor: "UserInput",_0: a};};
    var SelectNode = function (a) {    return {ctor: "SelectNode",_0: a};};
    var SelectOS = function (a) {    return {ctor: "SelectOS",_0: a};};
-   var instance = F2(function (address,_p20) {
-      var _p21 = _p20;
-      var _p23 = _p21;
-      var _p22 = _p21.machine;
-      var nodes = $Dict.keys(getNodes(_p23));
-      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"kvm",_p23));
-      var check = $Common$Components.withErrors(_p21.errors);
+   var instance = F2(function (address,_p22) {
+      var _p23 = _p22;
+      var _p25 = _p23;
+      var _p24 = _p23.machine;
+      var nodes = $Dict.keys(getNodes(_p25));
+      var oses = $Dict.keys(A2($Systems$Add$Common.getOses,"kvm",_p25));
+      var check = $Common$Components.withErrors(_p23.errors);
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       _U.list([A2($Html.legend,_U.list([]),_U.list([$Html.text("Domain")]))
-              ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,oses,_p22.os))
-              ,A2($Common$Components.group$,"Node",A4($Common$Components.selector,address,SelectNode,nodes,_p21.kvm.node))
+              ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,oses,_p24.os))
+              ,A2($Common$Components.group$,"Node",A4($Common$Components.selector,address,SelectNode,nodes,_p23.kvm.node))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Resources")]))
-              ,A2(check,"Cpu",A4($Common$Components.inputText,address,CpuInput,"",$Basics.toString(A2($Maybe.withDefault,1,_p22.cpu))))
-              ,A2(check,"Ram (mb)",A4($Common$Components.inputText,address,RamInput,"",$Basics.toString(A2($Maybe.withDefault,512,_p22.ram))))
+              ,A2(check,"Cpu",A4($Common$Components.inputText,address,CpuInput,"",$Basics.toString(A2($Maybe.withDefault,1,_p24.cpu))))
+              ,A2(check,"Ram (mb)",A4($Common$Components.inputText,address,RamInput,"",$Basics.toString(A2($Maybe.withDefault,512,_p24.ram))))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Network")]))
-              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p22.user))
-              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p22.hostname))
-              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p22.domain))]))]);
+              ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p24.user))
+              ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p24.hostname))
+              ,A2(check,"Domain",A4($Common$Components.inputText,address,DomainInput,"",_p24.domain))]))]);
    });
-   var stepView = F2(function (address,_p24) {
-      var _p25 = _p24;
-      var _p26 = _p25.wizard.step;
-      switch (_p26.ctor)
-      {case "Instance": return A2(instance,address,_p25);
-         case "Summary": return $Systems$View$KVM.summarize({ctor: "_Tuple2",_0: _p25.kvm,_1: _p25.machine});
+   var stepView = F2(function (address,_p26) {
+      var _p27 = _p26;
+      var _p28 = _p27.wizard.step;
+      switch (_p28.ctor)
+      {case "Instance": return A2(instance,address,_p27);
+         case "Summary": return $Systems$View$KVM.summarize({ctor: "_Tuple2",_0: _p27.kvm,_1: _p27.machine});
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([]))]);}
    });
    var view = F2(function (address,model) {    return $Common$Components.fixedPanel(A2($Html.form,_U.list([]),A2(stepView,address,model)));});
