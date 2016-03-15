@@ -79,7 +79,12 @@ type Action =
 
 stage : Model -> SaveResponse -> (Model, Effects Action)
 stage model {id} =
-  (model, runJob (toString id) "stage" JobLaunched)
+  case id of
+   Just num ->
+     (model, runJob (toString num) "stage" JobLaunched)
+
+   Nothing -> 
+     none model
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({saveErrors, form, admin, name} as model) =

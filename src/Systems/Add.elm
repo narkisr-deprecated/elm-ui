@@ -86,7 +86,13 @@ init =
 
 setSaved : Action -> Model -> SaveResponse -> (Model, Effects Action)
 setSaved next model {id} =
-  (model, runJob (toString id) (toLower (toString next)) JobLaunched)
+  case id of 
+    Just num -> 
+      (model, runJob (toString num) (toLower (toString next)) JobLaunched)
+
+    Nothing -> 
+      none model
+
 
 back hasPrev model =
    let
