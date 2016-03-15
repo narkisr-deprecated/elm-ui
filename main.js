@@ -18786,6 +18786,7 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
    $Systems$Model$GCE = Elm.Systems.Model.GCE.make(_elm),
+   $Systems$Model$KVM = Elm.Systems.Model.KVM.make(_elm),
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm);
    var _op = {};
@@ -18828,6 +18829,7 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                          ,{ctor: "_Tuple2",_0: "os",_1: $Json$Encode.string(machine.os)}
                                          ,{ctor: "_Tuple2",_0: "user",_1: $Json$Encode.string(machine.user)}]));
    };
+   var kvmEncoder = function (kvm) {    return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "node",_1: $Json$Encode.string(kvm.node)}]));};
    var digitalEncoder = function (digital) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "size",_1: $Json$Encode.string(digital.size)}
                                          ,{ctor: "_Tuple2",_0: "region",_1: $Json$Encode.string(digital.region)}
@@ -18895,6 +18897,7 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
          case "Openstack": return {ctor: "_Tuple2"
                                   ,_0: "openstack"
                                   ,_1: openstackEncoder(A2($Maybe.withDefault,$Systems$Model$Openstack.emptyOpenstack,_p6.openstack))};
+         case "KVM": return {ctor: "_Tuple2",_0: "kvm",_1: kvmEncoder(A2($Maybe.withDefault,$Systems$Model$KVM.emptyKVM,_p6.kvm))};
          default: return {ctor: "_Tuple2",_0: "",_1: $Json$Encode.$null};}
    });
    var encode = F2(function (_p8,stage) {
@@ -18912,6 +18915,7 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                              ,awsEncoder: awsEncoder
                                              ,gceEncoder: gceEncoder
                                              ,digitalEncoder: digitalEncoder
+                                             ,kvmEncoder: kvmEncoder
                                              ,optional: optional
                                              ,physicalEncoder: physicalEncoder
                                              ,openstackVolumeEncoder: openstackVolumeEncoder
@@ -19374,6 +19378,7 @@ Elm.Systems.View.make = function (_elm) {
    $Systems$View$AWS = Elm.Systems.View.AWS.make(_elm),
    $Systems$View$Digital = Elm.Systems.View.Digital.make(_elm),
    $Systems$View$GCE = Elm.Systems.View.GCE.make(_elm),
+   $Systems$View$KVM = Elm.Systems.View.KVM.make(_elm),
    $Systems$View$Openstack = Elm.Systems.View.Openstack.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
@@ -19393,6 +19398,7 @@ Elm.Systems.View.make = function (_elm) {
       var options = _U.list([A3(toHtml,_p6,$Systems$View$AWS.summarize,_p7.aws)
                             ,A3(toHtml,_p6,$Systems$View$GCE.summarize,_p7.gce)
                             ,A3(toHtml,_p6,$Systems$View$Openstack.summarize,_p7.openstack)
+                            ,A3(toHtml,_p6,$Systems$View$KVM.summarize,_p7.kvm)
                             ,A3(toHtml,_p6,$Systems$View$Digital.summarize,_p7.digital)]);
       return A2($Maybe.withDefault,
       $Common$Components.asList($Common$Components.notImplemented),

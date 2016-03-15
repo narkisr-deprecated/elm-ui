@@ -6,6 +6,7 @@ import Systems.Model.Common exposing (..)
 import Systems.Model.AWS as AWS exposing (AWS, emptyVpc, emptyAws)
 import Systems.Model.Openstack as Openstack exposing (Openstack, emptyOpenstack)
 import Systems.Model.GCE exposing (GCE, emptyGce)
+import Systems.Model.KVM exposing (KVM, emptyKVM)
 import Systems.Model.Digital exposing (Digital, emptyDigital)
 import Systems.Model.Physical exposing (Physical, emptyPhysical)
 
@@ -75,6 +76,13 @@ digitalEncoder digital =
     , ("private-networking", bool digital.privateNetworking)
   ]
 
+kvmEncoder : KVM -> Value
+kvmEncoder kvm =
+  object [
+      ("node", string kvm.node)
+  ]
+
+
 optional : (a -> Value) -> Maybe a -> Value
 optional enc value =
   case value of
@@ -132,7 +140,7 @@ machineEncoder machine =
     , ("user", string machine.user)
   ]
 
-encoderOf {openstack, physical, aws, digital, gce} stage =
+encoderOf {openstack, physical, aws, digital, gce, kvm} stage =
   case stage of 
     "AWS" -> 
        ("aws", awsEncoder (withDefault emptyAws aws))
@@ -148,6 +156,10 @@ encoderOf {openstack, physical, aws, digital, gce} stage =
 
     "Openstack" -> 
       ("openstack" , openstackEncoder (withDefault emptyOpenstack openstack))
+
+    "KVM" -> 
+      ("kvm" , kvmEncoder (withDefault emptyKVM kvm))
+
 
     _ -> 
 

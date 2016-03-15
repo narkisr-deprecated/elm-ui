@@ -15,6 +15,7 @@ import Common.Errors exposing (successHandler)
 import Common.Components exposing (fixedPanel, asList, notImplemented)
 import Html exposing (..)
 import Systems.View.AWS  as AWSView
+import Systems.View.KVM as KVMView
 import Systems.View.Openstack as OpenstackView
 import Systems.View.GCE as GCEView
 import Systems.View.Digital as DigitalView
@@ -68,6 +69,7 @@ view address ({system} as model) =
       options = [ toHtml  model AWSView.summarize system.aws
                 , toHtml  model GCEView.summarize system.gce
                 , toHtml  model OpenstackView.summarize system.openstack
+                , toHtml  model KVMView.summarize system.kvm
                 , toHtml  model DigitalView.summarize system.digital]
       
 
