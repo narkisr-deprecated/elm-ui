@@ -236,6 +236,7 @@ update action ({wizard, aws, machine, volume, block} as model) =
       case (String.toInt size) of
         Ok num -> 
           setVolume (\volume -> { volume | size = num}) model
+
         Err _ -> 
           model
 
@@ -243,6 +244,7 @@ update action ({wizard, aws, machine, volume, block} as model) =
       case (String.toInt iops) of
         Ok num -> 
           setVolume (\volume -> { volume | iops = (Just num)}) model
+
         Err _ -> 
           model
 
