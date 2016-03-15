@@ -95,7 +95,6 @@
       hostname
    ))
 
-
 (defn gce-flow []
   (add "gce" "redis")
   (wait-until #(exists? {:tag "div" :id "Project id"}))
@@ -120,6 +119,17 @@
       (input-text (find-element-under "div#Domain" {:tag :input}) "local")
       (click-next)))
 
+(defn kvm-partial-save []
+   (set-driver!  {:browser :firefox})
+   (login)    
+   (add "kvm" "redis")
+   (let [hostname (uuid)] 
+      (input-text (find-element-under "div#User" {:tag :input}) "Foo")
+      (input-text (find-element-under "div#Hostname" {:tag :input}) "Bar")
+      (input-text (find-element-under "div#Domain" {:tag :input}) "local")
+      (click-next)))
+
+
 #_(with-driver- (create-phantom)
   (login)    
   (fact "Adding gce system" :gce 
@@ -131,5 +141,6 @@
        (text (find-element-under "tbody" {:tag :tr})) => (contains hostname))))
 
 ;; (digital-partial-save)
-(openstack-partial-template)
+;; (openstack-partial-template)
 ;; (openstack-partial-save)
+(kvm-partial-save)
