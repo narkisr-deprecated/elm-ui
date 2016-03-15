@@ -71,8 +71,6 @@ view address ({system} as model) =
                 , toHtml  model OpenstackView.summarize system.openstack
                 , toHtml  model KVMView.summarize system.kvm
                 , toHtml  model DigitalView.summarize system.digital]
-      
-
     in 
       withDefault (asList notImplemented) (List.head (List.filter (not << List.isEmpty) options))
 

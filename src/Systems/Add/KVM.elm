@@ -45,6 +45,8 @@ type Action =
    | SelectOS String
    | SelectNode String
    | UserInput String
+   | CpuInput String
+   | RamInput String
    | HostnameInput String
    | DomainInput String
    | NoOp
@@ -157,9 +159,13 @@ instance address ({kvm, machine, errors} as model) =
   in
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
-         legend [] [text "Instance"]
+         legend [] [text "Domain"]
        , group' "OS" (selector address SelectOS oses machine.os)
        , group' "Node" (selector address SelectNode nodes kvm.node)
+       , legend [] [text "Resources"]
+       , check  "Cpu" (inputText address CpuInput "" (toString (withDefault 1 machine.cpu)))
+       , check  "Ram (mb)" (inputText address RamInput "" (toString (withDefault 512 machine.ram)))
+       , legend [] [text "Network"]
        , check "User" (inputText address UserInput "" machine.user) 
        , check "Hostname" (inputText address HostnameInput "" machine.hostname)
        , check "Domain"  (inputText address DomainInput "" machine.domain)

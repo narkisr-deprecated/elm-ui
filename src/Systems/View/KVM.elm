@@ -31,8 +31,11 @@ type Action =
 summarySections : (KVM, Machine) -> List (List Html)
 summarySections ((kvm, machine) as model) =
    [ 
-     overviewSection "Instance" ["os", "user", "hostname", "domain" ] 
+     overviewSection "Network" ["user", "hostname", "domain" ] 
       [machine.os, machine.user,  machine.hostname, machine.domain]
+   , overviewSection "Domain" ["os", "node"] 
+      [machine.os, kvm.node]
+
    ]
 
 summarize: (KVM, Machine) -> List Html

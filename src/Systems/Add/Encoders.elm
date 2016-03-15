@@ -138,6 +138,8 @@ machineEncoder machine =
     , ("ip", optional string machine.ip)
     , ("os", string machine.os)
     , ("user", string machine.user)
+    , ("cpu", int (withDefault 0 machine.cpu))
+    , ("ram", int (withDefault 0 machine.ram))
   ]
 
 encoderOf {openstack, physical, aws, digital, gce, kvm} stage =
