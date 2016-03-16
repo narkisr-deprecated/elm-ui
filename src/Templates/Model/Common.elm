@@ -6,6 +6,7 @@ import Systems.Model.GCE exposing (GCE)
 import Systems.Model.Digital exposing (Digital)
 import Systems.Model.Openstack exposing (Openstack)
 import Systems.Model.Physical exposing (Physical)
+import Systems.Model.KVM exposing (KVM)
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Decoders exposing (..)
 import Dict exposing (Dict)
@@ -30,13 +31,14 @@ type alias Template =
   , gce : Maybe GCE
   , digital : Maybe Digital
   , openstack : Maybe Openstack
+  , kvm : Maybe KVM
   , physical : Maybe Physical
   , defaults : Maybe (Dict String Defaults)
   }
 
 emptyTemplate : Template
 emptyTemplate  =
-  Template "" "" "" emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing
+  Template "" "" "" emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 type alias Defaults = 
   {
@@ -69,6 +71,7 @@ decodeDefaults json =
   case Json.decodeString defaultsDictDecoder json of 
     Ok value -> 
        value
+
     Err error -> 
       Debug.log error emptyDefaults
 
@@ -92,6 +95,7 @@ templateDecoder =
     `apply` (maybe ("gce" := gceDecoder))
     `apply` (maybe ("digital-ocean" := digitalDecoder))
     `apply` (maybe ("openstack" := openstackDecoder))
+    `apply` (maybe ("kvm" := kvmDecoder))
     `apply` (maybe ("physical" := physicalDecoder))
     `apply` (maybe ("defaults" := defaultsDictDecoder))
  

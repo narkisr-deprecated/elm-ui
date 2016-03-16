@@ -19840,6 +19840,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
    $Systems$Model$Common = Elm.Systems.Model.Common.make(_elm),
    $Systems$Model$Digital = Elm.Systems.Model.Digital.make(_elm),
    $Systems$Model$GCE = Elm.Systems.Model.GCE.make(_elm),
+   $Systems$Model$KVM = Elm.Systems.Model.KVM.make(_elm),
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm);
    var _op = {};
@@ -19860,7 +19861,9 @@ Elm.Templates.Model.Common.make = function (_elm) {
                         return function (h) {
                            return function (i) {
                               return function (j) {
-                                 return {name: a,type$: b,description: c,machine: d,aws: e,gce: f,digital: g,openstack: h,physical: i,defaults: j};
+                                 return function (k) {
+                                    return {name: a,type$: b,description: c,machine: d,aws: e,gce: f,digital: g,openstack: h,kvm: i,physical: j,defaults: k};
+                                 };
                               };
                            };
                         };
@@ -19871,7 +19874,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
          };
       };
    };
-   var emptyTemplate = Template("")("")("")($Systems$Model$Common.emptyMachine)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing);
+   var emptyTemplate = Template("")("")("")($Systems$Model$Common.emptyMachine)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing)($Maybe.Nothing);
    var OpenstackDefaults = function (a) {    return {networks: a};};
    var emptyOpenstackDefaults = OpenstackDefaults($Maybe.Just(_U.list([])));
    var defaultsByEnv = function (envs) {
@@ -19899,6 +19902,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
    A2($Common$Http.apply,
    A2($Common$Http.apply,
    A2($Common$Http.apply,
+   A2($Common$Http.apply,
    A2($Json$Decode.map,Template,A2($Json$Decode._op[":="],"name",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"type",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"description",$Json$Decode.string)),
@@ -19907,6 +19911,7 @@ Elm.Templates.Model.Common.make = function (_elm) {
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"gce",$Systems$Decoders.gceDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"digital-ocean",$Systems$Decoders.digitalDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"openstack",$Systems$Decoders.openstackDecoder))),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"kvm",$Systems$Decoders.kvmDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"physical",$Systems$Decoders.physicalDecoder))),
    $Json$Decode.maybe(A2($Json$Decode._op[":="],"defaults",defaultsDictDecoder)));
    return _elm.Templates.Model.Common.values = {_op: _op
