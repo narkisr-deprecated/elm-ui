@@ -35,6 +35,8 @@ summarySections ((kvm, machine) as model) =
       [machine.os, machine.user,  machine.hostname, machine.domain]
    , overviewSection "Domain" ["os", "node"] 
       [machine.os, kvm.node]
+   , overviewSection "Resources" ["cpu", "ram"] 
+      [toString (withDefault 0 machine.cpu), toString (withDefault 0 machine.ram)]
 
    ]
 

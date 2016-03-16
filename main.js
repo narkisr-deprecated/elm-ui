@@ -15629,7 +15629,13 @@ Elm.Systems.Model.Common.make = function (_elm) {
       var base = A3(System,"","","");
       return A7(base,emptyMachine,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing);
    }();
-   return _elm.Systems.Model.Common.values = {_op: _op,Machine: Machine,System: System,emptyMachine: emptyMachine,emptySystem: emptySystem};
+   var resourcedMachine = F2(function (cpu,ram) {    return A7(Machine,"","","",$Maybe.Just(""),"",$Maybe.Just(ram),$Maybe.Just(cpu));});
+   return _elm.Systems.Model.Common.values = {_op: _op
+                                             ,Machine: Machine
+                                             ,System: System
+                                             ,emptyMachine: emptyMachine
+                                             ,resourcedMachine: resourcedMachine
+                                             ,emptySystem: emptySystem};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Decoders = Elm.Systems.Decoders || {};
@@ -17766,7 +17772,11 @@ Elm.Systems.View.KVM.make = function (_elm) {
       var _p1 = _p0;
       var _p2 = _p1._1;
       return _U.list([A3($Common$Summary.overviewSection,"Network",_U.list(["user","hostname","domain"]),_U.list([_p2.os,_p2.user,_p2.hostname,_p2.domain]))
-                     ,A3($Common$Summary.overviewSection,"Domain",_U.list(["os","node"]),_U.list([_p2.os,_p1._0.node]))]);
+                     ,A3($Common$Summary.overviewSection,"Domain",_U.list(["os","node"]),_U.list([_p2.os,_p1._0.node]))
+                     ,A3($Common$Summary.overviewSection,
+                     "Resources",
+                     _U.list(["cpu","ram"]),
+                     _U.list([$Basics.toString(A2($Maybe.withDefault,0,_p2.cpu)),$Basics.toString(A2($Maybe.withDefault,0,_p2.ram))]))]);
    };
    var summarize = function (model) {
       return _U.list([A2($Html.div,
@@ -17894,7 +17904,7 @@ Elm.Systems.Add.KVM.make = function (_elm) {
            "Domain",
            stringValidations,
            A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{domain: _p16._0});},_p20));
-         case "CpuInput": var _p18 = $String.toInt(_p16._0);
+         case "CpuInput": var _p18 = A2($Debug.log,"",$String.toInt(_p16._0));
            if (_p18.ctor === "Ok") {
                  return A2($Systems$Add$Common.setMachine,function (machine) {    return _U.update(machine,{cpu: $Maybe.Just(_p18._0)});},_p20);
               } else {
@@ -17930,8 +17940,8 @@ Elm.Systems.Add.KVM.make = function (_elm) {
               ,A2($Common$Components.group$,"OS",A4($Common$Components.selector,address,SelectOS,oses,_p24.os))
               ,A2($Common$Components.group$,"Node",A4($Common$Components.selector,address,SelectNode,nodes,_p23.kvm.node))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Resources")]))
-              ,A2(check,"Cpu",A4($Common$Components.inputText,address,CpuInput,"",$Basics.toString(A2($Maybe.withDefault,1,_p24.cpu))))
-              ,A2(check,"Ram (mb)",A4($Common$Components.inputText,address,RamInput,"",$Basics.toString(A2($Maybe.withDefault,512,_p24.ram))))
+              ,A2(check,"Cpu",A4($Common$Components.inputText,address,CpuInput,"",$Basics.toString(A2($Maybe.withDefault,0,_p24.cpu))))
+              ,A2(check,"Ram (mb)",A4($Common$Components.inputText,address,RamInput,"",$Basics.toString(A2($Maybe.withDefault,0,_p24.ram))))
               ,A2($Html.legend,_U.list([]),_U.list([$Html.text("Network")]))
               ,A2(check,"User",A4($Common$Components.inputText,address,UserInput,"",_p24.user))
               ,A2(check,"Hostname",A4($Common$Components.inputText,address,HostnameInput,"",_p24.hostname))
@@ -17953,7 +17963,7 @@ Elm.Systems.Add.KVM.make = function (_elm) {
    var Model = F5(function (a,b,c,d,e) {    return {wizard: a,kvm: b,machine: c,environment: d,errors: e};});
    var init = function () {
       var wizard = A3($Common$Wizard.init,Zero,Instance,_U.list([Instance,Summary]));
-      return A5(Model,wizard,$Systems$Model$KVM.emptyKVM,$Systems$Model$Common.emptyMachine,$Dict.empty,$Dict.empty);
+      return A5(Model,wizard,$Systems$Model$KVM.emptyKVM,A2($Systems$Model$Common.resourcedMachine,1,512),$Dict.empty,$Dict.empty);
    }();
    return _elm.Systems.Add.KVM.values = {_op: _op
                                         ,Model: Model

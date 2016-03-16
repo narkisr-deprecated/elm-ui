@@ -10,7 +10,7 @@ import Systems.View.KVM exposing (summarize)
 import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor(KVM))
 import Dict as Dict exposing (Dict)
-import Systems.Model.Common exposing (Machine, emptyMachine)
+import Systems.Model.Common exposing (Machine, resourcedMachine)
 import Systems.Model.KVM exposing (..)
 import Effects exposing (Effects, batch)
 import Common.Components exposing (fixedPanel, asList, withErrors)
@@ -37,7 +37,7 @@ init =
   let 
     wizard = Wizard.init Zero Instance [ Instance, Summary ]
   in 
-    Model wizard emptyKVM emptyMachine Dict.empty Dict.empty
+    Model wizard emptyKVM (resourcedMachine 1 512) Dict.empty Dict.empty
 
 type Action = 
   WizardAction Wizard.Action
@@ -146,7 +146,7 @@ update action ({wizard} as model) =
         |> validate wizard.step "Domain" stringValidations
 
     CpuInput count -> 
-      case (String.toInt count) of
+      case Debug.log "" (String.toInt count) of
         Ok num -> 
           model 
             |> setMachine (\machine -> {machine | cpu = Just num })
@@ -182,8 +182,8 @@ instance address ({kvm, machine, errors} as model) =
        , group' "OS" (selector address SelectOS oses machine.os)
        , group' "Node" (selector address SelectNode nodes kvm.node)
        , legend [] [text "Resources"]
-       , check  "Cpu" (inputText address CpuInput "" (toString (withDefault 1 machine.cpu)))
-       , check  "Ram (mb)" (inputText address RamInput "" (toString (withDefault 512 machine.ram)))
+       , check  "Cpu" (inputText address CpuInput "" (toString (withDefault 0 machine.cpu)))
+       , check  "Ram (mb)" (inputText address RamInput "" (toString (withDefault 0 machine.ram)))
        , legend [] [text "Network"]
        , check "User" (inputText address UserInput "" machine.user) 
        , check "Hostname" (inputText address HostnameInput "" machine.hostname)

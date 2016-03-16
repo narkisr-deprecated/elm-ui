@@ -35,6 +35,11 @@ emptyMachine : Machine
 emptyMachine =
   Machine "" "" "" (Just "") "" Nothing Nothing
 
+resourcedMachine : Int -> Int -> Machine
+resourcedMachine cpu ram =
+  Machine "" "" "" (Just "") "" (Just ram) (Just cpu)
+
+
 emptySystem : System
 emptySystem =
   let
