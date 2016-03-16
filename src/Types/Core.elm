@@ -37,6 +37,7 @@ init =
       , Effects.map Adding addAction
       , Effects.map Viewing viewAction
       , Effects.map Deleting deleteAction
+      , Effects.map Editing editAction
      ]
    in
      (Model list add view delete edit Nothing, Effects.batch effects) 
@@ -73,9 +74,6 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
 
       Editing editing -> 
         case editing of 
-          TypesEdit.Saved (Result.Ok _) -> 
-             ({model | navChange = Just (Types, List)}, effects)
-
           _ -> 
             (model, effects)
 
@@ -155,7 +153,13 @@ route action ({list, add, view, delete, edit} as model) =
     SetupJob (job, name) -> 
       case job of
         "clear" -> 
-          none { model | delete = setName delete name }
+           none { model | delete = setName delete name }
+           
+        "edit" -> 
+          let
+            (newEdit, effects) = TypesEdit.update (TypesEdit.LoadType name) edit
+          in 
+            ({ model | edit = newEdit }, Effects.map Editing effects)
          
         _ -> 
           none model

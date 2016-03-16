@@ -23,12 +23,22 @@ validate =
      ("description" := string)
      ("environment" := string)
  
-initialFields : String ->  List (String, Field)
-initialFields default =
-  [ ("environment", Field.text default) ]
+defaults : String ->  List (String, Field)
+defaults env =
+  [ ("environment", Field.text env) ]
 
 init env =
-  Model (Form.initial (initialFields env) validate)
+  Model (Form.initial (defaults env) validate)
+ 
+editDefaults: String -> Type ->  List (String, Field)
+editDefaults env {type', description, puppetStd} =
+    [ ("environment", Field.text env)
+    , ("description", Field.text (withDefault "" description))
+    , ("type", Field.text type')
+    ]
+
+reinit env type' =
+  Model (Form.initial (editDefaults env type') validate)
 
 -- View
 

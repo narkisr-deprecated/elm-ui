@@ -21,6 +21,7 @@ withDefaultProp parent default prop =
  case parent of
    Just v -> 
      (prop v)
+
    Nothing ->
      default
  
@@ -30,6 +31,7 @@ defaultEmpty list =
   case list of
     Just result  ->
       result
+
     Nothing -> 
       []
 

@@ -1,18 +1,21 @@
 module Types.Add.Puppet where
 
+import Common.Model exposing (Options(BoolOption))
 import Types.Model exposing (PuppetStd, emptyPuppet)
 import Effects exposing (Effects)
 import Html exposing (..)
-import Common.Utils exposing (none)
+import Common.Utils exposing (none, defaultEmpty)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Common.Components exposing (group')
 import Common.FormComponents exposing (formControl, formGroup)
 import Form exposing (Form)
 import Form.Validate as Validate exposing (..)
 import Form.Input as Input
-import Types.Model exposing (Type, puppetBase)
-
-
+import Types.Model exposing (Type, puppetBase, emptyPuppet)
+import Maybe exposing (withDefault)
+import Form.Field as Field exposing (Field)
+import Dict exposing (Dict)
+import String
 
 type alias Model = 
   {
@@ -30,6 +33,32 @@ validate =
 init : Model
 init =
   Model (Form.initial [] validate)
+
+defaultBool option = 
+  case (withDefault (BoolOption False) option) of 
+    BoolOption bool -> 
+      bool
+
+    _ -> 
+      False
+
+editDefaults: String -> Type -> List (String, Field)
+editDefaults env ({puppetStd} as type') =
+  let
+    ({module'} as std) = withDefault emptyPuppet (Dict.get env puppetStd)
+    unsecure = defaultBool (Dict.get "unsecure" (withDefault Dict.empty module'.options))
+  in 
+    [
+      ("name", Field.text module'.name)
+    , ("source", Field.text module'.src)
+    , ("unsecure", Field.check unsecure)
+    , ("arguments", Field.text (String.join "" std.args))
+    ]
+
+reinit: String -> Type -> Model
+reinit env type' =
+  Model (Form.initial (editDefaults env type') validate)
+
 
 view check address ({form} as model) =
  let 

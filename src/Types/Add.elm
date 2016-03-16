@@ -59,6 +59,17 @@ init =
   in
     (Model wizard errors True [] False Dict.empty, getEnvironments SetEnvironments)
 
+reinit : Model -> Type -> String -> Model
+reinit model type' env  = 
+  let
+    steps = [(step (Puppet.reinit env type') Puppet)]
+    mainStep = (step (Main.reinit env type') Main)
+    newWizard = Wizard.init mainStep steps
+  in
+    { model | wizard = newWizard } 
+
+  
+
 type Action = 
    ErrorsView Errors.Action
     | WizardAction Wizard.Action

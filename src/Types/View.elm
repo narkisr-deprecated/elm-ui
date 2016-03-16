@@ -44,7 +44,7 @@ update : Action ->  Model-> (Model , Effects Action)
 update action model =
   case action of 
    ViewType id -> 
-     (model, getType id)
+     (model, getType id SetType)
 
    SetType result -> 
       successHandler result model (setType model) NoOp
@@ -97,10 +97,9 @@ view address model =
   asList (div [] [h4 [] [(text "Type")], (summarize model.type')])
   
 
-getType : String -> Effects Action
-getType id = 
+getType id action = 
   getJson Model.type' ("/types/" ++ id)
     |> Task.toResult
-    |> Task.map SetType
+    |> Task.map action
     |> Effects.task
 
