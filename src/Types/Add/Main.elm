@@ -2,8 +2,8 @@ module Types.Add.Main where
 
 import Effects exposing (Effects)
 import Html exposing (..)
-import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
-import Common.FormComponents exposing (formControl)
+import Html.Attributes exposing (class, id, attribute, readonly, type')
+import Common.FormComponents exposing (formControl, formGroup)
 import Maybe exposing (withDefault)
 import Form exposing (Form)
 import Form.Validate as Validate exposing (..)
@@ -33,26 +33,32 @@ init env =
  
 editDefaults: String -> Type ->  List (String, Field)
 editDefaults env {type', description, puppetStd} =
-    [ ("environment", Field.Text env)
+    [ 
+      ("type", Field.Text type')
     , ("description", Field.Text (withDefault "" description))
-    , ("type", Field.Text type')
+    , ("environment", Field.Text env)
     ]
 
 reinit env type' =
   Model (Form.initial (editDefaults env type') validate)
 
 -- View
+typeField address {form} = 
+  let
+    ({isDirty, value} as type') = Form.getFieldAsString "type" form
+    inEdit = (not isDirty && value /= Nothing)
+  in
+    formGroup "Type" Input.textInput type' address [class "form-control", readonly inEdit]
 
 view environments address ({form} as model) =
   let 
-    type' = (Form.getFieldAsString "type" form)
-    description = (Form.getFieldAsString "description" form)
     environment = (Form.getFieldAsString "environment" form)
+    description = (Form.getFieldAsString "description" form)
   in 
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Type" Input.textInput type' address
-      , formControl "Description" Input.textInput description address 
+        typeField address model
+      , formControl "Description" Input.textInput description address
       , formControl "Environment"  (Input.selectInput environments) environment address
       ]
     ])

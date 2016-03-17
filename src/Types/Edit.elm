@@ -11,10 +11,12 @@ import Types.Add as Add exposing (Action(FormAction))
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
 import Common.Errors exposing (successHandler)
+import Maybe exposing (withDefault)
 
 import Form.Error as Error exposing (..)
 import Form.Field as Field exposing (..)
 import Form.Validate as Validate exposing (Validation)
+import Form exposing (Action(..))
 
 
 type alias Model = 
@@ -42,24 +44,27 @@ type Action =
 
 setType : Model -> Type -> (Model , Effects Action)
 setType ({add} as model) type' =
-  none {model | type' = type', add = Add.reinit add type' "dev"}
+  let
+    env = withDefault "" (List.head (add.environments))
+  in 
+    none {model | type' = type', add = Add.reinit add type' env}
 
 envChange action ({type', add} as model) = 
   case action of 
-    -- (FormAction (_  "environment" (Text env))) -> 
-    --    {model | type' = type', add = Add.reinit add type' env}
-    --
+    (FormAction (Input "environment" (Select env))) -> 
+      {model | type' = type', add = Add.reinit add type' env}
+
     _ -> 
        model
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({add} as model) =
-  case (Debug.log "" action) of 
+  case action of 
     AddAction addAction -> 
       let 
         (newAdd, effects) = Add.update addAction add
       in 
-        (envChange action { model | add = newAdd }, Effects.map AddAction effects)
+        (envChange addAction { model | add = newAdd }, Effects.map AddAction effects)
 
     LoadType name -> 
        (model, View.getType name SetType)

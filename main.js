@@ -24923,25 +24923,38 @@ Elm.Types.Add.Main.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Types$Model = Elm.Types.Model.make(_elm);
    var _op = {};
-   var view = F3(function (environments,address,_p0) {
+   var typeField = F2(function (address,_p0) {
       var _p1 = _p0;
-      var _p2 = _p1.form;
-      var environment = A2($Form.getFieldAsString,"environment",_p2);
-      var description = A2($Form.getFieldAsString,"description",_p2);
-      var type$ = A2($Form.getFieldAsString,"type",_p2);
+      var _p2 = A2($Form.getFieldAsString,"type",_p1.form);
+      var type$ = _p2;
+      var isDirty = _p2.isDirty;
+      var value = _p2.value;
+      var inEdit = $Basics.not(isDirty) && !_U.eq(value,$Maybe.Nothing);
+      return A5($Common$FormComponents.formGroup,
+      "Type",
+      $Form$Input.textInput,
+      type$,
+      address,
+      _U.list([$Html$Attributes.$class("form-control"),$Html$Attributes.readonly(inEdit)]));
+   });
+   var view = F3(function (environments,address,_p3) {
+      var _p4 = _p3;
+      var _p5 = _p4.form;
+      var description = A2($Form.getFieldAsString,"description",_p5);
+      var environment = A2($Form.getFieldAsString,"environment",_p5);
       return A2($Html.form,
       _U.list([]),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
-      _U.list([A4($Common$FormComponents.formControl,"Type",$Form$Input.textInput,type$,address)
+      _U.list([A2(typeField,address,_p4)
               ,A4($Common$FormComponents.formControl,"Description",$Form$Input.textInput,description,address)
               ,A4($Common$FormComponents.formControl,"Environment",$Form$Input.selectInput(environments),environment,address)]))]));
    });
-   var editDefaults = F2(function (env,_p3) {
-      var _p4 = _p3;
-      return _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.Text(env)}
-                     ,{ctor: "_Tuple2",_0: "description",_1: $Form$Field.Text(A2($Maybe.withDefault,"",_p4.description))}
-                     ,{ctor: "_Tuple2",_0: "type",_1: $Form$Field.Text(_p4.type$)}]);
+   var editDefaults = F2(function (env,_p6) {
+      var _p7 = _p6;
+      return _U.list([{ctor: "_Tuple2",_0: "type",_1: $Form$Field.Text(_p7.type$)}
+                     ,{ctor: "_Tuple2",_0: "description",_1: $Form$Field.Text(A2($Maybe.withDefault,"",_p7.description))}
+                     ,{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.Text(env)}]);
    });
    var defaults = function (env) {    return _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.Text(env)}]);};
    var validate = A4($Form$Validate.form3,
@@ -24959,6 +24972,7 @@ Elm.Types.Add.Main.make = function (_elm) {
                                        ,init: init
                                        ,editDefaults: editDefaults
                                        ,reinit: reinit
+                                       ,typeField: typeField
                                        ,view: view};
 };
 Elm.Types = Elm.Types || {};
@@ -25195,6 +25209,8 @@ Elm.Types.Edit.make = function (_elm) {
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
+   $Form = Elm.Form.make(_elm),
+   $Form$Field = Elm.Form.Field.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Http = Elm.Http.make(_elm),
    $List = Elm.List.make(_elm),
@@ -25205,10 +25221,22 @@ Elm.Types.Edit.make = function (_elm) {
    $Types$Model = Elm.Types.Model.make(_elm),
    $Types$View = Elm.Types.View.make(_elm);
    var _op = {};
-   var envChange = F2(function (action,_p0) {    var _p1 = _p0;var _p2 = action;return _p1;});
-   var setType = F2(function (_p3,type$) {
-      var _p4 = _p3;
-      return $Common$Utils.none(_U.update(_p4,{type$: type$,add: A3($Types$Add.reinit,_p4.add,type$,"dev")}));
+   var envChange = F2(function (action,_p0) {
+      var _p1 = _p0;
+      var _p4 = _p1.type$;
+      var _p3 = _p1;
+      var _p2 = action;
+      if (_p2.ctor === "FormAction" && _p2._0.ctor === "Input" && _p2._0._0 === "environment" && _p2._0._1.ctor === "Select") {
+            return _U.update(_p3,{type$: _p4,add: A3($Types$Add.reinit,_p1.add,_p4,_p2._0._1._0)});
+         } else {
+            return _p3;
+         }
+   });
+   var setType = F2(function (_p5,type$) {
+      var _p6 = _p5;
+      var _p7 = _p6.add;
+      var env = A2($Maybe.withDefault,"",$List.head(_p7.environments));
+      return $Common$Utils.none(_U.update(_p6,{type$: type$,add: A3($Types$Add.reinit,_p7,type$,env)}));
    });
    var SetType = function (a) {    return {ctor: "SetType",_0: a};};
    var ViewAction = function (a) {    return {ctor: "ViewAction",_0: a};};
@@ -25216,24 +25244,25 @@ Elm.Types.Edit.make = function (_elm) {
    var AddAction = function (a) {    return {ctor: "AddAction",_0: a};};
    var view = F2(function (address,model) {    return A2($Types$Add.view,A2($Signal.forwardTo,address,AddAction),model.add);});
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p5) {
-      var _p6 = _p5;
-      var _p9 = _p6;
-      var _p7 = A2($Debug.log,"",action);
-      switch (_p7.ctor)
-      {case "AddAction": var _p8 = A2($Types$Add.update,_p7._0,_p6.add);
-           var newAdd = _p8._0;
-           var effects = _p8._1;
-           return {ctor: "_Tuple2",_0: A2(envChange,action,_U.update(_p9,{add: newAdd})),_1: A2($Effects.map,AddAction,effects)};
-         case "LoadType": return {ctor: "_Tuple2",_0: _p9,_1: A2($Types$View.getType,_p7._0,SetType)};
-         case "SetType": return A4($Common$Errors.successHandler,_p7._0,_p9,setType(_p9),NoOp);
-         default: return $Common$Utils.none(_p9);}
+   var update = F2(function (action,_p8) {
+      var _p9 = _p8;
+      var _p13 = _p9;
+      var _p10 = action;
+      switch (_p10.ctor)
+      {case "AddAction": var _p12 = _p10._0;
+           var _p11 = A2($Types$Add.update,_p12,_p9.add);
+           var newAdd = _p11._0;
+           var effects = _p11._1;
+           return {ctor: "_Tuple2",_0: A2(envChange,_p12,_U.update(_p13,{add: newAdd})),_1: A2($Effects.map,AddAction,effects)};
+         case "LoadType": return {ctor: "_Tuple2",_0: _p13,_1: A2($Types$View.getType,_p10._0,SetType)};
+         case "SetType": return A4($Common$Errors.successHandler,_p10._0,_p13,setType(_p13),NoOp);
+         default: return $Common$Utils.none(_p13);}
    });
    var Model = F3(function (a,b,c) {    return {add: a,name: b,type$: c};});
    var init = function () {
-      var _p10 = $Types$Add.init;
-      var add = _p10._0;
-      var effects = _p10._1;
+      var _p14 = $Types$Add.init;
+      var add = _p14._0;
+      var effects = _p14._1;
       return {ctor: "_Tuple2",_0: A3(Model,add,"",$Types$Model.emptyType),_1: A2($Effects.map,AddAction,effects)};
    }();
    return _elm.Types.Edit.values = {_op: _op
