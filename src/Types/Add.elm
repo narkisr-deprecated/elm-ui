@@ -151,7 +151,7 @@ update action ({wizard, editClasses, classes} as model) =
       ({ model | editClasses = not editClasses}, loadEditor "types" NoOp (encodeClasses classes))
 
     SetClasses json -> 
-        none { model | classes = (Debug.log "" (decodeClasses json)) }
+        none { model | classes = decodeClasses json }
 
     Persist -> 
       (model, persistType saveType (merged model classes))

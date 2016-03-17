@@ -25110,7 +25110,7 @@ Elm.Types.Add.make = function (_elm) {
             case "LoadEditor": return {ctor: "_Tuple2"
                                       ,_0: _U.update(_p23,{editClasses: $Basics.not(_p18.editClasses)})
                                       ,_1: A3($Common$Editor.loadEditor,"types",NoOp,$Types$Persistency.encodeClasses(_p22))};
-            case "SetClasses": return $Common$Utils.none(_U.update(_p23,{classes: A2($Debug.log,"",$Types$Model.decodeClasses(_p19._0))}));
+            case "SetClasses": return $Common$Utils.none(_U.update(_p23,{classes: $Types$Model.decodeClasses(_p19._0)}));
             case "Persist": return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,_p22))};
             case "Save": return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,_p22))};
             case "Saved": return A3($Common$Errors.errorsHandler,_p19._0,_p23,NoOp);
