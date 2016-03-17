@@ -13319,29 +13319,35 @@ Elm.Form.Field.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var asString = function (field) {    var _p0 = field;if (_p0.ctor === "Text") {    return $Maybe.Just(_p0._0);} else {    return $Maybe.Nothing;}};
+   var asString = function (field) {
+      var _p0 = field;
+      switch (_p0.ctor)
+      {case "Text": return $Maybe.Just(_p0._0);
+         case "Textarea": return $Maybe.Just(_p0._0);
+         case "Select": return $Maybe.Just(_p0._0);
+         case "Radio": return $Maybe.Just(_p0._0);
+         default: return $Maybe.Nothing;}
+   };
    var asBool = function (field) {    var _p1 = field;if (_p1.ctor === "Check") {    return $Maybe.Just(_p1._0);} else {    return $Maybe.Nothing;}};
    var at = F2(function (name,field) {    var _p2 = field;if (_p2.ctor === "Group") {    return A2($Dict.get,name,_p2._0);} else {    return $Maybe.Nothing;}});
    var EmptyField = {ctor: "EmptyField"};
    var Check = function (a) {    return {ctor: "Check",_0: a};};
-   var check = Check;
+   var Radio = function (a) {    return {ctor: "Radio",_0: a};};
+   var Select = function (a) {    return {ctor: "Select",_0: a};};
+   var Textarea = function (a) {    return {ctor: "Textarea",_0: a};};
    var Text = function (a) {    return {ctor: "Text",_0: a};};
-   var text = Text;
-   var select = text;
-   var radio = text;
    var Group = function (a) {    return {ctor: "Group",_0: a};};
    var group = function (_p3) {    return Group($Dict.fromList(_p3));};
    return _elm.Form.Field.values = {_op: _op
+                                   ,group: group
                                    ,at: at
                                    ,asString: asString
                                    ,asBool: asBool
-                                   ,text: text
-                                   ,select: select
-                                   ,radio: radio
-                                   ,check: check
-                                   ,group: group
                                    ,Group: Group
                                    ,Text: Text
+                                   ,Textarea: Textarea
+                                   ,Select: Select
+                                   ,Radio: Radio
                                    ,Check: Check
                                    ,EmptyField: EmptyField};
 };
@@ -13384,7 +13390,7 @@ Elm.Form.Validate.make = function (_elm) {
    var includedIn = F3(function (items,s,field) {    return A2($List.member,s,items) ? $Result.Ok(s) : $Result.Err($Form$Error.NotIncludedIn);});
    var validUrlPattern = $Regex.caseInsensitive($Regex.regex("^(https?://)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\w \\.-]*)*/?$"));
    var validEmailPattern = $Regex.caseInsensitive($Regex.regex("^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"));
-   var format = F3(function (s,regex,field) {    return A2($Regex.contains,regex,s) ? $Result.Ok(s) : $Result.Err($Form$Error.InvalidFormat);});
+   var format = F3(function (regex,s,field) {    return A2($Regex.contains,regex,s) ? $Result.Ok(s) : $Result.Err($Form$Error.InvalidFormat);});
    var maxFloat = F3(function (max,i,field) {    return _U.cmp(i,max) < 1 ? $Result.Ok(i) : $Result.Err($Form$Error.GreaterFloatThan(max));});
    var minFloat = F3(function (min,i,field) {    return _U.cmp(i,min) > -1 ? $Result.Ok(i) : $Result.Err($Form$Error.SmallerFloatThan(min));});
    var maxInt = F3(function (max,i,field) {    return _U.cmp(i,max) < 1 ? $Result.Ok(i) : $Result.Err($Form$Error.GreaterIntThan(max));});
@@ -13396,17 +13402,17 @@ Elm.Form.Validate.make = function (_elm) {
    var nonEmpty = F2(function (s,field) {    return $String.isEmpty(s) ? $Result.Err($Form$Error.Empty) : $Result.Ok(s);});
    var maybe = F2(function (validation,field) {    return $Result.Ok($Result.toMaybe(validation(field)));});
    var date = function (v) {
-      var _p1 = v;
-      if (_p1.ctor === "Text") {
+      var _p1 = $Form$Field.asString(v);
+      if (_p1.ctor === "Just") {
             return A2($Result.formatError,function (_p2) {    return $Form$Error.InvalidDate;},$Date.fromString(_p1._0));
          } else {
             return $Result.Err($Form$Error.InvalidDate);
          }
    };
-   var bool = function (v) {    var _p3 = v;if (_p3.ctor === "Check") {    return $Result.Ok(_p3._0);} else {    return $Result.Ok(false);}};
+   var bool = function (v) {    var _p3 = $Form$Field.asBool(v);if (_p3.ctor === "Just") {    return $Result.Ok(_p3._0);} else {    return $Result.Ok(false);}};
    var emptyString = function (v) {
-      var _p4 = v;
-      if (_p4.ctor === "Text") {
+      var _p4 = $Form$Field.asString(v);
+      if (_p4.ctor === "Just") {
             var _p5 = _p4._0;
             return $String.isEmpty(_p5) ? $Result.Ok(_p5) : $Result.Err($Form$Error.InvalidString);
          } else {
@@ -13414,8 +13420,8 @@ Elm.Form.Validate.make = function (_elm) {
          }
    };
    var string = function (v) {
-      var _p6 = v;
-      if (_p6.ctor === "Text") {
+      var _p6 = $Form$Field.asString(v);
+      if (_p6.ctor === "Just") {
             var _p7 = _p6._0;
             return $String.isEmpty(_p7) ? $Result.Err($Form$Error.Empty) : $Result.Ok(_p7);
          } else {
@@ -13423,16 +13429,16 @@ Elm.Form.Validate.make = function (_elm) {
          }
    };
    var $float = function (v) {
-      var _p8 = v;
-      if (_p8.ctor === "Text") {
+      var _p8 = $Form$Field.asString(v);
+      if (_p8.ctor === "Just") {
             return A2($Result.formatError,function (_p9) {    return $Form$Error.InvalidFloat;},$String.toFloat(_p8._0));
          } else {
             return $Result.Err($Form$Error.InvalidInt);
          }
    };
    var $int = function (v) {
-      var _p10 = v;
-      if (_p10.ctor === "Text") {
+      var _p10 = $Form$Field.asString(v);
+      if (_p10.ctor === "Just") {
             return A2($Result.formatError,function (_p11) {    return $Form$Error.InvalidInt;},$String.toInt(_p10._0));
          } else {
             return $Result.Err($Form$Error.InvalidInt);
@@ -13457,8 +13463,6 @@ Elm.Form.Validate.make = function (_elm) {
       },
       validation(A2($Maybe.withDefault,$Form$Field.EmptyField,A2($Form$Field.at,key,field))));
    });
-   _op[":="] = get;
-   _op["?="] = F2(function (s,v) {    return maybe(A2(get,s,v));});
    var customError = $Form$Error.CustomError;
    var formatError = F3(function (f,validation,field) {    return A2($Result.formatError,f,validation(field));});
    var defaultValue = F3(function (a,validation,field) {    return $Result.Ok(A2($Result.withDefault,a,validation(field)));});
@@ -13470,7 +13474,6 @@ Elm.Form.Validate.make = function (_elm) {
             return $Result.Err(mergeMany(_U.list([getErr(_p14._0),getErr(_p14._1)])));
          }
    });
-   _op["|:"] = apply;
    var andThen = F3(function (validation,callback,field) {
       return A2($Result.andThen,validation(field),function (next) {    return A2(callback,next,field);});
    });
@@ -13478,9 +13481,9 @@ Elm.Form.Validate.make = function (_elm) {
    var email = A2(andThen,
    string,
    function (s) {
-      return A2(formatError,function (_p15) {    return $Form$Error.InvalidEmail;},A2(format,s,validEmailPattern));
+      return A2(formatError,function (_p15) {    return $Form$Error.InvalidEmail;},A2(format,validEmailPattern,s));
    });
-   var url = A2(andThen,string,function (s) {    return A2(formatError,function (_p16) {    return $Form$Error.InvalidUrl;},A2(format,s,validUrlPattern));});
+   var url = A2(andThen,string,function (s) {    return A2(formatError,function (_p16) {    return $Form$Error.InvalidUrl;},A2(format,validUrlPattern,s));});
    var map = F3(function (f,validation,field) {    return A2($Result.map,f,validation(field));});
    var form1 = map;
    var form2 = F3(function (func,v1,v2) {    return A2(apply,A2(form1,func,v1),v2);});
@@ -13637,26 +13640,17 @@ Elm.Form.make = function (_elm) {
    var updateValidate = function (model) {
       var _p29 = model.validation(model.fields);
       if (_p29.ctor === "Ok") {
-            return _U.update(model,{errors: $Form$Error.GroupErrors($Dict.empty),dirtyFields: $Set.empty,output: $Maybe.Just(_p29._0)});
+            return _U.update(model,{errors: $Form$Error.GroupErrors($Dict.empty),output: $Maybe.Just(_p29._0)});
          } else {
-            return _U.update(model,{errors: _p29._0,dirtyFields: $Set.empty,output: $Maybe.Nothing});
+            return _U.update(model,{errors: _p29._0,output: $Maybe.Nothing});
          }
    };
    var Reset = function (a) {    return {ctor: "Reset",_0: a};};
-   var reset = Reset;
-   var Submit = {ctor: "Submit"};
-   var submit = Submit;
    var Validate = {ctor: "Validate"};
-   var validate = Validate;
-   var UpdateField = F2(function (a,b) {    return {ctor: "UpdateField",_0: a,_1: b};});
-   var updateTextField = F2(function (name,s) {    return A2(UpdateField,name,$Form$Field.Text(s));});
-   var updateSelectField = updateTextField;
-   var updateRadioField = updateTextField;
-   var updateCheckField = F2(function (name,b) {    return A2(UpdateField,name,$Form$Field.Check(b));});
-   var OnBlur = function (a) {    return {ctor: "OnBlur",_0: a};};
-   var onBlur = OnBlur;
-   var OnFocus = function (a) {    return {ctor: "OnFocus",_0: a};};
-   var onFocus = OnFocus;
+   var Submit = {ctor: "Submit"};
+   var Input = F2(function (a,b) {    return {ctor: "Input",_0: a,_1: b};});
+   var Blur = function (a) {    return {ctor: "Blur",_0: a};};
+   var Focus = function (a) {    return {ctor: "Focus",_0: a};};
    var NoOp = {ctor: "NoOp"};
    var getField = F3(function (getValue,path,form) {
       return {path: path
@@ -13675,35 +13669,39 @@ Elm.Form.make = function (_elm) {
    });
    var F = function (a) {    return {ctor: "F",_0: a};};
    var initial = F2(function (initialFields,validation) {
-      return F({fields: $Form$Field.group(initialFields)
-               ,focus: $Maybe.Nothing
-               ,dirtyFields: $Set.empty
-               ,changedFields: $Set.empty
-               ,isSubmitted: false
-               ,output: $Maybe.Nothing
-               ,errors: $Form$Error.GroupErrors($Dict.empty)
-               ,validation: validation});
+      var model = {fields: $Form$Field.group(initialFields)
+                  ,focus: $Maybe.Nothing
+                  ,dirtyFields: $Set.empty
+                  ,changedFields: $Set.empty
+                  ,isSubmitted: false
+                  ,output: $Maybe.Nothing
+                  ,errors: $Form$Error.GroupErrors($Dict.empty)
+                  ,validation: validation};
+      return F(updateValidate(model));
    });
    var update = F2(function (action,_p30) {
       var _p31 = _p30;
-      var _p34 = _p31._0;
+      var _p36 = _p31._0;
       var _p32 = action;
       switch (_p32.ctor)
-      {case "NoOp": return F(_p34);
-         case "OnFocus": var newModel = _U.update(_p34,{focus: $Maybe.Just(_p32._0)});
+      {case "NoOp": return F(_p36);
+         case "Focus": var newModel = _U.update(_p36,{focus: $Maybe.Just(_p32._0)});
            return F(newModel);
-         case "OnBlur": var newModel = _U.update(_p34,{focus: $Maybe.Nothing});
+         case "Blur": var newDirtyFields = A2($Set.remove,_p32._0,_p36.dirtyFields);
+           var newModel = _U.update(_p36,{focus: $Maybe.Nothing,dirtyFields: newDirtyFields});
            return F(updateValidate(newModel));
-         case "UpdateField": var _p33 = _p32._0;
-           var newChangedFields = A2($Set.insert,_p33,_p34.changedFields);
-           var newDirtyFields = A2($Set.insert,_p33,_p34.dirtyFields);
-           var newFields = A3(setFieldAt,_p33,_p32._1,F(_p34));
-           var newModel = _U.update(_p34,{fields: newFields,dirtyFields: newDirtyFields,changedFields: newChangedFields});
-           return F(newModel);
-         case "Validate": return F(updateValidate(_p34));
-         case "Submit": var validatedModel = updateValidate(_p34);
+         case "Input": var _p35 = _p32._0;
+           var _p34 = _p32._1;
+           var newChangedFields = A2($Set.insert,_p35,_p36.changedFields);
+           var isDirty = function () {    var _p33 = _p34;switch (_p33.ctor) {case "Text": return true;case "Textarea": return true;default: return false;}}();
+           var newDirtyFields = isDirty ? A2($Set.insert,_p35,_p36.dirtyFields) : _p36.dirtyFields;
+           var newFields = A3(setFieldAt,_p35,_p34,F(_p36));
+           var newModel = _U.update(_p36,{fields: newFields,dirtyFields: newDirtyFields,changedFields: newChangedFields});
+           return F(updateValidate(newModel));
+         case "Submit": var validatedModel = updateValidate(_p36);
            return F(_U.update(validatedModel,{isSubmitted: true}));
-         default: var newModel = _U.update(_p34,
+         case "Validate": return F(updateValidate(_p36));
+         default: var newModel = _U.update(_p36,
            {fields: $Form$Field.group(_p32._0)
            ,dirtyFields: $Set.empty
            ,changedFields: $Set.empty
@@ -13720,16 +13718,14 @@ Elm.Form.make = function (_elm) {
                              ,getErrors: getErrors
                              ,isSubmitted: isSubmitted
                              ,getOutput: getOutput
-                             ,onFocus: onFocus
-                             ,onBlur: onBlur
-                             ,validate: validate
-                             ,submit: submit
-                             ,reset: reset
-                             ,updateTextField: updateTextField
-                             ,updateSelectField: updateSelectField
-                             ,updateCheckField: updateCheckField
-                             ,updateRadioField: updateRadioField
-                             ,FieldState: FieldState};
+                             ,FieldState: FieldState
+                             ,NoOp: NoOp
+                             ,Focus: Focus
+                             ,Blur: Blur
+                             ,Input: Input
+                             ,Submit: Submit
+                             ,Validate: Validate
+                             ,Reset: Reset};
 };
 Elm.Form = Elm.Form || {};
 Elm.Form.Input = Elm.Form.Input || {};
@@ -13742,6 +13738,7 @@ Elm.Form.Input.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Form = Elm.Form.make(_elm),
+   $Form$Field = Elm.Form.Field.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
@@ -13760,13 +13757,13 @@ Elm.Form.Input.make = function (_elm) {
       var formAttrs = _U.list([$Html$Attributes.type$("radio")
                               ,$Html$Attributes.name(value)
                               ,$Html$Attributes.checked(_U.eq(state.value,$Maybe.Just(value)))
-                              ,A2($Html$Events.onFocus,addr,$Form.onFocus(state.path))
-                              ,A2($Html$Events.onBlur,addr,$Form.onBlur(state.path))
+                              ,A2($Html$Events.onFocus,addr,$Form.Focus(state.path))
+                              ,A2($Html$Events.onBlur,addr,$Form.Blur(state.path))
                               ,A3($Html$Events.on,
                               "change",
                               $Html$Events.targetValue,
                               function (v) {
-                                 return A2($Signal.message,addr,A2($Form.updateRadioField,state.path,v));
+                                 return A2($Signal.message,addr,A2($Form.Input,state.path,$Form$Field.Radio(v)));
                               })]);
       return A2($Html.input,A2($Basics._op["++"],formAttrs,attrs),_U.list([]));
    });
@@ -13783,38 +13780,38 @@ Elm.Form.Input.make = function (_elm) {
                               "change",
                               $Html$Events.targetValue,
                               function (v) {
-                                 return A2($Signal.message,addr,A2($Form.updateSelectField,state.path,v));
+                                 return A2($Signal.message,addr,A2($Form.Input,state.path,$Form$Field.Select(v)));
                               })
-                              ,A2($Html$Events.onFocus,addr,$Form.onFocus(state.path))
-                              ,A2($Html$Events.onBlur,addr,$Form.onBlur(state.path))]);
+                              ,A2($Html$Events.onFocus,addr,$Form.Focus(state.path))
+                              ,A2($Html$Events.onBlur,addr,$Form.Blur(state.path))]);
       return A2($Html.select,A2($Basics._op["++"],formAttrs,attrs),A2($List.map,buildOption,options));
    });
    _op["?="] = $Basics.flip($Maybe.withDefault);
-   var baseInput = F4(function (t,state,addr,attrs) {
+   var baseInput = F5(function (t,toField,state,addr,attrs) {
       var formAttrs = _U.list([$Html$Attributes.type$(t)
                               ,$Html$Attributes.value(A2(_op["?="],state.value,""))
                               ,A3($Html$Events.on,
                               "input",
                               $Html$Events.targetValue,
                               function (v) {
-                                 return A2($Signal.message,addr,A2($Form.updateTextField,state.path,v));
+                                 return A2($Signal.message,addr,A2($Form.Input,state.path,toField(v)));
                               })
-                              ,A2($Html$Events.onFocus,addr,$Form.onFocus(state.path))
-                              ,A2($Html$Events.onBlur,addr,$Form.onBlur(state.path))]);
+                              ,A2($Html$Events.onFocus,addr,$Form.Focus(state.path))
+                              ,A2($Html$Events.onBlur,addr,$Form.Blur(state.path))]);
       return A2($Html.input,A2($Basics._op["++"],formAttrs,attrs),_U.list([]));
    });
-   var textInput = baseInput("text");
-   var passwordInput = baseInput("password");
+   var textInput = A2(baseInput,"text",$Form$Field.Text);
+   var passwordInput = A2(baseInput,"password",$Form$Field.Text);
    var textArea = F3(function (state,addr,attrs) {
       var value = A2(_op["?="],state.value,"");
       var formAttrs = _U.list([A3($Html$Events.on,
                               "input",
                               $Html$Events.targetValue,
                               function (v) {
-                                 return A2($Signal.message,addr,A2($Form.updateTextField,state.path,v));
+                                 return A2($Signal.message,addr,A2($Form.Input,state.path,$Form$Field.Textarea(v)));
                               })
-                              ,A2($Html$Events.onFocus,addr,$Form.onFocus(state.path))
-                              ,A2($Html$Events.onBlur,addr,$Form.onBlur(state.path))]);
+                              ,A2($Html$Events.onFocus,addr,$Form.Focus(state.path))
+                              ,A2($Html$Events.onBlur,addr,$Form.Blur(state.path))]);
       return A2($Html.textarea,A2($Basics._op["++"],formAttrs,attrs),_U.list([$Html.text(value)]));
    });
    var checkboxInput = F3(function (state,addr,attrs) {
@@ -13824,10 +13821,10 @@ Elm.Form.Input.make = function (_elm) {
                               "change",
                               $Html$Events.targetChecked,
                               function (v) {
-                                 return A2($Signal.message,addr,A2($Form.updateCheckField,state.path,v));
+                                 return A2($Signal.message,addr,A2($Form.Input,state.path,$Form$Field.Check(v)));
                               })
-                              ,A2($Html$Events.onFocus,addr,$Form.onFocus(state.path))
-                              ,A2($Html$Events.onBlur,addr,$Form.onBlur(state.path))]);
+                              ,A2($Html$Events.onFocus,addr,$Form.Focus(state.path))
+                              ,A2($Html$Events.onBlur,addr,$Form.Blur(state.path))]);
       return A2($Html.input,A2($Basics._op["++"],formAttrs,attrs),_U.list([]));
    });
    return _elm.Form.Input.values = {_op: _op
@@ -13839,6 +13836,27 @@ Elm.Form.Input.make = function (_elm) {
                                    ,selectInput: selectInput
                                    ,radioInput: radioInput
                                    ,dumpErrors: dumpErrors};
+};
+Elm.Form = Elm.Form || {};
+Elm.Form.Infix = Elm.Form.Infix || {};
+Elm.Form.Infix.make = function (_elm) {
+   "use strict";
+   _elm.Form = _elm.Form || {};
+   _elm.Form.Infix = _elm.Form.Infix || {};
+   if (_elm.Form.Infix.values) return _elm.Form.Infix.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Form$Validate = Elm.Form.Validate.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   _op["?="] = F2(function (s,v) {    return $Form$Validate.maybe(A2($Form$Validate.get,s,v));});
+   _op[":="] = $Form$Validate.get;
+   _op["|:"] = $Form$Validate.apply;
+   return _elm.Form.Infix.values = {_op: _op};
 };
 Elm.Native.Effects = {};
 Elm.Native.Effects.make = function(localRuntime) {
@@ -14169,35 +14187,37 @@ Elm.Date.Format.make = function (_elm) {
          case "Nov": return 11;
          default: return 12;}
    };
-   var collapse = function (m) {    return A2($Maybe.andThen,m,$Basics.identity);};
    var formatToken = F2(function (d,m) {
-      var symbol = A2($Maybe.withDefault," ",collapse(A2($Maybe.andThen,$List.tail(m.submatches),$List.head)));
-      var prefix = A2($Maybe.withDefault," ",collapse($List.head(m.submatches)));
-      return A2($Basics._op["++"],
-      prefix,
-      function () {
-         var _p4 = symbol;
-         switch (_p4)
-         {case "Y": return $Basics.toString($Date.year(d));
-            case "m": return A3($String.padLeft,2,_U.chr("0"),$Basics.toString(monthToInt($Date.month(d))));
-            case "B": return monthToFullName($Date.month(d));
-            case "b": return $Basics.toString($Date.month(d));
-            case "d": return A2(padWith,_U.chr("0"),$Date.day(d));
-            case "e": return A2(padWith,_U.chr(" "),$Date.day(d));
-            case "a": return $Basics.toString($Date.dayOfWeek(d));
-            case "A": return fullDayOfWeek($Date.dayOfWeek(d));
-            case "H": return A2(padWith,_U.chr("0"),$Date.hour(d));
-            case "k": return A2(padWith,_U.chr(" "),$Date.hour(d));
-            case "I": return A2(padWith,_U.chr("0"),zero2twelve(mod12($Date.hour(d))));
-            case "l": return A2(padWith,_U.chr(" "),zero2twelve(mod12($Date.hour(d))));
-            case "p": return _U.cmp($Date.hour(d),13) < 0 ? "AM" : "PM";
-            case "P": return _U.cmp($Date.hour(d),13) < 0 ? "am" : "pm";
-            case "M": return A2(padWith,_U.chr("0"),$Date.minute(d));
-            case "S": return A2(padWith,_U.chr("0"),$Date.second(d));
-            default: return "";}
-      }());
+      var symbol = function () {
+         var _p4 = m.submatches;
+         if (_p4.ctor === "::" && _p4._0.ctor === "Just" && _p4._1.ctor === "[]") {
+               return _p4._0._0;
+            } else {
+               return " ";
+            }
+      }();
+      var _p5 = symbol;
+      switch (_p5)
+      {case "%": return "%";
+         case "Y": return $Basics.toString($Date.year(d));
+         case "m": return A3($String.padLeft,2,_U.chr("0"),$Basics.toString(monthToInt($Date.month(d))));
+         case "B": return monthToFullName($Date.month(d));
+         case "b": return $Basics.toString($Date.month(d));
+         case "d": return A2(padWith,_U.chr("0"),$Date.day(d));
+         case "e": return A2(padWith,_U.chr(" "),$Date.day(d));
+         case "a": return $Basics.toString($Date.dayOfWeek(d));
+         case "A": return fullDayOfWeek($Date.dayOfWeek(d));
+         case "H": return A2(padWith,_U.chr("0"),$Date.hour(d));
+         case "k": return A2(padWith,_U.chr(" "),$Date.hour(d));
+         case "I": return A2(padWith,_U.chr("0"),zero2twelve(mod12($Date.hour(d))));
+         case "l": return A2(padWith,_U.chr(" "),zero2twelve(mod12($Date.hour(d))));
+         case "p": return _U.cmp($Date.hour(d),13) < 0 ? "AM" : "PM";
+         case "P": return _U.cmp($Date.hour(d),13) < 0 ? "am" : "pm";
+         case "M": return A2(padWith,_U.chr("0"),$Date.minute(d));
+         case "S": return A2(padWith,_U.chr("0"),$Date.second(d));
+         default: return "";}
    });
-   var re = $Regex.regex("(^|[^%])%(Y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)");
+   var re = $Regex.regex("%(%|Y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)");
    var format = F2(function (s,d) {    return A4($Regex.replace,$Regex.All,re,formatToken(d),s);});
    var formatISO8601 = format("%Y-%m-%dT%H:%M:%SZ");
    return _elm.Date.Format.values = {_op: _op,format: format,formatISO8601: formatISO8601};
@@ -24484,12 +24504,12 @@ Elm.Common.FormWizard.make = function (_elm) {
       var _p15 = _p12;
       var _p13 = action;
       switch (_p13.ctor)
-      {case "Next": var newModel = A2(update,FormAction($Form.validate),_p15);
+      {case "Next": var newModel = A2(update,FormAction($Form.Validate),_p15);
            var prevSteps = A2(append,_p18,_p17);
            var nextSteps = $Common$Utils.defaultEmpty($List.tail(_p16));
            var nextStep = $List.head(_p16);
            return noErrors(newModel) ? _U.update(newModel,{step: nextStep,next: nextSteps,prev: prevSteps}) : newModel;
-         case "Back": var newModel = A2(update,FormAction($Form.validate),_p15);
+         case "Back": var newModel = A2(update,FormAction($Form.Validate),_p15);
            var nextSteps = A2(prepend,_p18,_p16);
            var prevSteps = A2($List.take,$List.length(_p17) - 1,_p17);
            var prevStep = $List.head($List.reverse(_p17));
@@ -24497,7 +24517,7 @@ Elm.Common.FormWizard.make = function (_elm) {
          case "FormAction": var _p14 = _p18;
            if (_p14.ctor === "Just") {
                  var newForm = A2($Form.update,_p13._0,_p14._0.form);
-                 var newStep = _U.update(_p14._0,{form: A2($Form.update,$Form.validate,newForm)});
+                 var newStep = _U.update(_p14._0,{form: A2($Form.update,$Form.Validate,newForm)});
                  return _U.update(_p15,{step: $Maybe.Just(newStep)});
               } else {
                  return _p15;
@@ -24805,6 +24825,7 @@ Elm.Types.Add.Puppet.make = function (_elm) {
    $Dict = Elm.Dict.make(_elm),
    $Form = Elm.Form.make(_elm),
    $Form$Field = Elm.Form.Field.make(_elm),
+   $Form$Infix = Elm.Form.Infix.make(_elm),
    $Form$Input = Elm.Form.Input.make(_elm),
    $Form$Validate = Elm.Form.Validate.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -24853,17 +24874,17 @@ Elm.Types.Add.Puppet.make = function (_elm) {
       var std = _p6;
       var module$ = _p6.module$;
       var unsecure = defaultBool(A2($Dict.get,"unsecure",A2($Maybe.withDefault,$Dict.empty,module$.options)));
-      return _U.list([{ctor: "_Tuple2",_0: "name",_1: $Form$Field.text(module$.name)}
-                     ,{ctor: "_Tuple2",_0: "source",_1: $Form$Field.text(module$.src)}
-                     ,{ctor: "_Tuple2",_0: "unsecure",_1: $Form$Field.check(unsecure)}
-                     ,{ctor: "_Tuple2",_0: "arguments",_1: $Form$Field.text(A2($String.join,"",std.args))}]);
+      return _U.list([{ctor: "_Tuple2",_0: "name",_1: $Form$Field.Text(module$.name)}
+                     ,{ctor: "_Tuple2",_0: "source",_1: $Form$Field.Text(module$.src)}
+                     ,{ctor: "_Tuple2",_0: "unsecure",_1: $Form$Field.Check(unsecure)}
+                     ,{ctor: "_Tuple2",_0: "arguments",_1: $Form$Field.Text(A2($String.join,"",std.args))}]);
    });
    var validate = A5($Form$Validate.form4,
    $Types$Model.puppetBase,
-   A2($Form$Validate._op[":="],"name",$Form$Validate.string),
-   A2($Form$Validate._op[":="],"source",$Form$Validate.string),
-   A2($Form$Validate._op[":="],"unsecure",$Form$Validate.bool),
-   A2($Form$Validate._op[":="],"arguments",$Form$Validate.string));
+   A2($Form$Infix._op[":="],"name",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"source",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"unsecure",$Form$Validate.bool),
+   A2($Form$Infix._op[":="],"arguments",$Form$Validate.string));
    var Model = function (a) {    return {form: a};};
    var init = Model(A2($Form.initial,_U.list([]),validate));
    var reinit = F2(function (env,type$) {    return Model(A2($Form.initial,A2(editDefaults,env,type$),validate));});
@@ -24891,6 +24912,7 @@ Elm.Types.Add.Main.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Form = Elm.Form.make(_elm),
    $Form$Field = Elm.Form.Field.make(_elm),
+   $Form$Infix = Elm.Form.Infix.make(_elm),
    $Form$Input = Elm.Form.Input.make(_elm),
    $Form$Validate = Elm.Form.Validate.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -24917,16 +24939,16 @@ Elm.Types.Add.Main.make = function (_elm) {
    });
    var editDefaults = F2(function (env,_p3) {
       var _p4 = _p3;
-      return _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.text(env)}
-                     ,{ctor: "_Tuple2",_0: "description",_1: $Form$Field.text(A2($Maybe.withDefault,"",_p4.description))}
-                     ,{ctor: "_Tuple2",_0: "type",_1: $Form$Field.text(_p4.type$)}]);
+      return _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.Text(env)}
+                     ,{ctor: "_Tuple2",_0: "description",_1: $Form$Field.Text(A2($Maybe.withDefault,"",_p4.description))}
+                     ,{ctor: "_Tuple2",_0: "type",_1: $Form$Field.Text(_p4.type$)}]);
    });
-   var defaults = function (env) {    return _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.text(env)}]);};
+   var defaults = function (env) {    return _U.list([{ctor: "_Tuple2",_0: "environment",_1: $Form$Field.Text(env)}]);};
    var validate = A4($Form$Validate.form3,
    $Types$Model.typeBase,
-   A2($Form$Validate._op[":="],"type",$Form$Validate.string),
-   A2($Form$Validate._op[":="],"description",$Form$Validate.string),
-   A2($Form$Validate._op[":="],"environment",$Form$Validate.string));
+   A2($Form$Infix._op[":="],"type",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"description",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"environment",$Form$Validate.string));
    var Model = function (a) {    return {form: a};};
    var init = function (env) {    return Model(A2($Form.initial,defaults(env),validate));};
    var reinit = F2(function (env,type$) {    return Model(A2($Form.initial,A2(editDefaults,env,type$),validate));});
@@ -25183,9 +25205,10 @@ Elm.Types.Edit.make = function (_elm) {
    $Types$Model = Elm.Types.Model.make(_elm),
    $Types$View = Elm.Types.View.make(_elm);
    var _op = {};
-   var setType = F2(function (_p0,type$) {
-      var _p1 = _p0;
-      return $Common$Utils.none(_U.update(_p1,{type$: type$,add: A3($Types$Add.reinit,_p1.add,type$,"dev")}));
+   var envChange = F2(function (action,_p0) {    var _p1 = _p0;var _p2 = action;return _p1;});
+   var setType = F2(function (_p3,type$) {
+      var _p4 = _p3;
+      return $Common$Utils.none(_U.update(_p4,{type$: type$,add: A3($Types$Add.reinit,_p4.add,type$,"dev")}));
    });
    var SetType = function (a) {    return {ctor: "SetType",_0: a};};
    var ViewAction = function (a) {    return {ctor: "ViewAction",_0: a};};
@@ -25193,24 +25216,24 @@ Elm.Types.Edit.make = function (_elm) {
    var AddAction = function (a) {    return {ctor: "AddAction",_0: a};};
    var view = F2(function (address,model) {    return A2($Types$Add.view,A2($Signal.forwardTo,address,AddAction),model.add);});
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p2) {
-      var _p3 = _p2;
-      var _p6 = _p3;
-      var _p4 = action;
-      switch (_p4.ctor)
-      {case "AddAction": var _p5 = A2($Types$Add.update,_p4._0,_p3.add);
-           var newAdd = _p5._0;
-           var effects = _p5._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p6,{add: newAdd}),_1: A2($Effects.map,AddAction,effects)};
-         case "LoadType": return {ctor: "_Tuple2",_0: _p6,_1: A2($Types$View.getType,_p4._0,SetType)};
-         case "SetType": return A4($Common$Errors.successHandler,_p4._0,_p6,setType(_p6),NoOp);
-         default: return $Common$Utils.none(_p6);}
+   var update = F2(function (action,_p5) {
+      var _p6 = _p5;
+      var _p9 = _p6;
+      var _p7 = A2($Debug.log,"",action);
+      switch (_p7.ctor)
+      {case "AddAction": var _p8 = A2($Types$Add.update,_p7._0,_p6.add);
+           var newAdd = _p8._0;
+           var effects = _p8._1;
+           return {ctor: "_Tuple2",_0: A2(envChange,action,_U.update(_p9,{add: newAdd})),_1: A2($Effects.map,AddAction,effects)};
+         case "LoadType": return {ctor: "_Tuple2",_0: _p9,_1: A2($Types$View.getType,_p7._0,SetType)};
+         case "SetType": return A4($Common$Errors.successHandler,_p7._0,_p9,setType(_p9),NoOp);
+         default: return $Common$Utils.none(_p9);}
    });
    var Model = F3(function (a,b,c) {    return {add: a,name: b,type$: c};});
    var init = function () {
-      var _p7 = $Types$Add.init;
-      var add = _p7._0;
-      var effects = _p7._1;
+      var _p10 = $Types$Add.init;
+      var add = _p10._0;
+      var effects = _p10._1;
       return {ctor: "_Tuple2",_0: A3(Model,add,"",$Types$Model.emptyType),_1: A2($Effects.map,AddAction,effects)};
    }();
    return _elm.Types.Edit.values = {_op: _op
@@ -25222,6 +25245,7 @@ Elm.Types.Edit.make = function (_elm) {
                                    ,ViewAction: ViewAction
                                    ,SetType: SetType
                                    ,setType: setType
+                                   ,envChange: envChange
                                    ,update: update
                                    ,view: view};
 };
@@ -25774,6 +25798,7 @@ Elm.Templates.Launch.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Form = Elm.Form.make(_elm),
+   $Form$Infix = Elm.Form.Infix.make(_elm),
    $Form$Input = Elm.Form.Input.make(_elm),
    $Form$Validate = Elm.Form.Validate.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -25832,8 +25857,8 @@ Elm.Templates.Launch.make = function (_elm) {
       var _p5 = action;
       switch (_p5.ctor)
       {case "FormAction": var newForm = A2($Form.update,_p5._0,_p4.form);
-           return $Common$Utils.none(_U.update(_p10,{form: A2($Form.update,$Form.validate,newForm)}));
-         case "Launch": var _p6 = A2(update,FormAction($Form.validate),_p10);
+           return $Common$Utils.none(_U.update(_p10,{form: A2($Form.update,$Form.Validate,newForm)}));
+         case "Launch": var _p6 = A2(update,FormAction($Form.Validate),_p10);
            var newModel = _p6._0;
            if ($List.isEmpty($Form.getErrors(newModel.form))) {
                  var _p7 = $Form.getOutput(newModel.form);
@@ -25879,12 +25904,12 @@ Elm.Templates.Launch.make = function (_elm) {
    var PartialMachine = F2(function (a,b) {    return {hostname: a,domain: b};});
    var validate = A2($Form$Validate.form1,
    Provided,
-   A2($Form$Validate._op[":="],
+   A2($Form$Infix._op[":="],
    "machine",
    A3($Form$Validate.form2,
    PartialMachine,
-   A2($Form$Validate._op[":="],"hostname",$Form$Validate.string),
-   A2($Form$Validate._op[":="],"domain",$Form$Validate.string))));
+   A2($Form$Infix._op[":="],"hostname",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"domain",$Form$Validate.string))));
    var init = function () {
       var errors = $Common$Errors.init;
       var _p16 = $Admin$Core.init;

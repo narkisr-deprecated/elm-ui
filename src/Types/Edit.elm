@@ -7,10 +7,14 @@ import Common.Http exposing (postJson, SaveResponse, saveResponse)
 import Common.Components exposing (asList)
 import Common.Utils exposing (none)
 import Html exposing (..)
-import Types.Add as Add
+import Types.Add as Add exposing (Action(FormAction))
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
 import Common.Errors exposing (successHandler)
+
+import Form.Error as Error exposing (..)
+import Form.Field as Field exposing (..)
+import Form.Validate as Validate exposing (Validation)
 
 
 type alias Model = 
@@ -40,14 +44,22 @@ setType : Model -> Type -> (Model , Effects Action)
 setType ({add} as model) type' =
   none {model | type' = type', add = Add.reinit add type' "dev"}
 
+envChange action ({type', add} as model) = 
+  case action of 
+    -- (FormAction (_  "environment" (Text env))) -> 
+    --    {model | type' = type', add = Add.reinit add type' env}
+    --
+    _ -> 
+       model
+
 update : Action ->  Model-> (Model , Effects Action)
 update action ({add} as model) =
-  case action of 
+  case (Debug.log "" action) of 
     AddAction addAction -> 
-     let 
-      (newAdd, effects) = Add.update addAction add
-     in 
-      ({ model | add = newAdd }, Effects.map AddAction effects)
+      let 
+        (newAdd, effects) = Add.update addAction add
+      in 
+        (envChange action { model | add = newAdd }, Effects.map AddAction effects)
 
     LoadType name -> 
        (model, View.getType name SetType)

@@ -18,7 +18,8 @@
         "circuithub/elm-html-shorthand":"9.0.3 <= v < 10.0.0",
 	  "evancz/focus":"2.0.0 <= v < 3.0.0",
 	  "mgold/elm-date-format": "1.0.3 <= v < 2.0.0",
-	  "etaque/elm-simple-form" : "1.0.2 <= v < 2.0.0"
+	  "etaque/elm-simple-form" : "2.0.1 <= v < 3.0.0",
+	  "etaque/elm-simple-form-infix" : "1.0.0 <= v < 2.0.0"
     },
     "native-modules": true,
     "elm-version": "0.16.0 <= v < 0.17.0"

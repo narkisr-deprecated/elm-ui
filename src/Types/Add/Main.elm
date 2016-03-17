@@ -10,6 +10,7 @@ import Form.Validate as Validate exposing (..)
 import Form.Input as Input
 import Types.Model exposing (Type, typeBase)
 import Form.Field as Field exposing (Field)
+import Form.Infix exposing (..)
 
 type alias Model = 
   {
@@ -25,16 +26,16 @@ validate =
  
 defaults : String ->  List (String, Field)
 defaults env =
-  [ ("environment", Field.text env) ]
+  [ ("environment", Field.Text env) ]
 
 init env =
   Model (Form.initial (defaults env) validate)
  
 editDefaults: String -> Type ->  List (String, Field)
 editDefaults env {type', description, puppetStd} =
-    [ ("environment", Field.text env)
-    , ("description", Field.text (withDefault "" description))
-    , ("type", Field.text type')
+    [ ("environment", Field.Text env)
+    , ("description", Field.Text (withDefault "" description))
+    , ("type", Field.Text type')
     ]
 
 reinit env type' =

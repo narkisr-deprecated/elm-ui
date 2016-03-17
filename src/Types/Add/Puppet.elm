@@ -14,6 +14,7 @@ import Form.Input as Input
 import Types.Model exposing (Type, puppetBase, emptyPuppet)
 import Maybe exposing (withDefault)
 import Form.Field as Field exposing (Field)
+import Form.Infix exposing (..)
 import Dict exposing (Dict)
 import String
 
@@ -49,10 +50,10 @@ editDefaults env ({puppetStd} as type') =
     unsecure = defaultBool (Dict.get "unsecure" (withDefault Dict.empty module'.options))
   in 
     [
-      ("name", Field.text module'.name)
-    , ("source", Field.text module'.src)
-    , ("unsecure", Field.check unsecure)
-    , ("arguments", Field.text (String.join "" std.args))
+      ("name", Field.Text module'.name)
+    , ("source", Field.Text module'.src)
+    , ("unsecure", Field.Check unsecure)
+    , ("arguments", Field.Text (String.join "" std.args))
     ]
 
 reinit: String -> Type -> Model

@@ -25,6 +25,7 @@ import Systems.Add.Validations exposing (notAny, validationOf, notEmpty)
 import Form exposing (Form)
 import Form.Validate as Validate exposing (..)
 import Form.Input as Input
+import Form.Infix exposing (..)
 
 
 type alias PartialMachine = 
@@ -93,11 +94,11 @@ update action ({saveErrors, form, admin, name} as model) =
        let 
          newForm = Form.update formAction form
        in
-         none { model | form = Form.update Form.validate newForm}
+         none { model | form = Form.update Form.Validate newForm}
 
     Launch -> 
       let
-        (newModel, _) = update (FormAction Form.validate) model
+        (newModel, _) = update (FormAction Form.Validate) model
       in
         if List.isEmpty (Form.getErrors newModel.form) then
           case (Form.getOutput newModel.form) of

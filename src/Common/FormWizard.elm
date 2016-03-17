@@ -69,7 +69,7 @@ update action ({next, prev, step} as model)  =
         nextStep = (List.head next)
         nextSteps = defaultEmpty (List.tail next)
         prevSteps = append step prev
-        newModel = update (FormAction Form.validate) model
+        newModel = update (FormAction Form.Validate) model
       in
         if noErrors newModel then
            { newModel | step = nextStep, next = nextSteps, prev = prevSteps}
@@ -81,7 +81,7 @@ update action ({next, prev, step} as model)  =
         prevStep = List.head (List.reverse prev)
         prevSteps = List.take ((List.length prev) - 1) prev
         nextSteps = prepend step next
-        newModel = update (FormAction Form.validate) model
+        newModel = update (FormAction Form.Validate) model
       in
         if (noErrors newModel && prevStep /= Nothing) then
           {newModel | step = prevStep, next = nextSteps, prev = prevSteps}
@@ -93,7 +93,7 @@ update action ({next, prev, step} as model)  =
         Just ({form} as currStep) -> 
          let 
            newForm = Form.update formAction form
-           newStep = { currStep | form = Form.update Form.validate newForm }
+           newStep = { currStep | form = Form.update Form.Validate newForm }
          in
            { model | step = Just newStep }
 
