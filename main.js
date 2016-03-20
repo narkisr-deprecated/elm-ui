@@ -25124,35 +25124,33 @@ Elm.Types.Add.make = function (_elm) {
       return $Common$Utils.none(_U.update(_p19,{environments: environments,wizard: _U.update(_p19.wizard,{step: $Maybe.Just(mainStep)})}));
    });
    var update = F2(function (action,_p20) {
-      update: while (true) {
-         var _p21 = _p20;
-         var _p26 = _p21.wizard;
-         var _p25 = _p21;
-         var _p22 = action;
-         switch (_p22.ctor)
-         {case "Next": var _v12 = WizardAction($Common$FormWizard.Next),_v13 = _p25;
-              action = _v12;
-              _p20 = _v13;
-              continue update;
-            case "Back": var _p23 = A2(update,WizardAction($Common$FormWizard.Back),_p25);
-              var back = _p23._0;
-              return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false}),_1: $Common$Editor.unloadEditor(NoOp)};
-            case "Reset": var _p24 = A2(update,WizardAction($Common$FormWizard.Back),_p25);
-              var back = _p24._0;
-              return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false,saveErrors: $Common$Errors.init}),_1: $Common$Editor.unloadEditor(NoOp)};
-            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p22._0,_p26);
-              return $Common$Utils.none(_U.update(_p25,{wizard: newWizard}));
-            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p22._0),_p26);
-              return $Common$Utils.none(_U.update(_p25,{wizard: newWizard}));
-            case "SetEnvironments": return A4($Common$Errors.successHandler,_p22._0,_p25,setEnvironment(_p25),NoOp);
-            case "LoadEditor": return {ctor: "_Tuple2"
-                                      ,_0: _U.update(_p25,{editClasses: $Basics.not(_p21.editClasses)})
-                                      ,_1: A3($Common$Editor.loadEditor,_p22._0,NoOp,$Types$Persistency.encodeClasses(_p21.classes))};
-            case "SetClasses": return $Common$Utils.none(_U.update(_p25,{classes: $Types$Model.decodeClasses(_p22._0)}));
-            case "Save": return {ctor: "_Tuple2",_0: _p25,_1: A2($Types$Persistency.persistType,_p22._0,merged(_p25))};
-            case "Saved": return A3($Common$Errors.errorsHandler,_p22._0,_p25,NoOp);
-            default: return $Common$Utils.none(_p25);}
-      }
+      var _p21 = _p20;
+      var _p27 = _p21.wizard;
+      var _p26 = _p21;
+      var _p22 = action;
+      switch (_p22.ctor)
+      {case "Next": var _p23 = A2(update,WizardAction($Common$FormWizard.Next),_p26);
+           var next = _p23._0;
+           var effects = _p23._1;
+           return {ctor: "_Tuple2",_0: next,_1: $Effects.batch(_U.list([effects,$Common$Editor.unloadEditor(NoOp)]))};
+         case "Back": var _p24 = A2(update,WizardAction($Common$FormWizard.Back),_p26);
+           var back = _p24._0;
+           return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false}),_1: $Common$Editor.unloadEditor(NoOp)};
+         case "Reset": var _p25 = A2(update,WizardAction($Common$FormWizard.Back),_p26);
+           var back = _p25._0;
+           return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false,saveErrors: $Common$Errors.init}),_1: $Common$Editor.unloadEditor(NoOp)};
+         case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p22._0,_p27);
+           return $Common$Utils.none(_U.update(_p26,{wizard: newWizard}));
+         case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p22._0),_p27);
+           return $Common$Utils.none(_U.update(_p26,{wizard: newWizard}));
+         case "SetEnvironments": return A4($Common$Errors.successHandler,_p22._0,_p26,setEnvironment(_p26),NoOp);
+         case "LoadEditor": return {ctor: "_Tuple2"
+                                   ,_0: _U.update(_p26,{editClasses: $Basics.not(_p21.editClasses)})
+                                   ,_1: A3($Common$Editor.loadEditor,_p22._0,NoOp,$Types$Persistency.encodeClasses(_p21.classes))};
+         case "SetClasses": return $Common$Utils.none(_U.update(_p26,{classes: $Types$Model.decodeClasses(_p22._0)}));
+         case "Save": return {ctor: "_Tuple2",_0: _p26,_1: A2($Types$Persistency.persistType,_p22._0,merged(_p26))};
+         case "Saved": return A3($Common$Errors.errorsHandler,_p22._0,_p26,NoOp);
+         default: return $Common$Utils.none(_p26);}
    });
    var Model = F6(function (a,b,c,d,e,f) {    return {wizard: a,saveErrors: b,hasNext: c,environments: d,editClasses: e,classes: f};});
    var init = function () {
