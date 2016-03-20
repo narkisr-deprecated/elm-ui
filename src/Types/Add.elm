@@ -115,7 +115,10 @@ update : Action ->  Model -> (Model , Effects Action)
 update action ({wizard, editClasses, classes} as model) =
   case action of 
     Next -> 
-       update (WizardAction Wizard.Next) model
+      let
+       (next, effects) = update (WizardAction Wizard.Next) model
+      in
+       (next, Effects.batch [effects , unloadEditor NoOp])
 
     Back -> 
       let
