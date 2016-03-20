@@ -8,9 +8,8 @@ import Html exposing (..)
 import Types.Add as Add exposing (Action(FormAction, Save, LoadEditor), updateType)
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
-import Common.Errors exposing (successHandler, errorsHandler)
+import Common.Errors exposing (successHandler)
 import Maybe exposing (withDefault)
-import Types.Persistency exposing (persistType)
 
 import Form.Error as Error exposing (..)
 import Form.Field as Field exposing (..)
