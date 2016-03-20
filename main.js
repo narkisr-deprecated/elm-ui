@@ -25107,50 +25107,53 @@ Elm.Types.Add.make = function (_elm) {
    var step = F2(function (model,value) {    return {form: model.form,value: value};});
    var Puppet = {ctor: "Puppet"};
    var Main = {ctor: "Main"};
-   var reinit = F3(function (model,type$,env) {
-      var mainStep = A2(step,A2($Types$Add$Main.reinit,env,type$),Main);
-      var steps = _U.list([A2(step,A2($Types$Add$Puppet.reinit,env,type$),Puppet)]);
-      var newWizard = A2($Common$FormWizard.init,mainStep,steps);
-      return _U.update(model,{wizard: newWizard});
-   });
-   var setEnvironment = F2(function (_p15,es) {
+   var reinit = F3(function (model,_p15,env) {
       var _p16 = _p15;
+      var _p17 = _p16;
+      var classes = A2($Maybe.withDefault,$Types$Model.emptyPuppet,A2($Dict.get,env,_p16.puppetStd)).classes;
+      var mainStep = A2(step,A2($Types$Add$Main.reinit,env,_p17),Main);
+      var steps = _U.list([A2(step,A2($Types$Add$Puppet.reinit,env,_p17),Puppet)]);
+      var newWizard = A2($Common$FormWizard.init,mainStep,steps);
+      return _U.update(model,{wizard: newWizard,classes: classes});
+   });
+   var setEnvironment = F2(function (_p18,es) {
+      var _p19 = _p18;
       var environments = $Dict.keys(es);
       var env = A2($Maybe.withDefault,"",$List.head($Dict.keys(es)));
       var mainStep = A2(step,$Types$Add$Main.init(env),Main);
-      return $Common$Utils.none(_U.update(_p16,{environments: environments,wizard: _U.update(_p16.wizard,{step: $Maybe.Just(mainStep)})}));
+      return $Common$Utils.none(_U.update(_p19,{environments: environments,wizard: _U.update(_p19.wizard,{step: $Maybe.Just(mainStep)})}));
    });
-   var update = F2(function (action,_p17) {
+   var update = F2(function (action,_p20) {
       update: while (true) {
-         var _p18 = _p17;
-         var _p24 = _p18.wizard;
-         var _p23 = _p18;
-         var _p22 = _p18.classes;
-         var _p19 = action;
-         switch (_p19.ctor)
-         {case "Next": var _v11 = WizardAction($Common$FormWizard.Next),_v12 = _p23;
-              action = _v11;
-              _p17 = _v12;
+         var _p21 = _p20;
+         var _p27 = _p21.wizard;
+         var _p26 = _p21;
+         var _p25 = _p21.classes;
+         var _p22 = action;
+         switch (_p22.ctor)
+         {case "Next": var _v12 = WizardAction($Common$FormWizard.Next),_v13 = _p26;
+              action = _v12;
+              _p20 = _v13;
               continue update;
-            case "Back": var _p20 = A2(update,WizardAction($Common$FormWizard.Back),_p23);
-              var back = _p20._0;
+            case "Back": var _p23 = A2(update,WizardAction($Common$FormWizard.Back),_p26);
+              var back = _p23._0;
               return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false}),_1: $Common$Editor.unloadEditor(NoOp)};
-            case "Reset": var _p21 = A2(update,WizardAction($Common$FormWizard.Back),_p23);
-              var back = _p21._0;
+            case "Reset": var _p24 = A2(update,WizardAction($Common$FormWizard.Back),_p26);
+              var back = _p24._0;
               return {ctor: "_Tuple2",_0: _U.update(back,{editClasses: false,saveErrors: $Common$Errors.init}),_1: $Common$Editor.unloadEditor(NoOp)};
-            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p19._0,_p24);
-              return $Common$Utils.none(_U.update(_p23,{wizard: newWizard}));
-            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p19._0),_p24);
-              return $Common$Utils.none(_U.update(_p23,{wizard: newWizard}));
-            case "SetEnvironments": return A4($Common$Errors.successHandler,_p19._0,_p23,setEnvironment(_p23),NoOp);
+            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p22._0,_p27);
+              return $Common$Utils.none(_U.update(_p26,{wizard: newWizard}));
+            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p22._0),_p27);
+              return $Common$Utils.none(_U.update(_p26,{wizard: newWizard}));
+            case "SetEnvironments": return A4($Common$Errors.successHandler,_p22._0,_p26,setEnvironment(_p26),NoOp);
             case "LoadEditor": return {ctor: "_Tuple2"
-                                      ,_0: _U.update(_p23,{editClasses: $Basics.not(_p18.editClasses)})
-                                      ,_1: A3($Common$Editor.loadEditor,"types",NoOp,$Types$Persistency.encodeClasses(_p22))};
-            case "SetClasses": return $Common$Utils.none(_U.update(_p23,{classes: $Types$Model.decodeClasses(_p19._0)}));
-            case "Persist": return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,_p22))};
-            case "Save": return {ctor: "_Tuple2",_0: _p23,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p23,_p22))};
-            case "Saved": return A3($Common$Errors.errorsHandler,_p19._0,_p23,NoOp);
-            default: return $Common$Utils.none(_p23);}
+                                      ,_0: _U.update(_p26,{editClasses: $Basics.not(_p21.editClasses)})
+                                      ,_1: A3($Common$Editor.loadEditor,"types",NoOp,$Types$Persistency.encodeClasses(_p25))};
+            case "SetClasses": return $Common$Utils.none(_U.update(_p26,{classes: $Types$Model.decodeClasses(_p22._0)}));
+            case "Persist": return {ctor: "_Tuple2",_0: _p26,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p26,_p25))};
+            case "Save": return {ctor: "_Tuple2",_0: _p26,_1: A2($Types$Persistency.persistType,saveType,A2(merged,_p26,_p25))};
+            case "Saved": return A3($Common$Errors.errorsHandler,_p22._0,_p26,NoOp);
+            default: return $Common$Utils.none(_p26);}
       }
    });
    var Model = F6(function (a,b,c,d,e,f) {    return {wizard: a,saveErrors: b,hasNext: c,environments: d,editClasses: e,classes: f};});
