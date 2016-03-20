@@ -45,8 +45,8 @@ reinit env type' =
 -- View
 typeField address {form} = 
   let
-    ({isDirty, value} as type') = Form.getFieldAsString "type" form
-    inEdit = (not isDirty && value /= Nothing)
+    ({isDirty, value, isChanged} as type') = Form.getFieldAsString "type" form
+    inEdit = (not isDirty && value /= Nothing && not isChanged )
   in
     formGroup "Type" Input.textInput type' address [class "form-control", readonly inEdit]
 

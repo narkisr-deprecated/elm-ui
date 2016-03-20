@@ -1,22 +1,22 @@
 module Types.Edit where
 
-import Common.Http exposing (postJson)
 import Http exposing (Error(BadResponse))
 import Effects exposing (Effects)
-import Common.Http exposing (postJson, SaveResponse, saveResponse)
 import Common.Components exposing (asList)
 import Common.Utils exposing (none)
 import Html exposing (..)
-import Types.Add as Add exposing (Action(FormAction))
+import Types.Add as Add exposing (Action(FormAction, Save), updateType)
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
-import Common.Errors exposing (successHandler)
+import Common.Errors exposing (successHandler, errorsHandler)
 import Maybe exposing (withDefault)
+import Types.Persistency exposing (persistType)
 
 import Form.Error as Error exposing (..)
 import Form.Field as Field exposing (..)
 import Form.Validate as Validate exposing (Validation)
 import Form exposing (Action(..))
+import Task exposing (Task)
 
 
 type alias Model = 
@@ -61,10 +61,18 @@ update : Action ->  Model-> (Model , Effects Action)
 update action ({add} as model) =
   case action of 
     AddAction addAction -> 
-      let 
-        (newAdd, effects) = Add.update addAction add
-      in 
-        (envChange addAction { model | add = newAdd }, Effects.map AddAction effects)
+      case addAction of 
+        Save _ -> 
+          let 
+            (newAdd, effects) = Add.update (Save updateType) add
+          in
+            ({ model | add = newAdd }, Effects.map AddAction effects)
+
+        _ -> 
+          let 
+            (newAdd, effects) = Add.update addAction add
+          in 
+            (envChange addAction { model | add = newAdd }, Effects.map AddAction effects)
 
     LoadType name -> 
        (model, View.getType name SetType)
@@ -80,3 +88,4 @@ update action ({add} as model) =
 view : Signal.Address Action -> Model -> List Html
 view address model =
   Add.view (Signal.forwardTo address AddAction) model.add
+

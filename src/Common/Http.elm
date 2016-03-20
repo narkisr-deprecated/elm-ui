@@ -25,6 +25,8 @@ getJson = httpJson "GET" Http.empty
 
 postJson = httpJson "POST"
 
+putJson = httpJson "PUT"
+
 apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
 apply func value =
     Json.object2 (<|) func value

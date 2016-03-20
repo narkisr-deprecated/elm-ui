@@ -74,6 +74,15 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
 
       Editing editing -> 
         case editing of 
+          TypesEdit.AddAction addAction -> 
+            case addAction of
+              TypesAdd.Saved (Result.Ok _) -> 
+                 refreshList True ({model | navChange = Just (Types, List)}, effects)
+
+              _ -> 
+               (model, effects)
+
+
           _ -> 
             (model, effects)
 

@@ -17,7 +17,7 @@ import Html.Attributes exposing (class, id, href, placeholder, attribute, type',
 import Http exposing (Error(BadResponse))
 import Common.Editor exposing (loadEditor, unloadEditor)
 import Json.Decode exposing (..)
-import Common.Http exposing (postJson)
+import Common.Http exposing (saveResponse, postJson, putJson, SaveResponse)
 import Task exposing (Task)
 import Types.Persistency exposing (persistType, encodeClasses)
 import Types.View exposing (summarize)
@@ -81,9 +81,8 @@ type Action =
     | Reset
     | Done
     | Back
-    | Persist
     | Next
-    | Save
+    | Save (String -> Effects Action)
     | Saved (Result Http.Error SaveResponse)
     | NoOp
 
@@ -111,7 +110,7 @@ merge classes ({value, form} as step) acc =
        in 
          { acc | puppetStd = Dict.insert env withClasses acc.puppetStd }
 
-merged {wizard} classes =
+merged {wizard, classes} =
   List.foldl (merge classes) emptyType wizard.prev 
 
 update : Action ->  Model -> (Model , Effects Action)
@@ -154,11 +153,8 @@ update action ({wizard, editClasses, classes} as model) =
     SetClasses json -> 
         none { model | classes = decodeClasses json }
 
-    Persist -> 
-      (model, persistType saveType (merged model classes))
-
-    Save -> 
-      (model, persistType saveType (merged model classes))
+    Save f -> 
+      (model, persistType f (merged model))
 
     Saved result -> 
        errorsHandler result model NoOp
@@ -187,7 +183,7 @@ currentView address ({wizard, environments, editClasses, classes} as model) =
           
       Nothing -> 
         dialogPanel "info" (info "Save new type") 
-           (panel (fixedPanel (summarize (merged model classes))))
+           (panel (fixedPanel (summarize (merged model))))
 
 
 errorsView address {saveErrors} = 
@@ -197,10 +193,10 @@ errorsView address {saveErrors} =
      dialogPanel "danger" (error "Failed to save type") (panel (panelContents body))
 
 saveButton address =
-    [button [id "Save", class "btn btn-primary", onClick address Save] [text "Save  "]]
+    [button [id "Save", class "btn btn-primary", onClick address (Save saveType) ] [text "Save  "]]
 
 doneButton address =
-    [button [id "Done", class "btn btn-primary", onClick address Save] [text "Done "]]
+    [button [id "Done", class "btn btn-primary", onClick address (Save saveType) ] [text "Done "]]
 
 
 rows contents buttons = 
@@ -225,19 +221,16 @@ view address ({wizard, saveErrors} as model) =
       (div [class "col-md-offset-2 col-md-8"] (currentView address model))
       (buttons' Next Back (saveButton address))
 
-type alias SaveResponse = 
-  {
-    message : String
-  } 
-
-saveResponse : Decoder SaveResponse
-saveResponse = 
-  object1 SaveResponse
-    ("message" := string) 
-
 saveType: String -> Effects Action
 saveType json = 
   postJson (Http.string json) saveResponse "/types"  
+    |> Task.toResult
+    |> Task.map Saved
+    |> Effects.task
+
+updateType: String -> Effects Action
+updateType json = 
+  putJson (Http.string json) saveResponse "/types"  
     |> Task.toResult
     |> Task.map Saved
     |> Effects.task

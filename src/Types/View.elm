@@ -70,7 +70,7 @@ moduleSection env {args, module', classes} =
     args' = String.join "" args
   in 
   [overviewSection (capitalize env)
-     ["name", "source", "arguemnts", "options", "classes"]
+     ["name", "source", "arguments", "options", "classes"]
      [module'.name, module'.src, args', os, cs]]
 
 puppetSummary :  Dict String PuppetStd -> List (List Html)
