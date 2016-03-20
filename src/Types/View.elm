@@ -67,7 +67,7 @@ moduleSection env {args, module', classes} =
   let
     cs = String.join "" (Dict.keys classes)
     os = optionsList module'.options
-    args' = String.join "" args
+    args' = String.join ", " args
   in 
   [overviewSection (capitalize env)
      ["name", "source", "arguments", "options", "classes"]

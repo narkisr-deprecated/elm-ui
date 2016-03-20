@@ -24681,7 +24681,7 @@ Elm.Types.View.make = function (_elm) {
    var moduleSection = F2(function (env,_p1) {
       var _p2 = _p1;
       var _p3 = _p2.module$;
-      var args$ = A2($String.join,"",_p2.args);
+      var args$ = A2($String.join,", ",_p2.args);
       var os = optionsList(_p3.options);
       var cs = A2($String.join,"",$Dict.keys(_p2.classes));
       return _U.list([A3($Common$Summary.overviewSection,
