@@ -18619,7 +18619,7 @@ Elm.Types.Model.make = function (_elm) {
    });
    var puppetBase = F4(function (name,src,unsecure,args) {
       var module$ = A3(Module,name,src,$Maybe.Just($Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "unsecure",_1: $Common$Model.BoolOption(unsecure)}]))));
-      var puppet = A3(PuppetStd,module$,A2($String.split,args," "),$Dict.empty);
+      var puppet = A3(PuppetStd,module$,A2($String.split," ",args),$Dict.empty);
       return _U.update(emptyType,{puppetStd: $Dict.fromList(_U.list([{ctor: "_Tuple2",_0: "--",_1: puppet}]))});
    });
    return _elm.Types.Model.values = {_op: _op

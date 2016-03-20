@@ -80,7 +80,7 @@ typeBase type' description environment =
 puppetBase name src unsecure args = 
   let
     module' = Module name src (Just (Dict.fromList [("unsecure", BoolOption unsecure)]))
-    puppet = PuppetStd module' (String.split args " ") Dict.empty
+    puppet = PuppetStd module' (String.split " " args) Dict.empty
   in
     { emptyType | puppetStd = Dict.fromList [("--", puppet)] }
 
