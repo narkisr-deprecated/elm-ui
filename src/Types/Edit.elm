@@ -5,7 +5,7 @@ import Effects exposing (Effects)
 import Common.Components exposing (asList)
 import Common.Utils exposing (none)
 import Html exposing (..)
-import Types.Add as Add exposing (Action(FormAction, Save), updateType)
+import Types.Add as Add exposing (Action(FormAction, Save, LoadEditor), updateType)
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
 import Common.Errors exposing (successHandler, errorsHandler)
@@ -14,7 +14,6 @@ import Types.Persistency exposing (persistType)
 
 import Form.Error as Error exposing (..)
 import Form.Field as Field exposing (..)
-import Form.Validate as Validate exposing (Validation)
 import Form exposing (Action(..))
 import Task exposing (Task)
 
@@ -41,6 +40,7 @@ type Action =
    | LoadType String
    | ViewAction View.Action
    | SetType (Result Http.Error Type)
+   | SetClasses String
 
 setType : Model -> Type -> (Model , Effects Action)
 setType ({add} as model) type' =
@@ -55,7 +55,7 @@ envChange action ({type', add} as model) =
       {model | type' = type', add = Add.reinit add type' env}
 
     _ -> 
-       model
+      model
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({add} as model) =
@@ -65,6 +65,12 @@ update action ({add} as model) =
         Save _ -> 
           let 
             (newAdd, effects) = Add.update (Save updateType) add
+          in
+            ({ model | add = newAdd }, Effects.map AddAction effects)
+
+        LoadEditor _ -> 
+          let 
+            (newAdd, effects) = Add.update (LoadEditor "typesEdit") add
           in
             ({ model | add = newAdd }, Effects.map AddAction effects)
 

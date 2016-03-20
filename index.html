@@ -91,7 +91,10 @@
         var container = document.getElementById('jsoneditor');
 	  var options = {
 	      mode : 'code'
-	    , onChange : function(){main.ports.editorInPort.send([event[1], input(editor)]) }
+	    , onChange : function(){
+	         console.log(target) 
+	         main.ports.editorInPort.send([target, input(editor)]) 
+		 }
 	  }
 	  if(editor === undefined) {
 	    editor = new JSONEditor(container, options, JSON.parse(event[0]));

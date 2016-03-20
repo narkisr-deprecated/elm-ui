@@ -7,13 +7,14 @@ import Maybe exposing (withDefault)
 import Dict exposing (Dict)
 
 errors = Dict.fromList [
-    ("InvalidString", "Cannot be empty")
+      ("InvalidString", "Cannot be empty")
+    , ("Empty", "Cannot be empty")
   ]
 
 errorFor field =
    case field.error of
      Just error ->
-       span [ class "help-block" ] [ text (withDefault "" (Dict.get (toString error) errors)) ]
+       span [ class "help-block" ] [ text (withDefault "Error message missing!" (Dict.get (toString error) errors)) ]
      Nothing ->
        span [ class "help-block" ] []
 

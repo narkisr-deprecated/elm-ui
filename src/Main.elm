@@ -14,6 +14,7 @@ import Templates.Launch as TemplatesLaunch
 import Templates.Core as TemplatesCore
 import Types.Core as TypesCore
 import Types.Add as TypesAdd
+import Types.Edit as TypesEdit
 import Json.Encode as E exposing (list, string)
 
 -- Templates
@@ -86,8 +87,11 @@ editorValue p =
       "templates" -> 
          Application.TemplatesAction (TemplatesCore.TemplatesAdd (TemplatesAdd.SetDefaults json))
       
-      "types" ->   
+      "typesAdd" ->   
          Application.TypesAction (TypesCore.Adding (TypesAdd.SetClasses json))
+
+      "typesEdit" ->   
+         Application.TypesAction (TypesCore.Editing (TypesEdit.AddAction (TypesAdd.SetClasses json)))
 
       _ -> 
         Application.NoOp

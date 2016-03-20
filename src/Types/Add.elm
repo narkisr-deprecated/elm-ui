@@ -67,16 +67,14 @@ reinit model ({puppetStd} as type') env  =
     newWizard = Wizard.init mainStep steps
     classes = (withDefault emptyPuppet (Dict.get env puppetStd)).classes
   in
-    { model | wizard = newWizard, classes = classes } 
-
-  
+    { model | wizard = newWizard, classes = classes, editClasses = False, saveErrors = Errors.init } 
 
 type Action = 
    ErrorsView Errors.Action
     | WizardAction Wizard.Action
     | FormAction Form.Action
     | SetEnvironments (Result Http.Error Environments)
-    | LoadEditor
+    | LoadEditor String
     | SetClasses String
     | Reset
     | Done
@@ -147,8 +145,8 @@ update action ({wizard, editClasses, classes} as model) =
     SetEnvironments result ->
        (successHandler result model (setEnvironment model) NoOp)
 
-    LoadEditor -> 
-      ({ model | editClasses = not editClasses}, loadEditor "types" NoOp (encodeClasses classes))
+    LoadEditor dest -> 
+      ({ model | editClasses = not editClasses}, loadEditor dest NoOp (encodeClasses classes))
 
     SetClasses json -> 
         none { model | classes = decodeClasses json }
@@ -176,7 +174,7 @@ currentView address ({wizard, environments, editClasses, classes} as model) =
 
           Puppet -> 
             let
-             check = (checkbox address LoadEditor editClasses)
+             check = (checkbox address (LoadEditor "typesAdd") editClasses)
             in 
              dialogPanel "info" (info "Module properties") 
                (panel (fixedPanel (Puppet.view check (Signal.forwardTo address FormAction) current)))

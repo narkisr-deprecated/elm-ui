@@ -9,7 +9,7 @@ import Html.Attributes exposing (class, id, href, placeholder, attribute, type',
 import Common.Components exposing (group')
 import Common.FormComponents exposing (formControl, formGroup)
 import Form exposing (Form)
-import Form.Validate as Validate exposing (..)
+import Form.Validate exposing (..)
 import Form.Input as Input
 import Types.Model exposing (Type, puppetBase, emptyPuppet)
 import Maybe exposing (withDefault)
@@ -53,7 +53,7 @@ editDefaults env ({puppetStd} as type') =
       ("name", Field.Text module'.name)
     , ("source", Field.Text module'.src)
     , ("unsecure", Field.Check unsecure)
-    , ("arguments", Field.Text (String.join "" std.args))
+    , ("arguments", Field.Text (String.join " " std.args))
     ]
 
 reinit: String -> Type -> Model

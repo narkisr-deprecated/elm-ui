@@ -6,7 +6,7 @@ import Html.Attributes exposing (class, id, attribute, readonly, type')
 import Common.FormComponents exposing (formControl, formGroup)
 import Maybe exposing (withDefault)
 import Form exposing (Form)
-import Form.Validate as Validate exposing (..)
+import Form.Validate exposing (..)
 import Form.Input as Input
 import Types.Model exposing (Type, typeBase)
 import Form.Field as Field exposing (Field)
