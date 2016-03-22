@@ -11,7 +11,9 @@ import Html.Events exposing (onClick)
 import String
 
 type alias Model = 
-  { session : Session}
+  {
+    session : Session
+  }
 
 init : (Model , Effects Action)
 init =
