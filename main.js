@@ -19638,8 +19638,7 @@ Elm.Nav.Side.make = function (_elm) {
       return _U.list([A4(drop,address,Systems,_U.list([List,Add]),"fa fa-server")
                      ,A4(drop,address,Templates,_U.list([List]),"fa fa-clone")
                      ,A4(drop,address,Types,_U.list([List,Add]),"fa fa-archive")
-                     ,A4(drop,address,Jobs,_U.list([List,Stats]),"fa fa-tasks")
-                     ,A4(drop,address,Stacks,_U.list([List,Add]),"fa fa-object-group")]);
+                     ,A4(drop,address,Jobs,_U.list([List,Stats]),"fa fa-tasks")]);
    };
    var view = F2(function (address,model) {
       return _U.list([A2($Html.aside,
@@ -26409,6 +26408,71 @@ Elm.Nav.Header.make = function (_elm) {
                                    ,topNav: topNav
                                    ,view: view};
 };
+Elm.Nav = Elm.Nav || {};
+Elm.Nav.Core = Elm.Nav.Core || {};
+Elm.Nav.Core.make = function (_elm) {
+   "use strict";
+   _elm.Nav = _elm.Nav || {};
+   _elm.Nav.Core = _elm.Nav.Core || {};
+   if (_elm.Nav.Core.values) return _elm.Nav.Core.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Nav$Header = Elm.Nav.Header.make(_elm),
+   $Nav$Side = Elm.Nav.Side.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var section = function (_p0) {    var _p1 = _p0;return _p1.side.section;};
+   var activeOf = function (_p2) {    var _p3 = _p2;return _p3.side.active;};
+   var NoOp = {ctor: "NoOp"};
+   var HeaderAction = function (a) {    return {ctor: "HeaderAction",_0: a};};
+   var update = F2(function (action,_p4) {
+      var _p5 = _p4;
+      var _p8 = _p5;
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "SideAction": var newSide = A2($Nav$Side.update,_p6._0,_p5.side);
+           return $Common$Utils.none(_U.update(_p8,{side: newSide}));
+         case "HeaderAction": var _p7 = A2($Nav$Header.update,_p6._0,_p5.header);
+           var newHeader = _p7._0;
+           var effects = _p7._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p8,{header: newHeader}),_1: A2($Effects.map,HeaderAction,effects)};
+         default: return $Common$Utils.none(_p8);}
+   });
+   var headerView = F2(function (address,_p9) {    var _p10 = _p9;return A2($Nav$Header.view,A2($Signal.forwardTo,address,HeaderAction),_p10.header);});
+   var SideAction = function (a) {    return {ctor: "SideAction",_0: a};};
+   var $goto = F4(function (active,section,_p11,effects) {
+      var _p12 = _p11;
+      var _p13 = A2(update,SideAction(A2($Nav$Side.Goto,active,section)),_p12.nav);
+      var newNav = _p13._0;
+      return {ctor: "_Tuple2",_0: _U.update(_p12,{nav: newNav}),_1: effects};
+   });
+   var sideView = F2(function (address,_p14) {    var _p15 = _p14;return A2($Nav$Side.view,A2($Signal.forwardTo,address,SideAction),_p15.side);});
+   var Model = F2(function (a,b) {    return {side: a,header: b};});
+   var init = function () {
+      var _p16 = $Nav$Header.init;
+      var header = _p16._0;
+      var headerAction = _p16._1;
+      return {ctor: "_Tuple2",_0: A2(Model,$Nav$Side.init,header),_1: $Effects.batch(_U.list([A2($Effects.map,HeaderAction,headerAction)]))};
+   }();
+   return _elm.Nav.Core.values = {_op: _op
+                                 ,Model: Model
+                                 ,init: init
+                                 ,SideAction: SideAction
+                                 ,HeaderAction: HeaderAction
+                                 ,NoOp: NoOp
+                                 ,$goto: $goto
+                                 ,update: update
+                                 ,sideView: sideView
+                                 ,headerView: headerView
+                                 ,activeOf: activeOf
+                                 ,section: section};
+};
 Elm.Application = Elm.Application || {};
 Elm.Application.make = function (_elm) {
    "use strict";
@@ -26425,7 +26489,7 @@ Elm.Application.make = function (_elm) {
    $Jobs$Stats = Elm.Jobs.Stats.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
-   $Nav$Header = Elm.Nav.Header.make(_elm),
+   $Nav$Core = Elm.Nav.Core.make(_elm),
    $Nav$Side = Elm.Nav.Side.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
@@ -26434,202 +26498,185 @@ Elm.Application.make = function (_elm) {
    $Templates$Core = Elm.Templates.Core.make(_elm),
    $Types$Core = Elm.Types.Core.make(_elm);
    var _op = {};
-   var $goto = F3(function (active,section,_p0) {
-      var _p1 = _p0;
-      return {ctor: "_Tuple2",_0: _U.update(_p1._0,{navSide: A2($Nav$Side.update,A2($Nav$Side.Goto,active,section),_p1._0.navSide)}),_1: _p1._1};
-   });
    var NoOp = {ctor: "NoOp"};
    var TemplatesAction = function (a) {    return {ctor: "TemplatesAction",_0: a};};
    var TypesAction = function (a) {    return {ctor: "TypesAction",_0: a};};
-   var NavHeaderAction = function (a) {    return {ctor: "NavHeaderAction",_0: a};};
-   var NavSideAction = function (a) {    return {ctor: "NavSideAction",_0: a};};
    var JobsStats = function (a) {    return {ctor: "JobsStats",_0: a};};
    var JobsList = function (a) {    return {ctor: "JobsList",_0: a};};
-   var jobListing = function (_p2) {
-      var _p3 = _p2;
-      var _p4 = $Jobs$List.init;
-      var newJobs = _p4._0;
-      var effects = _p4._1;
-      return {ctor: "_Tuple2",_0: _U.update(_p3,{jobsList: newJobs}),_1: A2($Effects.map,JobsList,effects)};
+   var jobListing = function (model) {
+      var _p0 = $Jobs$List.init;
+      var newJobs = _p0._0;
+      var effects = _p0._1;
+      return {ctor: "_Tuple2",_0: _U.update(model,{jobsList: newJobs}),_1: A2($Effects.map,JobsList,effects)};
    };
-   var StacksAction = function (a) {    return {ctor: "StacksAction",_0: a};};
-   var navigate = F2(function (action,_p5) {
-      var _p6 = _p5;
-      var _p18 = _p6._0.systems;
-      var _p17 = _p6._0;
-      var _p16 = _p6._1;
-      var _p7 = action;
-      switch (_p7.ctor)
-      {case "SystemsAction": var _p8 = _p18.navChange;
-           _v4_3: do {
-              if (_p8.ctor === "Just" && _p8._0.ctor === "_Tuple2") {
-                    switch (_p8._0._0.ctor)
-                    {case "Jobs": if (_p8._0._1.ctor === "List") {
-                               var _p9 = jobListing(_p17);
-                               var withJobs = _p9._0;
-                               var jobEffects = _p9._1;
-                               return A3($goto,$Nav$Side.Jobs,$Nav$Side.List,{ctor: "_Tuple2",_0: withJobs,_1: jobEffects});
+   var navigate = F2(function (action,_p1) {
+      var _p2 = _p1;
+      var _p12 = _p2._0.systems;
+      var _p11 = _p2._0;
+      var _p10 = _p2._1;
+      var _p3 = action;
+      switch (_p3.ctor)
+      {case "SystemsAction": var _p4 = _p12.navChange;
+           _v2_3: do {
+              if (_p4.ctor === "Just" && _p4._0.ctor === "_Tuple2") {
+                    switch (_p4._0._0.ctor)
+                    {case "Jobs": if (_p4._0._1.ctor === "List") {
+                               var _p5 = jobListing(_p11);
+                               var withJobs = _p5._0;
+                               var effects = _p5._1;
+                               return A4($Nav$Core.$goto,$Nav$Side.Jobs,$Nav$Side.List,withJobs,effects);
                             } else {
-                               break _v4_3;
+                               break _v2_3;
                             }
-                       case "Systems": return A3($goto,$Nav$Side.Systems,_p8._0._1,{ctor: "_Tuple2",_0: _p17,_1: _p16});
-                       case "Templates": var _p10 = $Systems$Core.addedSystem(_p18);
-                         var hyp = _p10._0;
-                         var system = _p10._1;
+                       case "Systems": return A4($Nav$Core.$goto,$Nav$Side.Systems,_p4._0._1,_p11,_p10);
+                       case "Templates": var _p6 = $Systems$Core.addedSystem(_p12);
+                         var hyp = _p6._0;
+                         var system = _p6._1;
                          var add = A2($Templates$Core.add,hyp,system);
-                         var _p11 = A2($Templates$Core.update,add,_p17.templates);
-                         var newTemplates = _p11._0;
-                         var effects = _p11._1;
-                         return A3($goto,
+                         var _p7 = A2($Templates$Core.update,add,_p11.templates);
+                         var newTemplates = _p7._0;
+                         var effects = _p7._1;
+                         return A4($Nav$Core.$goto,
                          $Nav$Side.Templates,
-                         _p8._0._1,
-                         {ctor: "_Tuple2",_0: _U.update(_p17,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)});
-                       default: break _v4_3;}
+                         _p4._0._1,
+                         _U.update(_p11,{templates: newTemplates}),
+                         A2($Effects.map,TemplatesAction,effects));
+                       default: break _v2_3;}
                  } else {
-                    break _v4_3;
+                    break _v2_3;
                  }
            } while (false);
-           return {ctor: "_Tuple2",_0: _p17,_1: _p16};
-         case "TemplatesAction": var _p12 = _p6._0.templates.navChange;
-           if (_p12.ctor === "Just" && _p12._0.ctor === "_Tuple2") {
-                 return A3($goto,_p12._0._0,_p12._0._1,{ctor: "_Tuple2",_0: _p17,_1: _p16});
+           return {ctor: "_Tuple2",_0: _p11,_1: _p10};
+         case "TemplatesAction": var _p8 = _p2._0.templates.navChange;
+           if (_p8.ctor === "Just" && _p8._0.ctor === "_Tuple2") {
+                 return A4($Nav$Core.$goto,_p8._0._0,_p8._0._1,_p11,_p10);
               } else {
-                 return {ctor: "_Tuple2",_0: _p17,_1: _p16};
+                 return {ctor: "_Tuple2",_0: _p11,_1: _p10};
               }
-         case "TypesAction": var _p13 = _p6._0.types.navChange;
-           if (_p13.ctor === "Just" && _p13._0.ctor === "_Tuple2") {
-                 return A3($goto,_p13._0._0,_p13._0._1,{ctor: "_Tuple2",_0: _p17,_1: _p16});
+         case "TypesAction": var _p9 = _p2._0.types.navChange;
+           if (_p9.ctor === "Just" && _p9._0.ctor === "_Tuple2") {
+                 return A4($Nav$Core.$goto,_p9._0._0,_p9._0._1,_p11,_p10);
               } else {
-                 return {ctor: "_Tuple2",_0: _p17,_1: _p16};
+                 return {ctor: "_Tuple2",_0: _p11,_1: _p10};
               }
-         case "NavSideAction": var _p14 = _p7._0;
-           if (_p14._0.ctor === "Stacks" && _p14._1.ctor === "Add") {
-                 var _p15 = $Stacks$Core.loadTemplates(_p6._0.stacks);
-                 var newStacks = _p15._0;
-                 var effects = _p15._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p17,{stacks: newStacks}),_1: A2($Effects.map,StacksAction,effects)};
-              } else {
-                 return {ctor: "_Tuple2",_0: _p17,_1: _p16};
-              }
-         default: return {ctor: "_Tuple2",_0: _p17,_1: _p16};}
+         default: return {ctor: "_Tuple2",_0: _p11,_1: _p10};}
    });
+   var StacksAction = function (a) {    return {ctor: "StacksAction",_0: a};};
+   var NavAction = function (a) {    return {ctor: "NavAction",_0: a};};
    var SystemsAction = function (a) {    return {ctor: "SystemsAction",_0: a};};
-   var activeView = F2(function (address,_p19) {
-      var _p20 = _p19;
-      var _p23 = _p20;
-      var _p21 = _p23.navSide.active;
-      switch (_p21.ctor)
-      {case "Systems": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p23.systems,_p23.navSide.section);
-         case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p23.types,_p23.navSide.section);
-         case "Templates": return A3($Templates$Core.view,A2($Signal.forwardTo,address,TemplatesAction),_p23.templates,_p23.navSide.section);
-         case "Jobs": var _p22 = _p23.navSide.section;
-           switch (_p22.ctor)
-           {case "List": return A2($Jobs$List.view,A2($Signal.forwardTo,address,JobsList),_p20.jobsList);
-              case "Stats": return A2($Jobs$Stats.view,A2($Signal.forwardTo,address,JobsStats),_p20.jobsStats);
-              default: return _U.list([]);}
-         default: return A3($Stacks$Core.view,A2($Signal.forwardTo,address,StacksAction),_p23.stacks,_p23.navSide.section);}
+   var route = F2(function (action,_p13) {
+      var _p14 = _p13;
+      var _p25 = _p14.nav;
+      var _p24 = _p14;
+      var _p15 = action;
+      switch (_p15.ctor)
+      {case "JobsList": var _p17 = _p15._0;
+           if (_U.eq(_p17,$Jobs$List.Polling) && !_U.eq($Nav$Core.activeOf(_p25),$Nav$Side.Jobs)) return {ctor: "_Tuple2",_0: _p24,_1: $Effects.none}; else {
+                 var _p16 = A2($Jobs$List.update,_p17,_p14.jobsList);
+                 var newJobList = _p16._0;
+                 var effects = _p16._1;
+                 return {ctor: "_Tuple2",_0: _U.update(_p24,{jobsList: newJobList}),_1: A2($Effects.map,JobsList,effects)};
+              }
+         case "JobsStats": var _p18 = A2($Jobs$Stats.update,_p15._0,_p14.jobsStats);
+           var newJobsStats = _p18._0;
+           var effects = _p18._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{jobsStats: newJobsStats}),_1: A2($Effects.map,JobsStats,effects)};
+         case "TypesAction": var _p19 = A2($Types$Core.update,_p15._0,_p14.types);
+           var newTypes = _p19._0;
+           var effects = _p19._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
+         case "StacksAction": var _p20 = A2($Stacks$Core.update,_p15._0,_p14.stacks);
+           var newStacks = _p20._0;
+           var effects = _p20._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{stacks: newStacks}),_1: A2($Effects.map,StacksAction,effects)};
+         case "TemplatesAction": var _p21 = A2($Templates$Core.update,_p15._0,_p14.templates);
+           var newTemplates = _p21._0;
+           var effects = _p21._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
+         case "SystemsAction": var _p22 = A2($Systems$Core.update,_p15._0,_p14.systems);
+           var newSystems = _p22._0;
+           var effects = _p22._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{systems: newSystems}),_1: A2($Effects.map,SystemsAction,effects)};
+         case "NavAction": var _p23 = A2($Nav$Core.update,_p15._0,_p25);
+           var newNav = _p23._0;
+           var effects = _p23._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p24,{nav: newNav}),_1: A2($Effects.map,NavAction,effects)};
+         default: return $Common$Utils.none(_p24);}
    });
-   var view = F2(function (address,model) {
+   var update = F2(function (action,model) {    return A2(navigate,action,A2(route,action,model));});
+   var activeView = F2(function (address,_p26) {
+      var _p27 = _p26;
+      var _p30 = _p27.nav;
+      var section = $Nav$Core.section(_p30);
+      var _p28 = A2($Debug.log,"",$Nav$Core.activeOf(_p30));
+      switch (_p28.ctor)
+      {case "Systems": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p27.systems,section);
+         case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p27.types,section);
+         case "Templates": return A3($Templates$Core.view,A2($Signal.forwardTo,address,TemplatesAction),_p27.templates,section);
+         case "Jobs": var _p29 = section;
+           switch (_p29.ctor)
+           {case "List": return A2($Jobs$List.view,A2($Signal.forwardTo,address,JobsList),_p27.jobsList);
+              case "Stats": return A2($Jobs$Stats.view,A2($Signal.forwardTo,address,JobsStats),_p27.jobsStats);
+              default: return _U.list([]);}
+         default: return A3($Stacks$Core.view,A2($Signal.forwardTo,address,StacksAction),_p27.stacks,section);}
+   });
+   var view = F2(function (address,_p31) {
+      var _p32 = _p31;
+      var _p33 = _p32.nav;
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("wrapper")]),
       A2($List.append,
       A2($List.append,
-      A2($Nav$Header.view,A2($Signal.forwardTo,address,NavHeaderAction),model.navHeader),
-      A2($Nav$Side.view,A2($Signal.forwardTo,address,NavSideAction),model.navSide)),
+      A2($Nav$Core.sideView,A2($Signal.forwardTo,address,NavAction),_p33),
+      A2($Nav$Core.headerView,A2($Signal.forwardTo,address,NavAction),_p33)),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("content-wrapper")]),
-      _U.list([A2($Html.section,_U.list([$Html$Attributes.$class("content")]),A2(activeView,address,model))]))])));
+      _U.list([A2($Html.section,_U.list([$Html$Attributes.$class("content")]),A2(activeView,address,_p32))]))])));
    });
-   var Model = F8(function (a,b,c,d,e,f,g,h) {    return {systems: a,stacks: b,jobsList: c,jobsStats: d,types: e,templates: f,navSide: g,navHeader: h};});
+   var Model = F7(function (a,b,c,d,e,f,g) {    return {systems: a,stacks: b,jobsList: c,jobsStats: d,types: e,templates: f,nav: g};});
    var init = function () {
-      var _p24 = $Stacks$Core.init;
-      var stacks = _p24._0;
-      var stacksAction = _p24._1;
-      var _p25 = $Systems$Core.init;
-      var systems = _p25._0;
-      var systemsAction = _p25._1;
-      var _p26 = $Templates$Core.init;
-      var templates = _p26._0;
-      var templatesAction = _p26._1;
-      var _p27 = $Types$Core.init;
-      var types = _p27._0;
-      var typesAction = _p27._1;
-      var _p28 = $Nav$Header.init;
-      var navHeaderModel = _p28._0;
-      var navHeaderAction = _p28._1;
-      var _p29 = $Jobs$Stats.init;
-      var jobsStat = _p29._0;
-      var jobsStatAction = _p29._1;
-      var _p30 = $Jobs$List.init;
-      var jobsList = _p30._0;
-      var jobsListAction = _p30._1;
+      var _p34 = $Stacks$Core.init;
+      var stacks = _p34._0;
+      var stacksAction = _p34._1;
+      var _p35 = $Systems$Core.init;
+      var systems = _p35._0;
+      var systemsAction = _p35._1;
+      var _p36 = $Nav$Core.init;
+      var nav = _p36._0;
+      var navAction = _p36._1;
+      var _p37 = $Templates$Core.init;
+      var templates = _p37._0;
+      var templatesAction = _p37._1;
+      var _p38 = $Types$Core.init;
+      var types = _p38._0;
+      var typesAction = _p38._1;
+      var _p39 = $Jobs$Stats.init;
+      var jobsStat = _p39._0;
+      var jobsStatAction = _p39._1;
+      var _p40 = $Jobs$List.init;
+      var jobsList = _p40._0;
+      var jobsListAction = _p40._1;
       var effects = _U.list([A2($Effects.map,TemplatesAction,templatesAction)
                             ,A2($Effects.map,TypesAction,typesAction)
                             ,A2($Effects.map,SystemsAction,systemsAction)
                             ,A2($Effects.map,StacksAction,stacksAction)
-                            ,A2($Effects.map,NavHeaderAction,navHeaderAction)
+                            ,A2($Effects.map,NavAction,navAction)
                             ,A2($Effects.map,JobsList,jobsListAction)
                             ,A2($Effects.map,JobsStats,jobsStatAction)]);
-      return {ctor: "_Tuple2",_0: A8(Model,systems,stacks,jobsList,jobsStat,types,templates,$Nav$Side.init,navHeaderModel),_1: $Effects.batch(effects)};
+      return {ctor: "_Tuple2",_0: A7(Model,systems,stacks,jobsList,jobsStat,types,templates,nav),_1: $Effects.batch(effects)};
    }();
-   var route = F2(function (action,_p31) {
-      var _p32 = _p31;
-      var _p43 = _p32;
-      var _p33 = action;
-      switch (_p33.ctor)
-      {case "JobsList": var _p35 = _p33._0;
-           if (_U.eq(_p35,$Jobs$List.Polling) && !_U.eq(_p32.navSide.active,$Nav$Side.Jobs)) return {ctor: "_Tuple2",_0: _p43,_1: $Effects.none}; else {
-                 var _p34 = A2($Jobs$List.update,_p35,_p32.jobsList);
-                 var newJobList = _p34._0;
-                 var effects = _p34._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p43,{jobsList: newJobList}),_1: A2($Effects.map,JobsList,effects)};
-              }
-         case "JobsStats": var _p36 = A2($Jobs$Stats.update,_p33._0,_p32.jobsStats);
-           var newJobsStats = _p36._0;
-           var effects = _p36._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p43,{jobsStats: newJobsStats}),_1: A2($Effects.map,JobsStats,effects)};
-         case "NavSideAction": var _p37 = init;
-           var newModel = _p37._0;
-           var effects = _p37._1;
-           var newNavSide = A2($Nav$Side.update,_p33._0,_p43.navSide);
-           return {ctor: "_Tuple2",_0: _U.update(newModel,{navSide: newNavSide}),_1: effects};
-         case "NavHeaderAction": var _p38 = A2($Nav$Header.update,_p33._0,_p43.navHeader);
-           var newNavHeader = _p38._0;
-           var effects = _p38._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p43,{navHeader: newNavHeader}),_1: A2($Effects.map,NavHeaderAction,effects)};
-         case "TypesAction": var _p39 = A2($Types$Core.update,_p33._0,_p32.types);
-           var newTypes = _p39._0;
-           var effects = _p39._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p43,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
-         case "StacksAction": var _p40 = A2($Stacks$Core.update,_p33._0,_p32.stacks);
-           var newStacks = _p40._0;
-           var effects = _p40._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p43,{stacks: newStacks}),_1: A2($Effects.map,StacksAction,effects)};
-         case "TemplatesAction": var _p41 = A2($Templates$Core.update,_p33._0,_p32.templates);
-           var newTemplates = _p41._0;
-           var effects = _p41._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p43,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
-         case "SystemsAction": var _p42 = A2($Systems$Core.update,_p33._0,_p32.systems);
-           var newSystems = _p42._0;
-           var effects = _p42._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p43,{systems: newSystems}),_1: A2($Effects.map,SystemsAction,effects)};
-         default: return $Common$Utils.none(_p43);}
-   });
-   var update = F2(function (action,model) {    return A2(navigate,action,A2(route,action,model));});
    return _elm.Application.values = {_op: _op
                                     ,init: init
                                     ,Model: Model
                                     ,SystemsAction: SystemsAction
+                                    ,NavAction: NavAction
                                     ,StacksAction: StacksAction
                                     ,JobsList: JobsList
                                     ,JobsStats: JobsStats
-                                    ,NavSideAction: NavSideAction
-                                    ,NavHeaderAction: NavHeaderAction
                                     ,TypesAction: TypesAction
                                     ,TemplatesAction: TemplatesAction
                                     ,NoOp: NoOp
                                     ,jobListing: jobListing
-                                    ,$goto: $goto
                                     ,navigate: navigate
                                     ,route: route
                                     ,update: update

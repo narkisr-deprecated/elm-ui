@@ -12,7 +12,7 @@ import Common.Utils exposing (none)
 import Types.Core as Types
 import Templates.Core as Templates
 import Nav.Side as NavSide exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
-import Nav.Header as NavHeader
+import Nav.Core as Nav exposing (goto)
 
 import Bootstrap.Html exposing (..)
 import Debug
@@ -22,9 +22,9 @@ init =
   let 
     (jobsList, jobsListAction) = Jobs.List.init
     (jobsStat, jobsStatAction) = Jobs.Stats.init
-    (navHeaderModel, navHeaderAction) = NavHeader.init
     (types, typesAction) = Types.init
     (templates, templatesAction) = Templates.init
+    (nav, navAction) = Nav.init
     (systems, systemsAction) = Systems.init
     (stacks, stacksAction) = Stacks.init
     effects = [ 
@@ -32,12 +32,12 @@ init =
               , Effects.map TypesAction typesAction
               , Effects.map SystemsAction systemsAction
               , Effects.map StacksAction stacksAction
-              , Effects.map NavHeaderAction navHeaderAction
+              , Effects.map NavAction navAction
               , Effects.map JobsList jobsListAction
               , Effects.map JobsStats jobsStatAction
               ]
   in
-    (Model systems stacks jobsList jobsStat types templates NavSide.init navHeaderModel, Effects.batch effects) 
+    (Model systems stacks jobsList jobsStat types templates nav, Effects.batch effects) 
 
 type alias Model = 
   { 
@@ -47,33 +47,26 @@ type alias Model =
   , jobsStats : Jobs.Stats.Model
   , types : Types.Model
   , templates : Templates.Model
-  , navSide : NavSide.Model 
-  , navHeader : NavHeader.Model 
+  , nav : Nav.Model
   }
-
 
 type Action = 
   SystemsAction Systems.Action
+    | NavAction Nav.Action
     | StacksAction Stacks.Action
     | JobsList Jobs.List.Action
     | JobsStats Jobs.Stats.Action
-    | NavSideAction NavSide.Action
-    | NavHeaderAction NavHeader.Action
     | TypesAction Types.Action
     | TemplatesAction Templates.Action
     | NoOp
 
 -- Navigation changes
 jobListing : Model -> (Model , Effects Action)
-jobListing ({navSide} as model) = 
+jobListing model = 
   let
     (newJobs, effects) = Jobs.List.init
   in 
     ({model | jobsList = newJobs}, Effects.map JobsList effects)
-
-goto : Active -> Section -> (Model, Effects Action) -> (Model, Effects Action)
-goto active section (({navSide} as model), effects)  =
-  ({model | navSide = NavSide.update (NavSide.Goto active section) navSide}, effects)
 
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
 navigate action ({systems, templates, stacks, types} as model , effects) =
@@ -82,12 +75,12 @@ navigate action ({systems, templates, stacks, types} as model , effects) =
       case systems.navChange  of
          Just (Jobs, List) -> 
            let
-             (withJobs, jobEffects) = (jobListing model)
+             (withJobs, effects) = (jobListing model)
            in
-             goto Jobs List (withJobs, jobEffects)
+             goto Jobs List withJobs effects
  
          Just (Systems, section) -> 
-            goto Systems section (model , effects)
+            goto Systems section model effects
 
          Just (Templates, section) -> 
             let
@@ -95,14 +88,14 @@ navigate action ({systems, templates, stacks, types} as model , effects) =
                add = (Templates.add hyp system)
                (newTemplates, effects) = Templates.update add model.templates 
             in
-              goto Templates section ({model | templates = newTemplates}, Effects.map TemplatesAction effects)
+              goto Templates section {model | templates = newTemplates}  (Effects.map TemplatesAction effects)
          _ -> 
             (model, effects) 
 
     TemplatesAction action -> 
         case templates.navChange of
           Just (active, dest) -> 
-            goto active dest (model, effects)
+            goto active dest model effects
 
           _ -> 
             (model, effects) 
@@ -110,30 +103,20 @@ navigate action ({systems, templates, stacks, types} as model , effects) =
     TypesAction action -> 
         case types.navChange of
           Just (active, dest) -> 
-            goto active dest (model, effects)
+            goto active dest model effects
 
           _ -> 
             (model, effects) 
-    NavSideAction navAction -> 
-      case navAction of 
-        NavSide.Goto Stacks Add -> 
-          let
-            (newStacks, effects) = Stacks.loadTemplates stacks
-          in
-            ({ model | stacks = newStacks }, Effects.map StacksAction effects)
-
-        _ -> 
-         (model, effects)
 
     _ -> 
       (model, effects)
 
 
 route : Action ->  Model -> (Model , Effects Action)
-route action ({navSide, types, jobsList, jobsStats, systems, templates, stacks} as model) =
+route action ({nav, types, jobsList, jobsStats, systems, templates, stacks} as model) =
   case action of 
     JobsList jobAction -> 
-      if jobAction == Polling && navSide.active /= Jobs then
+      if jobAction == Polling && (Nav.activeOf nav) /= Jobs then
         (model, Effects.none)
       else
         let 
@@ -146,19 +129,6 @@ route action ({navSide, types, jobsList, jobsStats, systems, templates, stacks} 
         (newJobsStats, effects) = Jobs.Stats.update jobAction jobsStats
       in
         ({model | jobsStats= newJobsStats }, Effects.map JobsStats effects) 
-
-    NavSideAction navAction -> 
-      let 
-        newNavSide = NavSide.update navAction model.navSide
-        (newModel, effects) = init
-      in
-        ({ newModel | navSide = newNavSide }, effects)
-
-    NavHeaderAction navAction -> 
-      let 
-        (newNavHeader, effects) = NavHeader.update navAction model.navHeader
-      in
-        ({ model | navHeader = newNavHeader}, Effects.map NavHeaderAction effects)
 
     TypesAction action -> 
       let 
@@ -184,6 +154,12 @@ route action ({navSide, types, jobsList, jobsStats, systems, templates, stacks} 
       in
         ({ model | systems = newSystems}, Effects.map SystemsAction effects)
 
+    NavAction action -> 
+      let 
+        (newNav, effects) = Nav.update action nav
+      in
+        ({ model | nav = newNav}, Effects.map NavAction effects)
+
     _ -> 
         none model
 
@@ -193,38 +169,41 @@ update action model =
    navigate action (route action model)
 
 activeView : Signal.Address Action -> Model -> List Html
-activeView address ({jobsList, jobsStats} as model) =
-  case model.navSide.active of
-    Systems -> 
-      Systems.view (Signal.forwardTo address SystemsAction) model.systems model.navSide.section 
+activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks} as model) =
+  let
+    section = (Nav.section nav)
+  in 
+    case Debug.log "" (Nav.activeOf nav) of
+      Systems -> 
+        Systems.view (Signal.forwardTo address SystemsAction) systems section
 
-    Types -> 
-      Types.view (Signal.forwardTo address TypesAction) model.types model.navSide.section
+      Types -> 
+        Types.view (Signal.forwardTo address TypesAction) types section
 
-    Templates -> 
-      Templates.view (Signal.forwardTo address TemplatesAction) model.templates model.navSide.section
-    
-    Jobs -> 
-      case model.navSide.section of
-        List ->
-          Jobs.List.view (Signal.forwardTo address JobsList) jobsList
+      Templates -> 
+        Templates.view (Signal.forwardTo address TemplatesAction) templates section
+      
+      Jobs -> 
+        case section of
+          List ->
+            Jobs.List.view (Signal.forwardTo address JobsList) jobsList
 
-        Stats ->
-          Jobs.Stats.view (Signal.forwardTo address JobsStats) jobsStats
+          Stats ->
+            Jobs.Stats.view (Signal.forwardTo address JobsStats) jobsStats
 
-        _ ->
-           []
+          _ ->
+            []
 
-    Stacks -> 
-       Stacks.view (Signal.forwardTo address StacksAction) model.stacks model.navSide.section 
+      Stacks -> 
+        Stacks.view (Signal.forwardTo address StacksAction) stacks section
 
 view : Signal.Address Action -> Model -> Html
-view address model = 
-  div [ class "wrapper" ] 
+view address ({nav} as model) = 
+  div [class "wrapper"] 
     (List.append
        (List.append 
-         (NavHeader.view (Signal.forwardTo address NavHeaderAction) model.navHeader) 
-         (NavSide.view (Signal.forwardTo address NavSideAction) model.navSide))
+         (Nav.sideView (Signal.forwardTo address NavAction) nav) 
+         (Nav.headerView (Signal.forwardTo address NavAction) nav))
        [div [class "content-wrapper"]
          [section [class "content"] (activeView address model)]])
 
