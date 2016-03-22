@@ -6,6 +6,7 @@ import Effects exposing (Effects, batch)
 import Http exposing (Error(BadResponse))
 import Admin.Core as Admin 
 import Common.Components exposing (..)
+import Common.Utils exposing (none)
 
 
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type')
@@ -33,6 +34,7 @@ type alias Model =
 
 type Action = 
   NoOp
+  | SetEnvironments (Result Http.Error Environments)
   | AdminAction Admin.Action 
   | SetTypes (Result Http.Error (List Type))
   | SelectType String
@@ -42,23 +44,26 @@ type Action =
 init : (Model , Effects Action)
 init =
   let
-    (admin, effects) = Admin.init
-    loadEffects = [getTypes SetTypes, (Effects.map AdminAction effects)] in
-   (Model "" [] "" [] admin, batch loadEffects)
+    (admin, adminEffects) = Admin.init
+    effects = Effects.batch [
+             getTypes SetTypes
+           , getEnvironments SetEnvironments
+           , (Effects.map AdminAction adminEffects)
+    ]
+  in
+    (Model "" [] "" [] admin, effects)
 
 -- Update
 
-updateHypervisors : Model -> Environments -> String -> Model
-updateHypervisors model es environment = 
+setEnvironments : Model -> Environments -> (Model, Effects Action)
+setEnvironments model es =
   let 
-    hypervisors = (Dict.keys (Maybe.withDefault Dict.empty (Dict.get environment es)))
-    hypervisor = Maybe.withDefault "" (List.head hypervisors)
+     environment = Maybe.withDefault "" (List.head (Dict.keys es))
+     environments = Dict.keys es
+     hypervisors = (Dict.keys (Maybe.withDefault Dict.empty (Dict.get environment es)))
+     hypervisor = Maybe.withDefault "" (List.head hypervisors)
   in 
-    {model | hypervisors = hypervisors, hypervisor = hypervisor}
-
-withoutEffects : (a , Effects action) -> a 
-withoutEffects (model,_) =
-  model
+    none {model | hypervisors = hypervisors, hypervisor = hypervisor}
 
 setTypes : Model -> List Type -> (Model, Effects Action)
 setTypes model types =
@@ -68,26 +73,29 @@ setTypes model types =
   in
     ({model | types = typesList , type' = firstType}, Effects.none)
 
-update : Action ->  Model-> Model
+update : Action ->  Model-> (Model, Effects Action)
 update action ({admin} as model) =
   case action of
-    AdminAction action -> 
+    SetEnvironments result ->
+     (successHandler result model (setEnvironments model) NoOp)
+
+    AdminAction adminAction -> 
       let
-        (newAdmin, _) = Admin.update action admin
+        (newAdmin, effects) = Admin.update adminAction admin
       in  
-        (updateHypervisors { model | admin = newAdmin} newAdmin.rawEnvironments newAdmin.environment)
+        ({ model | admin = newAdmin}, Effects.map AdminAction effects)
 
     SelectHypervisor hypervisor -> 
-      {model | hypervisor = hypervisor}
+      none {model | hypervisor = hypervisor}
 
     SetTypes result ->
-      withoutEffects (successHandler result model (setTypes model) NoOp)
+      (successHandler result model (setTypes model) NoOp)
 
     SelectType type' -> 
-      {model | type' = type' }
+      none {model | type' = type' }
 
     _ -> 
-      model
+      none model
 
 -- View
 

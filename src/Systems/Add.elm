@@ -229,9 +229,9 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
 
     GeneralView action -> 
       let
-        newGeneral= General.update action general
+        (newGeneral, effects) = General.update action general
       in
-        none { model | general = newGeneral }
+        ({ model | general = newGeneral }, Effects.map GeneralView effects)
 
     Stage -> 
        (model, persistModel (saveSystem Stage) (intoSystem model) (toString stage))

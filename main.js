@@ -15269,6 +15269,39 @@ Elm.Users.List.make = function (_elm) {
    var getUsers = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,usersList,"/users"))));};
    return _elm.Users.List.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
 };
+Elm.Users = Elm.Users || {};
+Elm.Users.Session = Elm.Users.Session || {};
+Elm.Users.Session.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Session = _elm.Users.Session || {};
+   if (_elm.Users.Session.values) return _elm.Users.Session.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $Json$Decode = Elm.Json.Decode.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var logout = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult($Http.getString("/logout"))));};
+   var Session = F5(function (a,b,c,d,e) {    return {envs: a,identity: b,operations: c,roles: d,username: e};});
+   var emptySession = A5(Session,_U.list([]),"",_U.list([]),_U.list([]),"");
+   var session = A6($Json$Decode.object5,
+   Session,
+   A2($Json$Decode._op[":="],"envs",$Json$Decode.list($Json$Decode.string)),
+   A2($Json$Decode._op[":="],"identity",$Json$Decode.string),
+   A2($Json$Decode._op[":="],"operations",$Json$Decode.list($Json$Decode.string)),
+   A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
+   A2($Json$Decode._op[":="],"username",$Json$Decode.string));
+   var getSession = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,session,"/sessions"))));};
+   return _elm.Users.Session.values = {_op: _op,Session: Session,emptySession: emptySession,session: session,getSession: getSession,logout: logout};
+};
 Elm.Admin = Elm.Admin || {};
 Elm.Admin.Core = Elm.Admin.Core || {};
 Elm.Admin.Core.make = function (_elm) {
@@ -15291,8 +15324,10 @@ Elm.Admin.Core.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Users$List = Elm.Users.List.make(_elm);
+   $Users$List = Elm.Users.List.make(_elm),
+   $Users$Session = Elm.Users.Session.make(_elm);
    var _op = {};
+   var ownersList = function (_p0) {    var _p1 = _p0;var _p2 = _p1.owners;return $List.isEmpty(_p2) ? _U.list([_p1.owner]) : _p2;};
    var setEnvironments = F2(function (model,es) {
       var environment = A2($Maybe.withDefault,"",$List.head($Dict.keys(es)));
       return $Common$Utils.none(_U.update(model,{environments: $Dict.keys(es),environment: environment,rawEnvironments: es}));
@@ -15303,29 +15338,37 @@ Elm.Admin.Core.make = function (_elm) {
       return $Common$Utils.none(_U.update(model,{owners: users,owner: user}));
    });
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,model) {
-      var _p0 = action;
-      switch (_p0.ctor)
-      {case "SetEnvironments": return A4($Common$Errors.successHandler,_p0._0,model,setEnvironments(model),NoOp);
-         case "SelectEnvironment": return $Common$Utils.none(_U.update(model,{environment: _p0._0}));
-         case "SetOwners": return A4($Common$Errors.successHandler,_p0._0,model,setOwners(model),NoOp);
-         case "SelectOwner": return $Common$Utils.none(_U.update(model,{owner: _p0._0}));
-         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
-   });
+   var LoadSession = function (a) {    return {ctor: "LoadSession",_0: a};};
    var SelectEnvironment = function (a) {    return {ctor: "SelectEnvironment",_0: a};};
    var SelectOwner = function (a) {    return {ctor: "SelectOwner",_0: a};};
-   var view = F2(function (address,_p1) {
-      var _p2 = _p1;
-      return _U.list([A2($Common$Components.group$,"Environment",A4($Common$Components.selector,address,SelectEnvironment,_p2.environments,_p2.environment))
-                     ,A2($Common$Components.group$,"Owner",A4($Common$Components.selector,address,SelectOwner,_p2.owners,_p2.owner))]);
+   var view = F2(function (address,_p3) {
+      var _p4 = _p3;
+      return _U.list([A2($Common$Components.group$,"Environment",A4($Common$Components.selector,address,SelectEnvironment,_p4.environments,_p4.environment))
+                     ,A2($Common$Components.group$,"Owner",A4($Common$Components.selector,address,SelectOwner,ownersList(_p4),_p4.owner))]);
    });
    var SetOwners = function (a) {    return {ctor: "SetOwners",_0: a};};
+   var setSession = F2(function (model,_p5) {
+      var _p6 = _p5;
+      return A2($List.member,"celestial.roles/user",_p6.roles) ? $Common$Utils.none(_U.update(model,{owner: _p6.username})) : {ctor: "_Tuple2"
+                                                                                                                              ,_0: model
+                                                                                                                              ,_1: $Users$List.getUsers(SetOwners)};
+   });
+   var update = F2(function (action,model) {
+      var _p7 = action;
+      switch (_p7.ctor)
+      {case "SetEnvironments": return A4($Common$Errors.successHandler,_p7._0,model,setEnvironments(model),NoOp);
+         case "SelectEnvironment": return $Common$Utils.none(_U.update(model,{environment: _p7._0}));
+         case "SetOwners": return A4($Common$Errors.successHandler,_p7._0,model,setOwners(model),NoOp);
+         case "SelectOwner": return $Common$Utils.none(_U.update(model,{owner: _p7._0}));
+         case "LoadSession": return A4($Common$Errors.successHandler,_p7._0,model,setSession(model),NoOp);
+         default: return $Common$Utils.none(model);}
+   });
    var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
    var Model = F5(function (a,b,c,d,e) {    return {environments: a,environment: b,rawEnvironments: c,owners: d,owner: e};});
    var partialAdmin = F2(function (owner,environment) {    return A5(Model,_U.list([]),environment,$Dict.empty,_U.list([]),owner);});
    var init = {ctor: "_Tuple2"
               ,_0: A5(Model,_U.list([]),"",$Dict.empty,_U.list([]),"")
-              ,_1: $Effects.batch(_U.list([$Users$List.getUsers(SetOwners),$Environments$List.getEnvironments(SetEnvironments)]))};
+              ,_1: $Effects.batch(_U.list([$Environments$List.getEnvironments(SetEnvironments),$Users$Session.getSession(LoadSession)]))};
    return _elm.Admin.Core.values = {_op: _op
                                    ,Model: Model
                                    ,partialAdmin: partialAdmin
@@ -15334,10 +15377,13 @@ Elm.Admin.Core.make = function (_elm) {
                                    ,SetOwners: SetOwners
                                    ,SelectOwner: SelectOwner
                                    ,SelectEnvironment: SelectEnvironment
+                                   ,LoadSession: LoadSession
                                    ,NoOp: NoOp
                                    ,setOwners: setOwners
                                    ,setEnvironments: setEnvironments
+                                   ,setSession: setSession
                                    ,update: update
+                                   ,ownersList: ownersList
                                    ,view: view};
 };
 Elm.Systems = Elm.Systems || {};
@@ -18733,6 +18779,7 @@ Elm.Systems.Add.General.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Common$Components = Elm.Common.Components.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
@@ -18752,60 +18799,66 @@ Elm.Systems.Add.General.make = function (_elm) {
       var firstType = A2($Maybe.withDefault,"",$List.head(typesList));
       return {ctor: "_Tuple2",_0: _U.update(model,{types: typesList,type$: firstType}),_1: $Effects.none};
    });
-   var withoutEffects = function (_p0) {    var _p1 = _p0;return _p1._0;};
-   var updateHypervisors = F3(function (model,es,environment) {
+   var setEnvironments = F2(function (model,es) {
+      var environments = $Dict.keys(es);
+      var environment = A2($Maybe.withDefault,"",$List.head($Dict.keys(es)));
       var hypervisors = $Dict.keys(A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,environment,es)));
       var hypervisor = A2($Maybe.withDefault,"",$List.head(hypervisors));
-      return _U.update(model,{hypervisors: hypervisors,hypervisor: hypervisor});
+      return $Common$Utils.none(_U.update(model,{hypervisors: hypervisors,hypervisor: hypervisor}));
    });
    var SelectHypervisor = function (a) {    return {ctor: "SelectHypervisor",_0: a};};
    var SelectType = function (a) {    return {ctor: "SelectType",_0: a};};
    var SetTypes = function (a) {    return {ctor: "SetTypes",_0: a};};
    var AdminAction = function (a) {    return {ctor: "AdminAction",_0: a};};
-   var general = F2(function (address,_p2) {
-      var _p3 = _p2;
+   var general = F2(function (address,_p0) {
+      var _p1 = _p0;
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
       A2($List.append,
-      A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p3.admin),
-      _U.list([A2($Common$Components.group$,"Type",A4($Common$Components.selector,address,SelectType,_p3.types,_p3.type$))
-              ,A2($Common$Components.group$,"Hypervisor",A4($Common$Components.selector,address,SelectHypervisor,_p3.hypervisors,_p3.hypervisor))])));
+      A2($Admin$Core.view,A2($Signal.forwardTo,address,AdminAction),_p1.admin),
+      _U.list([A2($Common$Components.group$,"Type",A4($Common$Components.selector,address,SelectType,_p1.types,_p1.type$))
+              ,A2($Common$Components.group$,"Hypervisor",A4($Common$Components.selector,address,SelectHypervisor,_p1.hypervisors,_p1.hypervisor))])));
    });
    var view = F2(function (address,model) {
       return $Common$Components.fixedPanel(A2($Html.form,_U.list([]),$Common$Components.asList(A2(general,address,model))));
    });
+   var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
    var NoOp = {ctor: "NoOp"};
-   var update = F2(function (action,_p4) {
-      var _p5 = _p4;
-      var _p8 = _p5;
-      var _p6 = action;
-      switch (_p6.ctor)
-      {case "AdminAction": var _p7 = A2($Admin$Core.update,_p6._0,_p5.admin);
-           var newAdmin = _p7._0;
-           return A3(updateHypervisors,_U.update(_p8,{admin: newAdmin}),newAdmin.rawEnvironments,newAdmin.environment);
-         case "SelectHypervisor": return _U.update(_p8,{hypervisor: _p6._0});
-         case "SetTypes": return withoutEffects(A4($Common$Errors.successHandler,_p6._0,_p8,setTypes(_p8),NoOp));
-         case "SelectType": return _U.update(_p8,{type$: _p6._0});
-         default: return _p8;}
+   var update = F2(function (action,_p2) {
+      var _p3 = _p2;
+      var _p6 = _p3;
+      var _p4 = action;
+      switch (_p4.ctor)
+      {case "SetEnvironments": return A4($Common$Errors.successHandler,_p4._0,_p6,setEnvironments(_p6),NoOp);
+         case "AdminAction": var _p5 = A2($Admin$Core.update,_p4._0,_p3.admin);
+           var newAdmin = _p5._0;
+           var effects = _p5._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p6,{admin: newAdmin}),_1: A2($Effects.map,AdminAction,effects)};
+         case "SelectHypervisor": return $Common$Utils.none(_U.update(_p6,{hypervisor: _p4._0}));
+         case "SetTypes": return A4($Common$Errors.successHandler,_p4._0,_p6,setTypes(_p6),NoOp);
+         case "SelectType": return $Common$Utils.none(_U.update(_p6,{type$: _p4._0}));
+         default: return $Common$Utils.none(_p6);}
    });
    var Model = F5(function (a,b,c,d,e) {    return {type$: a,types: b,hypervisor: c,hypervisors: d,admin: e};});
    var init = function () {
-      var _p9 = $Admin$Core.init;
-      var admin = _p9._0;
-      var effects = _p9._1;
-      var loadEffects = _U.list([$Types$List.getTypes(SetTypes),A2($Effects.map,AdminAction,effects)]);
-      return {ctor: "_Tuple2",_0: A5(Model,"",_U.list([]),"",_U.list([]),admin),_1: $Effects.batch(loadEffects)};
+      var _p7 = $Admin$Core.init;
+      var admin = _p7._0;
+      var adminEffects = _p7._1;
+      var effects = $Effects.batch(_U.list([$Types$List.getTypes(SetTypes)
+                                           ,$Environments$List.getEnvironments(SetEnvironments)
+                                           ,A2($Effects.map,AdminAction,adminEffects)]));
+      return {ctor: "_Tuple2",_0: A5(Model,"",_U.list([]),"",_U.list([]),admin),_1: effects};
    }();
    return _elm.Systems.Add.General.values = {_op: _op
                                             ,Model: Model
                                             ,NoOp: NoOp
+                                            ,SetEnvironments: SetEnvironments
                                             ,AdminAction: AdminAction
                                             ,SetTypes: SetTypes
                                             ,SelectType: SelectType
                                             ,SelectHypervisor: SelectHypervisor
                                             ,init: init
-                                            ,updateHypervisors: updateHypervisors
-                                            ,withoutEffects: withoutEffects
+                                            ,setEnvironments: setEnvironments
                                             ,setTypes: setTypes
                                             ,update: update
                                             ,general: general
@@ -19305,68 +19358,70 @@ Elm.Systems.Add.make = function (_elm) {
    });
    var update = F2(function (action,_p26) {
       var _p27 = _p26;
-      var _p40 = _p27.stage;
-      var _p39 = _p27.physicalModel;
-      var _p38 = _p27.openstackModel;
-      var _p37 = _p27;
-      var _p36 = _p27.kvmModel;
-      var _p35 = _p27.general;
-      var _p34 = _p27.gceModel;
-      var _p33 = _p27.digitalModel;
-      var _p32 = _p27.awsModel;
+      var _p41 = _p27.stage;
+      var _p40 = _p27.physicalModel;
+      var _p39 = _p27.openstackModel;
+      var _p38 = _p27;
+      var _p37 = _p27.kvmModel;
+      var _p36 = _p27.general;
+      var _p35 = _p27.gceModel;
+      var _p34 = _p27.digitalModel;
+      var _p33 = _p27.awsModel;
       var _p28 = action;
       switch (_p28.ctor)
-      {case "Next": var _p29 = _p35;
+      {case "Next": var _p29 = _p36;
            var admin = _p29.admin;
            var current = A2($Maybe.withDefault,$Dict.empty,A2($Dict.get,admin.environment,admin.rawEnvironments));
-           var _p30 = _p35.hypervisor;
+           var _p30 = _p36.hypervisor;
            switch (_p30)
-           {case "aws": var newAws = A2($Systems$Add$AWS.next,_p32,current);
-                return $Common$Utils.none(_U.update(_p37,{stage: AWS,awsModel: newAws,hasNext: $Common$Wizard.hasNext(newAws)}));
-              case "gce": var newGce = A2($Systems$Add$GCE.next,_p34,current);
-                return $Common$Utils.none(_U.update(_p37,{stage: GCE,gceModel: newGce,hasNext: $Common$Wizard.hasNext(newGce)}));
-              case "digital-ocean": var newDigital = A2($Systems$Add$Digital.next,_p33,current);
-                return $Common$Utils.none(_U.update(_p37,{stage: Digital,digitalModel: newDigital,hasNext: $Common$Wizard.hasNext(newDigital)}));
-              case "physical": var newPhysical = A2($Systems$Add$Physical.next,_p39,current);
-                return $Common$Utils.none(_U.update(_p37,{stage: Physical,physicalModel: newPhysical,hasNext: $Common$Wizard.hasNext(newPhysical)}));
-              case "openstack": var newOpenstack = A2($Systems$Add$Openstack.next,_p38,current);
-                return $Common$Utils.none(_U.update(_p37,{stage: Openstack,openstackModel: newOpenstack,hasNext: $Common$Wizard.hasNext(newOpenstack)}));
-              case "kvm": var newKvm = A2($Systems$Add$KVM.next,_p36,current);
-                return $Common$Utils.none(_U.update(_p37,{stage: KVM,kvmModel: newKvm,hasNext: $Common$Wizard.hasNext(newKvm)}));
-              default: return {ctor: "_Tuple2",_0: _p37,_1: $Effects.none};}
-         case "Back": return $Common$Utils.none(A2(getBack,_p37,_p35.hypervisor));
-         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p28._0,_p32);
-           return $Common$Utils.none(_U.update(_p37,{awsModel: newAws}));
-         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p28._0,_p34);
-           return $Common$Utils.none(_U.update(_p37,{gceModel: newGce}));
-         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p28._0,_p33);
-           return $Common$Utils.none(_U.update(_p37,{digitalModel: newDigital}));
-         case "PhysicalView": var newPhysical = A2($Systems$Add$Physical.update,_p28._0,_p39);
-           return $Common$Utils.none(_U.update(_p37,{physicalModel: newPhysical}));
-         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p28._0,_p38);
-           return $Common$Utils.none(_U.update(_p37,{openstackModel: newOpenstack}));
-         case "KVMView": var newKvm = A2($Systems$Add$KVM.update,_p28._0,_p36);
-           return $Common$Utils.none(_U.update(_p37,{kvmModel: newKvm}));
-         case "GeneralView": var newGeneral = A2($Systems$Add$General.update,_p28._0,_p35);
-           return $Common$Utils.none(_U.update(_p37,{general: newGeneral}));
-         case "Stage": return {ctor: "_Tuple2"
-                              ,_0: _p37
-                              ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Stage),intoSystem(_p37),$Basics.toString(_p40))};
-         case "SaveSystem": return {ctor: "_Tuple2"
-                                   ,_0: _p37
-                                   ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(NoOp),intoSystem(_p37),$Basics.toString(_p40))};
-         case "Create": return {ctor: "_Tuple2"
-                               ,_0: _p37
-                               ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Create),intoSystem(_p37),$Basics.toString(_p40))};
-         case "SaveTemplate": return $Common$Utils.none(_p37);
-         case "Saved": var _p31 = A4($Common$Errors.errorsSuccessHandler,_p28._1,_p37,A2(setSaved,_p28._0,_p37),NoOp);
-           var newModel = _p31._0;
-           var saveErrors = _p31._0.saveErrors;
+           {case "aws": var newAws = A2($Systems$Add$AWS.next,_p33,current);
+                return $Common$Utils.none(_U.update(_p38,{stage: AWS,awsModel: newAws,hasNext: $Common$Wizard.hasNext(newAws)}));
+              case "gce": var newGce = A2($Systems$Add$GCE.next,_p35,current);
+                return $Common$Utils.none(_U.update(_p38,{stage: GCE,gceModel: newGce,hasNext: $Common$Wizard.hasNext(newGce)}));
+              case "digital-ocean": var newDigital = A2($Systems$Add$Digital.next,_p34,current);
+                return $Common$Utils.none(_U.update(_p38,{stage: Digital,digitalModel: newDigital,hasNext: $Common$Wizard.hasNext(newDigital)}));
+              case "physical": var newPhysical = A2($Systems$Add$Physical.next,_p40,current);
+                return $Common$Utils.none(_U.update(_p38,{stage: Physical,physicalModel: newPhysical,hasNext: $Common$Wizard.hasNext(newPhysical)}));
+              case "openstack": var newOpenstack = A2($Systems$Add$Openstack.next,_p39,current);
+                return $Common$Utils.none(_U.update(_p38,{stage: Openstack,openstackModel: newOpenstack,hasNext: $Common$Wizard.hasNext(newOpenstack)}));
+              case "kvm": var newKvm = A2($Systems$Add$KVM.next,_p37,current);
+                return $Common$Utils.none(_U.update(_p38,{stage: KVM,kvmModel: newKvm,hasNext: $Common$Wizard.hasNext(newKvm)}));
+              default: return {ctor: "_Tuple2",_0: _p38,_1: $Effects.none};}
+         case "Back": return $Common$Utils.none(A2(getBack,_p38,_p36.hypervisor));
+         case "AWSView": var newAws = A2($Systems$Add$AWS.update,_p28._0,_p33);
+           return $Common$Utils.none(_U.update(_p38,{awsModel: newAws}));
+         case "GCEView": var newGce = A2($Systems$Add$GCE.update,_p28._0,_p35);
+           return $Common$Utils.none(_U.update(_p38,{gceModel: newGce}));
+         case "DigitalView": var newDigital = A2($Systems$Add$Digital.update,_p28._0,_p34);
+           return $Common$Utils.none(_U.update(_p38,{digitalModel: newDigital}));
+         case "PhysicalView": var newPhysical = A2($Systems$Add$Physical.update,_p28._0,_p40);
+           return $Common$Utils.none(_U.update(_p38,{physicalModel: newPhysical}));
+         case "OpenstackView": var newOpenstack = A2($Systems$Add$Openstack.update,_p28._0,_p39);
+           return $Common$Utils.none(_U.update(_p38,{openstackModel: newOpenstack}));
+         case "KVMView": var newKvm = A2($Systems$Add$KVM.update,_p28._0,_p37);
+           return $Common$Utils.none(_U.update(_p38,{kvmModel: newKvm}));
+         case "GeneralView": var _p31 = A2($Systems$Add$General.update,_p28._0,_p36);
+           var newGeneral = _p31._0;
            var effects = _p31._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p38,{general: newGeneral}),_1: A2($Effects.map,GeneralView,effects)};
+         case "Stage": return {ctor: "_Tuple2"
+                              ,_0: _p38
+                              ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Stage),intoSystem(_p38),$Basics.toString(_p41))};
+         case "SaveSystem": return {ctor: "_Tuple2"
+                                   ,_0: _p38
+                                   ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(NoOp),intoSystem(_p38),$Basics.toString(_p41))};
+         case "Create": return {ctor: "_Tuple2"
+                               ,_0: _p38
+                               ,_1: A3($Systems$Add$Persistency.persistModel,saveSystem(Create),intoSystem(_p38),$Basics.toString(_p41))};
+         case "SaveTemplate": return $Common$Utils.none(_p38);
+         case "Saved": var _p32 = A4($Common$Errors.errorsSuccessHandler,_p28._1,_p38,A2(setSaved,_p28._0,_p38),NoOp);
+           var newModel = _p32._0;
+           var saveErrors = _p32._0.saveErrors;
+           var effects = _p32._1;
            return $Common$Errors.hasErrors(saveErrors) ? {ctor: "_Tuple2",_0: _U.update(newModel,{stage: Error}),_1: effects} : {ctor: "_Tuple2"
-                                                                                                                                ,_0: _p37
+                                                                                                                                ,_0: _p38
                                                                                                                                 ,_1: effects};
-         default: return {ctor: "_Tuple2",_0: _p37,_1: $Effects.none};}
+         default: return {ctor: "_Tuple2",_0: _p38,_1: $Effects.none};}
    });
    return _elm.Systems.Add.values = {_op: _op
                                     ,General: General
@@ -24285,7 +24340,8 @@ Elm.Jobs.Stats.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm),
-   $Time = Elm.Time.make(_elm);
+   $Time = Elm.Time.make(_elm),
+   $Users$Session = Elm.Users.Session.make(_elm);
    var _op = {};
    var rgbString = function (color) {
       var _p0 = $Color.toRgb(color);
@@ -24331,36 +24387,41 @@ Elm.Jobs.Stats.make = function (_elm) {
       $Bootstrap$Html.row_,
       A2($Common$Utils.partition,2,A2($List.map,function (_p9) {    var _p10 = _p9;return A2(chart,_p10._1,_p10._0);},_p8.charts)));
    });
+   var setEnabled = F2(function (model,_p11) {
+      var _p12 = _p11;
+      return A2($List.member,"celestial.roles/user",_p12.roles) ? $Common$Utils.none(_U.update(model,{enabled: false})) : $Common$Utils.none(_U.update(model,
+      {enabled: true}));
+   });
    var meanMaxMin = function (polls) {
-      var reloadTimes = A2($List.map,function (_p11) {    var _p12 = _p11;return {ctor: "_Tuple2",_0: _p12._0,_1: _p12._1.reloadTimer};},polls);
-      var provisionTimes = A2($List.map,function (_p13) {    var _p14 = _p13;return {ctor: "_Tuple2",_0: _p14._0,_1: _p14._1.provisionTimer};},polls);
-      var stopTimes = A2($List.map,function (_p15) {    var _p16 = _p15;return {ctor: "_Tuple2",_0: _p16._0,_1: _p16._1.stopTimer};},polls);
-      var startTimes = A2($List.map,function (_p17) {    var _p18 = _p17;return {ctor: "_Tuple2",_0: _p18._0,_1: _p18._1.startTimer};},polls);
+      var reloadTimes = A2($List.map,function (_p13) {    var _p14 = _p13;return {ctor: "_Tuple2",_0: _p14._0,_1: _p14._1.reloadTimer};},polls);
+      var provisionTimes = A2($List.map,function (_p15) {    var _p16 = _p15;return {ctor: "_Tuple2",_0: _p16._0,_1: _p16._1.provisionTimer};},polls);
+      var stopTimes = A2($List.map,function (_p17) {    var _p18 = _p17;return {ctor: "_Tuple2",_0: _p18._0,_1: _p18._1.stopTimer};},polls);
+      var startTimes = A2($List.map,function (_p19) {    var _p20 = _p19;return {ctor: "_Tuple2",_0: _p20._0,_1: _p20._1.startTimer};},polls);
       return {ctor: "_Tuple5"
-             ,_0: _U.list([function (_p19) {
-                             var _p20 = _p19;
-                             return _p20.mean;
-                          }
-                          ,function (_p21) {
+             ,_0: _U.list([function (_p21) {
                              var _p22 = _p21;
-                             return _p22.min;
+                             return _p22.mean;
                           }
                           ,function (_p23) {
                              var _p24 = _p23;
-                             return _p24.max;
+                             return _p24.min;
+                          }
+                          ,function (_p25) {
+                             var _p26 = _p25;
+                             return _p26.max;
                           }])
              ,_1: _U.list(["mean","min","max"])
              ,_2: _U.list([A3($Color.rgba,204,204,255),A3($Color.rgba,153,204,255),A3($Color.rgba,51,153,255)])
              ,_3: _U.list([startTimes,stopTimes,provisionTimes,reloadTimes])
              ,_4: _U.list(["Start","Stop","Provision","Reload"])};
    };
-   var pollingTrim = F2(function (_p25,metrics) {
-      var _p26 = _p25;
-      var _p28 = _p26.polls;
-      var _p27 = _p26.lastPoll;
-      return _U.cmp($List.length(_p28),10) < 0 ? A2($List.append,_p28,_U.list([{ctor: "_Tuple2",_0: _p27,_1: metrics}])) : A2($List.append,
-      A2($Maybe.withDefault,_U.list([]),$List.tail(_p28)),
-      _U.list([{ctor: "_Tuple2",_0: _p27,_1: metrics}]));
+   var pollingTrim = F2(function (_p27,metrics) {
+      var _p28 = _p27;
+      var _p30 = _p28.polls;
+      var _p29 = _p28.lastPoll;
+      return _U.cmp($List.length(_p30),10) < 0 ? A2($List.append,_p30,_U.list([{ctor: "_Tuple2",_0: _p29,_1: metrics}])) : A2($List.append,
+      A2($Maybe.withDefault,_U.list([]),$List.tail(_p30)),
+      _U.list([{ctor: "_Tuple2",_0: _p29,_1: metrics}]));
    });
    var timerConfig = F4(function (xs,ysList,titles,styles) {
       return {ctor: "_Tuple2"
@@ -24374,33 +24435,35 @@ Elm.Jobs.Stats.make = function (_elm) {
    var timerChart = F4(function (timers,selectors,titles,styles) {
       var ysList = A2($List.map,
       function (selector) {
-         return A2($List.map,function (_p29) {    var _p30 = _p29;return selector(_p30._1) / $Time.second;},timers);
+         return A2($List.map,function (_p31) {    var _p32 = _p31;return selector(_p32._1) / $Time.second;},timers);
       },
       selectors);
-      var xs = A2($List.map,function (_p31) {    var _p32 = _p31;return A2($Date$Format.format,"%H:%M:%S",$Date.fromTime(_p32._0));},timers);
+      var xs = A2($List.map,function (_p33) {    var _p34 = _p33;return A2($Date$Format.format,"%H:%M:%S",$Date.fromTime(_p34._0));},timers);
       return A4(timerConfig,xs,ysList,titles,styles);
    });
-   var setMetrics = F2(function (_p33,metrics) {
-      var _p34 = _p33;
-      var _p36 = _p34;
-      var _p35 = meanMaxMin(_p34.polls);
-      var selectors = _p35._0;
-      var titles = _p35._1;
-      var styles = _p35._2;
-      var samples = _p35._3;
-      var headers = _p35._4;
+   var setMetrics = F2(function (_p35,metrics) {
+      var _p36 = _p35;
+      var _p38 = _p36;
+      var _p37 = meanMaxMin(_p36.polls);
+      var selectors = _p37._0;
+      var titles = _p37._1;
+      var styles = _p37._2;
+      var samples = _p37._3;
+      var headers = _p37._4;
       var newCharts = A3($List.map2,
       F2(function (sample,header) {    return {ctor: "_Tuple2",_0: header,_1: A4(timerChart,sample,selectors,titles,styles)};}),
       samples,
       headers);
-      var newPolls = A2(pollingTrim,_p36,metrics);
-      return {ctor: "_Tuple2",_0: _U.update(_p36,{polls: newPolls,charts: newCharts}),_1: $Effects.none};
+      var newPolls = A2(pollingTrim,_p38,metrics);
+      return {ctor: "_Tuple2",_0: _U.update(_p38,{polls: newPolls,charts: newCharts}),_1: $Effects.none};
    });
    var emptyTimer = {min: 0,max: 0,mean: 0};
    var NoOp = {ctor: "NoOp"};
+   var LoadSession = function (a) {    return {ctor: "LoadSession",_0: a};};
    var Load = function (a) {    return {ctor: "Load",_0: a};};
    var PollMetrics = function (a) {    return {ctor: "PollMetrics",_0: a};};
-   var Model = F4(function (a,b,c,d) {    return {polls: a,charts: b,lastPoll: c,interval: d};});
+   var Model = F5(function (a,b,c,d,e) {    return {polls: a,charts: b,lastPoll: c,interval: d,enabled: e};});
+   var init = {ctor: "_Tuple2",_0: A5(Model,_U.list([]),_U.list([]),$Now.loadTime,15,false),_1: $Users$Session.getSession(LoadSession)};
    var Metrics = F4(function (a,b,c,d) {    return {startTimer: a,stopTimer: b,provisionTimer: c,reloadTimer: d};});
    var Timer = F3(function (a,b,c) {    return {max: a,min: b,mean: c};});
    var timer = A4($Json$Decode.object3,
@@ -24415,15 +24478,15 @@ Elm.Jobs.Stats.make = function (_elm) {
    A2($Json$Decode.at,_U.list(["default.default.provision-time"]),timer),
    A2($Json$Decode.at,_U.list(["default.default.reload-time"]),timer));
    var getMetrics = $Effects.task(A2($Task.map,Load,$Task.toResult(A2($Common$Http.getJson,metricsDecoder,"/metrics"))));
-   var init = {ctor: "_Tuple2",_0: A4(Model,_U.list([]),_U.list([]),$Now.loadTime,15),_1: getMetrics};
-   var update = F2(function (action,_p37) {
-      var _p38 = _p37;
-      var _p40 = _p38;
-      var _p39 = action;
-      switch (_p39.ctor)
-      {case "PollMetrics": return {ctor: "_Tuple2",_0: _U.update(_p40,{lastPoll: _p39._0}),_1: getMetrics};
-         case "Load": return A4($Common$Errors.successHandler,_p39._0,_p40,setMetrics(_p40),NoOp);
-         default: return {ctor: "_Tuple2",_0: _p40,_1: $Effects.none};}
+   var update = F2(function (action,_p39) {
+      var _p40 = _p39;
+      var _p42 = _p40;
+      var _p41 = action;
+      switch (_p41.ctor)
+      {case "PollMetrics": return _p40.enabled ? {ctor: "_Tuple2",_0: _U.update(_p42,{lastPoll: _p41._0}),_1: getMetrics} : $Common$Utils.none(_p42);
+         case "Load": return A4($Common$Errors.successHandler,_p41._0,_p42,setMetrics(_p42),NoOp);
+         case "LoadSession": return A4($Common$Errors.successHandler,_p41._0,_p42,setEnabled(_p42),NoOp);
+         default: return {ctor: "_Tuple2",_0: _p42,_1: $Effects.none};}
    });
    return _elm.Jobs.Stats.values = {_op: _op
                                    ,Timer: Timer
@@ -24431,6 +24494,7 @@ Elm.Jobs.Stats.make = function (_elm) {
                                    ,Model: Model
                                    ,PollMetrics: PollMetrics
                                    ,Load: Load
+                                   ,LoadSession: LoadSession
                                    ,NoOp: NoOp
                                    ,emptyTimer: emptyTimer
                                    ,init: init
@@ -24439,6 +24503,7 @@ Elm.Jobs.Stats.make = function (_elm) {
                                    ,pollingTrim: pollingTrim
                                    ,meanMaxMin: meanMaxMin
                                    ,setMetrics: setMetrics
+                                   ,setEnabled: setEnabled
                                    ,update: update
                                    ,item: item
                                    ,legend: legend
@@ -26257,39 +26322,6 @@ Elm.Templates.Core.make = function (_elm) {
                                        ,update: update
                                        ,add: add
                                        ,view: view};
-};
-Elm.Users = Elm.Users || {};
-Elm.Users.Session = Elm.Users.Session || {};
-Elm.Users.Session.make = function (_elm) {
-   "use strict";
-   _elm.Users = _elm.Users || {};
-   _elm.Users.Session = _elm.Users.Session || {};
-   if (_elm.Users.Session.values) return _elm.Users.Session.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Common$Http = Elm.Common.Http.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Http = Elm.Http.make(_elm),
-   $Json$Decode = Elm.Json.Decode.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var logout = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult($Http.getString("/logout"))));};
-   var Session = F5(function (a,b,c,d,e) {    return {envs: a,identity: b,operations: c,roles: d,username: e};});
-   var emptySession = A5(Session,_U.list([]),"",_U.list([]),_U.list([]),"");
-   var session = A6($Json$Decode.object5,
-   Session,
-   A2($Json$Decode._op[":="],"envs",$Json$Decode.list($Json$Decode.string)),
-   A2($Json$Decode._op[":="],"identity",$Json$Decode.string),
-   A2($Json$Decode._op[":="],"operations",$Json$Decode.list($Json$Decode.string)),
-   A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
-   A2($Json$Decode._op[":="],"username",$Json$Decode.string));
-   var getSession = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,session,"/sessions"))));};
-   return _elm.Users.Session.values = {_op: _op,Session: Session,emptySession: emptySession,session: session,getSession: getSession,logout: logout};
 };
 Elm.Nav = Elm.Nav || {};
 Elm.Nav.Header = Elm.Nav.Header || {};
