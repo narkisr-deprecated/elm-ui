@@ -8,6 +8,7 @@ import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none)
 import Users.List exposing (User, getUsers)
 import Common.Components exposing (..)
+import Users.Session exposing (getSession, Session)
 import Dict
 
 
@@ -26,7 +27,7 @@ partialAdmin owner environment =
 
 init : (Model , Effects Action)
 init =
-  (Model [] "" Dict.empty [] "", batch [getUsers SetOwners,  getEnvironments SetEnvironments])
+  (Model [] "" Dict.empty [] "", Effects.batch [ getEnvironments SetEnvironments, getSession LoadSession])
 
 -- Update 
 
@@ -35,6 +36,7 @@ type Action =
     | SetOwners (Result Http.Error (List User))
     | SelectOwner String
     | SelectEnvironment String
+    | LoadSession (Result Http.Error Session)
     | NoOp
 
 setOwners : Model -> List User -> (Model, Effects Action)
@@ -43,7 +45,7 @@ setOwners model owners =
     users = List.map .username owners
     user = Maybe.withDefault "" (List.head users)
   in
-   none {model | owners = users, owner = user}
+    none {model | owners = users, owner = user}
 
 setEnvironments : Model -> Environments -> (Model, Effects Action)
 setEnvironments model es =
@@ -52,28 +54,43 @@ setEnvironments model es =
   in 
     none {model | environments = Dict.keys es, environment = environment, rawEnvironments = es}
 
+setSession model ({roles, username} as session) = 
+  if List.member "celestial.roles/user" roles then
+     none {model | owner = username } 
+  else 
+    (model, getUsers SetOwners)
+
 update : Action ->  Model-> (Model , Effects Action)
 update action model =
   case action of 
    SetEnvironments result ->
-       (successHandler result model (setEnvironments model) NoOp)
+     (successHandler result model (setEnvironments model) NoOp)
 
    SelectEnvironment environment -> 
-       none {model | environment = environment}
+      none {model | environment = environment}
 
    SetOwners result ->
-      (successHandler result model (setOwners model) NoOp)
+     (successHandler result model (setOwners model) NoOp)
 
    SelectOwner owner -> 
-      none {model | owner = owner}
+     none {model | owner = owner}
+
+   LoadSession result -> 
+      (successHandler result model (setSession model) NoOp)
 
    NoOp -> 
-      (model, Effects.none)
+      none model
 
+
+ownersList {owner, owners} = 
+  if List.isEmpty owners then 
+    [owner]
+  else 
+    owners
 
 view : Signal.Address Action -> Model -> List Html
-view address ({environments, environment, owner, owners} as model) =
+view address ({environments, environment, owner} as model) =
   [ 
     group' "Environment" (selector address SelectEnvironment environments environment)
-  , group' "Owner" (selector address SelectOwner owners owner)
+  , group' "Owner" (selector address SelectOwner (ownersList model) owner)
   ]
