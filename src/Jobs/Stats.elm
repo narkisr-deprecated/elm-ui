@@ -1,5 +1,8 @@
 module Jobs.Stats where
 
+import Users.Session exposing (getSession, Session)
+import Common.Utils exposing (none)
+
 -- model
 import Time exposing (Time,second)
 import Maybe exposing (withDefault)
@@ -30,20 +33,33 @@ import Common.Redirect exposing (redirect)
 import Common.Utils exposing (partition)
 
 type alias Timer = 
-  { max : Float, min : Float, mean : Float }
+  {
+    max : Float
+  , min : Float
+  , mean : Float 
+  }
 
 type alias Metrics = 
-  { startTimer : Timer
+  {
+    startTimer : Timer
   , stopTimer : Timer
   , provisionTimer : Timer
-  , reloadTimer : Timer}
+  , reloadTimer : Timer
+  }
 
 type alias Model = 
-  {polls : List (Time, Metrics), charts : List (String,Config) , lastPoll : Time, interval : Float}
+  {
+    polls : List (Time, Metrics)
+  , charts : List (String,Config) 
+  , lastPoll : Time
+  , interval : Float
+  , enabled : Bool
+  }
 
 type Action = 
   PollMetrics Time
     | Load (Result Http.Error Metrics)
+    | LoadSession (Result Http.Error Session)
     | NoOp
 
 emptyTimer : Timer
@@ -52,7 +68,7 @@ emptyTimer =
 
 init : (Model , Effects Action)
 init =
-   (Model [] [] Now.loadTime 15, getMetrics)
+   (Model [] [] Now.loadTime 15 False, getSession LoadSession)
 
 -- Update
 
@@ -99,15 +115,31 @@ setMetrics ({polls} as model) metrics =
    in 
     ({model | polls = newPolls, charts = newCharts} , Effects.none)
 
+setEnabled model ({roles, username} as session) = 
+  if List.member "celestial.roles/user" roles then
+     none {model | enabled = False } 
+  else 
+     none {model | enabled = True } 
+
+
 update : Action ->  Model-> (Model , Effects Action)
-update action ({polls, lastPoll} as model) =
+update action ({polls, lastPoll, enabled} as model) =
   case action of
     PollMetrics time ->
-      ({model | lastPoll = time}, getMetrics)
+      if enabled then 
+        ({model | lastPoll = time}, getMetrics)
+      else
+        none model
+
     Load result ->
        (successHandler result model (setMetrics model) NoOp)
+
+    LoadSession result -> 
+      (successHandler result model (setEnabled model) NoOp)
+
     _ -> 
       (model, Effects.none)
+
 -- View
 
 item : (String,String) -> Html
