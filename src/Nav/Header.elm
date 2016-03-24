@@ -27,7 +27,7 @@ type Action =
    SignOut
     | SetSession Session
     | Redirect (Result Http.Error String)
-    | LoadAdmin
+    | LoadUsers
     | LoadSwagger
     | NoOp 
 
@@ -46,7 +46,7 @@ update action model =
     Redirect _ -> 
      (model, redirect NoOp)
 
-    LoadAdmin -> 
+    LoadUsers -> 
       none model
 
     LoadSwagger -> 
@@ -73,7 +73,7 @@ gearsButton address session =
     div [class "dropdown pull-right"] [
         i (dropdown [ class "fa fa-gears", style [("color", "black")]]) []
       , ul [ class "dropdown-menu" ] [
-          li [] [ a [href "#"] [text "Users"] ]
+          li [] [ a [href "#", onClick address LoadUsers] [text "Users" ] ]
         , li [] [ a [href "#"] [text "Quota"] ]
         , li [] [ a [href "#", onClick address LoadSwagger] [text "Swagger"] ]
         ] 

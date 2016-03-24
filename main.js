@@ -26392,6 +26392,7 @@ Elm.Nav.Header.make = function (_elm) {
    var setSession = F2(function (model,session) {    return $Common$Utils.none(_U.update(model,{session: session}));});
    var NoOp = {ctor: "NoOp"};
    var LoadSwagger = {ctor: "LoadSwagger"};
+   var LoadUsers = {ctor: "LoadUsers"};
    var gearsButton = F2(function (address,session) {
       return $Users$Session.isUser(session) ? A2($Html.i,
       _U.list([$Html$Attributes.$class("fa fa-gears")
@@ -26403,7 +26404,9 @@ Elm.Nav.Header.make = function (_elm) {
               _U.list([]))
               ,A2($Html.ul,
               _U.list([$Html$Attributes.$class("dropdown-menu")]),
-              _U.list([A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Users")]))]))
+              _U.list([A2($Html.li,
+                      _U.list([]),
+                      _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,LoadUsers)]),_U.list([$Html.text("Users")]))]))
                       ,A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Quota")]))]))
                       ,A2($Html.li,
                       _U.list([]),
@@ -26411,7 +26414,6 @@ Elm.Nav.Header.make = function (_elm) {
                       _U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,LoadSwagger)]),
                       _U.list([$Html.text("Swagger")]))]))]))]));
    });
-   var LoadAdmin = {ctor: "LoadAdmin"};
    var Redirect = function (a) {    return {ctor: "Redirect",_0: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
@@ -26419,7 +26421,7 @@ Elm.Nav.Header.make = function (_elm) {
       {case "SetSession": return $Common$Utils.none(_U.update(model,{session: _p0._0}));
          case "SignOut": return {ctor: "_Tuple2",_0: model,_1: $Users$Session.logout(Redirect)};
          case "Redirect": return {ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(NoOp)};
-         case "LoadAdmin": return $Common$Utils.none(model);
+         case "LoadUsers": return $Common$Utils.none(model);
          case "LoadSwagger": return {ctor: "_Tuple2",_0: model,_1: A2($Common$NewTab.newtab,NoOp,"swagger/index.html")};
          default: return $Common$Utils.none(model);}
    });
@@ -26493,7 +26495,7 @@ Elm.Nav.Header.make = function (_elm) {
                                    ,SignOut: SignOut
                                    ,SetSession: SetSession
                                    ,Redirect: Redirect
-                                   ,LoadAdmin: LoadAdmin
+                                   ,LoadUsers: LoadUsers
                                    ,LoadSwagger: LoadSwagger
                                    ,NoOp: NoOp
                                    ,setSession: setSession
