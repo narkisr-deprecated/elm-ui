@@ -26375,6 +26375,29 @@ Elm.Nav.Header.make = function (_elm) {
    $String = Elm.String.make(_elm),
    $Users$Session = Elm.Users.Session.make(_elm);
    var _op = {};
+   var dropdown = function (attrs) {
+      return A2($List.append,
+      _U.list([A2($Html$Attributes.attribute,"aria-expanded","false")
+              ,$Html$Attributes.$class("dropdown-toggle")
+              ,A2($Html$Attributes.attribute,"data-toggle","dropdown")
+              ,$Html$Attributes.href("#")]),
+      attrs);
+   };
+   var gearsButton = F2(function (address,session) {
+      return $Users$Session.isUser(session) ? A2($Html.i,
+      _U.list([$Html$Attributes.$class("fa fa-gears")
+              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "color",_1: "gray"},{ctor: "_Tuple2",_0: "pointer-events",_1: "none"}]))]),
+      _U.list([])) : A2($Html.div,
+      _U.list([$Html$Attributes.$class("dropdown pull-right")]),
+      _U.list([A2($Html.i,
+              dropdown(_U.list([$Html$Attributes.$class("fa fa-gears"),$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "color",_1: "black"}]))])),
+              _U.list([]))
+              ,A2($Html.ul,
+              _U.list([$Html$Attributes.$class("dropdown-menu")]),
+              _U.list([A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Users")]))]))
+                      ,A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Quota")]))]))
+                      ,A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Swagger")]))]))]))]));
+   });
    var navHeader = A2($Html.div,
    _U.list([$Html$Attributes.$class("navbar-header")]),
    _U.list([A2($Html.img,
@@ -26383,12 +26406,6 @@ Elm.Nav.Header.make = function (_elm) {
    var setSession = F2(function (model,session) {    return $Common$Utils.none(_U.update(model,{session: session}));});
    var NoOp = {ctor: "NoOp"};
    var LoadAdmin = {ctor: "LoadAdmin"};
-   var gearsButton = F2(function (address,session) {
-      return $Users$Session.isUser(session) ? A2($Html.i,
-      _U.list([$Html$Attributes.$class("fa fa-gears")
-              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "color",_1: "gray"},{ctor: "_Tuple2",_0: "pointer-events",_1: "none"}]))]),
-      _U.list([])) : A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-gears"),A2($Html$Events.onClick,address,LoadAdmin)]),_U.list([]));
-   });
    var Redirect = function (a) {    return {ctor: "Redirect",_0: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
@@ -26474,6 +26491,7 @@ Elm.Nav.Header.make = function (_elm) {
                                    ,setSession: setSession
                                    ,update: update
                                    ,navHeader: navHeader
+                                   ,dropdown: dropdown
                                    ,gearsButton: gearsButton
                                    ,topNav: topNav
                                    ,view: view};

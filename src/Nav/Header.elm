@@ -57,12 +57,22 @@ navHeader  =
    img [src "assets/img/cropped.png", alt "Celestial", width 110 , height 50] []
  ]
 
+dropdown attrs = 
+  List.append [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ] attrs
+
 gearsButton : Signal.Address Action  -> Session -> Html
 gearsButton address session =
   if isUser session then 
      i [ class "fa fa-gears", style [("color", "gray"), ("pointer-events", "none")]] [ ] 
   else
-     i [ class "fa fa-gears", onClick address LoadAdmin] [ ] 
+    div [class "dropdown pull-right"] [
+        i (dropdown [ class "fa fa-gears", style [("color", "black")]]) []
+      , ul [ class "dropdown-menu" ] [
+          li [] [ a [href "#"] [text "Users"] ]
+        , li [] [ a [href "#"] [text "Quota"] ]
+        , li [] [ a [href "#"] [text "Swagger"] ]
+        ] 
+      ]
 
 topNav : Signal.Address Action  -> Session -> Html
 topNav address ({username, envs} as session) =
@@ -73,10 +83,10 @@ topNav address ({username, envs} as session) =
             [ span [ class "hidden-xs" ]
                 [text  username]
             ]
-        , ul [ class "dropdown-menu" ]
-            [ li [ class "user-header" ]
-                [ p [] [ text ("Environments you can access: " ++ (String.join " " envs)) ]
-                ]
+        , ul [ class "dropdown-menu" ] [
+              li [ class "user-header" ] [
+                   p [] [ text ("Environments you can access: " ++ (String.join " " envs)) ]
+              ]
             , li [ class "user-body" ] [ ]
             , li [ class "user-footer" ] [
                 div [ class "pull-left" ] [
