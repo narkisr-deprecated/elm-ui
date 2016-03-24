@@ -41,4 +41,6 @@ logout action =
       |> Task.map action
       |> Effects.task
 
-
+isUser: Session -> Bool
+isUser {roles} =
+  List.member "celestial.roles/user" roles 

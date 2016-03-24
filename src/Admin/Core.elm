@@ -8,7 +8,7 @@ import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none)
 import Users.List exposing (User, getUsers)
 import Common.Components exposing (..)
-import Users.Session exposing (getSession, Session)
+import Users.Session exposing (isUser, getSession, Session)
 import Dict
 
 
@@ -54,8 +54,8 @@ setEnvironments model es =
   in 
     none {model | environments = Dict.keys es, environment = environment, rawEnvironments = es}
 
-setSession model ({roles, username} as session) = 
-  if List.member "celestial.roles/user" roles then
+setSession model ({username} as session) = 
+  if isUser session then
      none {model | owner = username } 
   else 
     (model, getUsers SetOwners)

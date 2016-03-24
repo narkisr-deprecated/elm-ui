@@ -3,10 +3,12 @@ module Nav.Side where
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
 import Html exposing (..)
+import Users.Session exposing (isUser)
 import Html.Attributes exposing (class , href, attribute)
+import Users.Session exposing (Session, emptySession)
 import Effects exposing (Effects)
 import Html.Events exposing (onClick)
-
+import Common.Utils exposing (none)
 
 type Active = 
   Systems 
@@ -27,22 +29,27 @@ type Section =
 type alias Model = 
   { active : Active 
   , section : Section 
+  , session : Session
   }
 
 init : Model 
 init =
-   { active = Systems, section = List }
+   Model Systems List emptySession
 
 -- Update
 
 type Action = 
   Goto Active Section
+   | SetSession Session
 
-update : Action ->  Model-> Model 
+update : Action ->  Model-> (Model , Effects Action)
 update action model =
    case action of
      Goto active section ->
-       { model | active = active , section = section }
+       none { model | active = active , section = section }
+
+     SetSession session -> 
+       none { model | session = session }
 
 -- View
 
@@ -67,20 +74,30 @@ drop address active actions icon =
       (List.map (\section -> sectionItem address active section) actions)
   ]
 
-menus : Signal.Address Action -> List Html
-menus address =
+adminMenus : Signal.Address Action -> List Html
+adminMenus address =
    [ drop address Systems [List, Add] "fa fa-server"
    , drop address Templates [List] "fa fa-clone"
    , drop address Types [List, Add] "fa fa-archive"
    , drop address Jobs [List, Stats] "fa fa-tasks"
-   -- , drop address Stacks [List, Add] "fa fa-object-group"
+   ]
+
+userMenus : Signal.Address Action -> List Html
+userMenus address =
+   [ drop address Systems [List, Add] "fa fa-server"
+   , drop address Templates [List] "fa fa-clone"
+   , drop address Jobs [List] "fa fa-tasks"
    ]
 
 view : Signal.Address Action -> Model -> List Html
-view address model =
+view address {session} =
  [aside [class "main-sidebar"] 
-   [section [class "sidebar"] 
-     [ul [class "sidebar-menu"]  (menus address)
+   [section [class "sidebar"] [
+       ul [class "sidebar-menu"]
+        (if isUser session then
+          (userMenus address)
+        else
+          (adminMenus address))
      ]
    ]
  ] 

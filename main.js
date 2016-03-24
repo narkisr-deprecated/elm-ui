@@ -15289,6 +15289,7 @@ Elm.Users.Session.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
+   var isUser = function (_p0) {    var _p1 = _p0;return A2($List.member,"celestial.roles/user",_p1.roles);};
    var logout = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult($Http.getString("/logout"))));};
    var Session = F5(function (a,b,c,d,e) {    return {envs: a,identity: b,operations: c,roles: d,username: e};});
    var emptySession = A5(Session,_U.list([]),"",_U.list([]),_U.list([]),"");
@@ -15300,7 +15301,13 @@ Elm.Users.Session.make = function (_elm) {
    A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
    A2($Json$Decode._op[":="],"username",$Json$Decode.string));
    var getSession = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,session,"/sessions"))));};
-   return _elm.Users.Session.values = {_op: _op,Session: Session,emptySession: emptySession,session: session,getSession: getSession,logout: logout};
+   return _elm.Users.Session.values = {_op: _op
+                                      ,Session: Session
+                                      ,emptySession: emptySession
+                                      ,session: session
+                                      ,getSession: getSession
+                                      ,logout: logout
+                                      ,isUser: isUser};
 };
 Elm.Admin = Elm.Admin || {};
 Elm.Admin.Core = Elm.Admin.Core || {};
@@ -15349,9 +15356,9 @@ Elm.Admin.Core.make = function (_elm) {
    var SetOwners = function (a) {    return {ctor: "SetOwners",_0: a};};
    var setSession = F2(function (model,_p5) {
       var _p6 = _p5;
-      return A2($List.member,"celestial.roles/user",_p6.roles) ? $Common$Utils.none(_U.update(model,{owner: _p6.username})) : {ctor: "_Tuple2"
-                                                                                                                              ,_0: model
-                                                                                                                              ,_1: $Users$List.getUsers(SetOwners)};
+      return $Users$Session.isUser(_p6) ? $Common$Utils.none(_U.update(model,{owner: _p6.username})) : {ctor: "_Tuple2"
+                                                                                                       ,_0: model
+                                                                                                       ,_1: $Users$List.getUsers(SetOwners)};
    });
    var update = F2(function (action,model) {
       var _p7 = action;
@@ -19644,7 +19651,9 @@ Elm.Nav.Side.make = function (_elm) {
    if (_elm.Nav.Side.values) return _elm.Nav.Side.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
@@ -19652,9 +19661,18 @@ Elm.Nav.Side.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $Users$Session = Elm.Users.Session.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {    var _p0 = action;return _U.update(model,{active: _p0._0,section: _p0._1});});
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "Goto") {
+            return $Common$Utils.none(_U.update(model,{active: _p0._0,section: _p0._1}));
+         } else {
+            return $Common$Utils.none(_U.update(model,{session: _p0._0}));
+         }
+   });
+   var SetSession = function (a) {    return {ctor: "SetSession",_0: a};};
    var Goto = F2(function (a,b) {    return {ctor: "Goto",_0: a,_1: b};});
    var sectionItem = F3(function (address,active,section) {
       return $Html$Shorthand.li_(_U.list([A2($Html.a,
@@ -19675,7 +19693,7 @@ Elm.Nav.Side.make = function (_elm) {
               _U.list([$Html$Attributes.$class("treeview-menu")]),
               A2($List.map,function (section) {    return A3(sectionItem,address,active,section);},actions))]));
    });
-   var Model = F2(function (a,b) {    return {active: a,section: b};});
+   var Model = F3(function (a,b,c) {    return {active: a,section: b,session: c};});
    var Stats = {ctor: "Stats"};
    var View = {ctor: "View"};
    var List = {ctor: "List"};
@@ -19688,19 +19706,27 @@ Elm.Nav.Side.make = function (_elm) {
    var Jobs = {ctor: "Jobs"};
    var Types = {ctor: "Types"};
    var Systems = {ctor: "Systems"};
-   var init = {active: Systems,section: List};
-   var menus = function (address) {
+   var init = A3(Model,Systems,List,$Users$Session.emptySession);
+   var adminMenus = function (address) {
       return _U.list([A4(drop,address,Systems,_U.list([List,Add]),"fa fa-server")
                      ,A4(drop,address,Templates,_U.list([List]),"fa fa-clone")
                      ,A4(drop,address,Types,_U.list([List,Add]),"fa fa-archive")
                      ,A4(drop,address,Jobs,_U.list([List,Stats]),"fa fa-tasks")]);
    };
-   var view = F2(function (address,model) {
+   var userMenus = function (address) {
+      return _U.list([A4(drop,address,Systems,_U.list([List,Add]),"fa fa-server")
+                     ,A4(drop,address,Templates,_U.list([List]),"fa fa-clone")
+                     ,A4(drop,address,Jobs,_U.list([List]),"fa fa-tasks")]);
+   };
+   var view = F2(function (address,_p1) {
+      var _p2 = _p1;
       return _U.list([A2($Html.aside,
       _U.list([$Html$Attributes.$class("main-sidebar")]),
       _U.list([A2($Html.section,
       _U.list([$Html$Attributes.$class("sidebar")]),
-      _U.list([A2($Html.ul,_U.list([$Html$Attributes.$class("sidebar-menu")]),menus(address))]))]))]);
+      _U.list([A2($Html.ul,
+      _U.list([$Html$Attributes.$class("sidebar-menu")]),
+      $Users$Session.isUser(_p2.session) ? userMenus(address) : adminMenus(address))]))]))]);
    });
    return _elm.Nav.Side.values = {_op: _op
                                  ,Systems: Systems
@@ -19718,10 +19744,12 @@ Elm.Nav.Side.make = function (_elm) {
                                  ,Model: Model
                                  ,init: init
                                  ,Goto: Goto
+                                 ,SetSession: SetSession
                                  ,update: update
                                  ,sectionItem: sectionItem
                                  ,drop: drop
-                                 ,menus: menus
+                                 ,adminMenus: adminMenus
+                                 ,userMenus: userMenus
                                  ,view: view};
 };
 Elm.Systems = Elm.Systems || {};
@@ -26332,8 +26360,8 @@ Elm.Nav.Header.make = function (_elm) {
    if (_elm.Nav.Header.values) return _elm.Nav.Header.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -26352,17 +26380,26 @@ Elm.Nav.Header.make = function (_elm) {
    _U.list([A2($Html.img,
    _U.list([$Html$Attributes.src("assets/img/cropped.png"),$Html$Attributes.alt("Celestial"),$Html$Attributes.width(110),$Html$Attributes.height(50)]),
    _U.list([]))]));
-   var setSession = F2(function (model,session) {    return {ctor: "_Tuple2",_0: _U.update(model,{session: session}),_1: $Effects.none};});
+   var setSession = F2(function (model,session) {    return $Common$Utils.none(_U.update(model,{session: session}));});
    var NoOp = {ctor: "NoOp"};
+   var LoadAdmin = {ctor: "LoadAdmin"};
+   var gearsButton = F2(function (address,session) {
+      return $Users$Session.isUser(session) ? A2($Html.i,
+      _U.list([$Html$Attributes.$class("fa fa-gears")
+              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "color",_1: "gray"},{ctor: "_Tuple2",_0: "pointer-events",_1: "none"}]))]),
+      _U.list([])) : A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-gears"),A2($Html$Events.onClick,address,LoadAdmin)]),_U.list([]));
+   });
    var Redirect = function (a) {    return {ctor: "Redirect",_0: a};};
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "LoadSession": return A4($Common$Errors.successHandler,_p0._0,model,setSession(model),NoOp);
+      {case "SetSession": return $Common$Utils.none(_U.update(model,{session: _p0._0}));
          case "SignOut": return {ctor: "_Tuple2",_0: model,_1: $Users$Session.logout(Redirect)};
          case "Redirect": return {ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(NoOp)};
-         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+         case "LoadAdmin": return $Common$Utils.none(model);
+         default: return $Common$Utils.none(model);}
    });
+   var SetSession = function (a) {    return {ctor: "SetSession",_0: a};};
    var SignOut = {ctor: "SignOut"};
    var topNav = F2(function (address,_p1) {
       var _p2 = _p1;
@@ -26404,7 +26441,7 @@ Elm.Nav.Header.make = function (_elm) {
               _U.list([]),
               _U.list([A2($Html.a,
               _U.list([A2($Html$Attributes.attribute,"data-toggle","control-sidebar"),$Html$Attributes.href("#")]),
-              _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-gears")]),_U.list([]))]))]))]))]));
+              _U.list([A2(gearsButton,address,_p2)]))]))]))]));
    });
    var view = F2(function (address,_p3) {
       var _p4 = _p3;
@@ -26424,19 +26461,20 @@ Elm.Nav.Header.make = function (_elm) {
                       _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("sr-only")]),_U.list([$Html.text("Toggle navigation")]))]))
                       ,A2(topNav,address,_p4.session)]))]))]);
    });
-   var LoadSession = function (a) {    return {ctor: "LoadSession",_0: a};};
    var Model = function (a) {    return {session: a};};
-   var init = {ctor: "_Tuple2",_0: Model($Users$Session.emptySession),_1: $Users$Session.getSession(LoadSession)};
+   var init = $Common$Utils.none(Model($Users$Session.emptySession));
    return _elm.Nav.Header.values = {_op: _op
                                    ,Model: Model
                                    ,init: init
-                                   ,LoadSession: LoadSession
                                    ,SignOut: SignOut
+                                   ,SetSession: SetSession
                                    ,Redirect: Redirect
+                                   ,LoadAdmin: LoadAdmin
                                    ,NoOp: NoOp
                                    ,setSession: setSession
                                    ,update: update
                                    ,navHeader: navHeader
+                                   ,gearsButton: gearsButton
                                    ,topNav: topNav
                                    ,view: view};
 };
@@ -26449,56 +26487,71 @@ Elm.Nav.Core.make = function (_elm) {
    if (_elm.Nav.Core.values) return _elm.Nav.Core.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
+   $Http = Elm.Http.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Nav$Header = Elm.Nav.Header.make(_elm),
    $Nav$Side = Elm.Nav.Side.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $Users$Session = Elm.Users.Session.make(_elm);
    var _op = {};
    var section = function (_p0) {    var _p1 = _p0;return _p1.side.section;};
    var activeOf = function (_p2) {    var _p3 = _p2;return _p3.side.active;};
-   var NoOp = {ctor: "NoOp"};
-   var HeaderAction = function (a) {    return {ctor: "HeaderAction",_0: a};};
-   var update = F2(function (action,_p4) {
+   var setSession = F2(function (_p4,session) {
       var _p5 = _p4;
-      var _p8 = _p5;
-      var _p6 = action;
-      switch (_p6.ctor)
-      {case "SideAction": var newSide = A2($Nav$Side.update,_p6._0,_p5.side);
-           return $Common$Utils.none(_U.update(_p8,{side: newSide}));
-         case "HeaderAction": var _p7 = A2($Nav$Header.update,_p6._0,_p5.header);
-           var newHeader = _p7._0;
-           var effects = _p7._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p8,{header: newHeader}),_1: A2($Effects.map,HeaderAction,effects)};
-         default: return $Common$Utils.none(_p8);}
+      var _p6 = A2($Nav$Header.update,$Nav$Header.SetSession(session),_p5.header);
+      var newHeader = _p6._0;
+      var _p7 = A2($Nav$Side.update,$Nav$Side.SetSession(session),_p5.side);
+      var newSide = _p7._0;
+      return $Common$Utils.none(_U.update(_p5,{side: newSide,header: newHeader}));
    });
-   var headerView = F2(function (address,_p9) {    var _p10 = _p9;return A2($Nav$Header.view,A2($Signal.forwardTo,address,HeaderAction),_p10.header);});
+   var NoOp = {ctor: "NoOp"};
+   var LoadSession = function (a) {    return {ctor: "LoadSession",_0: a};};
+   var HeaderAction = function (a) {    return {ctor: "HeaderAction",_0: a};};
+   var update = F2(function (action,_p8) {
+      var _p9 = _p8;
+      var _p13 = _p9;
+      var _p10 = action;
+      switch (_p10.ctor)
+      {case "SideAction": var _p11 = A2($Nav$Side.update,_p10._0,_p9.side);
+           var newSide = _p11._0;
+           return $Common$Utils.none(_U.update(_p13,{side: newSide}));
+         case "HeaderAction": var _p12 = A2($Nav$Header.update,_p10._0,_p9.header);
+           var newHeader = _p12._0;
+           var effects = _p12._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p13,{header: newHeader}),_1: A2($Effects.map,HeaderAction,effects)};
+         case "LoadSession": return A4($Common$Errors.successHandler,_p10._0,_p13,setSession(_p13),NoOp);
+         default: return $Common$Utils.none(_p13);}
+   });
+   var headerView = F2(function (address,_p14) {    var _p15 = _p14;return A2($Nav$Header.view,A2($Signal.forwardTo,address,HeaderAction),_p15.header);});
    var SideAction = function (a) {    return {ctor: "SideAction",_0: a};};
-   var $goto = F4(function (active,section,_p11,effects) {
-      var _p12 = _p11;
-      var _p13 = A2(update,SideAction(A2($Nav$Side.Goto,active,section)),_p12.nav);
-      var newNav = _p13._0;
-      return {ctor: "_Tuple2",_0: _U.update(_p12,{nav: newNav}),_1: effects};
+   var $goto = F4(function (active,section,_p16,effects) {
+      var _p17 = _p16;
+      var _p18 = A2(update,SideAction(A2($Nav$Side.Goto,active,section)),_p17.nav);
+      var newNav = _p18._0;
+      return {ctor: "_Tuple2",_0: _U.update(_p17,{nav: newNav}),_1: effects};
    });
-   var sideView = F2(function (address,_p14) {    var _p15 = _p14;return A2($Nav$Side.view,A2($Signal.forwardTo,address,SideAction),_p15.side);});
+   var sideView = F2(function (address,_p19) {    var _p20 = _p19;return A2($Nav$Side.view,A2($Signal.forwardTo,address,SideAction),_p20.side);});
    var Model = F2(function (a,b) {    return {side: a,header: b};});
    var init = function () {
-      var _p16 = $Nav$Header.init;
-      var header = _p16._0;
-      var headerAction = _p16._1;
-      return {ctor: "_Tuple2",_0: A2(Model,$Nav$Side.init,header),_1: $Effects.batch(_U.list([A2($Effects.map,HeaderAction,headerAction)]))};
+      var _p21 = $Nav$Header.init;
+      var header = _p21._0;
+      return {ctor: "_Tuple2",_0: A2(Model,$Nav$Side.init,header),_1: $Effects.batch(_U.list([$Users$Session.getSession(LoadSession)]))};
    }();
    return _elm.Nav.Core.values = {_op: _op
                                  ,Model: Model
                                  ,init: init
                                  ,SideAction: SideAction
                                  ,HeaderAction: HeaderAction
+                                 ,LoadSession: LoadSession
                                  ,NoOp: NoOp
                                  ,$goto: $goto
+                                 ,setSession: setSession
                                  ,update: update
                                  ,sideView: sideView
                                  ,headerView: headerView
@@ -26640,7 +26693,7 @@ Elm.Application.make = function (_elm) {
       var _p27 = _p26;
       var _p30 = _p27.nav;
       var section = $Nav$Core.section(_p30);
-      var _p28 = A2($Debug.log,"",$Nav$Core.activeOf(_p30));
+      var _p28 = $Nav$Core.activeOf(_p30);
       switch (_p28.ctor)
       {case "Systems": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p27.systems,section);
          case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p27.types,section);

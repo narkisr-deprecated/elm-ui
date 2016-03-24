@@ -173,7 +173,7 @@ activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks
   let
     section = (Nav.section nav)
   in 
-    case Debug.log "" (Nav.activeOf nav) of
+    case Nav.activeOf nav of
       Systems -> 
         Systems.view (Signal.forwardTo address SystemsAction) systems section
 

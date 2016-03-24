@@ -1,13 +1,15 @@
 module Nav.Header where
 
 import Html exposing (..)
-import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
+import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src, style)
 import Users.Session exposing (getSession, Session, emptySession, logout)
 import Effects exposing (Effects)
 import Common.Redirect exposing (redirect)
 import Common.Errors exposing (successHandler)
+import Common.Utils exposing (none)
 import Http exposing (Error(BadResponse))
 import Html.Events exposing (onClick)
+import Users.Session exposing (isUser)
 import String
 
 type alias Model = 
@@ -17,23 +19,24 @@ type alias Model =
 
 init : (Model , Effects Action)
 init =
-  (Model emptySession, getSession LoadSession)
+  none (Model emptySession)
 
 
 type Action = 
-  LoadSession (Result Http.Error Session)
-    | SignOut
+   SignOut
+    | SetSession Session
     | Redirect (Result Http.Error String)
+    | LoadAdmin
     | NoOp 
 
 setSession model session = 
-   ({model | session = session }, Effects.none)
+   none {model | session = session }
 
 update : Action ->  Model-> (Model , Effects Action)
 update action model =
   case action of
-    LoadSession result -> 
-      (successHandler result model (setSession model) NoOp)
+    SetSession session -> 
+       none { model | session = session }
 
     SignOut -> 
      (model, logout Redirect)
@@ -41,8 +44,11 @@ update action model =
     Redirect _ -> 
      (model, redirect NoOp)
 
+    LoadAdmin -> 
+      none model
+
     NoOp -> 
-     (model, Effects.none)
+      none model
 
 
 navHeader : Html
@@ -51,6 +57,12 @@ navHeader  =
    img [src "assets/img/cropped.png", alt "Celestial", width 110 , height 50] []
  ]
 
+gearsButton : Signal.Address Action  -> Session -> Html
+gearsButton address session =
+  if isUser session then 
+     i [ class "fa fa-gears", style [("color", "gray"), ("pointer-events", "none")]] [ ] 
+  else
+     i [ class "fa fa-gears", onClick address LoadAdmin] [ ] 
 
 topNav : Signal.Address Action  -> Session -> Html
 topNav address ({username, envs} as session) =
@@ -81,7 +93,8 @@ topNav address ({username, envs} as session) =
         ]
     , li [] [
         a [ attribute "data-toggle" "control-sidebar", href "#" ] [
-          i [ class "fa fa-gears" ] [] ]
+             (gearsButton address session) 
+          ]
         ]
      ]
   ]
