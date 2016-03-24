@@ -26360,6 +26360,7 @@ Elm.Nav.Header.make = function (_elm) {
    if (_elm.Nav.Header.values) return _elm.Nav.Header.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
+   $Common$NewTab = Elm.Common.NewTab.make(_elm),
    $Common$Redirect = Elm.Common.Redirect.make(_elm),
    $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -26383,6 +26384,14 @@ Elm.Nav.Header.make = function (_elm) {
               ,$Html$Attributes.href("#")]),
       attrs);
    };
+   var navHeader = A2($Html.div,
+   _U.list([$Html$Attributes.$class("navbar-header")]),
+   _U.list([A2($Html.img,
+   _U.list([$Html$Attributes.src("assets/img/cropped.png"),$Html$Attributes.alt("Celestial"),$Html$Attributes.width(110),$Html$Attributes.height(50)]),
+   _U.list([]))]));
+   var setSession = F2(function (model,session) {    return $Common$Utils.none(_U.update(model,{session: session}));});
+   var NoOp = {ctor: "NoOp"};
+   var LoadSwagger = {ctor: "LoadSwagger"};
    var gearsButton = F2(function (address,session) {
       return $Users$Session.isUser(session) ? A2($Html.i,
       _U.list([$Html$Attributes.$class("fa fa-gears")
@@ -26396,15 +26405,12 @@ Elm.Nav.Header.make = function (_elm) {
               _U.list([$Html$Attributes.$class("dropdown-menu")]),
               _U.list([A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Users")]))]))
                       ,A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Quota")]))]))
-                      ,A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Swagger")]))]))]))]));
+                      ,A2($Html.li,
+                      _U.list([]),
+                      _U.list([A2($Html.a,
+                      _U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,LoadSwagger)]),
+                      _U.list([$Html.text("Swagger")]))]))]))]));
    });
-   var navHeader = A2($Html.div,
-   _U.list([$Html$Attributes.$class("navbar-header")]),
-   _U.list([A2($Html.img,
-   _U.list([$Html$Attributes.src("assets/img/cropped.png"),$Html$Attributes.alt("Celestial"),$Html$Attributes.width(110),$Html$Attributes.height(50)]),
-   _U.list([]))]));
-   var setSession = F2(function (model,session) {    return $Common$Utils.none(_U.update(model,{session: session}));});
-   var NoOp = {ctor: "NoOp"};
    var LoadAdmin = {ctor: "LoadAdmin"};
    var Redirect = function (a) {    return {ctor: "Redirect",_0: a};};
    var update = F2(function (action,model) {
@@ -26414,6 +26420,7 @@ Elm.Nav.Header.make = function (_elm) {
          case "SignOut": return {ctor: "_Tuple2",_0: model,_1: $Users$Session.logout(Redirect)};
          case "Redirect": return {ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(NoOp)};
          case "LoadAdmin": return $Common$Utils.none(model);
+         case "LoadSwagger": return {ctor: "_Tuple2",_0: model,_1: A2($Common$NewTab.newtab,NoOp,"swagger/index.html")};
          default: return $Common$Utils.none(model);}
    });
    var SetSession = function (a) {    return {ctor: "SetSession",_0: a};};
@@ -26487,6 +26494,7 @@ Elm.Nav.Header.make = function (_elm) {
                                    ,SetSession: SetSession
                                    ,Redirect: Redirect
                                    ,LoadAdmin: LoadAdmin
+                                   ,LoadSwagger: LoadSwagger
                                    ,NoOp: NoOp
                                    ,setSession: setSession
                                    ,update: update

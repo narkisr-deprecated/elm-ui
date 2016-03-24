@@ -10,6 +10,7 @@ import Common.Utils exposing (none)
 import Http exposing (Error(BadResponse))
 import Html.Events exposing (onClick)
 import Users.Session exposing (isUser)
+import Common.NewTab exposing (newtab)
 import String
 
 type alias Model = 
@@ -27,6 +28,7 @@ type Action =
     | SetSession Session
     | Redirect (Result Http.Error String)
     | LoadAdmin
+    | LoadSwagger
     | NoOp 
 
 setSession model session = 
@@ -46,6 +48,9 @@ update action model =
 
     LoadAdmin -> 
       none model
+
+    LoadSwagger -> 
+      (model, (newtab NoOp "swagger/index.html"))
 
     NoOp -> 
       none model
@@ -70,7 +75,7 @@ gearsButton address session =
       , ul [ class "dropdown-menu" ] [
           li [] [ a [href "#"] [text "Users"] ]
         , li [] [ a [href "#"] [text "Quota"] ]
-        , li [] [ a [href "#"] [text "Swagger"] ]
+        , li [] [ a [href "#", onClick address LoadSwagger] [text "Swagger"] ]
         ] 
       ]
 
