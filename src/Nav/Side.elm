@@ -27,7 +27,8 @@ type Section =
     | Stats
 
 type alias Model = 
-  { active : Active 
+  { 
+    active : Active 
   , section : Section 
   , session : Session
   }
