@@ -84,13 +84,15 @@ topNav address ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
      [li [ class "dropdown user user-menu"] [
-        a [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ]
-            [ span [ class "hidden-xs" ]
-                [text  username]
-            ]
+         a dropdown [
+          span [ class "hidden-xs" ]
+            [text  username]
+          ]
         , ul [ class "dropdown-menu" ] [
               li [ class "user-header" ] [
-                   p [] [ text ("Environments you can access: " ++ (String.join " " envs)) ]
+                   p [] [
+                     text ("Environments you can access: " ++ (String.join " " envs)) 
+                   ]
               ]
             , li [ class "user-body" ] [ ]
             , li [ class "user-footer" ] [
