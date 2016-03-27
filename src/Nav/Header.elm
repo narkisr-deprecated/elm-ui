@@ -12,6 +12,7 @@ import Html.Events exposing (onClick)
 import Users.Session exposing (isUser)
 import Common.NewTab exposing (newtab)
 import String
+import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 
 type alias Model = 
   {
@@ -30,6 +31,7 @@ type Action =
     | LoadUsers
     | LoadSwagger
     | NoOp 
+    | Goto Active Section
 
 setSession model session = 
    none {model | session = session }
@@ -46,13 +48,10 @@ update action model =
     Redirect _ -> 
      (model, redirect NoOp)
 
-    LoadUsers -> 
-      none model
-
     LoadSwagger -> 
       (model, (newtab NoOp "swagger/index.html"))
 
-    NoOp -> 
+    _ -> 
       none model
 
 

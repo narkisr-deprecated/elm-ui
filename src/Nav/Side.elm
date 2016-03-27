@@ -13,14 +13,12 @@ import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates), Sec
 
 type alias Model = 
   { 
-    active : Active 
-  , section : Section 
-  , session : Session
+    session : Session
   }
 
 init : Model 
 init =
-   Model Systems List emptySession
+   Model emptySession
 
 -- Update
 
@@ -31,11 +29,11 @@ type Action =
 update : Action ->  Model-> (Model , Effects Action)
 update action model =
    case action of
-     Goto active section ->
-       none { model | active = active , section = section }
-
      SetSession session -> 
        none { model | session = session }
+
+     _ -> 
+       none model
 
 -- View
 

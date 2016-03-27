@@ -2,7 +2,7 @@ module Nav.Core where
 
 import Nav.Common as NavCommon exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Nav.Header as Header exposing (Action(SetSession))
-import Nav.Side as Side exposing (Action(SetSession))
+import Nav.Side as Side exposing (Action(SetSession, Goto))
 import Users.Session exposing (getSession, Session)
 import Http exposing (Error(BadResponse))
 import Common.Errors exposing (successHandler)
@@ -14,6 +14,8 @@ type alias Model =
   {
     side : Side.Model 
   , header : Header.Model 
+  , active : Active 
+  , section : Section 
   }
  
 init : (Model , Effects Action)
@@ -21,7 +23,7 @@ init =
   let
     (header, _) = Header.init
   in 
-    (Model Side.init header, Effects.batch [getSession LoadSession])
+    (Model Side.init header Systems List , Effects.batch [getSession LoadSession])
 
 -- Update 
 
@@ -48,11 +50,17 @@ setSession ({side, header} as model) session =
 update : Action ->  Model-> (Model , Effects Action)
 update action ({side, header} as model) =
   case action of 
-    SideAction navAction -> 
-      let 
-        (newSide, _) = Side.update navAction side
-      in
-        none { model | side = newSide }
+    SideAction (Side.Goto active section) -> 
+        none { model | active = active, section = section }
+
+    SideAction navAction ->  
+       let 
+         (newSide, _) = Side.update navAction side
+       in
+         none { model | side = newSide }
+
+    HeaderAction (Header.Goto active section) -> 
+        none { model | active = active, section = section }
 
     HeaderAction navAction -> 
       let 
@@ -74,9 +82,4 @@ sideView address {side} =
 headerView address {header} = 
   Header.view (Signal.forwardTo address HeaderAction) header
 
-activeOf {side, header} = 
-  side.active
-
-section {side, header} = 
-  side.section
 

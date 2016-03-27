@@ -116,7 +116,7 @@ route : Action ->  Model -> (Model , Effects Action)
 route action ({nav, types, jobsList, jobsStats, systems, templates, stacks} as model) =
   case action of 
     JobsList jobAction -> 
-      if jobAction == Polling && (Nav.activeOf nav) /= Jobs then
+      if jobAction == Polling && nav.active /= Jobs then
         (model, Effects.none)
       else
         let 
@@ -171,9 +171,9 @@ update action model =
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks} as model) =
   let
-    section = (Nav.section nav)
+    section = nav.section
   in 
-    case Nav.activeOf nav of
+    case nav.active of
       Systems -> 
         Systems.view (Signal.forwardTo address SystemsAction) systems section
 

@@ -26308,6 +26308,7 @@ Elm.Nav.Header.make = function (_elm) {
    $Http = Elm.Http.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $String = Elm.String.make(_elm),
@@ -26327,6 +26328,7 @@ Elm.Nav.Header.make = function (_elm) {
    _U.list([$Html$Attributes.src("assets/img/cropped.png"),$Html$Attributes.alt("Celestial"),$Html$Attributes.width(110),$Html$Attributes.height(50)]),
    _U.list([]))]));
    var setSession = F2(function (model,session) {    return $Common$Utils.none(_U.update(model,{session: session}));});
+   var Goto = F2(function (a,b) {    return {ctor: "Goto",_0: a,_1: b};});
    var NoOp = {ctor: "NoOp"};
    var LoadSwagger = {ctor: "LoadSwagger"};
    var LoadUsers = {ctor: "LoadUsers"};
@@ -26358,7 +26360,6 @@ Elm.Nav.Header.make = function (_elm) {
       {case "SetSession": return $Common$Utils.none(_U.update(model,{session: _p0._0}));
          case "SignOut": return {ctor: "_Tuple2",_0: model,_1: $Users$Session.logout(Redirect)};
          case "Redirect": return {ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(NoOp)};
-         case "LoadUsers": return $Common$Utils.none(model);
          case "LoadSwagger": return {ctor: "_Tuple2",_0: model,_1: A2($Common$NewTab.newtab,NoOp,"swagger/index.html")};
          default: return $Common$Utils.none(model);}
    });
@@ -26432,6 +26433,7 @@ Elm.Nav.Header.make = function (_elm) {
                                    ,LoadUsers: LoadUsers
                                    ,LoadSwagger: LoadSwagger
                                    ,NoOp: NoOp
+                                   ,Goto: Goto
                                    ,setSession: setSession
                                    ,update: update
                                    ,navHeader: navHeader
@@ -26465,10 +26467,10 @@ Elm.Nav.Side.make = function (_elm) {
    var _op = {};
    var update = F2(function (action,model) {
       var _p0 = action;
-      if (_p0.ctor === "Goto") {
-            return $Common$Utils.none(_U.update(model,{active: _p0._0,section: _p0._1}));
-         } else {
+      if (_p0.ctor === "SetSession") {
             return $Common$Utils.none(_U.update(model,{session: _p0._0}));
+         } else {
+            return $Common$Utils.none(model);
          }
    });
    var SetSession = function (a) {    return {ctor: "SetSession",_0: a};};
@@ -26513,8 +26515,8 @@ Elm.Nav.Side.make = function (_elm) {
       _U.list([$Html$Attributes.$class("sidebar-menu")]),
       $Users$Session.isUser(_p2.session) ? userMenus(address) : adminMenus(address))]))]))]);
    });
-   var Model = F3(function (a,b,c) {    return {active: a,section: b,session: c};});
-   var init = A3(Model,$Nav$Common.Systems,$Nav$Common.List,$Users$Session.emptySession);
+   var Model = function (a) {    return {session: a};};
+   var init = Model($Users$Session.emptySession);
    return _elm.Nav.Side.values = {_op: _op
                                  ,Model: Model
                                  ,init: init
@@ -26543,54 +26545,63 @@ Elm.Nav.Core.make = function (_elm) {
    $Http = Elm.Http.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Nav$Header = Elm.Nav.Header.make(_elm),
    $Nav$Side = Elm.Nav.Side.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Users$Session = Elm.Users.Session.make(_elm);
    var _op = {};
-   var section = function (_p0) {    var _p1 = _p0;return _p1.side.section;};
-   var activeOf = function (_p2) {    var _p3 = _p2;return _p3.side.active;};
-   var setSession = F2(function (_p4,session) {
-      var _p5 = _p4;
-      var _p6 = A2($Nav$Header.update,$Nav$Header.SetSession(session),_p5.header);
-      var newHeader = _p6._0;
-      var _p7 = A2($Nav$Side.update,$Nav$Side.SetSession(session),_p5.side);
-      var newSide = _p7._0;
-      return $Common$Utils.none(_U.update(_p5,{side: newSide,header: newHeader}));
+   var setSession = F2(function (_p0,session) {
+      var _p1 = _p0;
+      var _p2 = A2($Nav$Header.update,$Nav$Header.SetSession(session),_p1.header);
+      var newHeader = _p2._0;
+      var _p3 = A2($Nav$Side.update,$Nav$Side.SetSession(session),_p1.side);
+      var newSide = _p3._0;
+      return $Common$Utils.none(_U.update(_p1,{side: newSide,header: newHeader}));
    });
    var NoOp = {ctor: "NoOp"};
    var LoadSession = function (a) {    return {ctor: "LoadSession",_0: a};};
    var HeaderAction = function (a) {    return {ctor: "HeaderAction",_0: a};};
-   var update = F2(function (action,_p8) {
-      var _p9 = _p8;
-      var _p13 = _p9;
-      var _p10 = action;
-      switch (_p10.ctor)
-      {case "SideAction": var _p11 = A2($Nav$Side.update,_p10._0,_p9.side);
-           var newSide = _p11._0;
-           return $Common$Utils.none(_U.update(_p13,{side: newSide}));
-         case "HeaderAction": var _p12 = A2($Nav$Header.update,_p10._0,_p9.header);
-           var newHeader = _p12._0;
-           var effects = _p12._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p13,{header: newHeader}),_1: A2($Effects.map,HeaderAction,effects)};
-         case "LoadSession": return A4($Common$Errors.successHandler,_p10._0,_p13,setSession(_p13),NoOp);
-         default: return $Common$Utils.none(_p13);}
+   var update = F2(function (action,_p4) {
+      var _p5 = _p4;
+      var _p9 = _p5;
+      var _p6 = action;
+      switch (_p6.ctor)
+      {case "SideAction": if (_p6._0.ctor === "Goto") {
+                 return $Common$Utils.none(_U.update(_p9,{active: _p6._0._0,section: _p6._0._1}));
+              } else {
+                 var _p7 = A2($Nav$Side.update,_p6._0,_p5.side);
+                 var newSide = _p7._0;
+                 return $Common$Utils.none(_U.update(_p9,{side: newSide}));
+              }
+         case "HeaderAction": if (_p6._0.ctor === "Goto") {
+                 return $Common$Utils.none(_U.update(_p9,{active: _p6._0._0,section: _p6._0._1}));
+              } else {
+                 var _p8 = A2($Nav$Header.update,_p6._0,_p5.header);
+                 var newHeader = _p8._0;
+                 var effects = _p8._1;
+                 return {ctor: "_Tuple2",_0: _U.update(_p9,{header: newHeader}),_1: A2($Effects.map,HeaderAction,effects)};
+              }
+         case "LoadSession": return A4($Common$Errors.successHandler,_p6._0,_p9,setSession(_p9),NoOp);
+         default: return $Common$Utils.none(_p9);}
    });
-   var headerView = F2(function (address,_p14) {    var _p15 = _p14;return A2($Nav$Header.view,A2($Signal.forwardTo,address,HeaderAction),_p15.header);});
+   var headerView = F2(function (address,_p10) {    var _p11 = _p10;return A2($Nav$Header.view,A2($Signal.forwardTo,address,HeaderAction),_p11.header);});
    var SideAction = function (a) {    return {ctor: "SideAction",_0: a};};
-   var $goto = F4(function (active,section,_p16,effects) {
-      var _p17 = _p16;
-      var _p18 = A2(update,SideAction(A2($Nav$Side.Goto,active,section)),_p17.nav);
-      var newNav = _p18._0;
-      return {ctor: "_Tuple2",_0: _U.update(_p17,{nav: newNav}),_1: effects};
+   var $goto = F4(function (active,section,_p12,effects) {
+      var _p13 = _p12;
+      var _p14 = A2(update,SideAction(A2($Nav$Side.Goto,active,section)),_p13.nav);
+      var newNav = _p14._0;
+      return {ctor: "_Tuple2",_0: _U.update(_p13,{nav: newNav}),_1: effects};
    });
-   var sideView = F2(function (address,_p19) {    var _p20 = _p19;return A2($Nav$Side.view,A2($Signal.forwardTo,address,SideAction),_p20.side);});
-   var Model = F2(function (a,b) {    return {side: a,header: b};});
+   var sideView = F2(function (address,_p15) {    var _p16 = _p15;return A2($Nav$Side.view,A2($Signal.forwardTo,address,SideAction),_p16.side);});
+   var Model = F4(function (a,b,c,d) {    return {side: a,header: b,active: c,section: d};});
    var init = function () {
-      var _p21 = $Nav$Header.init;
-      var header = _p21._0;
-      return {ctor: "_Tuple2",_0: A2(Model,$Nav$Side.init,header),_1: $Effects.batch(_U.list([$Users$Session.getSession(LoadSession)]))};
+      var _p17 = $Nav$Header.init;
+      var header = _p17._0;
+      return {ctor: "_Tuple2"
+             ,_0: A4(Model,$Nav$Side.init,header,$Nav$Common.Systems,$Nav$Common.List)
+             ,_1: $Effects.batch(_U.list([$Users$Session.getSession(LoadSession)]))};
    }();
    return _elm.Nav.Core.values = {_op: _op
                                  ,Model: Model
@@ -26603,9 +26614,7 @@ Elm.Nav.Core.make = function (_elm) {
                                  ,setSession: setSession
                                  ,update: update
                                  ,sideView: sideView
-                                 ,headerView: headerView
-                                 ,activeOf: activeOf
-                                 ,section: section};
+                                 ,headerView: headerView};
 };
 Elm.Application = Elm.Application || {};
 Elm.Application.make = function (_elm) {
@@ -26705,7 +26714,7 @@ Elm.Application.make = function (_elm) {
       var _p15 = action;
       switch (_p15.ctor)
       {case "JobsList": var _p17 = _p15._0;
-           if (_U.eq(_p17,$Jobs$List.Polling) && !_U.eq($Nav$Core.activeOf(_p25),$Nav$Common.Jobs)) return {ctor: "_Tuple2",_0: _p24,_1: $Effects.none}; else {
+           if (_U.eq(_p17,$Jobs$List.Polling) && !_U.eq(_p25.active,$Nav$Common.Jobs)) return {ctor: "_Tuple2",_0: _p24,_1: $Effects.none}; else {
                  var _p16 = A2($Jobs$List.update,_p17,_p14.jobsList);
                  var newJobList = _p16._0;
                  var effects = _p16._1;
@@ -26741,8 +26750,8 @@ Elm.Application.make = function (_elm) {
    var activeView = F2(function (address,_p26) {
       var _p27 = _p26;
       var _p30 = _p27.nav;
-      var section = $Nav$Core.section(_p30);
-      var _p28 = $Nav$Core.activeOf(_p30);
+      var section = _p30.section;
+      var _p28 = _p30.active;
       switch (_p28.ctor)
       {case "Systems": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p27.systems,section);
          case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p27.types,section);
