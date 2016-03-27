@@ -117,7 +117,7 @@ navigate action ({systems, templates, stacks, types} as model , effects) =
 
 
 route : Action ->  Model -> (Model , Effects Action)
-route action ({nav, types, jobsList, jobsStats, systems, templates, stacks} as model) =
+route action ({nav, types, users, jobsList, jobsStats, systems, templates, stacks} as model) =
   case action of 
     JobsList jobAction -> 
       if jobAction == Polling && nav.active /= Jobs then
@@ -139,6 +139,14 @@ route action ({nav, types, jobsList, jobsStats, systems, templates, stacks} as m
        (newTypes, effects) = Types.update action types
       in
        ({ model | types = newTypes}, Effects.map TypesAction effects) 
+
+
+    UsersAction action -> 
+      let 
+       (newUsers, effects) = Users.update action users
+      in
+       ({ model | users = newUsers}, Effects.map UsersAction effects) 
+
 
     StacksAction action -> 
       let 

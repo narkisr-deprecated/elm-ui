@@ -13,6 +13,7 @@ import String
 
 import Html exposing (..)
 import Bootstrap.Html exposing (..)
+import Debug
 
 
 type alias Model = 
@@ -23,8 +24,9 @@ type alias Model =
 
 userRow : String -> User -> List Html
 userRow name {roles, envs} = 
-    [ td [] [ text (String.join " " roles) ]
-    , td [] [ text (String.join " " envs)]
+    [ td [] [ text name ]
+    , td [] [ text (String.join ", " (List.map (\r -> String.dropLeft 16 r) roles))]
+    , td [] [ text (String.join ", " envs)]
     ]
  
 init : (Model, Effects Action)

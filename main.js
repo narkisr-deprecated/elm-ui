@@ -25699,8 +25699,11 @@ Elm.Users.List.make = function (_elm) {
    var SetUsers = function (a) {    return {ctor: "SetUsers",_0: a};};
    var userRow = F2(function (name,_p7) {
       var _p8 = _p7;
-      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(A2($String.join," ",_p8.roles))]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($String.join," ",_p8.envs))]))]);
+      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(name)]))
+                     ,A2($Html.td,
+                     _U.list([]),
+                     _U.list([$Html.text(A2($String.join,", ",A2($List.map,function (r) {    return A2($String.dropLeft,16,r);},_p8.roles)))]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($String.join,", ",_p8.envs))]))]);
    });
    var Model = F3(function (a,b,c) {    return {users: a,table: b,pager: c};});
    var init = function () {
@@ -26845,101 +26848,105 @@ Elm.Application.make = function (_elm) {
    var SystemsAction = function (a) {    return {ctor: "SystemsAction",_0: a};};
    var route = F2(function (action,_p13) {
       var _p14 = _p13;
-      var _p25 = _p14.nav;
-      var _p24 = _p14;
+      var _p26 = _p14.nav;
+      var _p25 = _p14;
       var _p15 = action;
       switch (_p15.ctor)
       {case "JobsList": var _p17 = _p15._0;
-           if (_U.eq(_p17,$Jobs$List.Polling) && !_U.eq(_p25.active,$Nav$Common.Jobs)) return {ctor: "_Tuple2",_0: _p24,_1: $Effects.none}; else {
+           if (_U.eq(_p17,$Jobs$List.Polling) && !_U.eq(_p26.active,$Nav$Common.Jobs)) return {ctor: "_Tuple2",_0: _p25,_1: $Effects.none}; else {
                  var _p16 = A2($Jobs$List.update,_p17,_p14.jobsList);
                  var newJobList = _p16._0;
                  var effects = _p16._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p24,{jobsList: newJobList}),_1: A2($Effects.map,JobsList,effects)};
+                 return {ctor: "_Tuple2",_0: _U.update(_p25,{jobsList: newJobList}),_1: A2($Effects.map,JobsList,effects)};
               }
          case "JobsStats": var _p18 = A2($Jobs$Stats.update,_p15._0,_p14.jobsStats);
            var newJobsStats = _p18._0;
            var effects = _p18._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p24,{jobsStats: newJobsStats}),_1: A2($Effects.map,JobsStats,effects)};
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{jobsStats: newJobsStats}),_1: A2($Effects.map,JobsStats,effects)};
          case "TypesAction": var _p19 = A2($Types$Core.update,_p15._0,_p14.types);
            var newTypes = _p19._0;
            var effects = _p19._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p24,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
-         case "StacksAction": var _p20 = A2($Stacks$Core.update,_p15._0,_p14.stacks);
-           var newStacks = _p20._0;
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
+         case "UsersAction": var _p20 = A2($Users$Core.update,_p15._0,_p14.users);
+           var newUsers = _p20._0;
            var effects = _p20._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p24,{stacks: newStacks}),_1: A2($Effects.map,StacksAction,effects)};
-         case "TemplatesAction": var _p21 = A2($Templates$Core.update,_p15._0,_p14.templates);
-           var newTemplates = _p21._0;
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{users: newUsers}),_1: A2($Effects.map,UsersAction,effects)};
+         case "StacksAction": var _p21 = A2($Stacks$Core.update,_p15._0,_p14.stacks);
+           var newStacks = _p21._0;
            var effects = _p21._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p24,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
-         case "SystemsAction": var _p22 = A2($Systems$Core.update,_p15._0,_p14.systems);
-           var newSystems = _p22._0;
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{stacks: newStacks}),_1: A2($Effects.map,StacksAction,effects)};
+         case "TemplatesAction": var _p22 = A2($Templates$Core.update,_p15._0,_p14.templates);
+           var newTemplates = _p22._0;
            var effects = _p22._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p24,{systems: newSystems}),_1: A2($Effects.map,SystemsAction,effects)};
-         case "NavAction": var _p23 = A2($Nav$Core.update,_p15._0,_p25);
-           var newNav = _p23._0;
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
+         case "SystemsAction": var _p23 = A2($Systems$Core.update,_p15._0,_p14.systems);
+           var newSystems = _p23._0;
            var effects = _p23._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p24,{nav: newNav}),_1: A2($Effects.map,NavAction,effects)};
-         default: return $Common$Utils.none(_p24);}
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{systems: newSystems}),_1: A2($Effects.map,SystemsAction,effects)};
+         case "NavAction": var _p24 = A2($Nav$Core.update,_p15._0,_p26);
+           var newNav = _p24._0;
+           var effects = _p24._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{nav: newNav}),_1: A2($Effects.map,NavAction,effects)};
+         default: return $Common$Utils.none(_p25);}
    });
    var update = F2(function (action,model) {    return A2(navigate,action,A2(route,action,model));});
-   var activeView = F2(function (address,_p26) {
-      var _p27 = _p26;
-      var _p31 = _p27.nav;
-      var _p28 = _p31;
-      var section = _p28.section;
-      var _p29 = _p31.active;
-      switch (_p29.ctor)
-      {case "Systems": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p27.systems,section);
-         case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p27.types,section);
-         case "Templates": return A3($Templates$Core.view,A2($Signal.forwardTo,address,TemplatesAction),_p27.templates,section);
-         case "Jobs": var _p30 = section;
-           switch (_p30.ctor)
-           {case "List": return A2($Jobs$List.view,A2($Signal.forwardTo,address,JobsList),_p27.jobsList);
-              case "Stats": return A2($Jobs$Stats.view,A2($Signal.forwardTo,address,JobsStats),_p27.jobsStats);
+   var activeView = F2(function (address,_p27) {
+      var _p28 = _p27;
+      var _p32 = _p28.nav;
+      var _p29 = _p32;
+      var section = _p29.section;
+      var _p30 = _p32.active;
+      switch (_p30.ctor)
+      {case "Systems": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p28.systems,section);
+         case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p28.types,section);
+         case "Templates": return A3($Templates$Core.view,A2($Signal.forwardTo,address,TemplatesAction),_p28.templates,section);
+         case "Jobs": var _p31 = section;
+           switch (_p31.ctor)
+           {case "List": return A2($Jobs$List.view,A2($Signal.forwardTo,address,JobsList),_p28.jobsList);
+              case "Stats": return A2($Jobs$Stats.view,A2($Signal.forwardTo,address,JobsStats),_p28.jobsStats);
               default: return _U.list([]);}
-         case "Stacks": return A3($Stacks$Core.view,A2($Signal.forwardTo,address,StacksAction),_p27.stacks,section);
-         default: return A3($Users$Core.view,A2($Signal.forwardTo,address,UsersAction),_p27.users,section);}
+         case "Stacks": return A3($Stacks$Core.view,A2($Signal.forwardTo,address,StacksAction),_p28.stacks,section);
+         default: return A3($Users$Core.view,A2($Signal.forwardTo,address,UsersAction),_p28.users,section);}
    });
-   var view = F2(function (address,_p32) {
-      var _p33 = _p32;
-      var _p34 = _p33.nav;
+   var view = F2(function (address,_p33) {
+      var _p34 = _p33;
+      var _p35 = _p34.nav;
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("wrapper")]),
       A2($List.append,
       A2($List.append,
-      A2($Nav$Core.sideView,A2($Signal.forwardTo,address,NavAction),_p34),
-      A2($Nav$Core.headerView,A2($Signal.forwardTo,address,NavAction),_p34)),
+      A2($Nav$Core.sideView,A2($Signal.forwardTo,address,NavAction),_p35),
+      A2($Nav$Core.headerView,A2($Signal.forwardTo,address,NavAction),_p35)),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("content-wrapper")]),
-      _U.list([A2($Html.section,_U.list([$Html$Attributes.$class("content")]),A2(activeView,address,_p33))]))])));
+      _U.list([A2($Html.section,_U.list([$Html$Attributes.$class("content")]),A2(activeView,address,_p34))]))])));
    });
    var Model = F8(function (a,b,c,d,e,f,g,h) {    return {systems: a,stacks: b,jobsList: c,jobsStats: d,types: e,templates: f,users: g,nav: h};});
    var init = function () {
-      var _p35 = $Stacks$Core.init;
-      var stacks = _p35._0;
-      var stacksAction = _p35._1;
-      var _p36 = $Systems$Core.init;
-      var systems = _p36._0;
-      var systemsAction = _p36._1;
-      var _p37 = $Nav$Core.init;
-      var nav = _p37._0;
-      var navAction = _p37._1;
-      var _p38 = $Templates$Core.init;
-      var templates = _p38._0;
-      var templatesAction = _p38._1;
-      var _p39 = $Users$Core.init;
-      var users = _p39._0;
-      var usersAction = _p39._1;
-      var _p40 = $Types$Core.init;
-      var types = _p40._0;
-      var typesAction = _p40._1;
-      var _p41 = $Jobs$Stats.init;
-      var jobsStat = _p41._0;
-      var jobsStatAction = _p41._1;
-      var _p42 = $Jobs$List.init;
-      var jobsList = _p42._0;
-      var jobsListAction = _p42._1;
+      var _p36 = $Stacks$Core.init;
+      var stacks = _p36._0;
+      var stacksAction = _p36._1;
+      var _p37 = $Systems$Core.init;
+      var systems = _p37._0;
+      var systemsAction = _p37._1;
+      var _p38 = $Nav$Core.init;
+      var nav = _p38._0;
+      var navAction = _p38._1;
+      var _p39 = $Templates$Core.init;
+      var templates = _p39._0;
+      var templatesAction = _p39._1;
+      var _p40 = $Users$Core.init;
+      var users = _p40._0;
+      var usersAction = _p40._1;
+      var _p41 = $Types$Core.init;
+      var types = _p41._0;
+      var typesAction = _p41._1;
+      var _p42 = $Jobs$Stats.init;
+      var jobsStat = _p42._0;
+      var jobsStatAction = _p42._1;
+      var _p43 = $Jobs$List.init;
+      var jobsList = _p43._0;
+      var jobsListAction = _p43._1;
       var effects = _U.list([A2($Effects.map,TemplatesAction,templatesAction)
                             ,A2($Effects.map,TypesAction,typesAction)
                             ,A2($Effects.map,UsersAction,usersAction)
