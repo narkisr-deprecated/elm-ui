@@ -10,8 +10,9 @@ import Jobs.List exposing (Action(Polling))
 import Jobs.Stats
 import Common.Utils exposing (none)
 import Types.Core as Types
+import Users.Core as Users
 import Templates.Core as Templates
-import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
+import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))
 import Nav.Core as Nav exposing (goto)
 
 import Bootstrap.Html exposing (..)
@@ -23,13 +24,14 @@ init =
     (jobsList, jobsListAction) = Jobs.List.init
     (jobsStat, jobsStatAction) = Jobs.Stats.init
     (types, typesAction) = Types.init
+    (users, usersAction) = Users.init
     (templates, templatesAction) = Templates.init
     (nav, navAction) = Nav.init
     (systems, systemsAction) = Systems.init
     (stacks, stacksAction) = Stacks.init
-    effects = [ 
-                Effects.map TemplatesAction templatesAction
+    effects = [ Effects.map TemplatesAction templatesAction
               , Effects.map TypesAction typesAction
+              , Effects.map UsersAction usersAction
               , Effects.map SystemsAction systemsAction
               , Effects.map StacksAction stacksAction
               , Effects.map NavAction navAction
@@ -37,7 +39,7 @@ init =
               , Effects.map JobsStats jobsStatAction
               ]
   in
-    (Model systems stacks jobsList jobsStat types templates nav, Effects.batch effects) 
+    (Model systems stacks jobsList jobsStat types templates users nav, Effects.batch effects) 
 
 type alias Model = 
   { 
@@ -47,6 +49,7 @@ type alias Model =
   , jobsStats : Jobs.Stats.Model
   , types : Types.Model
   , templates : Templates.Model
+  , users : Users.Model
   , nav : Nav.Model
   }
 
@@ -58,6 +61,7 @@ type Action =
     | JobsStats Jobs.Stats.Action
     | TypesAction Types.Action
     | TemplatesAction Templates.Action
+    | UsersAction Users.Action
     | NoOp
 
 -- Navigation changes
@@ -169,9 +173,9 @@ update action model =
    navigate action (route action model)
 
 activeView : Signal.Address Action -> Model -> List Html
-activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks} as model) =
+activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks, users} as model) =
   let
-    section = nav.section
+    {section} = nav
   in 
     case nav.active of
       Systems -> 
@@ -196,6 +200,10 @@ activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks
 
       Stacks -> 
         Stacks.view (Signal.forwardTo address StacksAction) stacks section
+
+      Users -> 
+        Users.view (Signal.forwardTo address UsersAction) users section
+
 
 view : Signal.Address Action -> Model -> Html
 view address ({nav} as model) = 

@@ -18,6 +18,7 @@ import Task
 import Maybe exposing (withDefault)
 import Common.Errors exposing (successHandler)
 import Types.Model as Model exposing (Type)
+import Common.Utils exposing (none)
 import Debug
 
 type alias Model = 
@@ -47,14 +48,14 @@ type Action =
     | NoOp
 
 setTypes: Model -> List Type -> (Model , Effects Action)
-setTypes model types = 
+setTypes ({pager, table} as model) types = 
   let
     total = List.length types
     typePairs = List.map (\ ({type'} as item) -> (type', item)) types
-    newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
-    newTable = (Table.update (Table.UpdateRows typePairs) model.table)
+    newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) pager)
+    newTable = (Table.update (Table.UpdateRows typePairs) table)
   in
-    ({ model | types = types, pager = newPager, table = newTable } , Effects.none)
+    none { model | types = types, pager = newPager, table = newTable }
 
 
 update : Action ->  Model-> (Model , Effects Action)
@@ -64,7 +65,7 @@ update action model =
       successHandler result model (setTypes model) NoOp
      
     _ -> 
-      (model, Effects.none)
+      none model
 
 view : Signal.Address Action -> Model -> List Html
 view address ({types, pager, table} as model) =

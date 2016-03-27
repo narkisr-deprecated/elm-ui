@@ -9,6 +9,7 @@ type Active =
     | Jobs
     | Templates
     | Stacks
+    | Users
 
 type Section = 
   Add 

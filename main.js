@@ -15240,12 +15240,12 @@ Elm.Common.Errors.make = function (_elm) {
                                       ,setErrors: setErrors};
 };
 Elm.Users = Elm.Users || {};
-Elm.Users.List = Elm.Users.List || {};
-Elm.Users.List.make = function (_elm) {
+Elm.Users.Model = Elm.Users.Model || {};
+Elm.Users.Model.make = function (_elm) {
    "use strict";
    _elm.Users = _elm.Users || {};
-   _elm.Users.List = _elm.Users.List || {};
-   if (_elm.Users.List.values) return _elm.Users.List.values;
+   _elm.Users.Model = _elm.Users.Model || {};
+   if (_elm.Users.Model.values) return _elm.Users.Model.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
@@ -15267,7 +15267,7 @@ Elm.Users.List.make = function (_elm) {
    A2($Json$Decode._op[":="],"envs",$Json$Decode.list($Json$Decode.string)));
    var usersList = $Json$Decode.list(user);
    var getUsers = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,usersList,"/users"))));};
-   return _elm.Users.List.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
+   return _elm.Users.Model.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
 };
 Elm.Users = Elm.Users || {};
 Elm.Users.Session = Elm.Users.Session || {};
@@ -15331,7 +15331,7 @@ Elm.Admin.Core.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Users$List = Elm.Users.List.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm),
    $Users$Session = Elm.Users.Session.make(_elm);
    var _op = {};
    var ownersList = function (_p0) {    var _p1 = _p0;var _p2 = _p1.owners;return $List.isEmpty(_p2) ? _U.list([_p1.owner]) : _p2;};
@@ -15358,7 +15358,7 @@ Elm.Admin.Core.make = function (_elm) {
       var _p6 = _p5;
       return $Users$Session.isUser(_p6) ? $Common$Utils.none(_U.update(model,{owner: _p6.username})) : {ctor: "_Tuple2"
                                                                                                        ,_0: model
-                                                                                                       ,_1: $Users$List.getUsers(SetOwners)};
+                                                                                                       ,_1: $Users$Model.getUsers(SetOwners)};
    });
    var update = F2(function (action,model) {
       var _p7 = action;
@@ -18702,6 +18702,7 @@ Elm.Types.List.make = function (_elm) {
    $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
    $Common$Errors = Elm.Common.Errors.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Html = Elm.Html.make(_elm),
@@ -18719,39 +18720,40 @@ Elm.Types.List.make = function (_elm) {
    var _op = {};
    var typesList = A2($Json$Decode.at,_U.list(["types"]),$Json$Decode.list($Types$Model.type$));
    var getTypes = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,typesList,"/types"))));};
-   var setTypes = F2(function (model,types) {
-      var typePairs = A2($List.map,function (_p0) {    var _p1 = _p0;return {ctor: "_Tuple2",_0: _p1.type$,_1: _p1};},types);
-      var newTable = A2($Table.update,$Table.UpdateRows(typePairs),model.table);
+   var setTypes = F2(function (_p0,types) {
+      var _p1 = _p0;
+      var typePairs = A2($List.map,function (_p2) {    var _p3 = _p2;return {ctor: "_Tuple2",_0: _p3.type$,_1: _p3};},types);
+      var newTable = A2($Table.update,$Table.UpdateRows(typePairs),_p1.table);
       var total = $List.length(types);
-      var newPager = A2($Pager.update,$Pager.UpdateTotal($Basics.toFloat(total)),model.pager);
-      return {ctor: "_Tuple2",_0: _U.update(model,{types: types,pager: newPager,table: newTable}),_1: $Effects.none};
+      var newPager = A2($Pager.update,$Pager.UpdateTotal($Basics.toFloat(total)),_p1.pager);
+      return $Common$Utils.none(_U.update(_p1,{types: types,pager: newPager,table: newTable}));
    });
    var NoOp = {ctor: "NoOp"};
    var update = F2(function (action,model) {
-      var _p2 = action;
-      if (_p2.ctor === "SetTypes") {
-            return A4($Common$Errors.successHandler,_p2._0,model,setTypes(model),NoOp);
+      var _p4 = action;
+      if (_p4.ctor === "SetTypes") {
+            return A4($Common$Errors.successHandler,_p4._0,model,setTypes(model),NoOp);
          } else {
-            return {ctor: "_Tuple2",_0: model,_1: $Effects.none};
+            return $Common$Utils.none(model);
          }
    });
    var SetTypes = function (a) {    return {ctor: "SetTypes",_0: a};};
    var GotoPage = function (a) {    return {ctor: "GotoPage",_0: a};};
    var LoadPage = function (a) {    return {ctor: "LoadPage",_0: a};};
-   var view = F2(function (address,_p3) {
-      var _p4 = _p3;
+   var view = F2(function (address,_p5) {
+      var _p6 = _p5;
       return _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("")]),
       _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
               _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
-              _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p4.table))]))]))
-              ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p4.pager)]))]))]);
+              _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p6.table))]))]))
+              ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p6.pager)]))]))]);
    });
-   var typeRow = F2(function (id,_p5) {
-      var _p6 = _p5;
-      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(_p6.type$)]))
+   var typeRow = F2(function (id,_p7) {
+      var _p8 = _p7;
+      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(_p8.type$)]))
                      ,A2($Html.td,_U.list([]),_U.list([$Html.text("Puppet standalone")]))
-                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($Maybe.withDefault,"",_p6.description))]))]);
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($Maybe.withDefault,"",_p8.description))]))]);
    });
    var Model = F3(function (a,b,c) {    return {types: a,table: b,pager: c};});
    var init = function () {
@@ -19664,6 +19666,7 @@ Elm.Nav.Common.make = function (_elm) {
    var Delete = {ctor: "Delete"};
    var Launch = {ctor: "Launch"};
    var Add = {ctor: "Add"};
+   var Users = {ctor: "Users"};
    var Stacks = {ctor: "Stacks"};
    var Templates = {ctor: "Templates"};
    var Jobs = {ctor: "Jobs"};
@@ -19675,6 +19678,7 @@ Elm.Nav.Common.make = function (_elm) {
                                    ,Jobs: Jobs
                                    ,Templates: Templates
                                    ,Stacks: Stacks
+                                   ,Users: Users
                                    ,Add: Add
                                    ,Launch: Launch
                                    ,Delete: Delete
@@ -25638,6 +25642,136 @@ Elm.Types.Core.make = function (_elm) {
                                    ,update: update
                                    ,view: view};
 };
+Elm.Users = Elm.Users || {};
+Elm.Users.List = Elm.Users.List || {};
+Elm.Users.List.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.List = _elm.Users.List || {};
+   if (_elm.Users.List.values) return _elm.Users.List.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Pager = Elm.Pager.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
+   $Table = Elm.Table.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm);
+   var _op = {};
+   var setUsers = F2(function (_p0,users) {
+      var _p1 = _p0;
+      var typePairs = A2($List.map,function (_p2) {    var _p3 = _p2;return {ctor: "_Tuple2",_0: _p3.username,_1: _p3};},users);
+      var newTable = A2($Table.update,$Table.UpdateRows(typePairs),_p1.table);
+      var total = $List.length(users);
+      var newPager = A2($Pager.update,$Pager.UpdateTotal($Basics.toFloat(total)),_p1.pager);
+      return $Common$Utils.none(_U.update(_p1,{users: users,pager: newPager,table: newTable}));
+   });
+   var NoOp = {ctor: "NoOp"};
+   var update = F2(function (action,model) {
+      var _p4 = action;
+      if (_p4.ctor === "SetUsers") {
+            return A4($Common$Errors.successHandler,_p4._0,model,setUsers(model),NoOp);
+         } else {
+            return $Common$Utils.none(model);
+         }
+   });
+   var LoadPage = function (a) {    return {ctor: "LoadPage",_0: a};};
+   var GotoPage = function (a) {    return {ctor: "GotoPage",_0: a};};
+   var view = F2(function (address,_p5) {
+      var _p6 = _p5;
+      return _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("")]),
+      _U.list([$Bootstrap$Html.row_(_U.list([A2($Html.div,
+              _U.list([$Html$Attributes.$class("col-md-offset-1 col-md-10")]),
+              _U.list([$Bootstrap$Html.panelDefault_(A2($Table.view,A2($Signal.forwardTo,address,LoadPage),_p6.table))]))]))
+              ,$Bootstrap$Html.row_(_U.list([A2($Pager.view,A2($Signal.forwardTo,address,GotoPage),_p6.pager)]))]))]);
+   });
+   var SetUsers = function (a) {    return {ctor: "SetUsers",_0: a};};
+   var userRow = F2(function (name,_p7) {
+      var _p8 = _p7;
+      return _U.list([A2($Html.td,_U.list([]),_U.list([$Html.text(A2($String.join," ",_p8.roles))]))
+                     ,A2($Html.td,_U.list([]),_U.list([$Html.text(A2($String.join," ",_p8.envs))]))]);
+   });
+   var Model = F3(function (a,b,c) {    return {users: a,table: b,pager: c};});
+   var init = function () {
+      var table = A5($Table.init,"usersListing",true,_U.list(["Name","Roles","Environments"]),userRow,"Users");
+      return {ctor: "_Tuple2",_0: A3(Model,_U.list([]),table,$Pager.init),_1: $Users$Model.getUsers(SetUsers)};
+   }();
+   return _elm.Users.List.values = {_op: _op
+                                   ,Model: Model
+                                   ,userRow: userRow
+                                   ,init: init
+                                   ,SetUsers: SetUsers
+                                   ,GotoPage: GotoPage
+                                   ,LoadPage: LoadPage
+                                   ,NoOp: NoOp
+                                   ,setUsers: setUsers
+                                   ,update: update
+                                   ,view: view};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.Core = Elm.Users.Core || {};
+Elm.Users.Core.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Core = _elm.Users.Core || {};
+   if (_elm.Users.Core.values) return _elm.Users.Core.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Users$List = Elm.Users.List.make(_elm);
+   var _op = {};
+   var NoOp = {ctor: "NoOp"};
+   var Listing = function (a) {    return {ctor: "Listing",_0: a};};
+   var update = F2(function (action,_p0) {
+      var _p1 = _p0;
+      var _p4 = _p1;
+      var _p2 = action;
+      if (_p2.ctor === "Listing") {
+            var _p3 = A2($Users$List.update,_p2._0,_p1.list);
+            var newList = _p3._0;
+            var effects = _p3._1;
+            return {ctor: "_Tuple2",_0: _U.update(_p4,{list: newList}),_1: A2($Effects.map,Listing,effects)};
+         } else {
+            return $Common$Utils.none(_p4);
+         }
+   });
+   var view = F3(function (address,_p5,section) {
+      var _p6 = _p5;
+      var _p7 = section;
+      if (_p7.ctor === "List") {
+            return A2($Users$List.view,A2($Signal.forwardTo,address,Listing),_p6.list);
+         } else {
+            return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
+         }
+   });
+   var Model = function (a) {    return {list: a};};
+   var init = function () {
+      var _p8 = $Users$List.init;
+      var list = _p8._0;
+      var listActions = _p8._1;
+      return {ctor: "_Tuple2",_0: Model(list),_1: A2($Effects.map,Listing,listActions)};
+   }();
+   return _elm.Users.Core.values = {_op: _op,Model: Model,init: init,Listing: Listing,NoOp: NoOp,update: update,view: view};
+};
 Elm.Templates = Elm.Templates || {};
 Elm.Templates.Persistency = Elm.Templates.Persistency || {};
 Elm.Templates.Persistency.make = function (_elm) {
@@ -26331,7 +26465,6 @@ Elm.Nav.Header.make = function (_elm) {
    var Goto = F2(function (a,b) {    return {ctor: "Goto",_0: a,_1: b};});
    var NoOp = {ctor: "NoOp"};
    var LoadSwagger = {ctor: "LoadSwagger"};
-   var LoadUsers = {ctor: "LoadUsers"};
    var gearsButton = F2(function (address,session) {
       return $Users$Session.isUser(session) ? A2($Html.i,
       _U.list([$Html$Attributes.$class("fa fa-gears")
@@ -26345,7 +26478,9 @@ Elm.Nav.Header.make = function (_elm) {
               _U.list([$Html$Attributes.$class("dropdown-menu")]),
               _U.list([A2($Html.li,
                       _U.list([]),
-                      _U.list([A2($Html.a,_U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,LoadUsers)]),_U.list([$Html.text("Users")]))]))
+                      _U.list([A2($Html.a,
+                      _U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,A2(Goto,$Nav$Common.Users,$Nav$Common.List))]),
+                      _U.list([$Html.text("Users")]))]))
                       ,A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Quota")]))]))
                       ,A2($Html.li,
                       _U.list([]),
@@ -26430,7 +26565,6 @@ Elm.Nav.Header.make = function (_elm) {
                                    ,SignOut: SignOut
                                    ,SetSession: SetSession
                                    ,Redirect: Redirect
-                                   ,LoadUsers: LoadUsers
                                    ,LoadSwagger: LoadSwagger
                                    ,NoOp: NoOp
                                    ,Goto: Goto
@@ -26639,9 +26773,11 @@ Elm.Application.make = function (_elm) {
    $Stacks$Core = Elm.Stacks.Core.make(_elm),
    $Systems$Core = Elm.Systems.Core.make(_elm),
    $Templates$Core = Elm.Templates.Core.make(_elm),
-   $Types$Core = Elm.Types.Core.make(_elm);
+   $Types$Core = Elm.Types.Core.make(_elm),
+   $Users$Core = Elm.Users.Core.make(_elm);
    var _op = {};
    var NoOp = {ctor: "NoOp"};
+   var UsersAction = function (a) {    return {ctor: "UsersAction",_0: a};};
    var TemplatesAction = function (a) {    return {ctor: "TemplatesAction",_0: a};};
    var TypesAction = function (a) {    return {ctor: "TypesAction",_0: a};};
    var JobsStats = function (a) {    return {ctor: "JobsStats",_0: a};};
@@ -26749,64 +26885,70 @@ Elm.Application.make = function (_elm) {
    var update = F2(function (action,model) {    return A2(navigate,action,A2(route,action,model));});
    var activeView = F2(function (address,_p26) {
       var _p27 = _p26;
-      var _p30 = _p27.nav;
-      var section = _p30.section;
-      var _p28 = _p30.active;
-      switch (_p28.ctor)
+      var _p31 = _p27.nav;
+      var _p28 = _p31;
+      var section = _p28.section;
+      var _p29 = _p31.active;
+      switch (_p29.ctor)
       {case "Systems": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p27.systems,section);
          case "Types": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p27.types,section);
          case "Templates": return A3($Templates$Core.view,A2($Signal.forwardTo,address,TemplatesAction),_p27.templates,section);
-         case "Jobs": var _p29 = section;
-           switch (_p29.ctor)
+         case "Jobs": var _p30 = section;
+           switch (_p30.ctor)
            {case "List": return A2($Jobs$List.view,A2($Signal.forwardTo,address,JobsList),_p27.jobsList);
               case "Stats": return A2($Jobs$Stats.view,A2($Signal.forwardTo,address,JobsStats),_p27.jobsStats);
               default: return _U.list([]);}
-         default: return A3($Stacks$Core.view,A2($Signal.forwardTo,address,StacksAction),_p27.stacks,section);}
+         case "Stacks": return A3($Stacks$Core.view,A2($Signal.forwardTo,address,StacksAction),_p27.stacks,section);
+         default: return A3($Users$Core.view,A2($Signal.forwardTo,address,UsersAction),_p27.users,section);}
    });
-   var view = F2(function (address,_p31) {
-      var _p32 = _p31;
-      var _p33 = _p32.nav;
+   var view = F2(function (address,_p32) {
+      var _p33 = _p32;
+      var _p34 = _p33.nav;
       return A2($Html.div,
       _U.list([$Html$Attributes.$class("wrapper")]),
       A2($List.append,
       A2($List.append,
-      A2($Nav$Core.sideView,A2($Signal.forwardTo,address,NavAction),_p33),
-      A2($Nav$Core.headerView,A2($Signal.forwardTo,address,NavAction),_p33)),
+      A2($Nav$Core.sideView,A2($Signal.forwardTo,address,NavAction),_p34),
+      A2($Nav$Core.headerView,A2($Signal.forwardTo,address,NavAction),_p34)),
       _U.list([A2($Html.div,
       _U.list([$Html$Attributes.$class("content-wrapper")]),
-      _U.list([A2($Html.section,_U.list([$Html$Attributes.$class("content")]),A2(activeView,address,_p32))]))])));
+      _U.list([A2($Html.section,_U.list([$Html$Attributes.$class("content")]),A2(activeView,address,_p33))]))])));
    });
-   var Model = F7(function (a,b,c,d,e,f,g) {    return {systems: a,stacks: b,jobsList: c,jobsStats: d,types: e,templates: f,nav: g};});
+   var Model = F8(function (a,b,c,d,e,f,g,h) {    return {systems: a,stacks: b,jobsList: c,jobsStats: d,types: e,templates: f,users: g,nav: h};});
    var init = function () {
-      var _p34 = $Stacks$Core.init;
-      var stacks = _p34._0;
-      var stacksAction = _p34._1;
-      var _p35 = $Systems$Core.init;
-      var systems = _p35._0;
-      var systemsAction = _p35._1;
-      var _p36 = $Nav$Core.init;
-      var nav = _p36._0;
-      var navAction = _p36._1;
-      var _p37 = $Templates$Core.init;
-      var templates = _p37._0;
-      var templatesAction = _p37._1;
-      var _p38 = $Types$Core.init;
-      var types = _p38._0;
-      var typesAction = _p38._1;
-      var _p39 = $Jobs$Stats.init;
-      var jobsStat = _p39._0;
-      var jobsStatAction = _p39._1;
-      var _p40 = $Jobs$List.init;
-      var jobsList = _p40._0;
-      var jobsListAction = _p40._1;
+      var _p35 = $Stacks$Core.init;
+      var stacks = _p35._0;
+      var stacksAction = _p35._1;
+      var _p36 = $Systems$Core.init;
+      var systems = _p36._0;
+      var systemsAction = _p36._1;
+      var _p37 = $Nav$Core.init;
+      var nav = _p37._0;
+      var navAction = _p37._1;
+      var _p38 = $Templates$Core.init;
+      var templates = _p38._0;
+      var templatesAction = _p38._1;
+      var _p39 = $Users$Core.init;
+      var users = _p39._0;
+      var usersAction = _p39._1;
+      var _p40 = $Types$Core.init;
+      var types = _p40._0;
+      var typesAction = _p40._1;
+      var _p41 = $Jobs$Stats.init;
+      var jobsStat = _p41._0;
+      var jobsStatAction = _p41._1;
+      var _p42 = $Jobs$List.init;
+      var jobsList = _p42._0;
+      var jobsListAction = _p42._1;
       var effects = _U.list([A2($Effects.map,TemplatesAction,templatesAction)
                             ,A2($Effects.map,TypesAction,typesAction)
+                            ,A2($Effects.map,UsersAction,usersAction)
                             ,A2($Effects.map,SystemsAction,systemsAction)
                             ,A2($Effects.map,StacksAction,stacksAction)
                             ,A2($Effects.map,NavAction,navAction)
                             ,A2($Effects.map,JobsList,jobsListAction)
                             ,A2($Effects.map,JobsStats,jobsStatAction)]);
-      return {ctor: "_Tuple2",_0: A7(Model,systems,stacks,jobsList,jobsStat,types,templates,nav),_1: $Effects.batch(effects)};
+      return {ctor: "_Tuple2",_0: A8(Model,systems,stacks,jobsList,jobsStat,types,templates,users,nav),_1: $Effects.batch(effects)};
    }();
    return _elm.Application.values = {_op: _op
                                     ,init: init
@@ -26818,6 +26960,7 @@ Elm.Application.make = function (_elm) {
                                     ,JobsStats: JobsStats
                                     ,TypesAction: TypesAction
                                     ,TemplatesAction: TemplatesAction
+                                    ,UsersAction: UsersAction
                                     ,NoOp: NoOp
                                     ,jobListing: jobListing
                                     ,navigate: navigate

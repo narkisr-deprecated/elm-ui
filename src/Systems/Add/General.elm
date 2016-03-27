@@ -14,7 +14,7 @@ import Html exposing (..)
 
 import Systems.Add.Common exposing (..)
 import Environments.List exposing (Environments, Environment, getEnvironments)
-import Users.List exposing (User, getUsers)
+import Users.Model exposing (User, getUsers)
 import Types.List exposing (getTypes)
 import Types.Model exposing (Type)
 import Common.Components exposing (fixedPanel, asList)

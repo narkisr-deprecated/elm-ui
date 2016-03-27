@@ -12,7 +12,7 @@ import Html.Events exposing (onClick)
 import Users.Session exposing (isUser)
 import Common.NewTab exposing (newtab)
 import String
-import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
+import Nav.Common exposing (Active(Users), Section(List))
 
 type alias Model = 
   {
@@ -28,7 +28,6 @@ type Action =
    SignOut
     | SetSession Session
     | Redirect (Result Http.Error String)
-    | LoadUsers
     | LoadSwagger
     | NoOp 
     | Goto Active Section
@@ -72,7 +71,7 @@ gearsButton address session =
     div [class "dropdown pull-right"] [
         i (dropdown [ class "fa fa-gears", style [("color", "black")]]) []
       , ul [ class "dropdown-menu" ] [
-          li [] [ a [href "#", onClick address LoadUsers] [text "Users" ] ]
+          li [] [ a [href "#", onClick address (Goto Users List)] [text "Users" ] ]
         , li [] [ a [href "#"] [text "Quota"] ]
         , li [] [ a [href "#", onClick address LoadSwagger] [text "Swagger"] ]
         ] 
