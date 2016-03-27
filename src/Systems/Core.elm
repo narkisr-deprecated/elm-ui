@@ -4,7 +4,7 @@ import Systems.List as List exposing (Error(NoSystemSelected, NoError))
 import Systems.Add as Add
 import Systems.View as View
 import Systems.Launch as Launch exposing (Action(Cancel, SetupJob, Run))
-import Nav.Side as NavSide exposing (Active(Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
+import Nav.Common exposing (Active(Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Html exposing (..)
 import Effects exposing (Effects, batch, map)
 import Common.Utils exposing (none)

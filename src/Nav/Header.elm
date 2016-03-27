@@ -84,7 +84,7 @@ topNav address ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
      [li [ class "dropdown user user-menu"] [
-         a dropdown [
+         a (dropdown []) [
           span [ class "hidden-xs" ]
             [text  username]
           ]

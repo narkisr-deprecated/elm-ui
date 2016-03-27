@@ -3,7 +3,7 @@ module Stacks.Core where
 import Effects exposing (Effects)
 import Html exposing (..)
 import Stacks.Add as Add
-import Nav.Side as NavSide exposing (Active(Jobs), Section(Stats, Launch, Add, List, View))
+import Nav.Common exposing (Active(Jobs), Section(Stats, Launch, Add, List, View))
 import Common.Components exposing (asList, notImplemented)
 import Debug
 

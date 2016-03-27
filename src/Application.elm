@@ -11,7 +11,7 @@ import Jobs.Stats
 import Common.Utils exposing (none)
 import Types.Core as Types
 import Templates.Core as Templates
-import Nav.Side as NavSide exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
+import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Nav.Core as Nav exposing (goto)
 
 import Bootstrap.Html exposing (..)

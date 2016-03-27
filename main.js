@@ -19643,57 +19643,20 @@ Elm.Systems.Launch.make = function (_elm) {
                                        ,view: view};
 };
 Elm.Nav = Elm.Nav || {};
-Elm.Nav.Side = Elm.Nav.Side || {};
-Elm.Nav.Side.make = function (_elm) {
+Elm.Nav.Common = Elm.Nav.Common || {};
+Elm.Nav.Common.make = function (_elm) {
    "use strict";
    _elm.Nav = _elm.Nav || {};
-   _elm.Nav.Side = _elm.Nav.Side || {};
-   if (_elm.Nav.Side.values) return _elm.Nav.Side.values;
+   _elm.Nav.Common = _elm.Nav.Common || {};
+   if (_elm.Nav.Common.values) return _elm.Nav.Common.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
-   $Common$Utils = Elm.Common.Utils.make(_elm),
    $Debug = Elm.Debug.make(_elm),
-   $Effects = Elm.Effects.make(_elm),
-   $Html = Elm.Html.make(_elm),
-   $Html$Attributes = Elm.Html.Attributes.make(_elm),
-   $Html$Events = Elm.Html.Events.make(_elm),
-   $Html$Shorthand = Elm.Html.Shorthand.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Users$Session = Elm.Users.Session.make(_elm);
+   $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var update = F2(function (action,model) {
-      var _p0 = action;
-      if (_p0.ctor === "Goto") {
-            return $Common$Utils.none(_U.update(model,{active: _p0._0,section: _p0._1}));
-         } else {
-            return $Common$Utils.none(_U.update(model,{session: _p0._0}));
-         }
-   });
-   var SetSession = function (a) {    return {ctor: "SetSession",_0: a};};
-   var Goto = F2(function (a,b) {    return {ctor: "Goto",_0: a,_1: b};});
-   var sectionItem = F3(function (address,active,section) {
-      return $Html$Shorthand.li_(_U.list([A2($Html.a,
-      _U.list([$Html$Attributes.$class(A2($Basics._op["++"],$Basics.toString(active),$Basics.toString(section)))
-              ,$Html$Attributes.href("#")
-              ,A2($Html$Events.onClick,address,A2(Goto,active,section))]),
-      _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-circle-o")]),_U.list([])),$Html.text($Basics.toString(section))]))]));
-   });
-   var drop = F4(function (address,active,actions,icon) {
-      return A2($Html.li,
-      _U.list([$Html$Attributes.$class("treeview")]),
-      _U.list([A2($Html.a,
-              _U.list([$Html$Attributes.$class(A2($Basics._op["++"],$Basics.toString(active),"Menu")),$Html$Attributes.href("#")]),
-              _U.list([A2($Html.i,_U.list([$Html$Attributes.$class(icon)]),_U.list([]))
-                      ,A2($Html.span,_U.list([]),_U.list([$Html.text($Basics.toString(active))]))
-                      ,A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-angle-left pull-right")]),_U.list([]))]))
-              ,A2($Html.ul,
-              _U.list([$Html$Attributes.$class("treeview-menu")]),
-              A2($List.map,function (section) {    return A3(sectionItem,address,active,section);},actions))]));
-   });
-   var Model = F3(function (a,b,c) {    return {active: a,section: b,session: c};});
    var Stats = {ctor: "Stats"};
    var View = {ctor: "View"};
    var List = {ctor: "List"};
@@ -19706,51 +19669,19 @@ Elm.Nav.Side.make = function (_elm) {
    var Jobs = {ctor: "Jobs"};
    var Types = {ctor: "Types"};
    var Systems = {ctor: "Systems"};
-   var init = A3(Model,Systems,List,$Users$Session.emptySession);
-   var adminMenus = function (address) {
-      return _U.list([A4(drop,address,Systems,_U.list([List,Add]),"fa fa-server")
-                     ,A4(drop,address,Templates,_U.list([List]),"fa fa-clone")
-                     ,A4(drop,address,Types,_U.list([List,Add]),"fa fa-archive")
-                     ,A4(drop,address,Jobs,_U.list([List,Stats]),"fa fa-tasks")]);
-   };
-   var userMenus = function (address) {
-      return _U.list([A4(drop,address,Systems,_U.list([List,Add]),"fa fa-server")
-                     ,A4(drop,address,Templates,_U.list([List]),"fa fa-clone")
-                     ,A4(drop,address,Jobs,_U.list([List]),"fa fa-tasks")]);
-   };
-   var view = F2(function (address,_p1) {
-      var _p2 = _p1;
-      return _U.list([A2($Html.aside,
-      _U.list([$Html$Attributes.$class("main-sidebar")]),
-      _U.list([A2($Html.section,
-      _U.list([$Html$Attributes.$class("sidebar")]),
-      _U.list([A2($Html.ul,
-      _U.list([$Html$Attributes.$class("sidebar-menu")]),
-      $Users$Session.isUser(_p2.session) ? userMenus(address) : adminMenus(address))]))]))]);
-   });
-   return _elm.Nav.Side.values = {_op: _op
-                                 ,Systems: Systems
-                                 ,Types: Types
-                                 ,Jobs: Jobs
-                                 ,Templates: Templates
-                                 ,Stacks: Stacks
-                                 ,Add: Add
-                                 ,Launch: Launch
-                                 ,Delete: Delete
-                                 ,Edit: Edit
-                                 ,List: List
-                                 ,View: View
-                                 ,Stats: Stats
-                                 ,Model: Model
-                                 ,init: init
-                                 ,Goto: Goto
-                                 ,SetSession: SetSession
-                                 ,update: update
-                                 ,sectionItem: sectionItem
-                                 ,drop: drop
-                                 ,adminMenus: adminMenus
-                                 ,userMenus: userMenus
-                                 ,view: view};
+   return _elm.Nav.Common.values = {_op: _op
+                                   ,Systems: Systems
+                                   ,Types: Types
+                                   ,Jobs: Jobs
+                                   ,Templates: Templates
+                                   ,Stacks: Stacks
+                                   ,Add: Add
+                                   ,Launch: Launch
+                                   ,Delete: Delete
+                                   ,Edit: Edit
+                                   ,List: List
+                                   ,View: View
+                                   ,Stats: Stats};
 };
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.Core = Elm.Systems.Core || {};
@@ -19767,7 +19698,7 @@ Elm.Systems.Core.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
-   $Nav$Side = Elm.Nav.Side.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm),
@@ -19796,7 +19727,7 @@ Elm.Systems.Core.make = function (_elm) {
             var newList = _U.update(_p7,{error: $Systems$List.NoError});
             return {ctor: "_Tuple2"
                    ,_0: _U.update(_p6,
-                   {systemsLaunch: newLaunch,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Systems,_1: $Nav$Side.Launch}),systemsList: newList})
+                   {systemsLaunch: newLaunch,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Systems,_1: $Nav$Common.Launch}),systemsList: newList})
                    ,_1: A2($Effects.map,SystemsLaunch,effect)};
          }
    });
@@ -19821,7 +19752,7 @@ Elm.Systems.Core.make = function (_elm) {
                  var newSystems = _p13._0;
                  var effects = _p13._1;
                  return {ctor: "_Tuple2"
-                        ,_0: _U.update(_p23,{systemsView: newSystems,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Systems,_1: $Nav$Side.View})})
+                        ,_0: _U.update(_p23,{systemsView: newSystems,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Systems,_1: $Nav$Common.View})})
                         ,_1: A2($Effects.map,SystemsView,effects)};
               } else {
                  var _p14 = A2($Systems$List.update,_p15,_p9.systemsList);
@@ -19832,19 +19763,20 @@ Elm.Systems.Core.make = function (_elm) {
          case "SystemsAdd": var _p19 = _p10._0;
            var _p16 = _p19;
            switch (_p16.ctor)
-           {case "JobLaunched": return $Common$Utils.none(_U.update(_p23,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.List})}));
+           {case "JobLaunched": return $Common$Utils.none(_U.update(_p23,
+                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Jobs,_1: $Nav$Common.List})}));
               case "SaveTemplate": return $Common$Utils.none(_U.update(_p23,
-                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Add})}));
+                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.Add})}));
               case "Saved": var _p17 = A2($Systems$Add.update,_p19,_p24);
                 var newSystems = _p17._0;
                 var effect = _p17._1;
                 return !_U.eq(effect,$Effects.none) && _U.eq(_p16._0,$Systems$Add.NoOp) ? $Common$Utils.none(_U.update(_p23,
-                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Systems,_1: $Nav$Side.List}),systemsAdd: newSystems})) : {ctor: "_Tuple2"
-                                                                                                                                ,_0: _U.update(_p23,
-                                                                                                                                {systemsAdd: newSystems})
-                                                                                                                                ,_1: A2($Effects.map,
-                                                                                                                                SystemsAdd,
-                                                                                                                                effect)};
+                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Systems,_1: $Nav$Common.List}),systemsAdd: newSystems})) : {ctor: "_Tuple2"
+                                                                                                                                    ,_0: _U.update(_p23,
+                                                                                                                                    {systemsAdd: newSystems})
+                                                                                                                                    ,_1: A2($Effects.map,
+                                                                                                                                    SystemsAdd,
+                                                                                                                                    effect)};
               default: var _p18 = A2($Systems$Add.update,_p19,_p24);
                 var newSystems = _p18._0;
                 var effect = _p18._1;
@@ -19852,8 +19784,9 @@ Elm.Systems.Core.make = function (_elm) {
          default: var _p22 = _p10._0;
            var _p20 = _p22;
            switch (_p20.ctor)
-           {case "Cancel": return $Common$Utils.none(_U.update(_p23,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Systems,_1: $Nav$Side.List})}));
-              case "JobLaunched": return $Common$Utils.none(_U.update(_p23,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.List})}));
+           {case "Cancel": return $Common$Utils.none(_U.update(_p23,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Systems,_1: $Nav$Common.List})}));
+              case "JobLaunched": return $Common$Utils.none(_U.update(_p23,
+                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Jobs,_1: $Nav$Common.List})}));
               case "SetupJob": return A2(setupJob,_p22,_p23);
               case "Run": var _p21 = A2($Systems$Launch.update,_p22,_p23.systemsLaunch);
                 var newLaunch = _p21._0;
@@ -20227,7 +20160,7 @@ Elm.Stacks.Core.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
-   $Nav$Side = Elm.Nav.Side.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Stacks$Add = Elm.Stacks.Add.make(_elm);
@@ -25521,7 +25454,7 @@ Elm.Types.Core.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
-   $Nav$Side = Elm.Nav.Side.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Table = Elm.Table.make(_elm),
@@ -25554,7 +25487,7 @@ Elm.Types.Core.make = function (_elm) {
                     var newSystems = _p4._0;
                     var effects = _p4._1;
                     return {ctor: "_Tuple2"
-                           ,_0: _U.update(_p11,{view: _p13,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.View})})
+                           ,_0: _U.update(_p11,{view: _p13,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.View})})
                            ,_1: A2($Effects.map,Viewing,effects)};
                  } else {
                     return {ctor: "_Tuple2",_0: _p11,_1: _p10};
@@ -25563,7 +25496,7 @@ Elm.Types.Core.make = function (_elm) {
               if (_p5.ctor === "Saved" && _p5._0.ctor === "Ok") {
                     return A2(refreshList,
                     true,
-                    {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p10});
+                    {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.List})}),_1: _p10});
                  } else {
                     return {ctor: "_Tuple2",_0: _p11,_1: _p10};
                  }
@@ -25573,7 +25506,9 @@ Elm.Types.Core.make = function (_elm) {
                     if (_p7.ctor === "Saved" && _p7._0.ctor === "Ok") {
                           return A2(refreshList,
                           true,
-                          {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p10});
+                          {ctor: "_Tuple2"
+                          ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.List})})
+                          ,_1: _p10});
                        } else {
                           return {ctor: "_Tuple2",_0: _p11,_1: _p10};
                        }
@@ -25584,23 +25519,25 @@ Elm.Types.Core.make = function (_elm) {
               switch (_p8.ctor)
               {case "Deleted": return _U.eq(_p1._0.$delete.errorMsg,"") ? {ctor: "_Tuple2"
                                                                           ,_0: _U.update(_p11,
-                                                                          {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})})
+                                                                          {navChange: $Maybe.Just({ctor: "_Tuple2"
+                                                                                                  ,_0: $Nav$Common.Types
+                                                                                                  ,_1: $Nav$Common.List})})
                                                                           ,_1: _p10} : _p12;
                  case "Cancel": return A2(refreshList,
                    true,
-                   {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p10});
+                   {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.List})}),_1: _p10});
                  case "Done": return A2(refreshList,
                    true,
-                   {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.List})}),_1: _p10});
+                   {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.List})}),_1: _p10});
                  default: return _p12;}
             case "SetupJob": if (_p2._0.ctor === "_Tuple2") {
                     var _p9 = _p2._0._0;
                     switch (_p9)
                     {case "edit": return {ctor: "_Tuple2"
-                                         ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Edit})})
+                                         ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.Edit})})
                                          ,_1: _p10};
                        case "clear": return {ctor: "_Tuple2"
-                                            ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Types,_1: $Nav$Side.Delete})})
+                                            ,_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.Delete})})
                                             ,_1: _p10};
                        default: return _p12;}
                  } else {
@@ -26168,7 +26105,7 @@ Elm.Templates.Core.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
-   $Nav$Side = Elm.Nav.Side.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Templates$Add = Elm.Templates.Add.make(_elm),
@@ -26195,10 +26132,10 @@ Elm.Templates.Core.make = function (_elm) {
                     var _p3 = _p2._0._0;
                     switch (_p3)
                     {case "launch": return {ctor: "_Tuple2"
-                                           ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Launch})})
+                                           ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.Launch})})
                                            ,_1: _p7};
                        case "clear": return {ctor: "_Tuple2"
-                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.Delete})})
+                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.Delete})})
                                             ,_1: _p7};
                        default: return _p9;}
                  } else {
@@ -26209,16 +26146,16 @@ Elm.Templates.Core.make = function (_elm) {
                  switch (_p4.ctor)
                  {case "Saved": if (_p4._0.ctor === "Ok") {
                             return {ctor: "_Tuple2"
-                                   ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                   ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.List})})
                                    ,_1: _p7};
                          } else {
                             break _v3_3;
                          }
                     case "Cancel": return {ctor: "_Tuple2"
-                                          ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                          ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.List})})
                                           ,_1: _p7};
                     case "Done": return {ctor: "_Tuple2"
-                                        ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                        ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.List})})
                                         ,_1: _p7};
                     default: break _v3_3;}
               } while (false);
@@ -26226,10 +26163,10 @@ Elm.Templates.Core.make = function (_elm) {
             case "TemplatesLaunch": var _p5 = _p2._0;
               switch (_p5.ctor)
               {case "Cancel": return {ctor: "_Tuple2"
-                                     ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})})
+                                     ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.List})})
                                      ,_1: _p7};
                  case "JobLaunched": return {ctor: "_Tuple2"
-                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Jobs,_1: $Nav$Side.List})})
+                                            ,_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Jobs,_1: $Nav$Common.List})})
                                             ,_1: _p7};
                  default: return _p9;}
             case "TemplatesDelete": var _p6 = _p2._0;
@@ -26237,15 +26174,15 @@ Elm.Templates.Core.make = function (_elm) {
               {case "Deleted": return _U.eq(_p1._0.$delete.errorMsg,"") ? {ctor: "_Tuple2"
                                                                           ,_0: _U.update(_p8,
                                                                           {navChange: $Maybe.Just({ctor: "_Tuple2"
-                                                                                                  ,_0: $Nav$Side.Templates
-                                                                                                  ,_1: $Nav$Side.List})})
+                                                                                                  ,_0: $Nav$Common.Templates
+                                                                                                  ,_1: $Nav$Common.List})})
                                                                           ,_1: _p7} : _p9;
                  case "Cancel": return A2(refreshList,
                    true,
-                   {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}),_1: _p7});
+                   {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.List})}),_1: _p7});
                  case "Done": return A2(refreshList,
                    true,
-                   {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Side.Templates,_1: $Nav$Side.List})}),_1: _p7});
+                   {ctor: "_Tuple2",_0: _U.update(_p8,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.List})}),_1: _p7});
                  default: return _p9;}
             default: break _v1_4;}
       } while (false);
@@ -26436,10 +26373,7 @@ Elm.Nav.Header.make = function (_elm) {
       _U.list([A2($Html.li,
               _U.list([$Html$Attributes.$class("dropdown user user-menu")]),
               _U.list([A2($Html.a,
-                      _U.list([A2($Html$Attributes.attribute,"aria-expanded","false")
-                              ,$Html$Attributes.$class("dropdown-toggle")
-                              ,A2($Html$Attributes.attribute,"data-toggle","dropdown")
-                              ,$Html$Attributes.href("#")]),
+                      dropdown(_U.list([])),
                       _U.list([A2($Html.span,_U.list([$Html$Attributes.$class("hidden-xs")]),_U.list([$Html.text(_p2.username)]))]))
                       ,A2($Html.ul,
                       _U.list([$Html$Attributes.$class("dropdown-menu")]),
@@ -26505,6 +26439,93 @@ Elm.Nav.Header.make = function (_elm) {
                                    ,gearsButton: gearsButton
                                    ,topNav: topNav
                                    ,view: view};
+};
+Elm.Nav = Elm.Nav || {};
+Elm.Nav.Side = Elm.Nav.Side || {};
+Elm.Nav.Side.make = function (_elm) {
+   "use strict";
+   _elm.Nav = _elm.Nav || {};
+   _elm.Nav.Side = _elm.Nav.Side || {};
+   if (_elm.Nav.Side.values) return _elm.Nav.Side.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Html$Shorthand = Elm.Html.Shorthand.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Users$Session = Elm.Users.Session.make(_elm);
+   var _op = {};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "Goto") {
+            return $Common$Utils.none(_U.update(model,{active: _p0._0,section: _p0._1}));
+         } else {
+            return $Common$Utils.none(_U.update(model,{session: _p0._0}));
+         }
+   });
+   var SetSession = function (a) {    return {ctor: "SetSession",_0: a};};
+   var Goto = F2(function (a,b) {    return {ctor: "Goto",_0: a,_1: b};});
+   var sectionItem = F3(function (address,active,section) {
+      return $Html$Shorthand.li_(_U.list([A2($Html.a,
+      _U.list([$Html$Attributes.$class(A2($Basics._op["++"],$Basics.toString(active),$Basics.toString(section)))
+              ,$Html$Attributes.href("#")
+              ,A2($Html$Events.onClick,address,A2(Goto,active,section))]),
+      _U.list([A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-circle-o")]),_U.list([])),$Html.text($Basics.toString(section))]))]));
+   });
+   var drop = F4(function (address,active,actions,icon) {
+      return A2($Html.li,
+      _U.list([$Html$Attributes.$class("treeview")]),
+      _U.list([A2($Html.a,
+              _U.list([$Html$Attributes.$class(A2($Basics._op["++"],$Basics.toString(active),"Menu")),$Html$Attributes.href("#")]),
+              _U.list([A2($Html.i,_U.list([$Html$Attributes.$class(icon)]),_U.list([]))
+                      ,A2($Html.span,_U.list([]),_U.list([$Html.text($Basics.toString(active))]))
+                      ,A2($Html.i,_U.list([$Html$Attributes.$class("fa fa-angle-left pull-right")]),_U.list([]))]))
+              ,A2($Html.ul,
+              _U.list([$Html$Attributes.$class("treeview-menu")]),
+              A2($List.map,function (section) {    return A3(sectionItem,address,active,section);},actions))]));
+   });
+   var adminMenus = function (address) {
+      return _U.list([A4(drop,address,$Nav$Common.Systems,_U.list([$Nav$Common.List,$Nav$Common.Add]),"fa fa-server")
+                     ,A4(drop,address,$Nav$Common.Templates,_U.list([$Nav$Common.List]),"fa fa-clone")
+                     ,A4(drop,address,$Nav$Common.Types,_U.list([$Nav$Common.List,$Nav$Common.Add]),"fa fa-archive")
+                     ,A4(drop,address,$Nav$Common.Jobs,_U.list([$Nav$Common.List,$Nav$Common.Stats]),"fa fa-tasks")]);
+   };
+   var userMenus = function (address) {
+      return _U.list([A4(drop,address,$Nav$Common.Systems,_U.list([$Nav$Common.List,$Nav$Common.Add]),"fa fa-server")
+                     ,A4(drop,address,$Nav$Common.Templates,_U.list([$Nav$Common.List]),"fa fa-clone")
+                     ,A4(drop,address,$Nav$Common.Jobs,_U.list([$Nav$Common.List]),"fa fa-tasks")]);
+   };
+   var view = F2(function (address,_p1) {
+      var _p2 = _p1;
+      return _U.list([A2($Html.aside,
+      _U.list([$Html$Attributes.$class("main-sidebar")]),
+      _U.list([A2($Html.section,
+      _U.list([$Html$Attributes.$class("sidebar")]),
+      _U.list([A2($Html.ul,
+      _U.list([$Html$Attributes.$class("sidebar-menu")]),
+      $Users$Session.isUser(_p2.session) ? userMenus(address) : adminMenus(address))]))]))]);
+   });
+   var Model = F3(function (a,b,c) {    return {active: a,section: b,session: c};});
+   var init = A3(Model,$Nav$Common.Systems,$Nav$Common.List,$Users$Session.emptySession);
+   return _elm.Nav.Side.values = {_op: _op
+                                 ,Model: Model
+                                 ,init: init
+                                 ,Goto: Goto
+                                 ,SetSession: SetSession
+                                 ,update: update
+                                 ,sectionItem: sectionItem
+                                 ,drop: drop
+                                 ,adminMenus: adminMenus
+                                 ,userMenus: userMenus
+                                 ,view: view};
 };
 Elm.Nav = Elm.Nav || {};
 Elm.Nav.Core = Elm.Nav.Core || {};
@@ -26602,8 +26623,8 @@ Elm.Application.make = function (_elm) {
    $Jobs$Stats = Elm.Jobs.Stats.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
+   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Nav$Core = Elm.Nav.Core.make(_elm),
-   $Nav$Side = Elm.Nav.Side.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Stacks$Core = Elm.Stacks.Core.make(_elm),
@@ -26637,11 +26658,11 @@ Elm.Application.make = function (_elm) {
                                var _p5 = jobListing(_p11);
                                var withJobs = _p5._0;
                                var effects = _p5._1;
-                               return A4($Nav$Core.$goto,$Nav$Side.Jobs,$Nav$Side.List,withJobs,effects);
+                               return A4($Nav$Core.$goto,$Nav$Common.Jobs,$Nav$Common.List,withJobs,effects);
                             } else {
                                break _v2_3;
                             }
-                       case "Systems": return A4($Nav$Core.$goto,$Nav$Side.Systems,_p4._0._1,_p11,_p10);
+                       case "Systems": return A4($Nav$Core.$goto,$Nav$Common.Systems,_p4._0._1,_p11,_p10);
                        case "Templates": var _p6 = $Systems$Core.addedSystem(_p12);
                          var hyp = _p6._0;
                          var system = _p6._1;
@@ -26650,7 +26671,7 @@ Elm.Application.make = function (_elm) {
                          var newTemplates = _p7._0;
                          var effects = _p7._1;
                          return A4($Nav$Core.$goto,
-                         $Nav$Side.Templates,
+                         $Nav$Common.Templates,
                          _p4._0._1,
                          _U.update(_p11,{templates: newTemplates}),
                          A2($Effects.map,TemplatesAction,effects));
@@ -26684,7 +26705,7 @@ Elm.Application.make = function (_elm) {
       var _p15 = action;
       switch (_p15.ctor)
       {case "JobsList": var _p17 = _p15._0;
-           if (_U.eq(_p17,$Jobs$List.Polling) && !_U.eq($Nav$Core.activeOf(_p25),$Nav$Side.Jobs)) return {ctor: "_Tuple2",_0: _p24,_1: $Effects.none}; else {
+           if (_U.eq(_p17,$Jobs$List.Polling) && !_U.eq($Nav$Core.activeOf(_p25),$Nav$Common.Jobs)) return {ctor: "_Tuple2",_0: _p24,_1: $Effects.none}; else {
                  var _p16 = A2($Jobs$List.update,_p17,_p14.jobsList);
                  var newJobList = _p16._0;
                  var effects = _p16._1;

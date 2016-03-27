@@ -9,7 +9,7 @@ import Templates.Add as Add
 import Templates.List as List
 import Templates.Launch as Launch
 import Templates.Delete as Delete
-import Nav.Side as NavSide exposing (Active(Templates, Jobs), Section(Add, Launch, List, Delete))
+import Nav.Common exposing (Active(Templates, Jobs), Section(Add, Launch, List, Delete))
 import Systems.Model.Common exposing (System)
 
 type alias Model = 

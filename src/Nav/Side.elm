@@ -9,22 +9,7 @@ import Users.Session exposing (Session, emptySession)
 import Effects exposing (Effects)
 import Html.Events exposing (onClick)
 import Common.Utils exposing (none)
-
-type Active = 
-  Systems 
-    | Types 
-    | Jobs
-    | Templates
-    | Stacks
-
-type Section = 
-  Add 
-    | Launch 
-    | Delete
-    | Edit
-    | List 
-    | View
-    | Stats
+import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 
 type alias Model = 
   { 
