@@ -72,7 +72,6 @@ gearsButton address session =
         i (dropdown [ class "fa fa-gears", style [("color", "black")]]) []
       , ul [ class "dropdown-menu" ] [
           li [] [ a [href "#", onClick address (Goto Users List)] [text "Users" ] ]
-        , li [] [ a [href "#"] [text "Quota"] ]
         , li [] [ a [href "#", onClick address LoadSwagger] [text "Swagger"] ]
         ] 
       ]

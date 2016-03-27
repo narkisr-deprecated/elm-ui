@@ -170,6 +170,22 @@
         clear: { name: "Clear", callback: typesAction("clear") }
     }
   });
+
+  usersAction = function (e) {
+    return function(key, opt){
+      typeName = $(this).context.cells[0].innerHTML;
+	if (typeName !== undefined) {
+	  main.ports.menuPort.send(["Users",e, typeName]); 
+	}
+    }
+  }
+  $.contextMenu({
+    selector: "#usersListing tr",
+    items: {
+        edit: { name: "Edit", callback: usersAction("edit")},
+        clear: { name: "Clear", callback: usersAction("clear") }
+    }
+  });
 </script>
 
 </html>

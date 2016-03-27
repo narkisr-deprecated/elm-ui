@@ -44,7 +44,7 @@ init =
 
 type Action = 
   Listing TypesList.Action
-    | SetupJob (String, String)
+    | MenuClick (String, String)
     | Adding TypesAdd.Action
     | Viewing TypesView.Action
     | Deleting TypesDelete.Action
@@ -104,7 +104,7 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
            _ -> 
             result
 
-      SetupJob (job,_) -> 
+      MenuClick (job,_) -> 
         case job of 
          "edit" -> 
             ({ model | navChange = Just (Types, Edit) }, effects)
@@ -159,7 +159,7 @@ route action ({list, add, view, delete, edit} as model) =
       in
         refreshList success ({ model | delete = newDelete } , Effects.map Deleting effects)
 
-    SetupJob (job, name) -> 
+    MenuClick (job, name) -> 
       case job of
         "clear" -> 
            none { model | delete = setName delete name }
@@ -174,7 +174,7 @@ route action ({list, add, view, delete, edit} as model) =
           none model
 
 update : Action ->  Model-> (Model , Effects Action)
-update action ({list, add, view} as model) =
+update action model =
   navigate action (route action model)
 
 view : Signal.Address Action -> Model -> Section -> List Html

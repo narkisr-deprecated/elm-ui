@@ -25473,7 +25473,7 @@ Elm.Types.Core.make = function (_elm) {
    var Deleting = function (a) {    return {ctor: "Deleting",_0: a};};
    var Viewing = function (a) {    return {ctor: "Viewing",_0: a};};
    var Adding = function (a) {    return {ctor: "Adding",_0: a};};
-   var SetupJob = function (a) {    return {ctor: "SetupJob",_0: a};};
+   var MenuClick = function (a) {    return {ctor: "MenuClick",_0: a};};
    var Listing = function (a) {    return {ctor: "Listing",_0: a};};
    var refreshList = A2($Common$Delete.refresh,$Types$List.init,Listing);
    var navigate = F2(function (action,_p0) {
@@ -25534,7 +25534,7 @@ Elm.Types.Core.make = function (_elm) {
                    true,
                    {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Types,_1: $Nav$Common.List})}),_1: _p10});
                  default: return _p12;}
-            case "SetupJob": if (_p2._0.ctor === "_Tuple2") {
+            case "MenuClick": if (_p2._0.ctor === "_Tuple2") {
                     var _p9 = _p2._0._0;
                     switch (_p9)
                     {case "edit": return {ctor: "_Tuple2"
@@ -25590,35 +25590,35 @@ Elm.Types.Core.make = function (_elm) {
                 return {ctor: "_Tuple2",_0: _U.update(_p28,{edit: newEdit}),_1: A2($Effects.map,Editing,effects)};
               default: return $Common$Utils.none(_p28);}}
    });
-   var update = F2(function (action,_p29) {    var _p30 = _p29;return A2(navigate,action,A2(route,action,_p30));});
-   var view = F3(function (address,_p31,section) {
-      var _p32 = _p31;
-      var _p33 = section;
-      switch (_p33.ctor)
-      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p32.list);
-         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p32.add);
-         case "Edit": return A2($Types$Edit.view,A2($Signal.forwardTo,address,Editing),_p32.edit);
-         case "View": return A2($Types$View.view,A2($Signal.forwardTo,address,Viewing),_p32.view);
-         case "Delete": return A2($Types$Delete.view,A2($Signal.forwardTo,address,Deleting),_p32.$delete);
+   var update = F2(function (action,model) {    return A2(navigate,action,A2(route,action,model));});
+   var view = F3(function (address,_p29,section) {
+      var _p30 = _p29;
+      var _p31 = section;
+      switch (_p31.ctor)
+      {case "List": return A2($Types$List.view,A2($Signal.forwardTo,address,Listing),_p30.list);
+         case "Add": return A2($Types$Add.view,A2($Signal.forwardTo,address,Adding),_p30.add);
+         case "Edit": return A2($Types$Edit.view,A2($Signal.forwardTo,address,Editing),_p30.edit);
+         case "View": return A2($Types$View.view,A2($Signal.forwardTo,address,Viewing),_p30.view);
+         case "Delete": return A2($Types$Delete.view,A2($Signal.forwardTo,address,Deleting),_p30.$delete);
          default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
    var Model = F6(function (a,b,c,d,e,f) {    return {list: a,add: b,view: c,$delete: d,edit: e,navChange: f};});
    var init = function () {
-      var _p34 = $Types$Delete.init;
-      var $delete = _p34._0;
-      var deleteAction = _p34._1;
-      var _p35 = $Types$Edit.init;
-      var edit = _p35._0;
-      var editAction = _p35._1;
-      var _p36 = $Types$View.init;
-      var view = _p36._0;
-      var viewAction = _p36._1;
-      var _p37 = $Types$Add.init;
-      var add = _p37._0;
-      var addAction = _p37._1;
-      var _p38 = $Types$List.init;
-      var list = _p38._0;
-      var listAction = _p38._1;
+      var _p32 = $Types$Delete.init;
+      var $delete = _p32._0;
+      var deleteAction = _p32._1;
+      var _p33 = $Types$Edit.init;
+      var edit = _p33._0;
+      var editAction = _p33._1;
+      var _p34 = $Types$View.init;
+      var view = _p34._0;
+      var viewAction = _p34._1;
+      var _p35 = $Types$Add.init;
+      var add = _p35._0;
+      var addAction = _p35._1;
+      var _p36 = $Types$List.init;
+      var list = _p36._0;
+      var listAction = _p36._1;
       var effects = _U.list([A2($Effects.map,Listing,listAction)
                             ,A2($Effects.map,Adding,addAction)
                             ,A2($Effects.map,Viewing,viewAction)
@@ -25630,7 +25630,7 @@ Elm.Types.Core.make = function (_elm) {
                                    ,Model: Model
                                    ,init: init
                                    ,Listing: Listing
-                                   ,SetupJob: SetupJob
+                                   ,MenuClick: MenuClick
                                    ,Adding: Adding
                                    ,Viewing: Viewing
                                    ,Deleting: Deleting
@@ -25742,38 +25742,68 @@ Elm.Users.Core.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Users$List = Elm.Users.List.make(_elm);
    var _op = {};
-   var NoOp = {ctor: "NoOp"};
-   var Listing = function (a) {    return {ctor: "Listing",_0: a};};
-   var update = F2(function (action,_p0) {
+   var navigate = F2(function (action,_p0) {
       var _p1 = _p0;
-      var _p4 = _p1;
+      var _p5 = _p1._0;
+      var _p4 = _p1._1;
       var _p2 = action;
-      if (_p2.ctor === "Listing") {
-            var _p3 = A2($Users$List.update,_p2._0,_p1.list);
-            var newList = _p3._0;
-            var effects = _p3._1;
-            return {ctor: "_Tuple2",_0: _U.update(_p4,{list: newList}),_1: A2($Effects.map,Listing,effects)};
+      if (_p2.ctor === "MenuClick" && _p2._0.ctor === "_Tuple2") {
+            var _p3 = _p2._0._0;
+            switch (_p3)
+            {case "edit": return {ctor: "_Tuple2"
+                                 ,_0: _U.update(_p5,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Users,_1: $Nav$Common.Edit})})
+                                 ,_1: _p4};
+               case "clear": return {ctor: "_Tuple2"
+                                    ,_0: _U.update(_p5,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Users,_1: $Nav$Common.Delete})})
+                                    ,_1: _p4};
+               default: return $Common$Utils.none(_p5);}
          } else {
-            return $Common$Utils.none(_p4);
+            return $Common$Utils.none(_p5);
          }
    });
-   var view = F3(function (address,_p5,section) {
-      var _p6 = _p5;
-      var _p7 = section;
-      if (_p7.ctor === "List") {
-            return A2($Users$List.view,A2($Signal.forwardTo,address,Listing),_p6.list);
+   var NoOp = {ctor: "NoOp"};
+   var MenuClick = function (a) {    return {ctor: "MenuClick",_0: a};};
+   var Listing = function (a) {    return {ctor: "Listing",_0: a};};
+   var route = F2(function (action,_p6) {
+      var _p7 = _p6;
+      var _p10 = _p7;
+      var _p8 = action;
+      if (_p8.ctor === "Listing") {
+            var _p9 = A2($Users$List.update,_p8._0,_p7.list);
+            var newList = _p9._0;
+            var effects = _p9._1;
+            return {ctor: "_Tuple2",_0: _U.update(_p10,{list: newList}),_1: A2($Effects.map,Listing,effects)};
+         } else {
+            return $Common$Utils.none(_p10);
+         }
+   });
+   var update = F2(function (action,model) {    return A2(navigate,action,A2(route,action,model));});
+   var view = F3(function (address,_p11,section) {
+      var _p12 = _p11;
+      var _p13 = section;
+      if (_p13.ctor === "List") {
+            return A2($Users$List.view,A2($Signal.forwardTo,address,Listing),_p12.list);
          } else {
             return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
          }
    });
-   var Model = function (a) {    return {list: a};};
+   var Model = F2(function (a,b) {    return {list: a,navChange: b};});
    var init = function () {
-      var _p8 = $Users$List.init;
-      var list = _p8._0;
-      var listActions = _p8._1;
-      return {ctor: "_Tuple2",_0: Model(list),_1: A2($Effects.map,Listing,listActions)};
+      var _p14 = $Users$List.init;
+      var list = _p14._0;
+      var listActions = _p14._1;
+      return {ctor: "_Tuple2",_0: A2(Model,list,$Maybe.Nothing),_1: A2($Effects.map,Listing,listActions)};
    }();
-   return _elm.Users.Core.values = {_op: _op,Model: Model,init: init,Listing: Listing,NoOp: NoOp,update: update,view: view};
+   return _elm.Users.Core.values = {_op: _op
+                                   ,Model: Model
+                                   ,init: init
+                                   ,Listing: Listing
+                                   ,MenuClick: MenuClick
+                                   ,NoOp: NoOp
+                                   ,navigate: navigate
+                                   ,route: route
+                                   ,update: update
+                                   ,view: view};
 };
 Elm.Templates = Elm.Templates || {};
 Elm.Templates.Persistency = Elm.Templates.Persistency || {};
@@ -26484,7 +26514,6 @@ Elm.Nav.Header.make = function (_elm) {
                       _U.list([A2($Html.a,
                       _U.list([$Html$Attributes.href("#"),A2($Html$Events.onClick,address,A2(Goto,$Nav$Common.Users,$Nav$Common.List))]),
                       _U.list([$Html.text("Users")]))]))
-                      ,A2($Html.li,_U.list([]),_U.list([A2($Html.a,_U.list([$Html$Attributes.href("#")]),_U.list([$Html.text("Quota")]))]))
                       ,A2($Html.li,
                       _U.list([]),
                       _U.list([A2($Html.a,
@@ -27006,7 +27035,8 @@ Elm.Main.make = function (_elm) {
    $Time = Elm.Time.make(_elm),
    $Types$Add = Elm.Types.Add.make(_elm),
    $Types$Core = Elm.Types.Core.make(_elm),
-   $Types$Edit = Elm.Types.Edit.make(_elm);
+   $Types$Edit = Elm.Types.Edit.make(_elm),
+   $Users$Core = Elm.Users.Core.make(_elm);
    var _op = {};
    var intoActions = function (_p0) {
       var _p1 = _p0;
@@ -27016,7 +27046,8 @@ Elm.Main.make = function (_elm) {
       switch (_p2)
       {case "Systems": return $Application.SystemsAction($Systems$Core.SystemsLaunch($Systems$Launch.SetupJob(_p3)));
          case "Templates": return $Application.TemplatesAction($Templates$Core.SetupJob({ctor: "_Tuple2",_0: _p3,_1: _p4}));
-         case "Types": return $Application.TypesAction($Types$Core.SetupJob({ctor: "_Tuple2",_0: _p3,_1: _p4}));
+         case "Types": return $Application.TypesAction($Types$Core.MenuClick({ctor: "_Tuple2",_0: _p3,_1: _p4}));
+         case "Users": return $Application.UsersAction($Users$Core.MenuClick({ctor: "_Tuple2",_0: _p3,_1: _p4}));
          default: return $Application.NoOp;}
    };
    var menuClick = function (p) {    return A2($Signal.map,intoActions,p);};

@@ -13,6 +13,7 @@ import Systems.Core as SystemsCore
 import Templates.Launch as TemplatesLaunch
 import Templates.Core as TemplatesCore
 import Types.Core as TypesCore
+import Users.Core as UsersCore
 import Types.Add as TypesAdd
 import Types.Edit as TypesEdit
 import Json.Encode as E exposing (list, string)
@@ -148,7 +149,11 @@ intoActions (dest, job, target) =
        Application.TemplatesAction (TemplatesCore.SetupJob (job, target))
 
     "Types" ->
-       Application.TypesAction (TypesCore.SetupJob (job, target))
+       Application.TypesAction (TypesCore.MenuClick (job, target))
+
+    "Users" ->
+       Application.UsersAction (UsersCore.MenuClick (job, target))
+
 
     _ -> 
        Application.NoOp
