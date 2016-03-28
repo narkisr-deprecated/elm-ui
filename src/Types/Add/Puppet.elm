@@ -67,7 +67,7 @@ view check address ({form} as model) =
     source = (Form.getFieldAsString "source" form)
     arguments = (Form.getFieldAsString "arguments" form)
     unsecure = (Form.getFieldAsBool "unsecure" form)
-  in 
+ in 
    (Html.form [] [
      div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
         formControl "Name" Input.textInput name address

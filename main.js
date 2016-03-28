@@ -15250,24 +15250,41 @@ Elm.Users.Model.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Common$Http = Elm.Common.Http.make(_elm),
    $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
    $Effects = Elm.Effects.make(_elm),
    $Json$Decode = Elm.Json.Decode.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var User = F4(function (a,b,c,d) {    return {username: a,operations: b,roles: c,envs: d};});
-   var user = A5($Json$Decode.object4,
+   var rolesList = $Json$Decode.dict($Json$Decode.string);
+   var getRoles = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,rolesList,"/users/roles"))));};
+   var User = F5(function (a,b,c,d,e) {    return {username: a,password: b,operations: c,roles: d,envs: e};});
+   var emptyUser = A5(User,"",$Maybe.Nothing,_U.list([]),_U.list([]),_U.list([]));
+   var userBase = F3(function (name,password,roles) {    return A5(User,name,$Maybe.Just(password),_U.list([]),A2($String.split," ",roles),_U.list([]));});
+   var permBase = F2(function (envs,operations) {    return A5(User,"",$Maybe.Nothing,_U.list([]),_U.list([]),_U.list([]));});
+   var user = A6($Json$Decode.object5,
    User,
    A2($Json$Decode._op[":="],"username",$Json$Decode.string),
+   $Json$Decode.maybe(A2($Json$Decode._op[":="],"password",$Json$Decode.string)),
    A2($Json$Decode._op[":="],"operations",$Json$Decode.list($Json$Decode.string)),
    A2($Json$Decode._op[":="],"roles",$Json$Decode.list($Json$Decode.string)),
    A2($Json$Decode._op[":="],"envs",$Json$Decode.list($Json$Decode.string)));
    var usersList = $Json$Decode.list(user);
    var getUsers = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,usersList,"/users"))));};
-   return _elm.Users.Model.values = {_op: _op,User: User,user: user,usersList: usersList,getUsers: getUsers};
+   return _elm.Users.Model.values = {_op: _op
+                                    ,User: User
+                                    ,emptyUser: emptyUser
+                                    ,userBase: userBase
+                                    ,permBase: permBase
+                                    ,user: user
+                                    ,usersList: usersList
+                                    ,getUsers: getUsers
+                                    ,rolesList: rolesList
+                                    ,getRoles: getRoles};
 };
 Elm.Users = Elm.Users || {};
 Elm.Users.Session = Elm.Users.Session || {};
@@ -26664,7 +26681,8 @@ Elm.Nav.Side.make = function (_elm) {
       return _U.list([A4(drop,address,$Nav$Common.Systems,_U.list([$Nav$Common.List,$Nav$Common.Add]),"fa fa-server")
                      ,A4(drop,address,$Nav$Common.Templates,_U.list([$Nav$Common.List]),"fa fa-clone")
                      ,A4(drop,address,$Nav$Common.Types,_U.list([$Nav$Common.List,$Nav$Common.Add]),"fa fa-archive")
-                     ,A4(drop,address,$Nav$Common.Jobs,_U.list([$Nav$Common.List,$Nav$Common.Stats]),"fa fa-tasks")]);
+                     ,A4(drop,address,$Nav$Common.Jobs,_U.list([$Nav$Common.List,$Nav$Common.Stats]),"fa fa-tasks")
+                     ,A4(drop,address,$Nav$Common.Users,_U.list([$Nav$Common.List,$Nav$Common.Add]),"fa fa-users")]);
    };
    var userMenus = function (address) {
       return _U.list([A4(drop,address,$Nav$Common.Systems,_U.list([$Nav$Common.List,$Nav$Common.Add]),"fa fa-server")
@@ -27168,4 +27186,345 @@ Elm.Main.make = function (_elm) {
                              ,jobsStatsPolling: jobsStatsPolling
                              ,intoActions: intoActions
                              ,menuClick: menuClick};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.Add = Elm.Users.Add || {};
+Elm.Users.Add.Perm = Elm.Users.Add.Perm || {};
+Elm.Users.Add.Perm.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Add = _elm.Users.Add || {};
+   _elm.Users.Add.Perm = _elm.Users.Add.Perm || {};
+   if (_elm.Users.Add.Perm.values) return _elm.Users.Add.Perm.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$FormComponents = Elm.Common.FormComponents.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Form = Elm.Form.make(_elm),
+   $Form$Infix = Elm.Form.Infix.make(_elm),
+   $Form$Input = Elm.Form.Input.make(_elm),
+   $Form$Validate = Elm.Form.Validate.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm);
+   var _op = {};
+   var view = F4(function (envs,operations,address,_p0) {
+      var _p1 = _p0;
+      var _p2 = _p1.form;
+      var operation = A2($Form.getFieldAsString,"operations",_p2);
+      var environment = A2($Form.getFieldAsString,"envs",_p2);
+      return A2($Html.form,
+      _U.list([]),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
+      _U.list([A4($Common$FormComponents.formControl,"Environment",$Form$Input.selectInput(envs),environment,address)
+              ,A4($Common$FormComponents.formControl,"Operation",$Form$Input.selectInput(operations),operation,address)]))]));
+   });
+   var validate = A3($Form$Validate.form2,
+   $Users$Model.permBase,
+   A2($Form$Infix._op[":="],"envs",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"operations",$Form$Validate.string));
+   var Model = function (a) {    return {form: a};};
+   var init = Model(A2($Form.initial,_U.list([]),validate));
+   return _elm.Users.Add.Perm.values = {_op: _op,Model: Model,validate: validate,init: init,view: view};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.Add = Elm.Users.Add || {};
+Elm.Users.Add.Main = Elm.Users.Add.Main || {};
+Elm.Users.Add.Main.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Add = _elm.Users.Add || {};
+   _elm.Users.Add.Main = _elm.Users.Add.Main || {};
+   if (_elm.Users.Add.Main.values) return _elm.Users.Add.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$FormComponents = Elm.Common.FormComponents.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Form = Elm.Form.make(_elm),
+   $Form$Field = Elm.Form.Field.make(_elm),
+   $Form$Infix = Elm.Form.Infix.make(_elm),
+   $Form$Input = Elm.Form.Input.make(_elm),
+   $Form$Validate = Elm.Form.Validate.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm);
+   var _op = {};
+   var view = F3(function (roles,address,_p0) {
+      var _p1 = _p0;
+      var _p2 = _p1.form;
+      var description = A2($Form.getFieldAsString,"description",_p2);
+      var role = A2($Form.getFieldAsString,"role",_p2);
+      return A2($Html.form,
+      _U.list([]),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
+      _U.list([A4($Common$FormComponents.formControl,"Description",$Form$Input.textInput,description,address)
+              ,A4($Common$FormComponents.formControl,"Roles",$Form$Input.selectInput(_U.list([])),role,address)]))]));
+   });
+   var defaults = function (role) {    return _U.list([{ctor: "_Tuple2",_0: "role",_1: $Form$Field.Text(role)}]);};
+   var validate = A4($Form$Validate.form3,
+   $Users$Model.userBase,
+   A2($Form$Infix._op[":="],"username",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"password",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"roles",$Form$Validate.string));
+   var Model = function (a) {    return {form: a};};
+   var init = function (role) {    return Model(A2($Form.initial,defaults(role),validate));};
+   return _elm.Users.Add.Main.values = {_op: _op,Model: Model,validate: validate,defaults: defaults,init: init,view: view};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.View = Elm.Users.View || {};
+Elm.Users.View.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.View = _elm.Users.View || {};
+   if (_elm.Users.View.values) return _elm.Users.View.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm);
+   var _op = {};
+   var getUser = F2(function (name,action) {
+      return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,$Users$Model.user,A2($Basics._op["++"],"/users/",name)))));
+   });
+   var summarize = function (model) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+      _U.list([]));
+   };
+   var view = F2(function (address,_p0) {
+      var _p1 = _p0;
+      return $Common$Components.asList(A2($Html.div,_U.list([]),_U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("User")])),summarize(_p1.user)])));
+   });
+   var setUser = F2(function (model,user) {    return $Common$Utils.none(_U.update(model,{user: user}));});
+   var NoOp = {ctor: "NoOp"};
+   var SetUser = function (a) {    return {ctor: "SetUser",_0: a};};
+   var update = F2(function (action,model) {
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "ViewUser": return {ctor: "_Tuple2",_0: model,_1: A2(getUser,_p2._0,SetUser)};
+         case "SetUser": return A4($Common$Errors.successHandler,_p2._0,model,setUser(model),NoOp);
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var ViewUser = function (a) {    return {ctor: "ViewUser",_0: a};};
+   var Model = function (a) {    return {user: a};};
+   var init = $Common$Utils.none(Model($Users$Model.emptyUser));
+   return _elm.Users.View.values = {_op: _op
+                                   ,Model: Model
+                                   ,init: init
+                                   ,ViewUser: ViewUser
+                                   ,SetUser: SetUser
+                                   ,NoOp: NoOp
+                                   ,setUser: setUser
+                                   ,update: update
+                                   ,summarize: summarize
+                                   ,view: view
+                                   ,getUser: getUser};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.Add = Elm.Users.Add || {};
+Elm.Users.Add.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Add = _elm.Users.Add || {};
+   if (_elm.Users.Add.values) return _elm.Users.Add.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$FormWizard = Elm.Common.FormWizard.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Form = Elm.Form.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Users$Add$Main = Elm.Users.Add.Main.make(_elm),
+   $Users$Add$Perm = Elm.Users.Add.Perm.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm),
+   $Users$View = Elm.Users.View.make(_elm);
+   var _op = {};
+   var rows = F2(function (contents,buttons) {    return _U.list([$Bootstrap$Html.row_(_U.list([contents])),$Bootstrap$Html.row_(buttons)]);});
+   var merge = F2(function (_p0,acc) {
+      var _p1 = _p0;
+      var user = A2($Maybe.withDefault,acc,$Form.getOutput(_p1.form));
+      var _p2 = _p1.value;
+      if (_p2.ctor === "Main") {
+            return user;
+         } else {
+            return user;
+         }
+   });
+   var merged = function (_p3) {    var _p4 = _p3;return A3($List.foldl,merge,$Users$Model.emptyUser,_p4.wizard.prev);};
+   var NoOp = {ctor: "NoOp"};
+   var Saved = function (a) {    return {ctor: "Saved",_0: a};};
+   var saveType = function (json) {
+      return $Effects.task(A2($Task.map,Saved,$Task.toResult(A3($Common$Http.postJson,$Http.string(json),$Common$Http.saveResponse,"/types"))));
+   };
+   var updateType = function (json) {
+      return $Effects.task(A2($Task.map,Saved,$Task.toResult(A3($Common$Http.putJson,$Http.string(json),$Common$Http.saveResponse,"/types"))));
+   };
+   var Save = function (a) {    return {ctor: "Save",_0: a};};
+   var saveButton = function (address) {
+      return _U.list([A2($Html.button,
+      _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Save(saveType))]),
+      _U.list([$Html.text("Save  ")]))]);
+   };
+   var doneButton = function (address) {
+      return _U.list([A2($Html.button,
+      _U.list([$Html$Attributes.id("Done"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Save(saveType))]),
+      _U.list([$Html.text("Done ")]))]);
+   };
+   var Next = {ctor: "Next"};
+   var Back = {ctor: "Back"};
+   var Done = {ctor: "Done"};
+   var Reset = {ctor: "Reset"};
+   var SetEnvironments = function (a) {    return {ctor: "SetEnvironments",_0: a};};
+   var FormAction = function (a) {    return {ctor: "FormAction",_0: a};};
+   var currentView = F2(function (address,_p5) {
+      var _p6 = _p5;
+      var _p7 = _p6.wizard.step;
+      if (_p7.ctor === "Just") {
+            var _p9 = _p7._0;
+            var _p8 = _p7._0.value;
+            if (_p8.ctor === "Main") {
+                  return A3($Common$Components.dialogPanel,
+                  "info",
+                  $Common$Components.info("Add a new User"),
+                  $Common$Components.panel($Common$Components.fixedPanel(A3($Users$Add$Main.view,_p6.roles,A2($Signal.forwardTo,address,FormAction),_p9))));
+               } else {
+                  return A3($Common$Components.dialogPanel,
+                  "info",
+                  $Common$Components.info("User permissions"),
+                  $Common$Components.panel($Common$Components.fixedPanel(A4($Users$Add$Perm.view,
+                  _U.list([]),
+                  _U.list([]),
+                  A2($Signal.forwardTo,address,FormAction),
+                  _p9))));
+               }
+         } else {
+            return A3($Common$Components.dialogPanel,
+            "info",
+            $Common$Components.info("Save new user"),
+            $Common$Components.panel($Common$Components.fixedPanel($Users$View.summarize(merged(_p6)))));
+         }
+   });
+   var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
+   var update = F2(function (action,_p10) {
+      update: while (true) {
+         var _p11 = _p10;
+         var _p15 = _p11.wizard;
+         var _p14 = _p11;
+         var _p12 = action;
+         switch (_p12.ctor)
+         {case "Next": var _v8 = WizardAction($Common$FormWizard.Next),_v9 = _p14;
+              action = _v8;
+              _p10 = _v9;
+              continue update;
+            case "Back": var _v10 = WizardAction($Common$FormWizard.Back),_v11 = _p14;
+              action = _v10;
+              _p10 = _v11;
+              continue update;
+            case "Reset": var _p13 = A2(update,WizardAction($Common$FormWizard.Back),_p14);
+              var back = _p13._0;
+              return $Common$Utils.none(_U.update(back,{saveErrors: $Common$Errors.init}));
+            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p12._0,_p15);
+              return $Common$Utils.none(_U.update(_p14,{wizard: newWizard}));
+            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p12._0),_p15);
+              return $Common$Utils.none(_U.update(_p14,{wizard: newWizard}));
+            case "SetEnvironments": return $Common$Utils.none(_p14);
+            case "Save": return $Common$Utils.none(_p14);
+            case "Saved": return A3($Common$Errors.errorsHandler,_p12._0,_p14,NoOp);
+            default: return $Common$Utils.none(_p14);}
+      }
+   });
+   var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
+   var errorsView = F2(function (address,_p16) {
+      var _p17 = _p16;
+      var body = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p17.saveErrors);
+      return A3($Common$Components.dialogPanel,
+      "danger",
+      $Common$Components.error("Failed to save type"),
+      $Common$Components.panel($Common$Components.panelContents(body)));
+   });
+   var view = F2(function (address,_p18) {
+      var _p19 = _p18;
+      var _p20 = _p19;
+      var buttons$ = A2($Common$Components.buttons,address,_U.update(_p20,{hasNext: $Common$FormWizard.notDone(_p20)}));
+      return $Common$Errors.hasErrors(_p19.saveErrors) ? A2(rows,
+      A2($Html.div,_U.list([]),A2(errorsView,address,_p20)),
+      A3(buttons$,Done,Reset,doneButton(address))) : A2(rows,
+      A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),A2(currentView,address,_p20)),
+      A3(buttons$,Next,Back,saveButton(address)));
+   });
+   var step = F2(function (model,value) {    return {form: model.form,value: value};});
+   var Perm = {ctor: "Perm"};
+   var Main = {ctor: "Main"};
+   var Model = F4(function (a,b,c,d) {    return {wizard: a,saveErrors: b,hasNext: c,roles: d};});
+   var init = function () {
+      var mainStep = A2(step,$Users$Add$Main.init(""),Main);
+      var steps = _U.list([A2(step,$Users$Add$Perm.init,Perm)]);
+      var wizard = A2($Common$FormWizard.init,mainStep,steps);
+      var errors = $Common$Errors.init;
+      return {ctor: "_Tuple2",_0: A4(Model,wizard,errors,false,$Dict.empty),_1: $Users$Model.getRoles(SetEnvironments)};
+   }();
+   return _elm.Users.Add.values = {_op: _op
+                                  ,Model: Model
+                                  ,Main: Main
+                                  ,Perm: Perm
+                                  ,step: step
+                                  ,init: init
+                                  ,ErrorsView: ErrorsView
+                                  ,WizardAction: WizardAction
+                                  ,FormAction: FormAction
+                                  ,SetEnvironments: SetEnvironments
+                                  ,Reset: Reset
+                                  ,Done: Done
+                                  ,Back: Back
+                                  ,Next: Next
+                                  ,Save: Save
+                                  ,Saved: Saved
+                                  ,NoOp: NoOp
+                                  ,merge: merge
+                                  ,merged: merged
+                                  ,update: update
+                                  ,currentView: currentView
+                                  ,errorsView: errorsView
+                                  ,saveButton: saveButton
+                                  ,doneButton: doneButton
+                                  ,rows: rows
+                                  ,view: view
+                                  ,saveType: saveType
+                                  ,updateType: updateType};
 };

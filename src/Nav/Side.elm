@@ -9,7 +9,7 @@ import Users.Session exposing (Session, emptySession)
 import Effects exposing (Effects)
 import Html.Events exposing (onClick)
 import Common.Utils exposing (none)
-import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
+import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))
 
 type alias Model = 
   { 
@@ -64,6 +64,7 @@ adminMenus address =
    , drop address Templates [List] "fa fa-clone"
    , drop address Types [List, Add] "fa fa-archive"
    , drop address Jobs [List, Stats] "fa fa-tasks"
+  , drop address Users [List, Add] "fa fa-users"
    ]
 
 userMenus : Signal.Address Action -> List Html
