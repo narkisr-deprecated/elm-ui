@@ -6,7 +6,8 @@
     "source-directories": [
         "src",
 	  "modules/elm-chartjs/src",
-	  "modules/elm-http/src"
+	  "modules/elm-http/src",
+	  "modules/elm-simple-form/src"
     ],
     "exposed-modules": [],
     "dependencies": {
@@ -18,7 +19,6 @@
         "circuithub/elm-html-shorthand":"9.0.3 <= v < 10.0.0",
 	  "evancz/focus":"2.0.0 <= v < 3.0.0",
 	  "mgold/elm-date-format": "1.0.3 <= v < 2.0.0",
-	  "etaque/elm-simple-form" : "2.0.1 <= v < 3.0.0",
 	  "etaque/elm-simple-form-infix" : "1.0.0 <= v < 2.0.0"
     },
     "native-modules": true,
