@@ -7,7 +7,8 @@
         "src",
 	  "modules/elm-chartjs/src",
 	  "modules/elm-http/src",
-	  "modules/elm-simple-form/src"
+	  "modules/elm-simple-form/src",
+	  "modules/elm-simple-form-infix/src"
     ],
     "exposed-modules": [],
     "dependencies": {
@@ -18,8 +19,7 @@
 	  "circuithub/elm-bootstrap-html":"6.3.2 <= v < 7.0.0",
         "circuithub/elm-html-shorthand":"9.0.3 <= v < 10.0.0",
 	  "evancz/focus":"2.0.0 <= v < 3.0.0",
-	  "mgold/elm-date-format": "1.0.3 <= v < 2.0.0",
-	  "etaque/elm-simple-form-infix" : "1.0.0 <= v < 2.0.0"
+	  "mgold/elm-date-format": "1.0.3 <= v < 2.0.0"
     },
     "native-modules": true,
     "elm-version": "0.16.0 <= v < 0.17.0"
