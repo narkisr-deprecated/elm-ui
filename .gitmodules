@@ -7,3 +7,6 @@
 [submodule "modules/elm-simple-form"]
 	path = modules/elm-simple-form
 	url = git@github.com:etaque/elm-simple-form.git
+[submodule "modules/elm-simple-form-infix"]
+	path = modules/elm-simple-form-infix
+	url = git@github.com:etaque/elm-simple-form-infix.git
