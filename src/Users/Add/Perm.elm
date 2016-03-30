@@ -23,8 +23,16 @@ validate =
      ("envs" := string)
      ("operations" := string)
 
+defaults : String ->  String -> List (String, Field)
+defaults env op =
+  [
+    ("envs", Field.Text env)
+  , ("operations", Field.Text op)
+  ]
+
+
 init =
-  Model (Form.initial [] validate)
+  Model (Form.initial (defaults "" "") validate)
  
 -- View
 
