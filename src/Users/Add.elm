@@ -52,14 +52,20 @@ init =
     steps = [(step Perm.init Perm)]
     mainStep = (step (Main.init "") Main)
     wizard = Wizard.init mainStep steps
+    effects = [
+       getRoles SetRoles
+    ,  getEnvironments SetEnvironments
+    ]
+
   in
-    (Model wizard errors False Dict.empty, getRoles SetRoles)
+    (Model wizard errors False Dict.empty,Effects.batch effects)
 
 type Action = 
    ErrorsView Errors.Action
     | WizardAction Wizard.Action
     | FormAction Form.Action
     | SetRoles (Result Http.Error (Dict String String))
+    | SetEnvironments (Result Http.Error Environments)
     | Reset
     | Done
     | Back
@@ -89,6 +95,14 @@ setRoles ({wizard} as model) roles =
   in
     none { model | roles = roles, wizard = { wizard | step = Just mainStep }}
 
+setEnvironment ({wizard} as model) es =
+  let
+    env = (Maybe.withDefault "" (List.head (Dict.keys es)))
+    environments = Dict.keys es
+  in 
+   none model
+
+
 update : Action ->  Model -> (Model , Effects Action)
 update action ({wizard} as model) =
   case action of 
@@ -104,7 +118,6 @@ update action ({wizard} as model) =
       in
         none { back | saveErrors = Errors.init }
 
-
     WizardAction wizardAction -> 
       let 
         newWizard = Wizard.update wizardAction wizard
@@ -119,6 +132,9 @@ update action ({wizard} as model) =
 
     SetRoles result ->
       (successHandler result model (setRoles model) NoOp)
+
+    SetEnvironments result ->
+       (successHandler result model (setEnvironment model) NoOp)
 
     Save f -> 
       none model

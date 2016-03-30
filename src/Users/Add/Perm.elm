@@ -32,19 +32,22 @@ defaults env op =
 
 
 init =
-  Model (Form.initial (defaults "" "") validate)
+  Model (Form.initial [] validate)
+
+reinit env op =
+  Model (Form.initial (defaults env op) validate)
  
 -- View
 
 view envs operations address ({form} as model) =
  let 
-    environment = (Form.getFieldAsString "envs" form)
-    operation = (Form.getFieldAsString "operations" form)
+    environment = (Form.getFieldAsStringList "envs" form)
+    operation = (Form.getFieldAsStringList "operations" form)
  in
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Environment"  (Input.selectInput envs) environment address
-      , formControl "Operation"  (Input.selectInput operations) operation address
+        formControl "Environment"  (Input.multiSelectInput envs) environment address
+      , formControl "Operation"  (Input.multiSelectInput operations) operation address
       ]
     ])
 
