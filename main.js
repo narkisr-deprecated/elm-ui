@@ -13240,319 +13240,6 @@ Elm.Regex.make = function (_elm) {
                               ,All: All
                               ,AtMost: AtMost};
 };
-Elm.Form = Elm.Form || {};
-Elm.Form.Error = Elm.Form.Error || {};
-Elm.Form.Error.make = function (_elm) {
-   "use strict";
-   _elm.Form = _elm.Form || {};
-   _elm.Form.Error = _elm.Form.Error || {};
-   if (_elm.Form.Error.values) return _elm.Form.Error.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var getAt = F2(function (name,error) {
-      var _p0 = error;
-      if (_p0.ctor === "GroupErrors") {
-            return A2($Dict.get,name,_p0._0);
-         } else {
-            return $Maybe.Nothing;
-         }
-   });
-   var CustomError = function (a) {    return {ctor: "CustomError",_0: a};};
-   var NotIncludedIn = {ctor: "NotIncludedIn"};
-   var LongerStringThan = function (a) {    return {ctor: "LongerStringThan",_0: a};};
-   var ShorterStringThan = function (a) {    return {ctor: "ShorterStringThan",_0: a};};
-   var GreaterFloatThan = function (a) {    return {ctor: "GreaterFloatThan",_0: a};};
-   var SmallerFloatThan = function (a) {    return {ctor: "SmallerFloatThan",_0: a};};
-   var GreaterIntThan = function (a) {    return {ctor: "GreaterIntThan",_0: a};};
-   var SmallerIntThan = function (a) {    return {ctor: "SmallerIntThan",_0: a};};
-   var InvalidDate = {ctor: "InvalidDate"};
-   var InvalidBool = {ctor: "InvalidBool"};
-   var InvalidFloat = {ctor: "InvalidFloat"};
-   var InvalidInt = {ctor: "InvalidInt"};
-   var InvalidFormat = {ctor: "InvalidFormat"};
-   var InvalidUrl = {ctor: "InvalidUrl"};
-   var InvalidEmail = {ctor: "InvalidEmail"};
-   var InvalidString = {ctor: "InvalidString"};
-   var Empty = {ctor: "Empty"};
-   var GroupErrors = function (a) {    return {ctor: "GroupErrors",_0: a};};
-   return _elm.Form.Error.values = {_op: _op
-                                   ,getAt: getAt
-                                   ,GroupErrors: GroupErrors
-                                   ,Empty: Empty
-                                   ,InvalidString: InvalidString
-                                   ,InvalidEmail: InvalidEmail
-                                   ,InvalidUrl: InvalidUrl
-                                   ,InvalidFormat: InvalidFormat
-                                   ,InvalidInt: InvalidInt
-                                   ,InvalidFloat: InvalidFloat
-                                   ,InvalidBool: InvalidBool
-                                   ,InvalidDate: InvalidDate
-                                   ,SmallerIntThan: SmallerIntThan
-                                   ,GreaterIntThan: GreaterIntThan
-                                   ,SmallerFloatThan: SmallerFloatThan
-                                   ,GreaterFloatThan: GreaterFloatThan
-                                   ,ShorterStringThan: ShorterStringThan
-                                   ,LongerStringThan: LongerStringThan
-                                   ,NotIncludedIn: NotIncludedIn
-                                   ,CustomError: CustomError};
-};
-Elm.Form = Elm.Form || {};
-Elm.Form.Field = Elm.Form.Field || {};
-Elm.Form.Field.make = function (_elm) {
-   "use strict";
-   _elm.Form = _elm.Form || {};
-   _elm.Form.Field = _elm.Form.Field || {};
-   if (_elm.Form.Field.values) return _elm.Form.Field.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var asString = function (field) {
-      var _p0 = field;
-      switch (_p0.ctor)
-      {case "Text": return $Maybe.Just(_p0._0);
-         case "Textarea": return $Maybe.Just(_p0._0);
-         case "Select": return $Maybe.Just(_p0._0);
-         case "Radio": return $Maybe.Just(_p0._0);
-         default: return $Maybe.Nothing;}
-   };
-   var asBool = function (field) {    var _p1 = field;if (_p1.ctor === "Check") {    return $Maybe.Just(_p1._0);} else {    return $Maybe.Nothing;}};
-   var at = F2(function (name,field) {    var _p2 = field;if (_p2.ctor === "Group") {    return A2($Dict.get,name,_p2._0);} else {    return $Maybe.Nothing;}});
-   var EmptyField = {ctor: "EmptyField"};
-   var Check = function (a) {    return {ctor: "Check",_0: a};};
-   var Radio = function (a) {    return {ctor: "Radio",_0: a};};
-   var Select = function (a) {    return {ctor: "Select",_0: a};};
-   var Textarea = function (a) {    return {ctor: "Textarea",_0: a};};
-   var Text = function (a) {    return {ctor: "Text",_0: a};};
-   var Group = function (a) {    return {ctor: "Group",_0: a};};
-   var group = function (_p3) {    return Group($Dict.fromList(_p3));};
-   return _elm.Form.Field.values = {_op: _op
-                                   ,group: group
-                                   ,at: at
-                                   ,asString: asString
-                                   ,asBool: asBool
-                                   ,Group: Group
-                                   ,Text: Text
-                                   ,Textarea: Textarea
-                                   ,Select: Select
-                                   ,Radio: Radio
-                                   ,Check: Check
-                                   ,EmptyField: EmptyField};
-};
-Elm.Form = Elm.Form || {};
-Elm.Form.Validate = Elm.Form.Validate || {};
-Elm.Form.Validate.make = function (_elm) {
-   "use strict";
-   _elm.Form = _elm.Form || {};
-   _elm.Form.Validate = _elm.Form.Validate || {};
-   if (_elm.Form.Validate.values) return _elm.Form.Validate.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Date = Elm.Date.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $Form$Error = Elm.Form.Error.make(_elm),
-   $Form$Field = Elm.Form.Field.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Regex = Elm.Regex.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var oneOf = F2(function (validations,field) {
-      var walkResults = F2(function (result,combined) {
-         var _p0 = {ctor: "_Tuple2",_0: combined,_1: result};
-         if (_p0.ctor === "_Tuple2" && _p0._0.ctor === "Ok") {
-               return combined;
-            } else {
-               return result;
-            }
-      });
-      var results = A2($List.map,function (v) {    return v(field);},validations);
-      return A3($List.foldl,walkResults,$Result.Err($Form$Error.Empty),results);
-   });
-   var customValidation = F3(function (validation,callback,field) {    return A2($Result.andThen,validation(field),callback);});
-   var succeed = F2(function (a,field) {    return $Result.Ok(a);});
-   var fail = F2(function (error,field) {    return $Result.Err(error);});
-   var includedIn = F3(function (items,s,field) {    return A2($List.member,s,items) ? $Result.Ok(s) : $Result.Err($Form$Error.NotIncludedIn);});
-   var validUrlPattern = $Regex.caseInsensitive($Regex.regex("^(https?://)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\w \\.-]*)*/?$"));
-   var validEmailPattern = $Regex.caseInsensitive($Regex.regex("^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"));
-   var format = F3(function (regex,s,field) {    return A2($Regex.contains,regex,s) ? $Result.Ok(s) : $Result.Err($Form$Error.InvalidFormat);});
-   var maxFloat = F3(function (max,i,field) {    return _U.cmp(i,max) < 1 ? $Result.Ok(i) : $Result.Err($Form$Error.GreaterFloatThan(max));});
-   var minFloat = F3(function (min,i,field) {    return _U.cmp(i,min) > -1 ? $Result.Ok(i) : $Result.Err($Form$Error.SmallerFloatThan(min));});
-   var maxInt = F3(function (max,i,field) {    return _U.cmp(i,max) < 1 ? $Result.Ok(i) : $Result.Err($Form$Error.GreaterIntThan(max));});
-   var minInt = F3(function (min,i,field) {    return _U.cmp(i,min) > -1 ? $Result.Ok(i) : $Result.Err($Form$Error.SmallerIntThan(min));});
-   var maxLength = F3(function (max,s,field) {    return _U.cmp($String.length(s),max) < 1 ? $Result.Ok(s) : $Result.Err($Form$Error.ShorterStringThan(max));});
-   var minLength = F3(function (min,s,field) {
-      return _U.cmp($String.length(s),min) > -1 ? $Result.Ok(s) : $Result.Err($Form$Error.ShorterStringThan(min));
-   });
-   var nonEmpty = F2(function (s,field) {    return $String.isEmpty(s) ? $Result.Err($Form$Error.Empty) : $Result.Ok(s);});
-   var maybe = F2(function (validation,field) {    return $Result.Ok($Result.toMaybe(validation(field)));});
-   var date = function (v) {
-      var _p1 = $Form$Field.asString(v);
-      if (_p1.ctor === "Just") {
-            return A2($Result.formatError,function (_p2) {    return $Form$Error.InvalidDate;},$Date.fromString(_p1._0));
-         } else {
-            return $Result.Err($Form$Error.InvalidDate);
-         }
-   };
-   var bool = function (v) {    var _p3 = $Form$Field.asBool(v);if (_p3.ctor === "Just") {    return $Result.Ok(_p3._0);} else {    return $Result.Ok(false);}};
-   var emptyString = function (v) {
-      var _p4 = $Form$Field.asString(v);
-      if (_p4.ctor === "Just") {
-            var _p5 = _p4._0;
-            return $String.isEmpty(_p5) ? $Result.Ok(_p5) : $Result.Err($Form$Error.InvalidString);
-         } else {
-            return $Result.Ok("");
-         }
-   };
-   var string = function (v) {
-      var _p6 = $Form$Field.asString(v);
-      if (_p6.ctor === "Just") {
-            var _p7 = _p6._0;
-            return $String.isEmpty(_p7) ? $Result.Err($Form$Error.Empty) : $Result.Ok(_p7);
-         } else {
-            return $Result.Err($Form$Error.InvalidString);
-         }
-   };
-   var $float = function (v) {
-      var _p8 = $Form$Field.asString(v);
-      if (_p8.ctor === "Just") {
-            return A2($Result.formatError,function (_p9) {    return $Form$Error.InvalidFloat;},$String.toFloat(_p8._0));
-         } else {
-            return $Result.Err($Form$Error.InvalidInt);
-         }
-   };
-   var $int = function (v) {
-      var _p10 = $Form$Field.asString(v);
-      if (_p10.ctor === "Just") {
-            return A2($Result.formatError,function (_p11) {    return $Form$Error.InvalidInt;},$String.toInt(_p10._0));
-         } else {
-            return $Result.Err($Form$Error.InvalidInt);
-         }
-   };
-   var getErr = function (res) {    var _p12 = res;if (_p12.ctor === "Ok") {    return $Maybe.Nothing;} else {    return $Maybe.Just(_p12._0);}};
-   var groupErrorsUnion = F2(function (e1,e2) {
-      var _p13 = {ctor: "_Tuple2",_0: e1,_1: e2};
-      if (_p13.ctor === "_Tuple2" && _p13._0.ctor === "GroupErrors" && _p13._1.ctor === "GroupErrors") {
-            return $Form$Error.GroupErrors(A2($Dict.union,_p13._0._0,_p13._1._0));
-         } else {
-            return e2;
-         }
-   });
-   var mergeMany = function (errors) {
-      return A3($List.foldl,groupErrorsUnion,$Form$Error.GroupErrors($Dict.empty),A2($List.filterMap,$Basics.identity,errors));
-   };
-   var get = F3(function (key,validation,field) {
-      return A2($Result.formatError,
-      function (e) {
-         return $Form$Error.GroupErrors($Dict.fromList(_U.list([{ctor: "_Tuple2",_0: key,_1: e}])));
-      },
-      validation(A2($Maybe.withDefault,$Form$Field.EmptyField,A2($Form$Field.at,key,field))));
-   });
-   var customError = $Form$Error.CustomError;
-   var formatError = F3(function (f,validation,field) {    return A2($Result.formatError,f,validation(field));});
-   var defaultValue = F3(function (a,validation,field) {    return $Result.Ok(A2($Result.withDefault,a,validation(field)));});
-   var apply = F3(function (partialValidation,aValidation,field) {
-      var _p14 = {ctor: "_Tuple2",_0: partialValidation(field),_1: aValidation(field)};
-      if (_p14._0.ctor === "Ok" && _p14._1.ctor === "Ok") {
-            return $Result.Ok(_p14._0._0(_p14._1._0));
-         } else {
-            return $Result.Err(mergeMany(_U.list([getErr(_p14._0),getErr(_p14._1)])));
-         }
-   });
-   var andThen = F3(function (validation,callback,field) {
-      return A2($Result.andThen,validation(field),function (next) {    return A2(callback,next,field);});
-   });
-   var pipeTo = $Basics.flip(andThen);
-   var email = A2(andThen,
-   string,
-   function (s) {
-      return A2(formatError,function (_p15) {    return $Form$Error.InvalidEmail;},A2(format,validEmailPattern,s));
-   });
-   var url = A2(andThen,string,function (s) {    return A2(formatError,function (_p16) {    return $Form$Error.InvalidUrl;},A2(format,validUrlPattern,s));});
-   var map = F3(function (f,validation,field) {    return A2($Result.map,f,validation(field));});
-   var form1 = map;
-   var form2 = F3(function (func,v1,v2) {    return A2(apply,A2(form1,func,v1),v2);});
-   var form3 = F4(function (func,v1,v2,v3) {    return A2(apply,A3(form2,func,v1,v2),v3);});
-   var form4 = F5(function (func,v1,v2,v3,v4) {    return A2(apply,A4(form3,func,v1,v2,v3),v4);});
-   var form5 = F6(function (func,v1,v2,v3,v4,v5) {    return A2(apply,A5(form4,func,v1,v2,v3,v4),v5);});
-   var form6 = F7(function (func,v1,v2,v3,v4,v5,v6) {    return A2(apply,A6(form5,func,v1,v2,v3,v4,v5),v6);});
-   var form7 = F8(function (func,v1,v2,v3,v4,v5,v6,v7) {    return A2(apply,A7(form6,func,v1,v2,v3,v4,v5,v6),v7);});
-   var form8 = F9(function (func,v1,v2,v3,v4,v5,v6,v7,v8) {    return A2(apply,A8(form7,func,v1,v2,v3,v4,v5,v6,v7),v8);});
-   return _elm.Form.Validate.values = {_op: _op
-                                      ,get: get
-                                      ,map: map
-                                      ,andThen: andThen
-                                      ,pipeTo: pipeTo
-                                      ,apply: apply
-                                      ,customError: customError
-                                      ,defaultValue: defaultValue
-                                      ,form1: form1
-                                      ,form2: form2
-                                      ,form3: form3
-                                      ,form4: form4
-                                      ,form5: form5
-                                      ,form6: form6
-                                      ,form7: form7
-                                      ,form8: form8
-                                      ,string: string
-                                      ,$int: $int
-                                      ,$float: $float
-                                      ,bool: bool
-                                      ,date: date
-                                      ,maybe: maybe
-                                      ,email: email
-                                      ,url: url
-                                      ,emptyString: emptyString
-                                      ,minInt: minInt
-                                      ,maxInt: maxInt
-                                      ,minFloat: minFloat
-                                      ,maxFloat: maxFloat
-                                      ,minLength: minLength
-                                      ,maxLength: maxLength
-                                      ,nonEmpty: nonEmpty
-                                      ,format: format
-                                      ,includedIn: includedIn
-                                      ,fail: fail
-                                      ,succeed: succeed
-                                      ,customValidation: customValidation
-                                      ,oneOf: oneOf};
-};
-Elm.Form = Elm.Form || {};
-Elm.Form.Infix = Elm.Form.Infix || {};
-Elm.Form.Infix.make = function (_elm) {
-   "use strict";
-   _elm.Form = _elm.Form || {};
-   _elm.Form.Infix = _elm.Form.Infix || {};
-   if (_elm.Form.Infix.values) return _elm.Form.Infix.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Form$Validate = Elm.Form.Validate.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   _op["?="] = F2(function (s,v) {    return $Form$Validate.maybe(A2($Form$Validate.get,s,v));});
-   _op[":="] = $Form$Validate.get;
-   _op["|:"] = $Form$Validate.apply;
-   return _elm.Form.Infix.values = {_op: _op};
-};
 Elm.Native.Effects = {};
 Elm.Native.Effects.make = function(localRuntime) {
 
@@ -14952,14 +14639,13 @@ Elm.Users.Model.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var rolesList = $Json$Decode.dict($Json$Decode.string);
+   var rolesList = A2($Json$Decode.at,_U.list(["roles"]),$Json$Decode.dict($Json$Decode.string));
    var getRoles = function (action) {    return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,rolesList,"/users/roles"))));};
    var User = F5(function (a,b,c,d,e) {    return {username: a,password: b,operations: c,roles: d,envs: e};});
    var emptyUser = A5(User,"",$Maybe.Nothing,_U.list([]),_U.list([]),_U.list([]));
-   var userBase = F3(function (name,password,roles) {    return A5(User,name,$Maybe.Just(password),_U.list([]),A2($String.split," ",roles),_U.list([]));});
+   var userBase = F3(function (name,password,role) {    return A5(User,name,$Maybe.Just(password),_U.list([]),_U.list([role]),_U.list([]));});
    var permBase = F2(function (envs,operations) {    return A5(User,"",$Maybe.Nothing,_U.list([]),_U.list([]),_U.list([]));});
    var user = A6($Json$Decode.object5,
    User,
@@ -24270,34 +23956,45 @@ Elm.Form.Field.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var asString = function (field) {
+   var asStringList = function (field) {
       var _p0 = field;
-      switch (_p0.ctor)
-      {case "Text": return $Maybe.Just(_p0._0);
-         case "Textarea": return $Maybe.Just(_p0._0);
-         case "Select": return $Maybe.Just(_p0._0);
-         case "Radio": return $Maybe.Just(_p0._0);
+      if (_p0.ctor === "MultiSelect") {
+            return $Maybe.Just(_p0._0);
+         } else {
+            return $Maybe.Nothing;
+         }
+   };
+   var asString = function (field) {
+      var _p1 = field;
+      switch (_p1.ctor)
+      {case "Text": return $Maybe.Just(_p1._0);
+         case "Textarea": return $Maybe.Just(_p1._0);
+         case "Select": return $Maybe.Just(_p1._0);
+         case "Radio": return $Maybe.Just(_p1._0);
          default: return $Maybe.Nothing;}
    };
-   var asBool = function (field) {    var _p1 = field;if (_p1.ctor === "Check") {    return $Maybe.Just(_p1._0);} else {    return $Maybe.Nothing;}};
-   var at = F2(function (name,field) {    var _p2 = field;if (_p2.ctor === "Group") {    return A2($Dict.get,name,_p2._0);} else {    return $Maybe.Nothing;}});
+   var asBool = function (field) {    var _p2 = field;if (_p2.ctor === "Check") {    return $Maybe.Just(_p2._0);} else {    return $Maybe.Nothing;}};
+   var at = F2(function (name,field) {    var _p3 = field;if (_p3.ctor === "Group") {    return A2($Dict.get,name,_p3._0);} else {    return $Maybe.Nothing;}});
    var EmptyField = {ctor: "EmptyField"};
    var Check = function (a) {    return {ctor: "Check",_0: a};};
    var Radio = function (a) {    return {ctor: "Radio",_0: a};};
+   var MultiSelect = function (a) {    return {ctor: "MultiSelect",_0: a};};
    var Select = function (a) {    return {ctor: "Select",_0: a};};
    var Textarea = function (a) {    return {ctor: "Textarea",_0: a};};
    var Text = function (a) {    return {ctor: "Text",_0: a};};
    var Group = function (a) {    return {ctor: "Group",_0: a};};
-   var group = function (_p3) {    return Group($Dict.fromList(_p3));};
+   var group = function (_p4) {    return Group($Dict.fromList(_p4));};
    return _elm.Form.Field.values = {_op: _op
                                    ,group: group
                                    ,at: at
                                    ,asString: asString
+                                   ,asStringList: asStringList
                                    ,asBool: asBool
                                    ,Group: Group
                                    ,Text: Text
                                    ,Textarea: Textarea
                                    ,Select: Select
+                                   ,MultiSelect: MultiSelect
                                    ,Radio: Radio
                                    ,Check: Check
                                    ,EmptyField: EmptyField};
@@ -24586,6 +24283,7 @@ Elm.Form.make = function (_elm) {
       });
       return A3($List.foldl,walkPath,$Maybe.Just(_p27._0.fields),A2($String.split,".",qualifiedName));
    });
+   var getStringListAt = F2(function (name,form) {    return A2($Maybe.andThen,A2(getFieldAt,name,form),$Form$Field.asStringList);});
    var getStringAt = F2(function (name,form) {    return A2($Maybe.andThen,A2(getFieldAt,name,form),$Form$Field.asString);});
    var getBoolAt = F2(function (name,form) {    return A2($Maybe.andThen,A2(getFieldAt,name,form),$Form$Field.asBool);});
    var updateValidate = function (model) {
@@ -24614,6 +24312,7 @@ Elm.Form.make = function (_elm) {
    });
    var getFieldAsBool = getField(getBoolAt);
    var getFieldAsString = getField(getStringAt);
+   var getFieldAsStringList = getField(getStringListAt);
    var FieldState = F7(function (a,b,c,d,e,f,g) {    return {path: a,value: b,error: c,liveError: d,isDirty: e,isChanged: f,hasFocus: g};});
    var Model = F8(function (a,b,c,d,e,f,g,h) {
       return {fields: a,focus: b,dirtyFields: c,changedFields: d,isSubmitted: e,output: f,errors: g,validation: h};
@@ -24664,6 +24363,7 @@ Elm.Form.make = function (_elm) {
                              ,initial: initial
                              ,update: update
                              ,getFieldAsString: getFieldAsString
+                             ,getFieldAsStringList: getFieldAsStringList
                              ,getFieldAsBool: getFieldAsBool
                              ,getFocus: getFocus
                              ,getErrors: getErrors
@@ -24718,13 +24418,32 @@ Elm.Form.Input.make = function (_elm) {
                               })]);
       return A2($Html.input,A2($Basics._op["++"],formAttrs,attrs),_U.list([]));
    });
-   var selectInput = F4(function (options,state,addr,attrs) {
+   var multiSelectInput = F4(function (options,state,addr,attrs) {
+      var values = A2($Maybe.withDefault,_U.list([]),state.value);
+      var formAttrs = _U.list([$Html$Attributes.type$("checkbox")
+                              ,A2($Html$Attributes.attribute,"multiple","true")
+                              ,A3($Html$Events.on,
+                              "change",
+                              $Html$Events.targetValue,
+                              function (v) {
+                                 return A2($Signal.message,addr,A2($Form.Input,state.path,$Form$Field.MultiSelect(A2($List._op["::"],v,values))));
+                              })
+                              ,A2($Html$Events.onFocus,addr,$Form.Focus(state.path))
+                              ,A2($Html$Events.onBlur,addr,$Form.Blur(state.path))]);
       var buildOption = function (_p2) {
          var _p3 = _p2;
          var _p4 = _p3._0;
+         return A2($Html.option,_U.list([$Html$Attributes.value(_p4),$Html$Attributes.selected(A2($List.member,_p4,values))]),_U.list([$Html.text(_p3._1)]));
+      };
+      return A2($Html.select,A2($Basics._op["++"],formAttrs,attrs),A2($List.map,buildOption,options));
+   });
+   var selectInput = F4(function (options,state,addr,attrs) {
+      var buildOption = function (_p5) {
+         var _p6 = _p5;
+         var _p7 = _p6._0;
          return A2($Html.option,
-         _U.list([$Html$Attributes.value(_p4),$Html$Attributes.selected(_U.eq(state.value,$Maybe.Just(_p4)))]),
-         _U.list([$Html.text(_p3._1)]));
+         _U.list([$Html$Attributes.value(_p7),$Html$Attributes.selected(_U.eq(state.value,$Maybe.Just(_p7)))]),
+         _U.list([$Html.text(_p6._1)]));
       };
       var formAttrs = _U.list([$Html$Attributes.type$("checkbox")
                               ,A3($Html$Events.on,
@@ -24785,6 +24504,7 @@ Elm.Form.Input.make = function (_elm) {
                                    ,textArea: textArea
                                    ,checkboxInput: checkboxInput
                                    ,selectInput: selectInput
+                                   ,multiSelectInput: multiSelectInput
                                    ,radioInput: radioInput
                                    ,dumpErrors: dumpErrors};
 };
@@ -25144,6 +24864,27 @@ Elm.Common.FormComponents.make = function (_elm) {
       return A5(formGroup,title,widget,field,address,_U.list([$Html$Attributes.$class("form-control")]));
    });
    return _elm.Common.FormComponents.values = {_op: _op,errors: errors,errorFor: errorFor,withError: withError,formControl: formControl,formGroup: formGroup};
+};
+Elm.Form = Elm.Form || {};
+Elm.Form.Infix = Elm.Form.Infix || {};
+Elm.Form.Infix.make = function (_elm) {
+   "use strict";
+   _elm.Form = _elm.Form || {};
+   _elm.Form.Infix = _elm.Form.Infix || {};
+   if (_elm.Form.Infix.values) return _elm.Form.Infix.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Form$Validate = Elm.Form.Validate.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   _op["?="] = F2(function (s,v) {    return $Form$Validate.maybe(A2($Form$Validate.get,s,v));});
+   _op[":="] = $Form$Validate.get;
+   _op["|:"] = $Form$Validate.apply;
+   return _elm.Form.Infix.values = {_op: _op};
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.Add = Elm.Types.Add || {};
@@ -26032,6 +25773,358 @@ Elm.Users.List.make = function (_elm) {
                                    ,view: view};
 };
 Elm.Users = Elm.Users || {};
+Elm.Users.Add = Elm.Users.Add || {};
+Elm.Users.Add.Perm = Elm.Users.Add.Perm || {};
+Elm.Users.Add.Perm.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Add = _elm.Users.Add || {};
+   _elm.Users.Add.Perm = _elm.Users.Add.Perm || {};
+   if (_elm.Users.Add.Perm.values) return _elm.Users.Add.Perm.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$FormComponents = Elm.Common.FormComponents.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Form = Elm.Form.make(_elm),
+   $Form$Field = Elm.Form.Field.make(_elm),
+   $Form$Infix = Elm.Form.Infix.make(_elm),
+   $Form$Input = Elm.Form.Input.make(_elm),
+   $Form$Validate = Elm.Form.Validate.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm);
+   var _op = {};
+   var view = F4(function (envs,operations,address,_p0) {
+      var _p1 = _p0;
+      var _p2 = _p1.form;
+      var operation = A2($Form.getFieldAsString,"operations",_p2);
+      var environment = A2($Form.getFieldAsString,"envs",_p2);
+      return A2($Html.form,
+      _U.list([]),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
+      _U.list([A4($Common$FormComponents.formControl,"Environment",$Form$Input.selectInput(envs),environment,address)
+              ,A4($Common$FormComponents.formControl,"Operation",$Form$Input.selectInput(operations),operation,address)]))]));
+   });
+   var defaults = F2(function (env,op) {
+      return _U.list([{ctor: "_Tuple2",_0: "envs",_1: $Form$Field.Text(env)},{ctor: "_Tuple2",_0: "operations",_1: $Form$Field.Text(op)}]);
+   });
+   var validate = A3($Form$Validate.form2,
+   $Users$Model.permBase,
+   A2($Form$Infix._op[":="],"envs",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"operations",$Form$Validate.string));
+   var Model = function (a) {    return {form: a};};
+   var init = Model(A2($Form.initial,A2(defaults,"",""),validate));
+   return _elm.Users.Add.Perm.values = {_op: _op,Model: Model,validate: validate,defaults: defaults,init: init,view: view};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.Add = Elm.Users.Add || {};
+Elm.Users.Add.Main = Elm.Users.Add.Main || {};
+Elm.Users.Add.Main.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Add = _elm.Users.Add || {};
+   _elm.Users.Add.Main = _elm.Users.Add.Main || {};
+   if (_elm.Users.Add.Main.values) return _elm.Users.Add.Main.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$FormComponents = Elm.Common.FormComponents.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Form = Elm.Form.make(_elm),
+   $Form$Field = Elm.Form.Field.make(_elm),
+   $Form$Infix = Elm.Form.Infix.make(_elm),
+   $Form$Input = Elm.Form.Input.make(_elm),
+   $Form$Validate = Elm.Form.Validate.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm);
+   var _op = {};
+   var view = F3(function (roles,address,_p0) {
+      var _p1 = _p0;
+      var _p2 = _p1.form;
+      var password = A2($Form.getFieldAsString,"password",_p2);
+      var name = A2($Form.getFieldAsString,"username",_p2);
+      var role = A2($Form.getFieldAsString,"role",_p2);
+      return A2($Html.form,
+      _U.list([]),
+      _U.list([A2($Html.div,
+      _U.list([$Html$Attributes.$class("form-horizontal"),A2($Html$Attributes.attribute,"onkeypress","return event.keyCode != 13;")]),
+      _U.list([A4($Common$FormComponents.formControl,"Name",$Form$Input.textInput,name,address)
+              ,A4($Common$FormComponents.formControl,"Password",$Form$Input.passwordInput,password,address)
+              ,A4($Common$FormComponents.formControl,"Roles",$Form$Input.selectInput(roles),role,address)]))]));
+   });
+   var defaults = function (role) {    return _U.list([{ctor: "_Tuple2",_0: "role",_1: $Form$Field.Text(role)}]);};
+   var validate = A4($Form$Validate.form3,
+   $Users$Model.userBase,
+   A2($Form$Infix._op[":="],"username",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"password",$Form$Validate.string),
+   A2($Form$Infix._op[":="],"role",$Form$Validate.string));
+   var Model = function (a) {    return {form: a};};
+   var init = function (role) {    return Model(A2($Form.initial,defaults(role),validate));};
+   return _elm.Users.Add.Main.values = {_op: _op,Model: Model,validate: validate,defaults: defaults,init: init,view: view};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.View = Elm.Users.View || {};
+Elm.Users.View.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.View = _elm.Users.View || {};
+   if (_elm.Users.View.values) return _elm.Users.View.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm);
+   var _op = {};
+   var getUser = F2(function (name,action) {
+      return $Effects.task(A2($Task.map,action,$Task.toResult(A2($Common$Http.getJson,$Users$Model.user,A2($Basics._op["++"],"/users/",name)))));
+   });
+   var summarize = function (model) {
+      return A2($Html.div,
+      _U.list([$Html$Attributes.style(_U.list([{ctor: "_Tuple2",_0: "line-height",_1: "1.8"},{ctor: "_Tuple2",_0: "list-style-type",_1: "none"}]))]),
+      _U.list([]));
+   };
+   var view = F2(function (address,_p0) {
+      var _p1 = _p0;
+      return $Common$Components.asList(A2($Html.div,_U.list([]),_U.list([A2($Html.h4,_U.list([]),_U.list([$Html.text("User")])),summarize(_p1.user)])));
+   });
+   var setUser = F2(function (model,user) {    return $Common$Utils.none(_U.update(model,{user: user}));});
+   var NoOp = {ctor: "NoOp"};
+   var SetUser = function (a) {    return {ctor: "SetUser",_0: a};};
+   var update = F2(function (action,model) {
+      var _p2 = action;
+      switch (_p2.ctor)
+      {case "ViewUser": return {ctor: "_Tuple2",_0: model,_1: A2(getUser,_p2._0,SetUser)};
+         case "SetUser": return A4($Common$Errors.successHandler,_p2._0,model,setUser(model),NoOp);
+         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+   });
+   var ViewUser = function (a) {    return {ctor: "ViewUser",_0: a};};
+   var Model = function (a) {    return {user: a};};
+   var init = $Common$Utils.none(Model($Users$Model.emptyUser));
+   return _elm.Users.View.values = {_op: _op
+                                   ,Model: Model
+                                   ,init: init
+                                   ,ViewUser: ViewUser
+                                   ,SetUser: SetUser
+                                   ,NoOp: NoOp
+                                   ,setUser: setUser
+                                   ,update: update
+                                   ,summarize: summarize
+                                   ,view: view
+                                   ,getUser: getUser};
+};
+Elm.Users = Elm.Users || {};
+Elm.Users.Add = Elm.Users.Add || {};
+Elm.Users.Add.make = function (_elm) {
+   "use strict";
+   _elm.Users = _elm.Users || {};
+   _elm.Users.Add = _elm.Users.Add || {};
+   if (_elm.Users.Add.values) return _elm.Users.Add.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Bootstrap$Html = Elm.Bootstrap.Html.make(_elm),
+   $Common$Components = Elm.Common.Components.make(_elm),
+   $Common$Errors = Elm.Common.Errors.make(_elm),
+   $Common$FormWizard = Elm.Common.FormWizard.make(_elm),
+   $Common$Http = Elm.Common.Http.make(_elm),
+   $Common$Utils = Elm.Common.Utils.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $Effects = Elm.Effects.make(_elm),
+   $Form = Elm.Form.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
+   $Http = Elm.Http.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm),
+   $Users$Add$Main = Elm.Users.Add.Main.make(_elm),
+   $Users$Add$Perm = Elm.Users.Add.Perm.make(_elm),
+   $Users$Model = Elm.Users.Model.make(_elm),
+   $Users$View = Elm.Users.View.make(_elm);
+   var _op = {};
+   var rows = F2(function (contents,buttons) {    return _U.list([$Bootstrap$Html.row_(_U.list([contents])),$Bootstrap$Html.row_(buttons)]);});
+   var merge = F2(function (_p0,acc) {
+      var _p1 = _p0;
+      var user = A2($Maybe.withDefault,acc,$Form.getOutput(_p1.form));
+      var _p2 = _p1.value;
+      if (_p2.ctor === "Main") {
+            return user;
+         } else {
+            return user;
+         }
+   });
+   var merged = function (_p3) {    var _p4 = _p3;return A3($List.foldl,merge,$Users$Model.emptyUser,_p4.wizard.prev);};
+   var NoOp = {ctor: "NoOp"};
+   var Saved = function (a) {    return {ctor: "Saved",_0: a};};
+   var saveType = function (json) {
+      return $Effects.task(A2($Task.map,Saved,$Task.toResult(A3($Common$Http.postJson,$Http.string(json),$Common$Http.saveResponse,"/types"))));
+   };
+   var updateType = function (json) {
+      return $Effects.task(A2($Task.map,Saved,$Task.toResult(A3($Common$Http.putJson,$Http.string(json),$Common$Http.saveResponse,"/types"))));
+   };
+   var Save = function (a) {    return {ctor: "Save",_0: a};};
+   var saveButton = function (address) {
+      return _U.list([A2($Html.button,
+      _U.list([$Html$Attributes.id("Save"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Save(saveType))]),
+      _U.list([$Html.text("Save  ")]))]);
+   };
+   var doneButton = function (address) {
+      return _U.list([A2($Html.button,
+      _U.list([$Html$Attributes.id("Done"),$Html$Attributes.$class("btn btn-primary"),A2($Html$Events.onClick,address,Save(saveType))]),
+      _U.list([$Html.text("Done ")]))]);
+   };
+   var Next = {ctor: "Next"};
+   var Back = {ctor: "Back"};
+   var Done = {ctor: "Done"};
+   var Reset = {ctor: "Reset"};
+   var SetRoles = function (a) {    return {ctor: "SetRoles",_0: a};};
+   var FormAction = function (a) {    return {ctor: "FormAction",_0: a};};
+   var currentView = F2(function (address,_p5) {
+      var _p6 = _p5;
+      var _p7 = _p6.wizard.step;
+      if (_p7.ctor === "Just") {
+            var _p11 = _p7._0;
+            var _p8 = _p7._0.value;
+            if (_p8.ctor === "Main") {
+                  var pairs = A2($List.map,function (_p9) {    var _p10 = _p9;return {ctor: "_Tuple2",_0: _p10._1,_1: _p10._0};},$Dict.toList(_p6.roles));
+                  return A3($Common$Components.dialogPanel,
+                  "info",
+                  $Common$Components.info("Add a new User"),
+                  $Common$Components.panel($Common$Components.fixedPanel(A3($Users$Add$Main.view,pairs,A2($Signal.forwardTo,address,FormAction),_p11))));
+               } else {
+                  return A3($Common$Components.dialogPanel,
+                  "info",
+                  $Common$Components.info("User permissions"),
+                  $Common$Components.panel($Common$Components.fixedPanel(A4($Users$Add$Perm.view,
+                  _U.list([]),
+                  _U.list([]),
+                  A2($Signal.forwardTo,address,FormAction),
+                  _p11))));
+               }
+         } else {
+            return A3($Common$Components.dialogPanel,
+            "info",
+            $Common$Components.info("Save new user"),
+            $Common$Components.panel($Common$Components.fixedPanel($Users$View.summarize(merged(_p6)))));
+         }
+   });
+   var WizardAction = function (a) {    return {ctor: "WizardAction",_0: a};};
+   var ErrorsView = function (a) {    return {ctor: "ErrorsView",_0: a};};
+   var errorsView = F2(function (address,_p12) {
+      var _p13 = _p12;
+      var body = A2($Common$Errors.view,A2($Signal.forwardTo,address,ErrorsView),_p13.saveErrors);
+      return A3($Common$Components.dialogPanel,
+      "danger",
+      $Common$Components.error("Failed to save type"),
+      $Common$Components.panel($Common$Components.panelContents(body)));
+   });
+   var view = F2(function (address,_p14) {
+      var _p15 = _p14;
+      var _p16 = _p15;
+      var buttons$ = A2($Common$Components.buttons,address,_U.update(_p16,{hasNext: $Common$FormWizard.notDone(_p16)}));
+      return $Common$Errors.hasErrors(_p15.saveErrors) ? A2(rows,
+      A2($Html.div,_U.list([]),A2(errorsView,address,_p16)),
+      A3(buttons$,Done,Reset,doneButton(address))) : A2(rows,
+      A2($Html.div,_U.list([$Html$Attributes.$class("col-md-offset-2 col-md-8")]),A2(currentView,address,_p16)),
+      A3(buttons$,Next,Back,saveButton(address)));
+   });
+   var step = F2(function (model,value) {    return {form: model.form,value: value};});
+   var Perm = {ctor: "Perm"};
+   var Main = {ctor: "Main"};
+   var setRoles = F2(function (_p17,roles) {
+      var _p18 = _p17;
+      var role = A2($Maybe.withDefault,"",$List.head($Dict.values(roles)));
+      var mainStep = A2(step,$Users$Add$Main.init(role),Main);
+      return $Common$Utils.none(_U.update(_p18,{roles: roles,wizard: _U.update(_p18.wizard,{step: $Maybe.Just(mainStep)})}));
+   });
+   var update = F2(function (action,_p19) {
+      update: while (true) {
+         var _p20 = _p19;
+         var _p24 = _p20.wizard;
+         var _p23 = _p20;
+         var _p21 = action;
+         switch (_p21.ctor)
+         {case "Next": return A2($Debug.log,"",A2(update,WizardAction($Common$FormWizard.Next),_p23));
+            case "Back": var _v12 = WizardAction($Common$FormWizard.Back),_v13 = _p23;
+              action = _v12;
+              _p19 = _v13;
+              continue update;
+            case "Reset": var _p22 = A2(update,WizardAction($Common$FormWizard.Back),_p23);
+              var back = _p22._0;
+              return $Common$Utils.none(_U.update(back,{saveErrors: $Common$Errors.init}));
+            case "WizardAction": var newWizard = A2($Common$FormWizard.update,_p21._0,_p24);
+              return $Common$Utils.none(_U.update(_p23,{wizard: newWizard}));
+            case "FormAction": var newWizard = A2($Common$FormWizard.update,$Common$FormWizard.FormAction(_p21._0),_p24);
+              return $Common$Utils.none(_U.update(_p23,{wizard: newWizard}));
+            case "SetRoles": return A4($Common$Errors.successHandler,_p21._0,_p23,setRoles(_p23),NoOp);
+            case "Save": return $Common$Utils.none(_p23);
+            case "Saved": return A3($Common$Errors.errorsHandler,_p21._0,_p23,NoOp);
+            default: return $Common$Utils.none(_p23);}
+      }
+   });
+   var Model = F4(function (a,b,c,d) {    return {wizard: a,saveErrors: b,hasNext: c,roles: d};});
+   var init = function () {
+      var mainStep = A2(step,$Users$Add$Main.init(""),Main);
+      var steps = _U.list([A2(step,$Users$Add$Perm.init,Perm)]);
+      var wizard = A2($Common$FormWizard.init,mainStep,steps);
+      var errors = $Common$Errors.init;
+      return {ctor: "_Tuple2",_0: A4(Model,wizard,errors,false,$Dict.empty),_1: $Users$Model.getRoles(SetRoles)};
+   }();
+   return _elm.Users.Add.values = {_op: _op
+                                  ,Model: Model
+                                  ,Main: Main
+                                  ,Perm: Perm
+                                  ,step: step
+                                  ,init: init
+                                  ,ErrorsView: ErrorsView
+                                  ,WizardAction: WizardAction
+                                  ,FormAction: FormAction
+                                  ,SetRoles: SetRoles
+                                  ,Reset: Reset
+                                  ,Done: Done
+                                  ,Back: Back
+                                  ,Next: Next
+                                  ,Save: Save
+                                  ,Saved: Saved
+                                  ,NoOp: NoOp
+                                  ,merge: merge
+                                  ,merged: merged
+                                  ,setRoles: setRoles
+                                  ,update: update
+                                  ,currentView: currentView
+                                  ,errorsView: errorsView
+                                  ,saveButton: saveButton
+                                  ,doneButton: doneButton
+                                  ,rows: rows
+                                  ,view: view
+                                  ,saveType: saveType
+                                  ,updateType: updateType};
+};
+Elm.Users = Elm.Users || {};
 Elm.Users.Core = Elm.Users.Core || {};
 Elm.Users.Core.make = function (_elm) {
    "use strict";
@@ -26049,6 +26142,7 @@ Elm.Users.Core.make = function (_elm) {
    $Nav$Common = Elm.Nav.Common.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $Users$Add = Elm.Users.Add.make(_elm),
    $Users$List = Elm.Users.List.make(_elm);
    var _op = {};
    var navigate = F2(function (action,_p0) {
@@ -26072,41 +26166,48 @@ Elm.Users.Core.make = function (_elm) {
    });
    var NoOp = {ctor: "NoOp"};
    var MenuClick = function (a) {    return {ctor: "MenuClick",_0: a};};
+   var Adding = function (a) {    return {ctor: "Adding",_0: a};};
    var Listing = function (a) {    return {ctor: "Listing",_0: a};};
    var route = F2(function (action,_p6) {
       var _p7 = _p6;
-      var _p10 = _p7;
+      var _p11 = _p7;
       var _p8 = action;
-      if (_p8.ctor === "Listing") {
-            var _p9 = A2($Users$List.update,_p8._0,_p7.list);
-            var newList = _p9._0;
-            var effects = _p9._1;
-            return {ctor: "_Tuple2",_0: _U.update(_p10,{list: newList}),_1: A2($Effects.map,Listing,effects)};
-         } else {
-            return $Common$Utils.none(_p10);
-         }
+      switch (_p8.ctor)
+      {case "Listing": var _p9 = A2($Users$List.update,_p8._0,_p7.list);
+           var newList = _p9._0;
+           var effects = _p9._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p11,{list: newList}),_1: A2($Effects.map,Listing,effects)};
+         case "Adding": var _p10 = A2($Users$Add.update,_p8._0,_p7.add);
+           var newAdd = _p10._0;
+           var effects = _p10._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p11,{add: newAdd}),_1: A2($Effects.map,Adding,effects)};
+         default: return $Common$Utils.none(_p11);}
    });
    var update = F2(function (action,model) {    return A2(navigate,action,A2(route,action,model));});
-   var view = F3(function (address,_p11,section) {
-      var _p12 = _p11;
-      var _p13 = section;
-      if (_p13.ctor === "List") {
-            return A2($Users$List.view,A2($Signal.forwardTo,address,Listing),_p12.list);
-         } else {
-            return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);
-         }
+   var view = F3(function (address,_p12,section) {
+      var _p13 = _p12;
+      var _p14 = section;
+      switch (_p14.ctor)
+      {case "List": return A2($Users$List.view,A2($Signal.forwardTo,address,Listing),_p13.list);
+         case "Add": return A2($Users$Add.view,A2($Signal.forwardTo,address,Adding),_p13.add);
+         default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
    });
-   var Model = F2(function (a,b) {    return {list: a,navChange: b};});
+   var Model = F3(function (a,b,c) {    return {list: a,add: b,navChange: c};});
    var init = function () {
-      var _p14 = $Users$List.init;
-      var list = _p14._0;
-      var listActions = _p14._1;
-      return {ctor: "_Tuple2",_0: A2(Model,list,$Maybe.Nothing),_1: A2($Effects.map,Listing,listActions)};
+      var _p15 = $Users$Add.init;
+      var add = _p15._0;
+      var addActions = _p15._1;
+      var _p16 = $Users$List.init;
+      var list = _p16._0;
+      var listActions = _p16._1;
+      var effects = _U.list([A2($Effects.map,Listing,listActions),A2($Effects.map,Adding,addActions)]);
+      return {ctor: "_Tuple2",_0: A3(Model,list,add,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();
    return _elm.Users.Core.values = {_op: _op
                                    ,Model: Model
                                    ,init: init
                                    ,Listing: Listing
+                                   ,Adding: Adding
                                    ,MenuClick: MenuClick
                                    ,NoOp: NoOp
                                    ,navigate: navigate
