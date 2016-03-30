@@ -28,13 +28,12 @@ emptyUser : User
 emptyUser  =
   User "" Nothing [] [] [] 
 
-userBase name password roles =
-  User name (Just password) [] (String.split " " roles) []
+userBase name password role =
+  User name (Just password) [] [role] []
 
 permBase : String -> String -> User
 permBase envs operations =
   User "" Nothing [] [] []
-
 
 -- Decoding
 
@@ -61,7 +60,7 @@ getUsers action =
 
 rolesList : Decoder (Dict String String)
 rolesList =
-  (dict string)
+  at ["roles"] (dict string)
 
 getRoles action = 
   getJson rolesList "/users/roles" 
