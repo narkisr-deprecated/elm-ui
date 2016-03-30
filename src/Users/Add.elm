@@ -32,7 +32,7 @@ type alias Model =
     wizard : (Wizard.Model Step User)
   , saveErrors : Errors.Model
   , hasNext : Bool
-  , roles : (Dict String String)
+  , roles : Dict String String
   }
 
 type Step = 
@@ -53,13 +53,13 @@ init =
     mainStep = (step (Main.init "") Main)
     wizard = Wizard.init mainStep steps
   in
-    (Model wizard errors False Dict.empty, getRoles SetEnvironments)
+    (Model wizard errors False Dict.empty, getRoles SetRoles)
 
 type Action = 
    ErrorsView Errors.Action
     | WizardAction Wizard.Action
     | FormAction Form.Action
-    | SetEnvironments (Result Http.Error (Dict String String))
+    | SetRoles (Result Http.Error (Dict String String))
     | Reset
     | Done
     | Back
@@ -82,11 +82,18 @@ merge ({value, form} as step) acc =
 merged {wizard} =
   List.foldl merge emptyUser wizard.prev 
 
+setRoles ({wizard} as model) roles =
+  let
+     role = (Maybe.withDefault "" (List.head (Dict.values roles)))
+     mainStep = (step (Main.init role) Main)
+  in
+    none { model | roles = roles, wizard = { wizard | step = Just mainStep }}
+
 update : Action ->  Model -> (Model , Effects Action)
 update action ({wizard} as model) =
   case action of 
     Next -> 
-       update (WizardAction Wizard.Next) model
+      Debug.log "" (update (WizardAction Wizard.Next) model)
 
     Back -> 
        update (WizardAction Wizard.Back) model
@@ -110,8 +117,8 @@ update action ({wizard} as model) =
       in
         none { model | wizard = newWizard }
 
-    SetEnvironments result ->
-       none model
+    SetRoles result ->
+      (successHandler result model (setRoles model) NoOp)
 
     Save f -> 
       none model
@@ -129,8 +136,11 @@ currentView address ({wizard, roles} as model) =
     Just ({value} as current) ->
       case value of 
         Main -> 
-          dialogPanel "info" (info "Add a new User") 
-           (panel (fixedPanel (Main.view roles (Signal.forwardTo address FormAction) current)) )
+          let 
+             pairs = List.map (\(f,s) -> (s, f)) (Dict.toList roles)
+          in
+            dialogPanel "info" (info "Add a new User") 
+             (panel (fixedPanel (Main.view pairs (Signal.forwardTo address FormAction) current)) )
 
         Perm -> 
            dialogPanel "info" (info "User permissions") 
