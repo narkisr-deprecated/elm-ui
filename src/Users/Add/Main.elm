@@ -22,7 +22,7 @@ validate =
   form3 userBase
      ("username" := string)
      ("password" := string)
-     ("roles" := string)
+     ("role" := string)
  
 defaults : String ->  List (String, Field)
 defaults role =
@@ -36,13 +36,14 @@ init role =
 view roles address ({form} as model) =
   let 
     role = (Form.getFieldAsString "role" form)
-    description = (Form.getFieldAsString "description" form)
+    name = (Form.getFieldAsString "username" form)
+    password = (Form.getFieldAsString "password" form)
   in 
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        -- typeField address model
-        formControl "Description" Input.textInput description address
-      , formControl "Roles"  (Input.selectInput []) role address
+        formControl "Name" Input.textInput name address
+      , formControl "Password" Input.passwordInput password address
+      , formControl "Roles"  (Input.selectInput roles) role address
       ]
     ])
 
