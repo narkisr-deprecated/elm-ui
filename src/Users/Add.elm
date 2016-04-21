@@ -6,7 +6,7 @@ import Bootstrap.Html exposing (..)
 import Dict exposing (Dict)
 import Effects exposing (Effects)
 import Common.Errors exposing (errorsHandler, successHandler)
-import Environments.List exposing (Environments, getEnvironments)
+import Environments.List exposing (Environments, getEnvironmentKeys)
 import Common.Components exposing (..)
 import Common.Utils exposing (none, setEnvironments)
 import Common.Errors as Errors exposing (..)
@@ -20,6 +20,7 @@ import Json.Decode exposing (..)
 import Common.Http exposing (saveResponse, postJson, putJson, SaveResponse)
 import Task exposing (Task)
 import Common.Model exposing (Options)
+import Common.Http exposing (getJson)
 
 import Users.Model exposing (User, emptyUser, getRoles)
 import Users.Add.Perm as Perm
@@ -32,7 +33,9 @@ type alias Model =
     wizard : (Wizard.Model Step User)
   , saveErrors : Errors.Model
   , hasNext : Bool
-  , roles : Dict String String
+  , roles : List (String,String)
+  , environments : List (String,String)
+  , operations : List (String,String)
   }
 
 type Step = 
@@ -54,18 +57,20 @@ init =
     wizard = Wizard.init mainStep steps
     effects = [
        getRoles SetRoles
-    ,  getEnvironments SetEnvironments
+    ,  getEnvironmentKeys SetEnvironments
+    ,  getOperations SetOperations
     ]
 
   in
-    (Model wizard errors False Dict.empty,Effects.batch effects)
+    (Model wizard errors False [] [] [],Effects.batch effects)
 
 type Action = 
    ErrorsView Errors.Action
     | WizardAction Wizard.Action
     | FormAction Form.Action
     | SetRoles (Result Http.Error (Dict String String))
-    | SetEnvironments (Result Http.Error Environments)
+    | SetEnvironments (Result Http.Error (List String))
+    | SetOperations (Result Http.Error (List String))
     | Reset
     | Done
     | Back
@@ -92,15 +97,24 @@ setRoles ({wizard} as model) roles =
   let
      role = (Maybe.withDefault "" (List.head (Dict.values roles)))
      mainStep = (step (Main.init role) Main)
+     pairs = List.map (\(f,s) -> (s, f)) (Dict.toList roles)
   in
-    none { model | roles = roles, wizard = { wizard | step = Just mainStep }}
+    none { model | roles = pairs, wizard = { wizard | step = Just mainStep }}
 
-setEnvironment ({wizard} as model) es =
+setEnvironment model keys =
   let
-    env = (Maybe.withDefault "" (List.head (Dict.keys es)))
-    environments = Dict.keys es
+    env = (Maybe.withDefault "" (List.head keys))
+    pairs = List.map (\key -> (key,key) ) keys
   in 
-   none model
+   none { model | environments = pairs }
+
+setOperation model keys =
+  let
+    op = (Maybe.withDefault "" (List.head keys))
+    pairs = List.map (\key -> (key,key) ) keys
+  in 
+   none { model | operations = pairs }
+
 
 
 update : Action ->  Model -> (Model , Effects Action)
@@ -136,6 +150,9 @@ update action ({wizard} as model) =
     SetEnvironments result ->
        (successHandler result model (setEnvironment model) NoOp)
 
+    SetOperations result ->
+       (successHandler result model (setOperation model) NoOp)
+
     Save f -> 
       none model
       -- (model, persistType f (merged model))
@@ -147,20 +164,17 @@ update action ({wizard} as model) =
       (none model)
 
 currentView : Signal.Address Action -> Model -> List Html
-currentView address ({wizard, roles} as model) =
+currentView address ({wizard, roles, environments, operations} as model) =
   case wizard.step of 
     Just ({value} as current) ->
       case value of 
         Main -> 
-          let 
-             pairs = List.map (\(f,s) -> (s, f)) (Dict.toList roles)
-          in
-            dialogPanel "info" (info "Add a new User") 
-             (panel (fixedPanel (Main.view pairs (Signal.forwardTo address FormAction) current)) )
+          dialogPanel "info" (info "Add a new User") 
+             (panel (fixedPanel (Main.view roles (Signal.forwardTo address FormAction) current)) )
 
         Perm -> 
            dialogPanel "info" (info "User permissions") 
-               (panel (fixedPanel (Perm.view [] [] (Signal.forwardTo address FormAction) current)))
+               (panel (fixedPanel (Perm.view environments operations (Signal.forwardTo address FormAction) current)))
           
     Nothing -> 
         dialogPanel "info" (info "Save new user") 
@@ -171,13 +185,13 @@ errorsView address {saveErrors} =
    let
      body = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
    in
-     dialogPanel "danger" (error "Failed to save type") (panel (panelContents body))
+     dialogPanel "danger" (error "Failed to save user") (panel (panelContents body))
 
 saveButton address =
-    [button [id "Save", class "btn btn-primary", onClick address (Save saveType) ] [text "Save  "]]
+    [button [id "Save", class "btn btn-primary", onClick address (Save saveUser) ] [text "Save  "]]
 
 doneButton address =
-    [button [id "Done", class "btn btn-primary", onClick address (Save saveType) ] [text "Done "]]
+    [button [id "Done", class "btn btn-primary", onClick address (Save saveUser) ] [text "Done "]]
 
 
 rows contents buttons = 
@@ -202,18 +216,30 @@ view address ({wizard, saveErrors} as model) =
       (div [class "col-md-offset-2 col-md-8"] (currentView address model))
       (buttons' Next Back (saveButton address))
 
-saveType: String -> Effects Action
-saveType json = 
-  postJson (Http.string json) saveResponse "/types"  
+saveUser: String -> Effects Action
+saveUser json = 
+  postJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
     |> Task.map Saved
     |> Effects.task
 
-updateType: String -> Effects Action
-updateType json = 
-  putJson (Http.string json) saveResponse "/types"  
+updateUser: String -> Effects Action
+updateUser json = 
+  putJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
     |> Task.map Saved
+    |> Effects.task
+
+
+environmentsKeys: Decoder (List String)
+environmentsKeys=
+  at ["operations"] (list string)
+
+
+getOperations action = 
+  getJson environmentsKeys "/users/operations" 
+    |> Task.toResult
+    |> Task.map action
     |> Effects.task
 
 
