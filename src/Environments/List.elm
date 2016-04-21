@@ -62,5 +62,16 @@ getEnvironments action =
     |> Task.map action
     |> Effects.task
 
+environmentsKeys: Decoder (List String)
+environmentsKeys=
+  at ["environments"] (list string)
+
+
+getEnvironmentKeys action = 
+  getJson environmentsKeys "/environments/keys" 
+    |> Task.toResult
+    |> Task.map action
+    |> Effects.task
+
 
 
