@@ -31,9 +31,9 @@ emptyUser  =
 userBase name password role =
   User name (Just password) [] [role] []
 
-permBase : String -> String -> User
+permBase : List String -> List String -> User
 permBase envs operations =
-  User "" Nothing [] [] []
+  User "" Nothing operations [] envs
 
 -- Decoding
 
