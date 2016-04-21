@@ -20,23 +20,12 @@ type alias Model =
 validate : Validation () User
 validate =
   form2 permBase
-     ("envs" := string)
-     ("operations" := string)
-
-defaults : String ->  String -> List (String, Field)
-defaults env op =
-  [
-    ("envs", Field.Text env)
-  , ("operations", Field.Text op)
-  ]
-
+     ("envs" := stringList)
+     ("operations" := stringList)
 
 init =
   Model (Form.initial [] validate)
 
-reinit env op =
-  Model (Form.initial (defaults env op) validate)
- 
 -- View
 
 view envs operations address ({form} as model) =
