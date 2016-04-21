@@ -14652,7 +14652,7 @@ Elm.Users.Model.make = function (_elm) {
    var User = F5(function (a,b,c,d,e) {    return {username: a,password: b,operations: c,roles: d,envs: e};});
    var emptyUser = A5(User,"",$Maybe.Nothing,_U.list([]),_U.list([]),_U.list([]));
    var userBase = F3(function (name,password,role) {    return A5(User,name,$Maybe.Just(password),_U.list([]),_U.list([role]),_U.list([]));});
-   var permBase = F2(function (envs,operations) {    return A5(User,"",$Maybe.Nothing,_U.list([]),_U.list([]),_U.list([]));});
+   var permBase = F2(function (envs,operations) {    return A5(User,"",$Maybe.Nothing,operations,_U.list([]),envs);});
    var user = A6($Json$Decode.object5,
    User,
    A2($Json$Decode._op[":="],"username",$Json$Decode.string),
@@ -24073,36 +24073,45 @@ Elm.Form.Validate.make = function (_elm) {
             return $Result.Ok("");
          }
    };
-   var string = function (v) {
-      var _p6 = $Form$Field.asString(v);
+   var stringList = function (v) {
+      var _p6 = $Form$Field.asStringList(v);
       if (_p6.ctor === "Just") {
             var _p7 = _p6._0;
-            return $String.isEmpty(_p7) ? $Result.Err($Form$Error.Empty) : $Result.Ok(_p7);
+            return $List.isEmpty(_p7) ? $Result.Err($Form$Error.Empty) : $Result.Ok(_p7);
+         } else {
+            return $Result.Err($Form$Error.InvalidString);
+         }
+   };
+   var string = function (v) {
+      var _p8 = $Form$Field.asString(v);
+      if (_p8.ctor === "Just") {
+            var _p9 = _p8._0;
+            return $String.isEmpty(_p9) ? $Result.Err($Form$Error.Empty) : $Result.Ok(_p9);
          } else {
             return $Result.Err($Form$Error.InvalidString);
          }
    };
    var $float = function (v) {
-      var _p8 = $Form$Field.asString(v);
-      if (_p8.ctor === "Just") {
-            return A2($Result.formatError,function (_p9) {    return $Form$Error.InvalidFloat;},$String.toFloat(_p8._0));
+      var _p10 = $Form$Field.asString(v);
+      if (_p10.ctor === "Just") {
+            return A2($Result.formatError,function (_p11) {    return $Form$Error.InvalidFloat;},$String.toFloat(_p10._0));
          } else {
             return $Result.Err($Form$Error.InvalidInt);
          }
    };
    var $int = function (v) {
-      var _p10 = $Form$Field.asString(v);
-      if (_p10.ctor === "Just") {
-            return A2($Result.formatError,function (_p11) {    return $Form$Error.InvalidInt;},$String.toInt(_p10._0));
+      var _p12 = $Form$Field.asString(v);
+      if (_p12.ctor === "Just") {
+            return A2($Result.formatError,function (_p13) {    return $Form$Error.InvalidInt;},$String.toInt(_p12._0));
          } else {
             return $Result.Err($Form$Error.InvalidInt);
          }
    };
-   var getErr = function (res) {    var _p12 = res;if (_p12.ctor === "Ok") {    return $Maybe.Nothing;} else {    return $Maybe.Just(_p12._0);}};
+   var getErr = function (res) {    var _p14 = res;if (_p14.ctor === "Ok") {    return $Maybe.Nothing;} else {    return $Maybe.Just(_p14._0);}};
    var groupErrorsUnion = F2(function (e1,e2) {
-      var _p13 = {ctor: "_Tuple2",_0: e1,_1: e2};
-      if (_p13.ctor === "_Tuple2" && _p13._0.ctor === "GroupErrors" && _p13._1.ctor === "GroupErrors") {
-            return $Form$Error.GroupErrors(A2($Dict.union,_p13._0._0,_p13._1._0));
+      var _p15 = {ctor: "_Tuple2",_0: e1,_1: e2};
+      if (_p15.ctor === "_Tuple2" && _p15._0.ctor === "GroupErrors" && _p15._1.ctor === "GroupErrors") {
+            return $Form$Error.GroupErrors(A2($Dict.union,_p15._0._0,_p15._1._0));
          } else {
             return e2;
          }
@@ -24121,11 +24130,11 @@ Elm.Form.Validate.make = function (_elm) {
    var formatError = F3(function (f,validation,field) {    return A2($Result.formatError,f,validation(field));});
    var defaultValue = F3(function (a,validation,field) {    return $Result.Ok(A2($Result.withDefault,a,validation(field)));});
    var apply = F3(function (partialValidation,aValidation,field) {
-      var _p14 = {ctor: "_Tuple2",_0: partialValidation(field),_1: aValidation(field)};
-      if (_p14._0.ctor === "Ok" && _p14._1.ctor === "Ok") {
-            return $Result.Ok(_p14._0._0(_p14._1._0));
+      var _p16 = {ctor: "_Tuple2",_0: partialValidation(field),_1: aValidation(field)};
+      if (_p16._0.ctor === "Ok" && _p16._1.ctor === "Ok") {
+            return $Result.Ok(_p16._0._0(_p16._1._0));
          } else {
-            return $Result.Err(mergeMany(_U.list([getErr(_p14._0),getErr(_p14._1)])));
+            return $Result.Err(mergeMany(_U.list([getErr(_p16._0),getErr(_p16._1)])));
          }
    });
    var andThen = F3(function (validation,callback,field) {
@@ -24135,9 +24144,9 @@ Elm.Form.Validate.make = function (_elm) {
    var email = A2(andThen,
    string,
    function (s) {
-      return A2(formatError,function (_p15) {    return $Form$Error.InvalidEmail;},A2(format,validEmailPattern,s));
+      return A2(formatError,function (_p17) {    return $Form$Error.InvalidEmail;},A2(format,validEmailPattern,s));
    });
-   var url = A2(andThen,string,function (s) {    return A2(formatError,function (_p16) {    return $Form$Error.InvalidUrl;},A2(format,validUrlPattern,s));});
+   var url = A2(andThen,string,function (s) {    return A2(formatError,function (_p18) {    return $Form$Error.InvalidUrl;},A2(format,validUrlPattern,s));});
    var map = F3(function (f,validation,field) {    return A2($Result.map,f,validation(field));});
    var form1 = map;
    var form2 = F3(function (func,v1,v2) {    return A2(apply,A2(form1,func,v1),v2);});
@@ -24164,6 +24173,7 @@ Elm.Form.Validate.make = function (_elm) {
                                       ,form7: form7
                                       ,form8: form8
                                       ,string: string
+                                      ,stringList: stringList
                                       ,$int: $int
                                       ,$float: $float
                                       ,bool: bool
@@ -24424,15 +24434,20 @@ Elm.Form.Input.make = function (_elm) {
                               })]);
       return A2($Html.input,A2($Basics._op["++"],formAttrs,attrs),_U.list([]));
    });
+   var appendOrClear = F2(function (list,item) {
+      return A2($List.member,item,list) ? A2($List.filter,function (v) {    return !_U.eq(item,v);},list) : A2($List._op["::"],item,list);
+   });
    var multiSelectInput = F4(function (options,state,addr,attrs) {
       var values = A2($Maybe.withDefault,_U.list([]),state.value);
       var formAttrs = _U.list([$Html$Attributes.type$("checkbox")
                               ,A2($Html$Attributes.attribute,"multiple","true")
                               ,A3($Html$Events.on,
-                              "change",
+                              "click",
                               $Html$Events.targetValue,
                               function (v) {
-                                 return A2($Signal.message,addr,A2($Form.Input,state.path,$Form$Field.MultiSelect(A2($List._op["::"],v,values))));
+                                 return A2($Signal.message,
+                                 addr,
+                                 A2($Form.Input,state.path,$Form$Field.MultiSelect(A2(appendOrClear,values,A2($Debug.log,"",v)))));
                               })
                               ,A2($Html$Events.onFocus,addr,$Form.Focus(state.path))
                               ,A2($Html$Events.onBlur,addr,$Form.Blur(state.path))]);
@@ -25792,7 +25807,6 @@ Elm.Users.Add.Perm.make = function (_elm) {
    $Common$FormComponents = Elm.Common.FormComponents.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Form = Elm.Form.make(_elm),
-   $Form$Field = Elm.Form.Field.make(_elm),
    $Form$Infix = Elm.Form.Infix.make(_elm),
    $Form$Input = Elm.Form.Input.make(_elm),
    $Form$Validate = Elm.Form.Validate.make(_elm),
@@ -25816,17 +25830,13 @@ Elm.Users.Add.Perm.make = function (_elm) {
       _U.list([A4($Common$FormComponents.formControl,"Environment",$Form$Input.multiSelectInput(envs),environment,address)
               ,A4($Common$FormComponents.formControl,"Operation",$Form$Input.multiSelectInput(operations),operation,address)]))]));
    });
-   var defaults = F2(function (env,op) {
-      return _U.list([{ctor: "_Tuple2",_0: "envs",_1: $Form$Field.Text(env)},{ctor: "_Tuple2",_0: "operations",_1: $Form$Field.Text(op)}]);
-   });
    var validate = A3($Form$Validate.form2,
    $Users$Model.permBase,
-   A2($Form$Infix._op[":="],"envs",$Form$Validate.string),
-   A2($Form$Infix._op[":="],"operations",$Form$Validate.string));
+   A2($Form$Infix._op[":="],"envs",$Form$Validate.stringList),
+   A2($Form$Infix._op[":="],"operations",$Form$Validate.stringList));
    var Model = function (a) {    return {form: a};};
    var init = Model(A2($Form.initial,_U.list([]),validate));
-   var reinit = F2(function (env,op) {    return Model(A2($Form.initial,A2(defaults,env,op),validate));});
-   return _elm.Users.Add.Perm.values = {_op: _op,Model: Model,validate: validate,defaults: defaults,init: init,reinit: reinit,view: view};
+   return _elm.Users.Add.Perm.values = {_op: _op,Model: Model,validate: validate,init: init,view: view};
 };
 Elm.Users = Elm.Users || {};
 Elm.Users.Add = Elm.Users.Add || {};
