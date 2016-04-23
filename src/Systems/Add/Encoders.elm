@@ -147,13 +147,13 @@ machineEncoder machine =
     encoded =  [
         ("domain", string machine.domain)
       , ("hostname", string machine.hostname)
-      , ("ip", optional string machine.ip)
       , ("os", string machine.os)
       , ("user", string machine.user)
      ]
   in
    encoded |> (combine int machine.cpu "cpu") 
            |> (combine int machine.ram "ram") 
+           |> (combine string machine.ip "ip") 
            |> object
     
 

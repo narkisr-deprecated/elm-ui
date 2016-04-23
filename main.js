@@ -18314,6 +18314,17 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
             return curr;
          }
    });
+   var machineEncoder = function (machine) {
+      var encoded = _U.list([{ctor: "_Tuple2",_0: "domain",_1: $Json$Encode.string(machine.domain)}
+                            ,{ctor: "_Tuple2",_0: "hostname",_1: $Json$Encode.string(machine.hostname)}
+                            ,{ctor: "_Tuple2",_0: "os",_1: $Json$Encode.string(machine.os)}
+                            ,{ctor: "_Tuple2",_0: "user",_1: $Json$Encode.string(machine.user)}]);
+      return $Json$Encode.object(A4(combine,
+      $Json$Encode.string,
+      machine.ip,
+      "ip",
+      A4(combine,$Json$Encode.$int,machine.ram,"ram",A4(combine,$Json$Encode.$int,machine.cpu,"cpu",encoded))));
+   };
    var maybeString = function (optional) {
       var _p1 = optional;
       if (_p1.ctor === "Just") {
@@ -18345,14 +18356,6 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
    var physicalEncoder = function (physical) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "mac",_1: A2(optional,$Json$Encode.string,physical.mac)}
                                          ,{ctor: "_Tuple2",_0: "broadcast",_1: A2(optional,$Json$Encode.string,physical.broadcast)}]));
-   };
-   var machineEncoder = function (machine) {
-      var encoded = _U.list([{ctor: "_Tuple2",_0: "domain",_1: $Json$Encode.string(machine.domain)}
-                            ,{ctor: "_Tuple2",_0: "hostname",_1: $Json$Encode.string(machine.hostname)}
-                            ,{ctor: "_Tuple2",_0: "ip",_1: A2(optional,$Json$Encode.string,machine.ip)}
-                            ,{ctor: "_Tuple2",_0: "os",_1: $Json$Encode.string(machine.os)}
-                            ,{ctor: "_Tuple2",_0: "user",_1: $Json$Encode.string(machine.user)}]);
-      return $Json$Encode.object(A4(combine,$Json$Encode.$int,machine.ram,"ram",A4(combine,$Json$Encode.$int,machine.cpu,"cpu",encoded)));
    };
    var kvmEncoder = function (kvm) {    return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "node",_1: $Json$Encode.string(kvm.node)}]));};
    var digitalEncoder = function (digital) {
