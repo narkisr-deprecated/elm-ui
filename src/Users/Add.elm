@@ -121,7 +121,7 @@ update : Action ->  Model -> (Model , Effects Action)
 update action ({wizard} as model) =
   case action of 
     Next -> 
-      Debug.log "" (update (WizardAction Wizard.Next) model)
+      update (WizardAction Wizard.Next) model
 
     Back -> 
        update (WizardAction Wizard.Back) model
