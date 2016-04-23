@@ -34,30 +34,40 @@ blockEncoder block =
     , ("device", string block.device)
   ]
 
-vpcEncoder : AWS.VPC -> Value
-vpcEncoder ({vpcId} as vpc) =
+vpcEncoder ({vpcId} as vpc) curr =
   if String.isEmpty vpcId then
-    null
+    curr 
   else
-    object [
+    (List.append curr [
+     ("vpc", object [
         ("subnet-id", string vpc.subnetId)
       , ("vpc-id", string vpc.vpcId)
       , ("assign-public", bool vpc.assignPublic)
-    ]
+    ])])
+
+zoneEncoder {availabilityZone} curr =
+  case availabilityZone of 
+    Just zone -> 
+      (List.append curr [("availability-zone", string zone)])
+
+    Nothing -> 
+      curr 
+
 
 awsEncoder : AWS -> Value
 awsEncoder aws =
-  object [
-      ("key-name", string aws.keyName)
-    , ("endpoint", string aws.endpoint)
-    , ("instance-type", string aws.instanceType)
-    , ("ebs-optimized", bool (withDefault False aws.ebsOptimized))
-    , ("availability-zone", maybeString aws.availabilityZone)
-    , ("security-groups", list (List.map string (defaultEmpty aws.securityGroups)))
-    , ("vpc", vpcEncoder (withDefault emptyVpc aws.vpc))
-    , ("block-devices", list (List.map blockEncoder (defaultEmpty aws.blockDevices)))
-    , ("volumes", list (List.map awsVolumeEncoder (defaultEmpty aws.volumes)))
-  ]
+  let 
+     root = [
+        ("key-name", string aws.keyName)
+      , ("endpoint", string aws.endpoint)
+      , ("instance-type", string aws.instanceType)
+      , ("ebs-optimized", bool (withDefault False aws.ebsOptimized))
+      , ("security-groups", list (List.map string (defaultEmpty aws.securityGroups)))
+      , ("block-devices", list (List.map blockEncoder (defaultEmpty aws.blockDevices)))
+      , ("volumes", list (List.map awsVolumeEncoder (defaultEmpty aws.volumes)))
+     ]
+   in
+     root |> (vpcEncoder (withDefault emptyVpc aws.vpc)) |> (zoneEncoder aws) |> object
 
 gceEncoder : GCE -> Value
 gceEncoder gce =

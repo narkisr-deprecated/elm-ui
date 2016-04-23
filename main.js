@@ -18361,17 +18361,26 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                           ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(gce.tags)))}
                                          ,{ctor: "_Tuple2",_0: "project-id",_1: $Json$Encode.string(gce.projectId)}]));
    };
-   var vpcEncoder = function (_p2) {
+   var zoneEncoder = F2(function (_p2,curr) {
       var _p3 = _p2;
-      var _p4 = _p3;
-      return $String.isEmpty(_p3.vpcId) ? $Json$Encode.$null : $Json$Encode.object(_U.list([{ctor: "_Tuple2"
-                                                                                            ,_0: "subnet-id"
-                                                                                            ,_1: $Json$Encode.string(_p4.subnetId)}
-                                                                                           ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p4.vpcId)}
-                                                                                           ,{ctor: "_Tuple2"
-                                                                                            ,_0: "assign-public"
-                                                                                            ,_1: $Json$Encode.bool(_p4.assignPublic)}]));
-   };
+      var _p4 = _p3.availabilityZone;
+      if (_p4.ctor === "Just") {
+            return A2($List.append,curr,_U.list([{ctor: "_Tuple2",_0: "availability-zone",_1: $Json$Encode.string(_p4._0)}]));
+         } else {
+            return curr;
+         }
+   });
+   var vpcEncoder = F2(function (_p5,curr) {
+      var _p6 = _p5;
+      var _p7 = _p6;
+      return $String.isEmpty(_p6.vpcId) ? curr : A2($List.append,
+      curr,
+      _U.list([{ctor: "_Tuple2"
+               ,_0: "vpc"
+               ,_1: $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "subnet-id",_1: $Json$Encode.string(_p7.subnetId)}
+                                                ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p7.vpcId)}
+                                                ,{ctor: "_Tuple2",_0: "assign-public",_1: $Json$Encode.bool(_p7.assignPublic)}]))}]));
+   });
    var blockEncoder = function (block) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "volume",_1: $Json$Encode.string(block.volume)}
                                          ,{ctor: "_Tuple2",_0: "device",_1: $Json$Encode.string(block.device)}]));
@@ -18384,52 +18393,48 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                          ,{ctor: "_Tuple2",_0: "clear",_1: $Json$Encode.bool(volume.clear)}]));
    };
    var awsEncoder = function (aws) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "key-name",_1: $Json$Encode.string(aws.keyName)}
-                                         ,{ctor: "_Tuple2",_0: "endpoint",_1: $Json$Encode.string(aws.endpoint)}
-                                         ,{ctor: "_Tuple2",_0: "instance-type",_1: $Json$Encode.string(aws.instanceType)}
-                                         ,{ctor: "_Tuple2",_0: "ebs-optimized",_1: $Json$Encode.bool(A2($Maybe.withDefault,false,aws.ebsOptimized))}
-                                         ,{ctor: "_Tuple2",_0: "availability-zone",_1: maybeString(aws.availabilityZone)}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "security-groups"
-                                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(aws.securityGroups)))}
-                                         ,{ctor: "_Tuple2",_0: "vpc",_1: vpcEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,aws.vpc))}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "block-devices"
-                                          ,_1: $Json$Encode.list(A2($List.map,blockEncoder,$Common$Utils.defaultEmpty(aws.blockDevices)))}
-                                         ,{ctor: "_Tuple2"
-                                          ,_0: "volumes"
-                                          ,_1: $Json$Encode.list(A2($List.map,awsVolumeEncoder,$Common$Utils.defaultEmpty(aws.volumes)))}]));
+      var root = _U.list([{ctor: "_Tuple2",_0: "key-name",_1: $Json$Encode.string(aws.keyName)}
+                         ,{ctor: "_Tuple2",_0: "endpoint",_1: $Json$Encode.string(aws.endpoint)}
+                         ,{ctor: "_Tuple2",_0: "instance-type",_1: $Json$Encode.string(aws.instanceType)}
+                         ,{ctor: "_Tuple2",_0: "ebs-optimized",_1: $Json$Encode.bool(A2($Maybe.withDefault,false,aws.ebsOptimized))}
+                         ,{ctor: "_Tuple2"
+                          ,_0: "security-groups"
+                          ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(aws.securityGroups)))}
+                         ,{ctor: "_Tuple2",_0: "block-devices",_1: $Json$Encode.list(A2($List.map,blockEncoder,$Common$Utils.defaultEmpty(aws.blockDevices)))}
+                         ,{ctor: "_Tuple2",_0: "volumes",_1: $Json$Encode.list(A2($List.map,awsVolumeEncoder,$Common$Utils.defaultEmpty(aws.volumes)))}]);
+      return $Json$Encode.object(A2(zoneEncoder,aws,A2(vpcEncoder,A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,aws.vpc),root)));
    };
-   var encoderOf = F2(function (_p5,stage) {
-      var _p6 = _p5;
-      var _p7 = stage;
-      switch (_p7)
-      {case "AWS": return {ctor: "_Tuple2",_0: "aws",_1: awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p6.aws))};
-         case "GCE": return {ctor: "_Tuple2",_0: "gce",_1: gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p6.gce))};
+   var encoderOf = F2(function (_p8,stage) {
+      var _p9 = _p8;
+      var _p10 = stage;
+      switch (_p10)
+      {case "AWS": return {ctor: "_Tuple2",_0: "aws",_1: awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p9.aws))};
+         case "GCE": return {ctor: "_Tuple2",_0: "gce",_1: gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p9.gce))};
          case "Digital": return {ctor: "_Tuple2"
                                 ,_0: "digital-ocean"
-                                ,_1: digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p6.digital))};
+                                ,_1: digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p9.digital))};
          case "Physical": return {ctor: "_Tuple2"
                                  ,_0: "physical"
-                                 ,_1: physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p6.physical))};
+                                 ,_1: physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p9.physical))};
          case "Openstack": return {ctor: "_Tuple2"
                                   ,_0: "openstack"
-                                  ,_1: openstackEncoder(A2($Maybe.withDefault,$Systems$Model$Openstack.emptyOpenstack,_p6.openstack))};
-         case "KVM": return {ctor: "_Tuple2",_0: "kvm",_1: kvmEncoder(A2($Maybe.withDefault,$Systems$Model$KVM.emptyKVM,_p6.kvm))};
+                                  ,_1: openstackEncoder(A2($Maybe.withDefault,$Systems$Model$Openstack.emptyOpenstack,_p9.openstack))};
+         case "KVM": return {ctor: "_Tuple2",_0: "kvm",_1: kvmEncoder(A2($Maybe.withDefault,$Systems$Model$KVM.emptyKVM,_p9.kvm))};
          default: return {ctor: "_Tuple2",_0: "",_1: $Json$Encode.$null};}
    });
-   var encode = F2(function (_p8,stage) {
-      var _p9 = _p8;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p9.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p9.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p9.env)}
-                                         ,A2(encoderOf,_p9,stage)
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: machineEncoder(_p9.machine)}]));
+   var encode = F2(function (_p11,stage) {
+      var _p12 = _p11;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p12.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p12.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p12.env)}
+                                         ,A2(encoderOf,_p12,stage)
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: machineEncoder(_p12.machine)}]));
    });
    return _elm.Systems.Add.Encoders.values = {_op: _op
                                              ,awsVolumeEncoder: awsVolumeEncoder
                                              ,blockEncoder: blockEncoder
                                              ,vpcEncoder: vpcEncoder
+                                             ,zoneEncoder: zoneEncoder
                                              ,awsEncoder: awsEncoder
                                              ,gceEncoder: gceEncoder
                                              ,digitalEncoder: digitalEncoder
@@ -26103,10 +26108,13 @@ Elm.Users.Add.make = function (_elm) {
          var _p23 = _p20;
          var _p21 = action;
          switch (_p21.ctor)
-         {case "Next": return A2($Debug.log,"",A2(update,WizardAction($Common$FormWizard.Next),_p23));
-            case "Back": var _v12 = WizardAction($Common$FormWizard.Back),_v13 = _p23;
+         {case "Next": var _v12 = WizardAction($Common$FormWizard.Next),_v13 = _p23;
               action = _v12;
               _p19 = _v13;
+              continue update;
+            case "Back": var _v14 = WizardAction($Common$FormWizard.Back),_v15 = _p23;
+              action = _v14;
+              _p19 = _v15;
               continue update;
             case "Reset": var _p22 = A2(update,WizardAction($Common$FormWizard.Back),_p23);
               var back = _p22._0;
