@@ -45,15 +45,6 @@ vpcEncoder ({vpcId} as vpc) curr =
       , ("assign-public", bool vpc.assignPublic)
     ])])
 
-zoneEncoder {availabilityZone} curr =
-  case availabilityZone of 
-    Just zone -> 
-      (List.append curr [("availability-zone", string zone)])
-
-    Nothing -> 
-      curr 
-
-
 awsEncoder : AWS -> Value
 awsEncoder aws =
   let 
@@ -67,7 +58,9 @@ awsEncoder aws =
       , ("volumes", list (List.map awsVolumeEncoder (defaultEmpty aws.volumes)))
      ]
    in
-     root |> (vpcEncoder (withDefault emptyVpc aws.vpc)) |> (zoneEncoder aws) |> object
+     root |> (vpcEncoder (withDefault emptyVpc aws.vpc)) 
+          |> (combine string aws.availabilityZone "availability-zone") 
+          |> object
 
 gceEncoder : GCE -> Value
 gceEncoder gce =
@@ -140,17 +133,30 @@ openstackEncoder openstack =
     , ("volumes", list (List.map openstackVolumeEncoder (defaultEmpty openstack.volumes)))
   ]
 
+combine enc value key curr =
+  case value of 
+    Just exists -> 
+      List.append curr [(key, enc exists)]
+
+    Nothing -> 
+      curr 
+
 machineEncoder : Machine -> Value
 machineEncoder machine =
-  object [
-      ("domain", string machine.domain)
-    , ("hostname", string machine.hostname)
-    , ("ip", optional string machine.ip)
-    , ("os", string machine.os)
-    , ("user", string machine.user)
-    , ("cpu", int (withDefault 0 machine.cpu))
-    , ("ram", int (withDefault 0 machine.ram))
-  ]
+  let
+    encoded =  [
+        ("domain", string machine.domain)
+      , ("hostname", string machine.hostname)
+      , ("ip", optional string machine.ip)
+      , ("os", string machine.os)
+      , ("user", string machine.user)
+     ]
+  in
+   encoded |> (combine int machine.cpu "cpu") 
+           |> (combine int machine.ram "ram") 
+           |> object
+    
+
 
 encoderOf {openstack, physical, aws, digital, gce, kvm} stage =
   case stage of 

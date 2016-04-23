@@ -18306,10 +18306,18 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
    $Systems$Model$Openstack = Elm.Systems.Model.Openstack.make(_elm),
    $Systems$Model$Physical = Elm.Systems.Model.Physical.make(_elm);
    var _op = {};
-   var maybeString = function (optional) {
-      var _p0 = optional;
+   var combine = F4(function (enc,value,key,curr) {
+      var _p0 = value;
       if (_p0.ctor === "Just") {
-            return $Json$Encode.string(_p0._0);
+            return A2($List.append,curr,_U.list([{ctor: "_Tuple2",_0: key,_1: enc(_p0._0)}]));
+         } else {
+            return curr;
+         }
+   });
+   var maybeString = function (optional) {
+      var _p1 = optional;
+      if (_p1.ctor === "Just") {
+            return $Json$Encode.string(_p1._0);
          } else {
             return $Json$Encode.$null;
          }
@@ -18333,19 +18341,18 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                           ,_0: "volumes"
                                           ,_1: $Json$Encode.list(A2($List.map,openstackVolumeEncoder,$Common$Utils.defaultEmpty(openstack.volumes)))}]));
    };
-   var optional = F2(function (enc,value) {    var _p1 = value;if (_p1.ctor === "Just") {    return enc(_p1._0);} else {    return $Json$Encode.$null;}});
+   var optional = F2(function (enc,value) {    var _p2 = value;if (_p2.ctor === "Just") {    return enc(_p2._0);} else {    return $Json$Encode.$null;}});
    var physicalEncoder = function (physical) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "mac",_1: A2(optional,$Json$Encode.string,physical.mac)}
                                          ,{ctor: "_Tuple2",_0: "broadcast",_1: A2(optional,$Json$Encode.string,physical.broadcast)}]));
    };
    var machineEncoder = function (machine) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "domain",_1: $Json$Encode.string(machine.domain)}
-                                         ,{ctor: "_Tuple2",_0: "hostname",_1: $Json$Encode.string(machine.hostname)}
-                                         ,{ctor: "_Tuple2",_0: "ip",_1: A2(optional,$Json$Encode.string,machine.ip)}
-                                         ,{ctor: "_Tuple2",_0: "os",_1: $Json$Encode.string(machine.os)}
-                                         ,{ctor: "_Tuple2",_0: "user",_1: $Json$Encode.string(machine.user)}
-                                         ,{ctor: "_Tuple2",_0: "cpu",_1: $Json$Encode.$int(A2($Maybe.withDefault,0,machine.cpu))}
-                                         ,{ctor: "_Tuple2",_0: "ram",_1: $Json$Encode.$int(A2($Maybe.withDefault,0,machine.ram))}]));
+      var encoded = _U.list([{ctor: "_Tuple2",_0: "domain",_1: $Json$Encode.string(machine.domain)}
+                            ,{ctor: "_Tuple2",_0: "hostname",_1: $Json$Encode.string(machine.hostname)}
+                            ,{ctor: "_Tuple2",_0: "ip",_1: A2(optional,$Json$Encode.string,machine.ip)}
+                            ,{ctor: "_Tuple2",_0: "os",_1: $Json$Encode.string(machine.os)}
+                            ,{ctor: "_Tuple2",_0: "user",_1: $Json$Encode.string(machine.user)}]);
+      return $Json$Encode.object(A4(combine,$Json$Encode.$int,machine.ram,"ram",A4(combine,$Json$Encode.$int,machine.cpu,"cpu",encoded)));
    };
    var kvmEncoder = function (kvm) {    return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "node",_1: $Json$Encode.string(kvm.node)}]));};
    var digitalEncoder = function (digital) {
@@ -18361,25 +18368,16 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                           ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(gce.tags)))}
                                          ,{ctor: "_Tuple2",_0: "project-id",_1: $Json$Encode.string(gce.projectId)}]));
    };
-   var zoneEncoder = F2(function (_p2,curr) {
-      var _p3 = _p2;
-      var _p4 = _p3.availabilityZone;
-      if (_p4.ctor === "Just") {
-            return A2($List.append,curr,_U.list([{ctor: "_Tuple2",_0: "availability-zone",_1: $Json$Encode.string(_p4._0)}]));
-         } else {
-            return curr;
-         }
-   });
-   var vpcEncoder = F2(function (_p5,curr) {
-      var _p6 = _p5;
-      var _p7 = _p6;
-      return $String.isEmpty(_p6.vpcId) ? curr : A2($List.append,
+   var vpcEncoder = F2(function (_p3,curr) {
+      var _p4 = _p3;
+      var _p5 = _p4;
+      return $String.isEmpty(_p4.vpcId) ? curr : A2($List.append,
       curr,
       _U.list([{ctor: "_Tuple2"
                ,_0: "vpc"
-               ,_1: $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "subnet-id",_1: $Json$Encode.string(_p7.subnetId)}
-                                                ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p7.vpcId)}
-                                                ,{ctor: "_Tuple2",_0: "assign-public",_1: $Json$Encode.bool(_p7.assignPublic)}]))}]));
+               ,_1: $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "subnet-id",_1: $Json$Encode.string(_p5.subnetId)}
+                                                ,{ctor: "_Tuple2",_0: "vpc-id",_1: $Json$Encode.string(_p5.vpcId)}
+                                                ,{ctor: "_Tuple2",_0: "assign-public",_1: $Json$Encode.bool(_p5.assignPublic)}]))}]));
    });
    var blockEncoder = function (block) {
       return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "volume",_1: $Json$Encode.string(block.volume)}
@@ -18402,39 +18400,42 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                           ,_1: $Json$Encode.list(A2($List.map,$Json$Encode.string,$Common$Utils.defaultEmpty(aws.securityGroups)))}
                          ,{ctor: "_Tuple2",_0: "block-devices",_1: $Json$Encode.list(A2($List.map,blockEncoder,$Common$Utils.defaultEmpty(aws.blockDevices)))}
                          ,{ctor: "_Tuple2",_0: "volumes",_1: $Json$Encode.list(A2($List.map,awsVolumeEncoder,$Common$Utils.defaultEmpty(aws.volumes)))}]);
-      return $Json$Encode.object(A2(zoneEncoder,aws,A2(vpcEncoder,A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,aws.vpc),root)));
+      return $Json$Encode.object(A4(combine,
+      $Json$Encode.string,
+      aws.availabilityZone,
+      "availability-zone",
+      A2(vpcEncoder,A2($Maybe.withDefault,$Systems$Model$AWS.emptyVpc,aws.vpc),root)));
    };
-   var encoderOf = F2(function (_p8,stage) {
-      var _p9 = _p8;
-      var _p10 = stage;
-      switch (_p10)
-      {case "AWS": return {ctor: "_Tuple2",_0: "aws",_1: awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p9.aws))};
-         case "GCE": return {ctor: "_Tuple2",_0: "gce",_1: gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p9.gce))};
+   var encoderOf = F2(function (_p6,stage) {
+      var _p7 = _p6;
+      var _p8 = stage;
+      switch (_p8)
+      {case "AWS": return {ctor: "_Tuple2",_0: "aws",_1: awsEncoder(A2($Maybe.withDefault,$Systems$Model$AWS.emptyAws,_p7.aws))};
+         case "GCE": return {ctor: "_Tuple2",_0: "gce",_1: gceEncoder(A2($Maybe.withDefault,$Systems$Model$GCE.emptyGce,_p7.gce))};
          case "Digital": return {ctor: "_Tuple2"
                                 ,_0: "digital-ocean"
-                                ,_1: digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p9.digital))};
+                                ,_1: digitalEncoder(A2($Maybe.withDefault,$Systems$Model$Digital.emptyDigital,_p7.digital))};
          case "Physical": return {ctor: "_Tuple2"
                                  ,_0: "physical"
-                                 ,_1: physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p9.physical))};
+                                 ,_1: physicalEncoder(A2($Maybe.withDefault,$Systems$Model$Physical.emptyPhysical,_p7.physical))};
          case "Openstack": return {ctor: "_Tuple2"
                                   ,_0: "openstack"
-                                  ,_1: openstackEncoder(A2($Maybe.withDefault,$Systems$Model$Openstack.emptyOpenstack,_p9.openstack))};
-         case "KVM": return {ctor: "_Tuple2",_0: "kvm",_1: kvmEncoder(A2($Maybe.withDefault,$Systems$Model$KVM.emptyKVM,_p9.kvm))};
+                                  ,_1: openstackEncoder(A2($Maybe.withDefault,$Systems$Model$Openstack.emptyOpenstack,_p7.openstack))};
+         case "KVM": return {ctor: "_Tuple2",_0: "kvm",_1: kvmEncoder(A2($Maybe.withDefault,$Systems$Model$KVM.emptyKVM,_p7.kvm))};
          default: return {ctor: "_Tuple2",_0: "",_1: $Json$Encode.$null};}
    });
-   var encode = F2(function (_p11,stage) {
-      var _p12 = _p11;
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p12.type$)}
-                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p12.owner)}
-                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p12.env)}
-                                         ,A2(encoderOf,_p12,stage)
-                                         ,{ctor: "_Tuple2",_0: "machine",_1: machineEncoder(_p12.machine)}]));
+   var encode = F2(function (_p9,stage) {
+      var _p10 = _p9;
+      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "type",_1: $Json$Encode.string(_p10.type$)}
+                                         ,{ctor: "_Tuple2",_0: "owner",_1: $Json$Encode.string(_p10.owner)}
+                                         ,{ctor: "_Tuple2",_0: "env",_1: $Json$Encode.string(_p10.env)}
+                                         ,A2(encoderOf,_p10,stage)
+                                         ,{ctor: "_Tuple2",_0: "machine",_1: machineEncoder(_p10.machine)}]));
    });
    return _elm.Systems.Add.Encoders.values = {_op: _op
                                              ,awsVolumeEncoder: awsVolumeEncoder
                                              ,blockEncoder: blockEncoder
                                              ,vpcEncoder: vpcEncoder
-                                             ,zoneEncoder: zoneEncoder
                                              ,awsEncoder: awsEncoder
                                              ,gceEncoder: gceEncoder
                                              ,digitalEncoder: digitalEncoder
@@ -18444,6 +18445,7 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                              ,openstackVolumeEncoder: openstackVolumeEncoder
                                              ,maybeString: maybeString
                                              ,openstackEncoder: openstackEncoder
+                                             ,combine: combine
                                              ,machineEncoder: machineEncoder
                                              ,encoderOf: encoderOf
                                              ,encode: encode};
