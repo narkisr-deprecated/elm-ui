@@ -14916,7 +14916,7 @@ Elm.Systems.Model.AWS.make = function (_elm) {
    var Block = F2(function (a,b) {    return {volume: a,device: b};});
    var emptyBlock = A2(Block,"","");
    var Volume = F5(function (a,b,c,d,e) {    return {type$: a,size: b,iops: c,device: d,clear: e};});
-   var emptyVolume = A5(Volume,"Magnetic",50,$Maybe.Just(50),"",false);
+   var emptyVolume = A5(Volume,"Magnetic",50,$Maybe.Nothing,"",false);
    return _elm.Systems.Model.AWS.values = {_op: _op
                                           ,Volume: Volume
                                           ,Block: Block
@@ -18387,11 +18387,11 @@ Elm.Systems.Add.Encoders.make = function (_elm) {
                                          ,{ctor: "_Tuple2",_0: "device",_1: $Json$Encode.string(block.device)}]));
    };
    var awsVolumeEncoder = function (volume) {
-      return $Json$Encode.object(_U.list([{ctor: "_Tuple2",_0: "volume-type",_1: maybeString(A2($Dict.get,volume.type$,$Systems$Add$AWS.ebsTypes))}
-                                         ,{ctor: "_Tuple2",_0: "size",_1: $Json$Encode.$int(volume.size)}
-                                         ,{ctor: "_Tuple2",_0: "iops",_1: $Json$Encode.$int(A2($Maybe.withDefault,0,volume.iops))}
-                                         ,{ctor: "_Tuple2",_0: "device",_1: $Json$Encode.string(volume.device)}
-                                         ,{ctor: "_Tuple2",_0: "clear",_1: $Json$Encode.bool(volume.clear)}]));
+      var enc = _U.list([{ctor: "_Tuple2",_0: "volume-type",_1: maybeString(A2($Dict.get,volume.type$,$Systems$Add$AWS.ebsTypes))}
+                        ,{ctor: "_Tuple2",_0: "size",_1: $Json$Encode.$int(volume.size)}
+                        ,{ctor: "_Tuple2",_0: "device",_1: $Json$Encode.string(volume.device)}
+                        ,{ctor: "_Tuple2",_0: "clear",_1: $Json$Encode.bool(volume.clear)}]);
+      return $Json$Encode.object(A4(combine,$Json$Encode.$int,volume.iops,"iops",enc));
    };
    var awsEncoder = function (aws) {
       var root = _U.list([{ctor: "_Tuple2",_0: "key-name",_1: $Json$Encode.string(aws.keyName)}

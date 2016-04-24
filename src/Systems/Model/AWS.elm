@@ -37,7 +37,7 @@ type alias AWS =
 
 emptyVolume : Volume
 emptyVolume =
-  Volume "Magnetic" 50 (Just 50) "" False
+  Volume "Magnetic" 50 Nothing "" False
 
 emptyBlock: Block
 emptyBlock =

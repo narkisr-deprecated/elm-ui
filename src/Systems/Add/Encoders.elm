@@ -18,13 +18,16 @@ import String
 
 awsVolumeEncoder : AWS.Volume -> Value
 awsVolumeEncoder volume =
-  object [
-      ("volume-type", maybeString (Dict.get volume.type' ebsTypes))
-    , ("size", int volume.size)
-    , ("iops", int (withDefault 0 volume.iops))
-    , ("device", string volume.device)
-    , ("clear", bool volume.clear)
-  ]
+  let
+    enc =  [
+       ("volume-type", maybeString (Dict.get volume.type' ebsTypes))
+     , ("size", int volume.size)
+     , ("device", string volume.device)
+     , ("clear", bool volume.clear)
+    ]
+  in
+    enc |> (combine int volume.iops "iops") 
+        |> object
 
 
 blockEncoder : AWS.Block -> Value
