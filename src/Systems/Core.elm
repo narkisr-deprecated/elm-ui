@@ -93,12 +93,14 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
 
         Add.Saved next result -> 
           let
-            (newSystems, effect) = Add.update systemsAction systemsAdd
+            (newSystems, newEffects) = Add.update systemsAction systemsAdd
+            (initial, initEffects) = Add.init
           in
-            if effect /= Effects.none && next == Add.NoOp then
-              none {model | navChange = Just (Systems, List), systemsAdd = newSystems}
+            -- If not the default case
+            if newEffects/= Effects.none && next == Add.NoOp then
+              ({model | navChange = Just (Systems, List), systemsAdd = initial}, Effects.map SystemsAdd initEffects)
             else  
-              ({model | systemsAdd = newSystems }, Effects.map SystemsAdd effect)
+              ({model | systemsAdd = newSystems }, Effects.map SystemsAdd newEffects)
 
         _ -> 
           let 

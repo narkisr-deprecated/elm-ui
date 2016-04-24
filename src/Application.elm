@@ -18,6 +18,11 @@ import Nav.Core as Nav exposing (goto)
 import Bootstrap.Html exposing (..)
 import Debug
 
+-- Hop
+import Hop.Types exposing (Location, Query,newLocation)
+import Routing.Model exposing (Route(SystemsRoute), defaultRoute)
+
+
 init : (Model, Effects Action)
 init =
   let 
@@ -39,7 +44,7 @@ init =
               , Effects.map JobsStats jobsStatAction
               ]
   in
-    (Model systems stacks jobsList jobsStat types templates users nav, Effects.batch effects) 
+    (Model systems stacks jobsList jobsStat types templates users nav defaultRoute newLocation, Effects.batch effects) 
 
 type alias Model = 
   { 
@@ -51,10 +56,14 @@ type alias Model =
   , templates : Templates.Model
   , users : Users.Model
   , nav : Nav.Model
+  , route : Route
+  , location : Location
   }
 
 type Action = 
-  SystemsAction Systems.Action
+  ApplyRoute (Route,Location)
+    | HopAction ()
+    | SystemsAction Systems.Action
     | NavAction Nav.Action
     | StacksAction Stacks.Action
     | JobsList Jobs.List.Action
@@ -76,7 +85,7 @@ navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
 navigate action ({systems, templates, stacks, types} as model , effects) =
   case action of
     SystemsAction action -> 
-      case systems.navChange  of
+      case (Debug.log "" systems.navChange)  of
          Just (Jobs, List) -> 
            let
              (withJobs, effects) = (jobListing model)
@@ -84,7 +93,11 @@ navigate action ({systems, templates, stacks, types} as model , effects) =
              goto Jobs List withJobs effects
  
          Just (Systems, section) -> 
-            goto Systems section model effects
+           let
+            (model, effects) = (goto Systems section model effects)
+            newSystems = { systems | navChange = Nothing}
+           in
+            ({model | systems = newSystems }, effects)
 
          Just (Templates, section) -> 
             let
@@ -93,6 +106,7 @@ navigate action ({systems, templates, stacks, types} as model , effects) =
                (newTemplates, effects) = Templates.update add model.templates 
             in
               goto Templates section {model | templates = newTemplates}  (Effects.map TemplatesAction effects)
+
          _ -> 
             (model, effects) 
 
@@ -118,7 +132,7 @@ navigate action ({systems, templates, stacks, types} as model , effects) =
 
 route : Action ->  Model -> (Model , Effects Action)
 route action ({nav, types, users, jobsList, jobsStats, systems, templates, stacks} as model) =
-  case action of 
+  case (Debug.log "" action) of 
     JobsList jobAction -> 
       if jobAction == Polling && nav.active /= Jobs then
         (model, Effects.none)
@@ -166,11 +180,11 @@ route action ({nav, types, users, jobsList, jobsStats, systems, templates, stack
       in
         ({ model | systems = newSystems}, Effects.map SystemsAction effects)
 
-    NavAction action -> 
-      let 
-        (newNav, effects) = Nav.update action nav
-      in
-        ({ model | nav = newNav}, Effects.map NavAction effects)
+    ApplyRoute (route, location) ->
+       none { model | route = route, location = location }
+
+    HopAction () ->
+      ( model, Effects.none )
 
     _ -> 
         none model
@@ -181,37 +195,46 @@ update action model =
    navigate action (route action model)
 
 activeView : Signal.Address Action -> Model -> List Html
-activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks, users} as model) =
-  let
-    {section} = nav
-  in 
-    case nav.active of
-      Systems -> 
-        Systems.view (Signal.forwardTo address SystemsAction) systems section
-
-      Types -> 
-        Types.view (Signal.forwardTo address TypesAction) types section
-
-      Templates -> 
-        Templates.view (Signal.forwardTo address TemplatesAction) templates section
+activeView address ({jobsList, jobsStats, route, systems, types, templates, stacks, users} as model) =
+    case route of
+      SystemsRoute nested -> 
+        Systems.view (Signal.forwardTo address SystemsAction) systems List
       
-      Jobs -> 
-        case section of
-          List ->
-            Jobs.List.view (Signal.forwardTo address JobsList) jobsList
+      _ -> [text "Not found"]
 
-          Stats ->
-            Jobs.Stats.view (Signal.forwardTo address JobsStats) jobsStats
 
-          _ ->
-            []
-
-      Stacks -> 
-        Stacks.view (Signal.forwardTo address StacksAction) stacks section
-
-      Users -> 
-        Users.view (Signal.forwardTo address UsersAction) users section
-
+-- activeView : Signal.Address Action -> Model -> List Html
+-- activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks, users} as model) =
+--   let
+--     {section} = nav
+--   in 
+--     case nav.active of
+--       Systems -> 
+--         Systems.view (Signal.forwardTo address SystemsAction) systems section
+--
+--       Types -> 
+--         Types.view (Signal.forwardTo address TypesAction) types section
+--
+--       Templates -> 
+--         Templates.view (Signal.forwardTo address TemplatesAction) templates section
+--       
+--       Jobs -> 
+--         case section of
+--           List ->
+--             Jobs.List.view (Signal.forwardTo address JobsList) jobsList
+--
+--           Stats ->
+--             Jobs.Stats.view (Signal.forwardTo address JobsStats) jobsStats
+--
+--           _ ->
+--             []
+--
+--       Stacks -> 
+--         Stacks.view (Signal.forwardTo address StacksAction) stacks section
+--
+--       Users -> 
+--         Users.view (Signal.forwardTo address UsersAction) users section
+--
 
 view : Signal.Address Action -> Model -> Html
 view address ({nav} as model) = 

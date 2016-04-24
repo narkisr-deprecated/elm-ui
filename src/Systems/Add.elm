@@ -254,7 +254,8 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
        else
           (model, effects)
 
-    _ -> (model, Effects.none)
+    _ -> 
+     none model
 
 currentView : Signal.Address Action -> Model -> Html
 currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, kvmModel, saveErrors, general} as model)=

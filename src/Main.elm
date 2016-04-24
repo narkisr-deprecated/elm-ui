@@ -6,17 +6,26 @@ import Common.Redirect as Redirect exposing (redirectActions)
 import Common.NewTab as NewTab exposing (newtabActions)
 import Common.Editor as Editor exposing (editorActions)
 import Search exposing (searchActions)
-import Application exposing (init, view, update)
+import Application as App exposing (init, view, update) 
+import Users.Core as UsersCore
+import Json.Encode as E exposing (list, string)
+
+-- Systems
 import Systems.List
 import Systems.Launch as SystemsLaunch
 import Systems.Core as SystemsCore
-import Templates.Launch as TemplatesLaunch
-import Templates.Core as TemplatesCore
+
+-- Types
 import Types.Core as TypesCore
-import Users.Core as UsersCore
 import Types.Add as TypesAdd
 import Types.Edit as TypesEdit
-import Json.Encode as E exposing (list, string)
+
+-- Routing
+import Hop
+import Hop.Types exposing (Router)
+import Routing.Model exposing (Route)
+import Routing.Config exposing (..)
+import Task exposing (Task)
 
 -- Templates
 import Templates.Add as TemplatesAdd
@@ -26,6 +35,7 @@ import Templates.Core as TemplatesCore
 import Stacks.Add as StacksAdd
 import Stacks.Core as StacksCore
 
+-- Jobs 
 import Time exposing (every, second)
 import Jobs.List exposing (Action(Polling))
 import Jobs.Stats as Stats exposing (Action(PollMetrics))
@@ -40,8 +50,7 @@ app =
         parsingInput (Search.Result False) parsingErr,
         menuClick menuPort,
         editorValue editorInPort,
-        jobsListPolling,
-        jobsStatsPolling
+        routerSignal
       ]
     }
 
@@ -86,16 +95,16 @@ editorValue p =
  Signal.map (\(target, json) ->
     case target of 
       "templates" -> 
-         Application.TemplatesAction (TemplatesCore.TemplatesAdd (TemplatesAdd.SetDefaults json))
+         App.TemplatesAction (TemplatesCore.TemplatesAdd (TemplatesAdd.SetDefaults json))
       
       "typesAdd" ->   
-         Application.TypesAction (TypesCore.Adding (TypesAdd.SetClasses json))
+         App.TypesAction (TypesCore.Adding (TypesAdd.SetClasses json))
 
       "typesEdit" ->   
-         Application.TypesAction (TypesCore.Editing (TypesEdit.AddAction (TypesAdd.SetClasses json)))
+         App.TypesAction (TypesCore.Editing (TypesEdit.AddAction (TypesAdd.SetClasses json)))
 
       _ -> 
-        Application.NoOp
+        App.NoOp
 
     ) p
 
@@ -123,42 +132,54 @@ port parserPort =
 port parsingOk : Signal Search.ParseResult
 
 parsingInput action p =
-  Signal.map (\r -> Application.SystemsAction (SystemsCore.SystemsListing (Systems.List.Searching (action r)))) p
+  Signal.map (\r -> App.SystemsAction (SystemsCore.SystemsListing (Systems.List.Searching (action r)))) p
 
 port parsingErr : Signal Search.ParseResult
 
-jobsListPolling : Signal Application.Action
+jobsListPolling : Signal App.Action
 jobsListPolling =
-  Signal.map (\_ -> Application.JobsList Polling) (Time.every (1 * second))
+  Signal.map (\_ -> App.JobsList Polling) (Time.every (1 * second))
  
-jobsStatsPolling : Signal Application.Action
+jobsStatsPolling : Signal App.Action
 jobsStatsPolling =
   let
     (model, _)= Stats.init
   in
-    Signal.map (\t -> Application.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
+    Signal.map (\t -> App.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
  
 port menuPort : Signal (String, String, String)
 
 intoActions (dest, job, target) = 
   case dest of
     "Systems" ->
-       Application.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
+       App.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
 
     "Templates" ->
-       Application.TemplatesAction (TemplatesCore.SetupJob (job, target))
+       App.TemplatesAction (TemplatesCore.SetupJob (job, target))
 
     "Types" ->
-       Application.TypesAction (TypesCore.MenuClick (job, target))
+       App.TypesAction (TypesCore.MenuClick (job, target))
 
     "Users" ->
-       Application.UsersAction (UsersCore.MenuClick (job, target))
+       App.UsersAction (UsersCore.MenuClick (job, target))
 
 
     _ -> 
-       Application.NoOp
+       App.NoOp
 
 menuClick p =
  Signal.map intoActions p
 
 
+router : Router Route
+router =
+  Hop.new Routing.Config.config
+
+
+routerSignal : Signal App.Action
+routerSignal =
+  Signal.map App.ApplyRoute router.signal
+
+port routeRunTask : Task () ()
+port routeRunTask =
+  router.run

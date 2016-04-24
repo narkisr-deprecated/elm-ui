@@ -16,7 +16,6 @@ import Common.Components exposing (fixedPanel, asList)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
 import Maybe exposing (withDefault)
-import Debug
 import Common.Wizard as Wizard
 import Dict as Dict exposing (Dict)
 import Common.Components exposing (..)
