@@ -12,15 +12,18 @@ import Common.Utils exposing (none)
 import Types.Core as Types
 import Users.Core as Users
 import Templates.Core as Templates
-import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))
-import Nav.Core as Nav exposing (goto)
+-- import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))
+import Nav.Core as Nav
 
 import Bootstrap.Html exposing (..)
 import Debug
 
 -- Hop
 import Hop.Types exposing (Location, Query,newLocation)
-import Routing.Model exposing (Route(SystemsRoute), defaultRoute)
+import Hop.Navigate exposing (navigateTo, setQuery)
+
+import Routing.Config as BaseRoute exposing (config,Route(SystemsRoute,TypesRoute,NotFoundRoute), defaultRoute)
+import Systems.Routing.Config exposing (Route(List))
 
 
 init : (Model, Effects Action)
@@ -56,13 +59,14 @@ type alias Model =
   , templates : Templates.Model
   , users : Users.Model
   , nav : Nav.Model
-  , route : Route
+  , route : BaseRoute.Route
   , location : Location
   }
 
 type Action = 
-  ApplyRoute (Route,Location)
+  ApplyRoute (BaseRoute.Route,Location)
     | HopAction ()
+    | NavigateTo String
     | SystemsAction Systems.Action
     | NavAction Nav.Action
     | StacksAction Stacks.Action
@@ -73,68 +77,11 @@ type Action =
     | UsersAction Users.Action
     | NoOp
 
--- Navigation changes
-jobListing : Model -> (Model , Effects Action)
-jobListing model = 
-  let
-    (newJobs, effects) = Jobs.List.init
-  in 
-    ({model | jobsList = newJobs}, Effects.map JobsList effects)
-
-navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ({systems, templates, stacks, types} as model , effects) =
-  case action of
-    SystemsAction action -> 
-      case (Debug.log "" systems.navChange)  of
-         Just (Jobs, List) -> 
-           let
-             (withJobs, effects) = (jobListing model)
-           in
-             goto Jobs List withJobs effects
- 
-         Just (Systems, section) -> 
-           let
-            (model, effects) = (goto Systems section model effects)
-            newSystems = { systems | navChange = Nothing}
-           in
-            ({model | systems = newSystems }, effects)
-
-         Just (Templates, section) -> 
-            let
-               (hyp, system) = (Systems.addedSystem systems)
-               add = (Templates.add hyp system)
-               (newTemplates, effects) = Templates.update add model.templates 
-            in
-              goto Templates section {model | templates = newTemplates}  (Effects.map TemplatesAction effects)
-
-         _ -> 
-            (model, effects) 
-
-    TemplatesAction action -> 
-        case templates.navChange of
-          Just (active, dest) -> 
-            goto active dest model effects
-
-          _ -> 
-            (model, effects) 
-
-    TypesAction action -> 
-        case types.navChange of
-          Just (active, dest) -> 
-            goto active dest model effects
-
-          _ -> 
-            (model, effects) 
-
-    _ -> 
-      (model, effects)
-
-
 route : Action ->  Model -> (Model , Effects Action)
 route action ({nav, types, users, jobsList, jobsStats, systems, templates, stacks} as model) =
-  case (Debug.log "" action) of 
+  case action of 
     JobsList jobAction -> 
-      if jobAction == Polling && nav.active /= Jobs then
+      if jobAction == Polling then
         (model, Effects.none)
       else
         let 
@@ -181,10 +128,15 @@ route action ({nav, types, users, jobsList, jobsStats, systems, templates, stack
         ({ model | systems = newSystems}, Effects.map SystemsAction effects)
 
     ApplyRoute (route, location) ->
-       none { model | route = route, location = location }
+      case route of 
+        NotFoundRoute -> 
+            (model,  Effects.map HopAction (navigateTo config "systems/list"))
+
+        _ -> 
+            none { model | route = route, location = location }
 
     HopAction () ->
-      ( model, Effects.none )
+      none model
 
     _ -> 
         none model
@@ -192,49 +144,19 @@ route action ({nav, types, users, jobsList, jobsStats, systems, templates, stack
 
 update : Action ->  Model -> (Model , Effects Action)
 update action model = 
-   navigate action (route action model)
+   route action model
 
 activeView : Signal.Address Action -> Model -> List Html
 activeView address ({jobsList, jobsStats, route, systems, types, templates, stacks, users} as model) =
     case route of
       SystemsRoute nested -> 
-        Systems.view (Signal.forwardTo address SystemsAction) systems List
+        Systems.view (Signal.forwardTo address SystemsAction) systems nested
       
-      _ -> [text "Not found"]
-
-
--- activeView : Signal.Address Action -> Model -> List Html
--- activeView address ({jobsList, jobsStats, nav, systems, types, templates, stacks, users} as model) =
---   let
---     {section} = nav
---   in 
---     case nav.active of
---       Systems -> 
---         Systems.view (Signal.forwardTo address SystemsAction) systems section
---
---       Types -> 
---         Types.view (Signal.forwardTo address TypesAction) types section
---
---       Templates -> 
---         Templates.view (Signal.forwardTo address TemplatesAction) templates section
---       
---       Jobs -> 
---         case section of
---           List ->
---             Jobs.List.view (Signal.forwardTo address JobsList) jobsList
---
---           Stats ->
---             Jobs.Stats.view (Signal.forwardTo address JobsStats) jobsStats
---
---           _ ->
---             []
---
---       Stacks -> 
---         Stacks.view (Signal.forwardTo address StacksAction) stacks section
---
---       Users -> 
---         Users.view (Signal.forwardTo address UsersAction) users section
---
+      TypesRoute nested -> 
+        Types.view (Signal.forwardTo address TypesAction) types nested
+      
+      _ ->
+         Systems.view (Signal.forwardTo address SystemsAction) systems List
 
 view : Signal.Address Action -> Model -> Html
 view address ({nav} as model) = 

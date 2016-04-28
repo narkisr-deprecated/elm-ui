@@ -23,7 +23,6 @@ import Types.Edit as TypesEdit
 -- Routing
 import Hop
 import Hop.Types exposing (Router)
-import Routing.Model exposing (Route)
 import Routing.Config exposing (..)
 import Task exposing (Task)
 

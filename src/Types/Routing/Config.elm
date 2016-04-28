@@ -1,14 +1,14 @@
-module Systems.Routing.Config where
+module Types.Routing.Config where
 
-import Hop.Types exposing (Config, Location, Query, Router, PathMatcher, newLocation)
+import Hop.Types exposing (PathMatcher, newLocation)
 import Hop.Matchers exposing (..)
 
 type Route = 
   Add
-    | Launch
     | List
     | View Int
     | Delete Int
+    | Edit Int
 
 matcherAdd: PathMatcher Route
 matcherAdd =

@@ -2,6 +2,7 @@ module Systems.Core where
 
 import Systems.List as List exposing (Error(NoSystemSelected, NoError))
 import Systems.Add as Add
+import Systems.Routing.Config as Routing exposing (Route)
 import Systems.View as View
 import Systems.Launch as Launch exposing (Action(Cancel, SetupJob, Run))
 import Nav.Common exposing (Active(Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
@@ -129,19 +130,19 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
           (model, Effects.none)
 
 
-view : Signal.Address Action -> Model -> Section -> List Html
-view address model section =
-  case section of
-    List -> 
+view : Signal.Address Action -> Model -> Route -> List Html
+view address model route =
+  case route of
+    Routing.List -> 
       List.view (Signal.forwardTo address SystemsListing) model.systemsList 
 
-    Launch ->
+    Routing.Launch ->
       Launch.view (Signal.forwardTo address SystemsLaunch) model.systemsLaunch
 
-    Add ->
+    Routing.Add ->
       Add.view (Signal.forwardTo address SystemsAdd) model.systemsAdd
 
-    View -> 
+    Routing.View _ -> 
       View.view (Signal.forwardTo address SystemsView) model.systemsView
 
     _ -> 

@@ -13,6 +13,8 @@ import Common.Utils exposing (none)
 import Common.Delete exposing (refresh, succeeded)
 import Table as Table
 
+-- Routing
+import Types.Routing.Config as Routing exposing (Route)
 
 type alias Model = 
   {
@@ -177,23 +179,20 @@ update : Action ->  Model-> (Model , Effects Action)
 update action model =
   navigate action (route action model)
 
-view : Signal.Address Action -> Model -> Section -> List Html
+view : Signal.Address Action -> Model -> Route -> List Html
 view address ({list, add, view, delete, edit} as model) section =
    case section of
-     List -> 
+     Routing.List -> 
         TypesList.view (Signal.forwardTo address Listing) list
 
-     Add -> 
+     Routing.Add -> 
         TypesAdd.view (Signal.forwardTo address Adding) add
 
-     Edit -> 
+     Routing.Edit _ -> 
         TypesEdit.view (Signal.forwardTo address Editing) edit
 
-     View -> 
+     Routing.View _ -> 
         TypesView.view (Signal.forwardTo address Viewing) view
 
-     Delete -> 
+     Routing.Delete _ -> 
         TypesDelete.view (Signal.forwardTo address Deleting) delete
-
-     _ -> 
-       [div  [] [text "not implemented" ]]

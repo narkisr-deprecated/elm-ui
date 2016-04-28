@@ -2,7 +2,7 @@ module Nav.Core where
 
 import Nav.Common as NavCommon exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Nav.Header as Header exposing (Action(SetSession))
-import Nav.Side as Side exposing (Action(SetSession, Goto))
+import Nav.Side as Side exposing (Action(SetSession))
 import Users.Session exposing (getSession, Session)
 import Http exposing (Error(BadResponse))
 import Common.Errors exposing (successHandler)
@@ -33,12 +33,12 @@ type Action =
    | LoadSession (Result Http.Error Session)
    | NoOp
 
-
-goto active section ({nav} as model) effects =
-  let
-    (newNav, _) = update (SideAction (Side.Goto active section)) nav
-  in 
-   ({model | nav = newNav }, effects)
+--
+-- goto active section ({nav} as model) effects =
+--   let
+--     (newNav, _) = update (SideAction (Side.Goto active section)) nav
+--   in 
+--    ({model | nav = newNav }, effects)
 
 setSession ({side, header} as model) session = 
   let 
@@ -50,17 +50,11 @@ setSession ({side, header} as model) session =
 update : Action ->  Model-> (Model , Effects Action)
 update action ({side, header} as model) =
   case action of 
-    SideAction (Side.Goto active section) -> 
-        none { model | active = active, section = section }
-
     SideAction navAction ->  
        let 
          (newSide, _) = Side.update navAction side
        in
          none { model | side = newSide }
-
-    HeaderAction (Header.Goto active section) -> 
-        none { model | active = active, section = section }
 
     HeaderAction navAction -> 
       let 
