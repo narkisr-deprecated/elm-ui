@@ -27904,6 +27904,41 @@ Elm.Templates.Delete.make = function (_elm) {
                                          ,succeeded: succeeded};
 };
 Elm.Templates = Elm.Templates || {};
+Elm.Templates.Routing = Elm.Templates.Routing || {};
+Elm.Templates.Routing.make = function (_elm) {
+   "use strict";
+   _elm.Templates = _elm.Templates || {};
+   _elm.Templates.Routing = _elm.Templates.Routing || {};
+   if (_elm.Templates.Routing.values) return _elm.Templates.Routing.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Hop$Matchers = Elm.Hop.Matchers.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var Launch = function (a) {    return {ctor: "Launch",_0: a};};
+   var Delete = function (a) {    return {ctor: "Delete",_0: a};};
+   var View = function (a) {    return {ctor: "View",_0: a};};
+   var List = {ctor: "List"};
+   var matcherList = A2($Hop$Matchers.match1,List,"/list");
+   var Add = {ctor: "Add"};
+   var matcherAdd = A2($Hop$Matchers.match1,Add,"/add");
+   var matchers = _U.list([matcherAdd,matcherList]);
+   return _elm.Templates.Routing.values = {_op: _op
+                                          ,Add: Add
+                                          ,List: List
+                                          ,View: View
+                                          ,Delete: Delete
+                                          ,Launch: Launch
+                                          ,matcherAdd: matcherAdd
+                                          ,matcherList: matcherList
+                                          ,matchers: matchers};
+};
+Elm.Templates = Elm.Templates || {};
 Elm.Templates.Core = Elm.Templates.Core || {};
 Elm.Templates.Core.make = function (_elm) {
    "use strict";
@@ -27925,7 +27960,8 @@ Elm.Templates.Core.make = function (_elm) {
    $Templates$Add = Elm.Templates.Add.make(_elm),
    $Templates$Delete = Elm.Templates.Delete.make(_elm),
    $Templates$Launch = Elm.Templates.Launch.make(_elm),
-   $Templates$List = Elm.Templates.List.make(_elm);
+   $Templates$List = Elm.Templates.List.make(_elm),
+   $Templates$Routing = Elm.Templates.Routing.make(_elm);
    var _op = {};
    var setName = F2(function (model,name) {    return _U.update(model,{name: name});});
    var NoOp = {ctor: "NoOp"};
@@ -28055,15 +28091,15 @@ Elm.Templates.Core.make = function (_elm) {
    });
    var update = F2(function (action,_p27) {    var _p28 = _p27;return A2(navigate,action,A2(route,action,_p28));});
    var add = F2(function (hyp,system) {    return TemplatesAdd(A2($Templates$Add.SetSystem,hyp,system));});
-   var view = F3(function (address,_p29,section) {
+   var view = F3(function (address,_p29,route) {
       var _p30 = _p29;
-      var _p31 = section;
+      var _p31 = route;
       switch (_p31.ctor)
       {case "Add": return A2($Templates$Add.view,A2($Signal.forwardTo,address,TemplatesAdd),_p30.add);
          case "List": return A2($Templates$List.view,A2($Signal.forwardTo,address,TemplatesList),_p30.list);
          case "Launch": return A2($Templates$Launch.view,A2($Signal.forwardTo,address,TemplatesLaunch),_p30.launch);
          case "Delete": return A2($Templates$Delete.view,A2($Signal.forwardTo,address,TemplatesDelete),_p30.$delete);
-         default: return _U.list([A2($Html.div,_U.list([]),_U.list([$Html.text("not implemented")]))]);}
+         default: return _U.list([]);}
    });
    var Model = F5(function (a,b,c,d,e) {    return {add: a,list: b,launch: c,$delete: d,navChange: e};});
    var init = function () {
@@ -28554,25 +28590,30 @@ Elm.Routing.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Systems$Routing = Elm.Systems.Routing.make(_elm),
+   $Templates$Routing = Elm.Templates.Routing.make(_elm),
    $Types$Routing = Elm.Types.Routing.make(_elm);
    var _op = {};
    var NotFoundRoute = {ctor: "NotFoundRoute"};
    var JobsRoute = {ctor: "JobsRoute"};
+   var TemplatesRoute = function (a) {    return {ctor: "TemplatesRoute",_0: a};};
+   var matcherTemplates = A3($Hop$Matchers.nested1,TemplatesRoute,"/templates",$Templates$Routing.matchers);
    var TypesRoute = function (a) {    return {ctor: "TypesRoute",_0: a};};
    var matcherTypes = A3($Hop$Matchers.nested1,TypesRoute,"/types",$Types$Routing.matchers);
    var SystemsRoute = function (a) {    return {ctor: "SystemsRoute",_0: a};};
    var defaultRoute = SystemsRoute($Systems$Routing.List);
    var matcherSystems = A3($Hop$Matchers.nested1,SystemsRoute,"/systems",$Systems$Routing.matchers);
-   var matchers = _U.list([matcherSystems,matcherTypes]);
+   var matchers = _U.list([matcherSystems,matcherTypes,matcherTemplates]);
    var config = {basePath: "\\?\\#\\/",hash: true,matchers: matchers,notFound: NotFoundRoute};
    return _elm.Routing.values = {_op: _op
                                 ,SystemsRoute: SystemsRoute
                                 ,TypesRoute: TypesRoute
+                                ,TemplatesRoute: TemplatesRoute
                                 ,JobsRoute: JobsRoute
                                 ,NotFoundRoute: NotFoundRoute
                                 ,defaultRoute: defaultRoute
                                 ,matcherSystems: matcherSystems
                                 ,matcherTypes: matcherTypes
+                                ,matcherTemplates: matcherTemplates
                                 ,matchers: matchers
                                 ,config: config};
 };
@@ -28621,6 +28662,7 @@ Elm.Application.make = function (_elm) {
       switch (_p2.ctor)
       {case "SystemsRoute": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p3,_p2._0);
          case "TypesRoute": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p1.types,_p2._0);
+         case "TemplatesRoute": return A3($Templates$Core.view,A2($Signal.forwardTo,address,TemplatesAction),_p1.templates,_p2._0);
          default: return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p3,$Systems$Routing.List);}
    });
    var view = F2(function (address,_p4) {

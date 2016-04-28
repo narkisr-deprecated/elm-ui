@@ -23,7 +23,7 @@ import Hop.Types exposing (Location, Query,newLocation)
 import Hop.Navigate exposing (navigateTo, setQuery)
 
 -- Routing
-import Routing as BaseRoute exposing (config,Route(SystemsRoute,TypesRoute,NotFoundRoute), defaultRoute)
+import Routing as BaseRoute exposing (config,Route(..), defaultRoute)
 import Systems.Routing exposing (Route(List))
 
 
@@ -155,6 +155,9 @@ activeView address ({jobsList, jobsStats, route, systems, types, templates, stac
       
       TypesRoute nested -> 
         Types.view (Signal.forwardTo address TypesAction) types nested
+
+      TemplatesRoute nested -> 
+        Templates.view (Signal.forwardTo address TemplatesAction) templates nested
       
       _ ->
          Systems.view (Signal.forwardTo address SystemsAction) systems List

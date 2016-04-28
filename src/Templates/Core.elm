@@ -10,6 +10,7 @@ import Templates.List as List
 import Templates.Launch as Launch
 import Templates.Delete as Delete
 import Nav.Common exposing (Active(Templates, Jobs), Section(Add, Launch, List, Delete))
+import Templates.Routing as Route exposing (Route)
 import Systems.Model.Common exposing (System)
 
 type alias Model = 
@@ -169,21 +170,21 @@ update action ({add, launch, list} as model) =
 add hyp system = 
   TemplatesAdd (Add.SetSystem hyp system)
 
-view : Signal.Address Action -> Model -> Section -> List Html
-view address {add, list, launch, delete} section =
-  case section of
-    Add ->
+view : Signal.Address Action -> Model -> Route -> List Html
+view address {add, list, launch, delete} route =
+  case route of
+    Route.Add ->
       Add.view (Signal.forwardTo address TemplatesAdd) add
 
-    List ->
+    Route.List ->
       List.view (Signal.forwardTo address TemplatesList) list
 
-    Launch ->
+    Route.Launch _ ->
       Launch.view (Signal.forwardTo address TemplatesLaunch) launch
 
-    Delete ->
+    Route.Delete _ ->
       Delete.view (Signal.forwardTo address TemplatesDelete) delete
 
-    _ -> 
-     [div  [] [text "not implemented"]]
+    Route.View _ -> 
+      []
  

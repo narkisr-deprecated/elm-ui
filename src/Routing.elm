@@ -4,10 +4,12 @@ import Hop.Types exposing (Config, Location, Query, Router, PathMatcher, newLoca
 import Hop.Matchers exposing (..)
 import Systems.Routing as Systems
 import Types.Routing as Types
+import Templates.Routing as Templates
 
 type Route =
  SystemsRoute Systems.Route   
   | TypesRoute Types.Route   
+  | TemplatesRoute Templates.Route  
   | JobsRoute
   | NotFoundRoute
 
@@ -24,9 +26,15 @@ matcherTypes =
   nested1 TypesRoute "/types" Types.matchers
 
 
+matcherTemplates: PathMatcher Route
+matcherTemplates =
+  nested1 TemplatesRoute "/templates" Templates.matchers
+
+
+
 matchers : List (PathMatcher Route)
 matchers =
-  [ matcherSystems, matcherTypes ]
+  [ matcherSystems, matcherTypes, matcherTemplates]
 
 
 config : Config Route
