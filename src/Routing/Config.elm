@@ -18,7 +18,7 @@ matchers =
 config : Config Route
 config =
   { basePath = "\\?\\#\\/"
-  , hash = False
+  , hash = True
   , matchers = matchers
   , notFound = NotFoundRoute
   }
