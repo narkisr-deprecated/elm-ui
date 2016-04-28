@@ -19837,195 +19837,6 @@ Elm.Systems.Add.make = function (_elm) {
                                     ,view: view
                                     ,saveSystem: saveSystem};
 };
-Elm.Hop = Elm.Hop || {};
-Elm.Hop.Types = Elm.Hop.Types || {};
-Elm.Hop.Types.make = function (_elm) {
-   "use strict";
-   _elm.Hop = _elm.Hop || {};
-   _elm.Hop.Types = _elm.Hop.Types || {};
-   if (_elm.Hop.Types.values) return _elm.Hop.Types.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Combine = Elm.Combine.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Dict = Elm.Dict.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $Task = Elm.Task.make(_elm);
-   var _op = {};
-   var newQuery = $Dict.empty;
-   var newLocation = {query: newQuery,path: _U.list([])};
-   var Router = F2(function (a,b) {    return {run: a,signal: b};});
-   var Config = F4(function (a,b,c,d) {    return {basePath: a,hash: b,matchers: c,notFound: d};});
-   var PathMatcher = F2(function (a,b) {    return {parser: a,segments: b};});
-   var Location = F2(function (a,b) {    return {path: a,query: b};});
-   return _elm.Hop.Types.values = {_op: _op
-                                  ,newLocation: newLocation
-                                  ,newQuery: newQuery
-                                  ,Config: Config
-                                  ,Router: Router
-                                  ,PathMatcher: PathMatcher
-                                  ,Location: Location};
-};
-Elm.Hop = Elm.Hop || {};
-Elm.Hop.Matchers = Elm.Hop.Matchers || {};
-Elm.Hop.Matchers.make = function (_elm) {
-   "use strict";
-   _elm.Hop = _elm.Hop || {};
-   _elm.Hop.Matchers = _elm.Hop.Matchers || {};
-   if (_elm.Hop.Matchers.values) return _elm.Hop.Matchers.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Combine = Elm.Combine.make(_elm),
-   $Combine$Infix = Elm.Combine.Infix.make(_elm),
-   $Combine$Num = Elm.Combine.Num.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Hop$Types = Elm.Hop.Types.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm),
-   $String = Elm.String.make(_elm);
-   var _op = {};
-   var matcherToPath = F2(function (matcher,inputs) {
-      var makeSegment = F2(function (segment,input) {    return A2($Basics._op["++"],segment,input);});
-      var inputs$ = A2($List.append,inputs,_U.list([""]));
-      var path = A2($String.join,"",A3($List.map2,makeSegment,matcher.segments,inputs$));
-      return path;
-   });
-   var matchPathWithPathList = F3(function (routeParsers,notFoundAction,path) {
-      matchPathWithPathList: while (true) {
-         var _p0 = routeParsers;
-         if (_p0.ctor === "[]") {
-               return notFoundAction;
-            } else {
-               if (_p0._1.ctor === "[]") {
-                     var _p1 = A2($Combine.parse,_p0._0.parser,path);
-                     if (_p1._0.ctor === "Ok") {
-                           return _p1._0._0;
-                        } else {
-                           return notFoundAction;
-                        }
-                  } else {
-                     var _p2 = A2($Combine.parse,_p0._0.parser,path);
-                     if (_p2._0.ctor === "Ok") {
-                           return _p2._0._0;
-                        } else {
-                           var _v3 = _p0._1,_v4 = notFoundAction,_v5 = path;
-                           routeParsers = _v3;
-                           notFoundAction = _v4;
-                           path = _v5;
-                           continue matchPathWithPathList;
-                        }
-                  }
-            }
-      }
-   });
-   var matchPath = F2(function (config,path) {    return A3(matchPathWithPathList,config.matchers,config.notFound,path);});
-   var matchLocation = F2(function (config,location) {
-      var pathString = A2($String.join,"/",A2($List._op["::"],"",location.path));
-      return A2(matchPath,config,pathString);
-   });
-   var str = $Combine.regex("[^/]+");
-   var $int = $Combine$Num.$int;
-   var parserWithBeginningAndEnd = function (parser) {    return A2($Combine$Infix._op["<*"],parser,$Combine.end);};
-   var match1 = F2(function (constructor,segment1) {
-      var constructor$ = function (_p3) {    var _p4 = _p3;return constructor;};
-      var parser = A2($Combine.map,constructor$,parserWithBeginningAndEnd($Combine.skip($Combine.string(segment1))));
-      return {parser: parser,segments: _U.list([segment1])};
-   });
-   var match2 = F3(function (constructor,segment1,parser1) {
-      var parser = A2($Combine.map,constructor,parserWithBeginningAndEnd(A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1)));
-      return {parser: parser,segments: _U.list([segment1])};
-   });
-   var match3 = F4(function (constructor,segment1,parser1,segment2) {
-      var parser = A2($Combine.map,
-      constructor,
-      parserWithBeginningAndEnd(A2($Combine$Infix._op["<*"],A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1),$Combine.string(segment2))));
-      return {parser: parser,segments: _U.list([segment1,segment2])};
-   });
-   var match4 = F5(function (constructor,segment1,parser1,segment2,parser2) {
-      var constructor$ = function (_p5) {    var _p6 = _p5;return A2(constructor,_p6._0,_p6._1);};
-      var parser = A2($Combine.map,
-      constructor$,
-      parserWithBeginningAndEnd(A2($Combine.andThen,
-      A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1),
-      function (r) {
-         return A2($Combine.map,function (x) {    return {ctor: "_Tuple2",_0: r,_1: x};},A2($Combine$Infix._op["*>"],$Combine.string(segment2),parser2));
-      })));
-      return {parser: parser,segments: _U.list([segment1,segment2])};
-   });
-   var nested1 = F3(function (constructor,segment1,children) {
-      var childrenParsers = A2($List.map,function (_) {    return _.parser;},children);
-      var parser = A2($Combine.map,
-      constructor,
-      parserWithBeginningAndEnd(A2($Combine.andThen,$Combine.string(segment1),function (x) {    return $Combine.choice(childrenParsers);})));
-      return {parser: parser,segments: _U.list([segment1])};
-   });
-   var nested2 = F4(function (constructor,segment1,parser1,children) {
-      var constructor$ = function (_p7) {    var _p8 = _p7;return A2(constructor,_p8._0,_p8._1);};
-      var childrenParsers = A2($List.map,function (_) {    return _.parser;},children);
-      var parser = A2($Combine.map,
-      constructor$,
-      parserWithBeginningAndEnd(A2($Combine.andThen,
-      A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1),
-      function (r) {
-         return A2($Combine.map,function (x) {    return {ctor: "_Tuple2",_0: r,_1: x};},$Combine.choice(childrenParsers));
-      })));
-      return {parser: parser,segments: _U.list([segment1])};
-   });
-   return _elm.Hop.Matchers.values = {_op: _op
-                                     ,match1: match1
-                                     ,match2: match2
-                                     ,match3: match3
-                                     ,match4: match4
-                                     ,nested1: nested1
-                                     ,nested2: nested2
-                                     ,$int: $int
-                                     ,str: str
-                                     ,matchPath: matchPath
-                                     ,matchLocation: matchLocation
-                                     ,matcherToPath: matcherToPath};
-};
-Elm.Systems = Elm.Systems || {};
-Elm.Systems.Routing = Elm.Systems.Routing || {};
-Elm.Systems.Routing.Config = Elm.Systems.Routing.Config || {};
-Elm.Systems.Routing.Config.make = function (_elm) {
-   "use strict";
-   _elm.Systems = _elm.Systems || {};
-   _elm.Systems.Routing = _elm.Systems.Routing || {};
-   _elm.Systems.Routing.Config = _elm.Systems.Routing.Config || {};
-   if (_elm.Systems.Routing.Config.values) return _elm.Systems.Routing.Config.values;
-   var _U = Elm.Native.Utils.make(_elm),
-   $Basics = Elm.Basics.make(_elm),
-   $Debug = Elm.Debug.make(_elm),
-   $Hop$Matchers = Elm.Hop.Matchers.make(_elm),
-   $Hop$Types = Elm.Hop.Types.make(_elm),
-   $List = Elm.List.make(_elm),
-   $Maybe = Elm.Maybe.make(_elm),
-   $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
-   var _op = {};
-   var Delete = function (a) {    return {ctor: "Delete",_0: a};};
-   var View = function (a) {    return {ctor: "View",_0: a};};
-   var List = {ctor: "List"};
-   var matcherList = A2($Hop$Matchers.match1,List,"/list");
-   var Launch = {ctor: "Launch"};
-   var Add = {ctor: "Add"};
-   var matcherAdd = A2($Hop$Matchers.match1,Add,"/add");
-   var matchers = _U.list([matcherAdd,matcherList]);
-   return _elm.Systems.Routing.Config.values = {_op: _op
-                                               ,Add: Add
-                                               ,Launch: Launch
-                                               ,List: List
-                                               ,View: View
-                                               ,Delete: Delete
-                                               ,matcherAdd: matcherAdd
-                                               ,matcherList: matcherList
-                                               ,matchers: matchers};
-};
 Elm.Systems = Elm.Systems || {};
 Elm.Systems.View = Elm.Systems.View || {};
 Elm.Systems.View.make = function (_elm) {
@@ -20196,6 +20007,193 @@ Elm.Systems.Launch.make = function (_elm) {
                                        ,message: message
                                        ,view: view};
 };
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Types = Elm.Hop.Types || {};
+Elm.Hop.Types.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Types = _elm.Hop.Types || {};
+   if (_elm.Hop.Types.values) return _elm.Hop.Types.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Combine = Elm.Combine.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Dict = Elm.Dict.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $Task = Elm.Task.make(_elm);
+   var _op = {};
+   var newQuery = $Dict.empty;
+   var newLocation = {query: newQuery,path: _U.list([])};
+   var Router = F2(function (a,b) {    return {run: a,signal: b};});
+   var Config = F4(function (a,b,c,d) {    return {basePath: a,hash: b,matchers: c,notFound: d};});
+   var PathMatcher = F2(function (a,b) {    return {parser: a,segments: b};});
+   var Location = F2(function (a,b) {    return {path: a,query: b};});
+   return _elm.Hop.Types.values = {_op: _op
+                                  ,newLocation: newLocation
+                                  ,newQuery: newQuery
+                                  ,Config: Config
+                                  ,Router: Router
+                                  ,PathMatcher: PathMatcher
+                                  ,Location: Location};
+};
+Elm.Hop = Elm.Hop || {};
+Elm.Hop.Matchers = Elm.Hop.Matchers || {};
+Elm.Hop.Matchers.make = function (_elm) {
+   "use strict";
+   _elm.Hop = _elm.Hop || {};
+   _elm.Hop.Matchers = _elm.Hop.Matchers || {};
+   if (_elm.Hop.Matchers.values) return _elm.Hop.Matchers.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Combine = Elm.Combine.make(_elm),
+   $Combine$Infix = Elm.Combine.Infix.make(_elm),
+   $Combine$Num = Elm.Combine.Num.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
+   var _op = {};
+   var matcherToPath = F2(function (matcher,inputs) {
+      var makeSegment = F2(function (segment,input) {    return A2($Basics._op["++"],segment,input);});
+      var inputs$ = A2($List.append,inputs,_U.list([""]));
+      var path = A2($String.join,"",A3($List.map2,makeSegment,matcher.segments,inputs$));
+      return path;
+   });
+   var matchPathWithPathList = F3(function (routeParsers,notFoundAction,path) {
+      matchPathWithPathList: while (true) {
+         var _p0 = routeParsers;
+         if (_p0.ctor === "[]") {
+               return notFoundAction;
+            } else {
+               if (_p0._1.ctor === "[]") {
+                     var _p1 = A2($Combine.parse,_p0._0.parser,path);
+                     if (_p1._0.ctor === "Ok") {
+                           return _p1._0._0;
+                        } else {
+                           return notFoundAction;
+                        }
+                  } else {
+                     var _p2 = A2($Combine.parse,_p0._0.parser,path);
+                     if (_p2._0.ctor === "Ok") {
+                           return _p2._0._0;
+                        } else {
+                           var _v3 = _p0._1,_v4 = notFoundAction,_v5 = path;
+                           routeParsers = _v3;
+                           notFoundAction = _v4;
+                           path = _v5;
+                           continue matchPathWithPathList;
+                        }
+                  }
+            }
+      }
+   });
+   var matchPath = F2(function (config,path) {    return A3(matchPathWithPathList,config.matchers,config.notFound,path);});
+   var matchLocation = F2(function (config,location) {
+      var pathString = A2($String.join,"/",A2($List._op["::"],"",location.path));
+      return A2(matchPath,config,pathString);
+   });
+   var str = $Combine.regex("[^/]+");
+   var $int = $Combine$Num.$int;
+   var parserWithBeginningAndEnd = function (parser) {    return A2($Combine$Infix._op["<*"],parser,$Combine.end);};
+   var match1 = F2(function (constructor,segment1) {
+      var constructor$ = function (_p3) {    var _p4 = _p3;return constructor;};
+      var parser = A2($Combine.map,constructor$,parserWithBeginningAndEnd($Combine.skip($Combine.string(segment1))));
+      return {parser: parser,segments: _U.list([segment1])};
+   });
+   var match2 = F3(function (constructor,segment1,parser1) {
+      var parser = A2($Combine.map,constructor,parserWithBeginningAndEnd(A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1)));
+      return {parser: parser,segments: _U.list([segment1])};
+   });
+   var match3 = F4(function (constructor,segment1,parser1,segment2) {
+      var parser = A2($Combine.map,
+      constructor,
+      parserWithBeginningAndEnd(A2($Combine$Infix._op["<*"],A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1),$Combine.string(segment2))));
+      return {parser: parser,segments: _U.list([segment1,segment2])};
+   });
+   var match4 = F5(function (constructor,segment1,parser1,segment2,parser2) {
+      var constructor$ = function (_p5) {    var _p6 = _p5;return A2(constructor,_p6._0,_p6._1);};
+      var parser = A2($Combine.map,
+      constructor$,
+      parserWithBeginningAndEnd(A2($Combine.andThen,
+      A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1),
+      function (r) {
+         return A2($Combine.map,function (x) {    return {ctor: "_Tuple2",_0: r,_1: x};},A2($Combine$Infix._op["*>"],$Combine.string(segment2),parser2));
+      })));
+      return {parser: parser,segments: _U.list([segment1,segment2])};
+   });
+   var nested1 = F3(function (constructor,segment1,children) {
+      var childrenParsers = A2($List.map,function (_) {    return _.parser;},children);
+      var parser = A2($Combine.map,
+      constructor,
+      parserWithBeginningAndEnd(A2($Combine.andThen,$Combine.string(segment1),function (x) {    return $Combine.choice(childrenParsers);})));
+      return {parser: parser,segments: _U.list([segment1])};
+   });
+   var nested2 = F4(function (constructor,segment1,parser1,children) {
+      var constructor$ = function (_p7) {    var _p8 = _p7;return A2(constructor,_p8._0,_p8._1);};
+      var childrenParsers = A2($List.map,function (_) {    return _.parser;},children);
+      var parser = A2($Combine.map,
+      constructor$,
+      parserWithBeginningAndEnd(A2($Combine.andThen,
+      A2($Combine$Infix._op["*>"],$Combine.string(segment1),parser1),
+      function (r) {
+         return A2($Combine.map,function (x) {    return {ctor: "_Tuple2",_0: r,_1: x};},$Combine.choice(childrenParsers));
+      })));
+      return {parser: parser,segments: _U.list([segment1])};
+   });
+   return _elm.Hop.Matchers.values = {_op: _op
+                                     ,match1: match1
+                                     ,match2: match2
+                                     ,match3: match3
+                                     ,match4: match4
+                                     ,nested1: nested1
+                                     ,nested2: nested2
+                                     ,$int: $int
+                                     ,str: str
+                                     ,matchPath: matchPath
+                                     ,matchLocation: matchLocation
+                                     ,matcherToPath: matcherToPath};
+};
+Elm.Systems = Elm.Systems || {};
+Elm.Systems.Routing = Elm.Systems.Routing || {};
+Elm.Systems.Routing.make = function (_elm) {
+   "use strict";
+   _elm.Systems = _elm.Systems || {};
+   _elm.Systems.Routing = _elm.Systems.Routing || {};
+   if (_elm.Systems.Routing.values) return _elm.Systems.Routing.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Hop$Matchers = Elm.Hop.Matchers.make(_elm),
+   $Hop$Types = Elm.Hop.Types.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var Delete = function (a) {    return {ctor: "Delete",_0: a};};
+   var View = function (a) {    return {ctor: "View",_0: a};};
+   var List = {ctor: "List"};
+   var matcherList = A2($Hop$Matchers.match1,List,"/list");
+   var Launch = {ctor: "Launch"};
+   var Add = {ctor: "Add"};
+   var matcherAdd = A2($Hop$Matchers.match1,Add,"/add");
+   var matchers = _U.list([matcherAdd,matcherList]);
+   return _elm.Systems.Routing.values = {_op: _op
+                                        ,Add: Add
+                                        ,Launch: Launch
+                                        ,List: List
+                                        ,View: View
+                                        ,Delete: Delete
+                                        ,matcherAdd: matcherAdd
+                                        ,matcherList: matcherList
+                                        ,matchers: matchers};
+};
 Elm.Nav = Elm.Nav || {};
 Elm.Nav.Common = Elm.Nav.Common || {};
 Elm.Nav.Common.make = function (_elm) {
@@ -20261,7 +20259,7 @@ Elm.Systems.Core.make = function (_elm) {
    $Systems$Add = Elm.Systems.Add.make(_elm),
    $Systems$Launch = Elm.Systems.Launch.make(_elm),
    $Systems$List = Elm.Systems.List.make(_elm),
-   $Systems$Routing$Config = Elm.Systems.Routing.Config.make(_elm),
+   $Systems$Routing = Elm.Systems.Routing.make(_elm),
    $Systems$View = Elm.Systems.View.make(_elm),
    $Table = Elm.Table.make(_elm);
    var _op = {};
@@ -26672,13 +26670,11 @@ Elm.Types.Delete.make = function (_elm) {
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.Routing = Elm.Types.Routing || {};
-Elm.Types.Routing.Config = Elm.Types.Routing.Config || {};
-Elm.Types.Routing.Config.make = function (_elm) {
+Elm.Types.Routing.make = function (_elm) {
    "use strict";
    _elm.Types = _elm.Types || {};
    _elm.Types.Routing = _elm.Types.Routing || {};
-   _elm.Types.Routing.Config = _elm.Types.Routing.Config || {};
-   if (_elm.Types.Routing.Config.values) return _elm.Types.Routing.Config.values;
+   if (_elm.Types.Routing.values) return _elm.Types.Routing.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -26697,15 +26693,15 @@ Elm.Types.Routing.Config.make = function (_elm) {
    var Add = {ctor: "Add"};
    var matcherAdd = A2($Hop$Matchers.match1,Add,"/add");
    var matchers = _U.list([matcherAdd,matcherList]);
-   return _elm.Types.Routing.Config.values = {_op: _op
-                                             ,Add: Add
-                                             ,List: List
-                                             ,View: View
-                                             ,Delete: Delete
-                                             ,Edit: Edit
-                                             ,matcherAdd: matcherAdd
-                                             ,matcherList: matcherList
-                                             ,matchers: matchers};
+   return _elm.Types.Routing.values = {_op: _op
+                                      ,Add: Add
+                                      ,List: List
+                                      ,View: View
+                                      ,Delete: Delete
+                                      ,Edit: Edit
+                                      ,matcherAdd: matcherAdd
+                                      ,matcherList: matcherList
+                                      ,matchers: matchers};
 };
 Elm.Types = Elm.Types || {};
 Elm.Types.Core = Elm.Types.Core || {};
@@ -26731,7 +26727,7 @@ Elm.Types.Core.make = function (_elm) {
    $Types$Delete = Elm.Types.Delete.make(_elm),
    $Types$Edit = Elm.Types.Edit.make(_elm),
    $Types$List = Elm.Types.List.make(_elm),
-   $Types$Routing$Config = Elm.Types.Routing.Config.make(_elm),
+   $Types$Routing = Elm.Types.Routing.make(_elm),
    $Types$View = Elm.Types.View.make(_elm);
    var _op = {};
    var setName = F2(function (model,name) {    return _U.update(model,{name: name});});
@@ -28544,12 +28540,10 @@ Elm.Hop.Navigate.make = function (_elm) {
    return _elm.Hop.Navigate.values = {_op: _op,navigateTo: navigateTo,addQuery: addQuery,setQuery: setQuery,removeQuery: removeQuery,clearQuery: clearQuery};
 };
 Elm.Routing = Elm.Routing || {};
-Elm.Routing.Config = Elm.Routing.Config || {};
-Elm.Routing.Config.make = function (_elm) {
+Elm.Routing.make = function (_elm) {
    "use strict";
    _elm.Routing = _elm.Routing || {};
-   _elm.Routing.Config = _elm.Routing.Config || {};
-   if (_elm.Routing.Config.values) return _elm.Routing.Config.values;
+   if (_elm.Routing.values) return _elm.Routing.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -28559,28 +28553,28 @@ Elm.Routing.Config.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $Systems$Routing$Config = Elm.Systems.Routing.Config.make(_elm),
-   $Types$Routing$Config = Elm.Types.Routing.Config.make(_elm);
+   $Systems$Routing = Elm.Systems.Routing.make(_elm),
+   $Types$Routing = Elm.Types.Routing.make(_elm);
    var _op = {};
    var NotFoundRoute = {ctor: "NotFoundRoute"};
    var JobsRoute = {ctor: "JobsRoute"};
    var TypesRoute = function (a) {    return {ctor: "TypesRoute",_0: a};};
-   var matcherTypes = A3($Hop$Matchers.nested1,TypesRoute,"/types",$Types$Routing$Config.matchers);
+   var matcherTypes = A3($Hop$Matchers.nested1,TypesRoute,"/types",$Types$Routing.matchers);
    var SystemsRoute = function (a) {    return {ctor: "SystemsRoute",_0: a};};
-   var defaultRoute = SystemsRoute($Systems$Routing$Config.List);
-   var matcherSystems = A3($Hop$Matchers.nested1,SystemsRoute,"/systems",$Systems$Routing$Config.matchers);
+   var defaultRoute = SystemsRoute($Systems$Routing.List);
+   var matcherSystems = A3($Hop$Matchers.nested1,SystemsRoute,"/systems",$Systems$Routing.matchers);
    var matchers = _U.list([matcherSystems,matcherTypes]);
    var config = {basePath: "\\?\\#\\/",hash: true,matchers: matchers,notFound: NotFoundRoute};
-   return _elm.Routing.Config.values = {_op: _op
-                                       ,SystemsRoute: SystemsRoute
-                                       ,TypesRoute: TypesRoute
-                                       ,JobsRoute: JobsRoute
-                                       ,NotFoundRoute: NotFoundRoute
-                                       ,defaultRoute: defaultRoute
-                                       ,matcherSystems: matcherSystems
-                                       ,matcherTypes: matcherTypes
-                                       ,matchers: matchers
-                                       ,config: config};
+   return _elm.Routing.values = {_op: _op
+                                ,SystemsRoute: SystemsRoute
+                                ,TypesRoute: TypesRoute
+                                ,JobsRoute: JobsRoute
+                                ,NotFoundRoute: NotFoundRoute
+                                ,defaultRoute: defaultRoute
+                                ,matcherSystems: matcherSystems
+                                ,matcherTypes: matcherTypes
+                                ,matchers: matchers
+                                ,config: config};
 };
 Elm.Application = Elm.Application || {};
 Elm.Application.make = function (_elm) {
@@ -28602,11 +28596,11 @@ Elm.Application.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Nav$Core = Elm.Nav.Core.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Routing$Config = Elm.Routing.Config.make(_elm),
+   $Routing = Elm.Routing.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $Stacks$Core = Elm.Stacks.Core.make(_elm),
    $Systems$Core = Elm.Systems.Core.make(_elm),
-   $Systems$Routing$Config = Elm.Systems.Routing.Config.make(_elm),
+   $Systems$Routing = Elm.Systems.Routing.make(_elm),
    $Templates$Core = Elm.Templates.Core.make(_elm),
    $Types$Core = Elm.Types.Core.make(_elm),
    $Users$Core = Elm.Users.Core.make(_elm);
@@ -28627,7 +28621,7 @@ Elm.Application.make = function (_elm) {
       switch (_p2.ctor)
       {case "SystemsRoute": return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p3,_p2._0);
          case "TypesRoute": return A3($Types$Core.view,A2($Signal.forwardTo,address,TypesAction),_p1.types,_p2._0);
-         default: return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p3,$Systems$Routing$Config.List);}
+         default: return A3($Systems$Core.view,A2($Signal.forwardTo,address,SystemsAction),_p3,$Systems$Routing.List);}
    });
    var view = F2(function (address,_p4) {
       var _p5 = _p4;
@@ -28683,7 +28677,7 @@ Elm.Application.make = function (_elm) {
                     var _p19 = _p9._0._0;
                     var _p18 = _p19;
                     if (_p18.ctor === "NotFoundRoute") {
-                          return {ctor: "_Tuple2",_0: _p20,_1: A2($Effects.map,HopAction,A2($Hop$Navigate.navigateTo,$Routing$Config.config,"systems/list"))};
+                          return {ctor: "_Tuple2",_0: _p20,_1: A2($Effects.map,HopAction,A2($Hop$Navigate.navigateTo,$Routing.config,"systems/list"))};
                        } else {
                           return $Common$Utils.none(_U.update(_p20,{route: _p19,location: _p9._0._1}));
                        }
@@ -28756,7 +28750,7 @@ Elm.Application.make = function (_elm) {
                             ,A2($Effects.map,JobsList,jobsListAction)
                             ,A2($Effects.map,JobsStats,jobsStatAction)]);
       return {ctor: "_Tuple2"
-             ,_0: Model(systems)(stacks)(jobsList)(jobsStat)(types)(templates)(users)(nav)($Routing$Config.defaultRoute)($Hop$Types.newLocation)
+             ,_0: Model(systems)(stacks)(jobsList)(jobsStat)(types)(templates)(users)(nav)($Routing.defaultRoute)($Hop$Types.newLocation)
              ,_1: $Effects.batch(effects)};
    }();
    return _elm.Application.values = {_op: _op
@@ -28827,7 +28821,7 @@ Elm.Main.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Routing$Config = Elm.Routing.Config.make(_elm),
+   $Routing = Elm.Routing.make(_elm),
    $Search = Elm.Search.make(_elm),
    $Signal = Elm.Signal.make(_elm),
    $StartApp = Elm.StartApp.make(_elm),
@@ -28843,7 +28837,7 @@ Elm.Main.make = function (_elm) {
    $Types$Edit = Elm.Types.Edit.make(_elm),
    $Users$Core = Elm.Users.Core.make(_elm);
    var _op = {};
-   var router = $Hop.$new($Routing$Config.config);
+   var router = $Hop.$new($Routing.config);
    var routerSignal = A2($Signal.map,$Application.ApplyRoute,router.signal);
    var routeRunTask = Elm.Native.Task.make(_elm).perform(router.run);
    var intoActions = function (_p0) {

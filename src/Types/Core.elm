@@ -14,7 +14,7 @@ import Common.Delete exposing (refresh, succeeded)
 import Table as Table
 
 -- Routing
-import Types.Routing.Config as Routing exposing (Route)
+import Types.Routing as Routing exposing (Route)
 
 type alias Model = 
   {

@@ -1,9 +1,9 @@
-module Routing.Config (..) where
+module Routing (..) where
 
 import Hop.Types exposing (Config, Location, Query, Router, PathMatcher, newLocation)
 import Hop.Matchers exposing (..)
-import Systems.Routing.Config as Systems
-import Types.Routing.Config as Types
+import Systems.Routing as Systems
+import Types.Routing as Types
 
 type Route =
  SystemsRoute Systems.Route   

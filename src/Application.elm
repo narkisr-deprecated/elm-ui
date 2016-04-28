@@ -22,8 +22,9 @@ import Debug
 import Hop.Types exposing (Location, Query,newLocation)
 import Hop.Navigate exposing (navigateTo, setQuery)
 
-import Routing.Config as BaseRoute exposing (config,Route(SystemsRoute,TypesRoute,NotFoundRoute), defaultRoute)
-import Systems.Routing.Config exposing (Route(List))
+-- Routing
+import Routing as BaseRoute exposing (config,Route(SystemsRoute,TypesRoute,NotFoundRoute), defaultRoute)
+import Systems.Routing exposing (Route(List))
 
 
 init : (Model, Effects Action)

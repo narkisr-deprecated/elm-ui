@@ -23,7 +23,7 @@ import Types.Edit as TypesEdit
 -- Routing
 import Hop
 import Hop.Types exposing (Router)
-import Routing.Config exposing (..)
+import Routing exposing (..)
 import Task exposing (Task)
 
 -- Templates
@@ -172,7 +172,7 @@ menuClick p =
 
 router : Router Route
 router =
-  Hop.new Routing.Config.config
+  Hop.new Routing.config
 
 
 routerSignal : Signal App.Action

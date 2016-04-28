@@ -1,4 +1,4 @@
-module Systems.Routing.Config where
+module Systems.Routing where
 
 import Hop.Types exposing (Config, Location, Query, Router, PathMatcher, newLocation)
 import Hop.Matchers exposing (..)
