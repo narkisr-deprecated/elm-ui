@@ -38,6 +38,7 @@ import Stacks.Core as StacksCore
 import Time exposing (every, second)
 import Jobs.List exposing (Action(Polling))
 import Jobs.Stats as Stats exposing (Action(PollMetrics))
+import Jobs.Core as Jobs
 
 app =
   StartApp.start
@@ -137,14 +138,14 @@ port parsingErr : Signal Search.ParseResult
 
 jobsListPolling : Signal App.Action
 jobsListPolling =
-  Signal.map (\_ -> App.JobsList Polling) (Time.every (1 * second))
+  Signal.map (\_ -> App.JobsAction (Jobs.JobsListing Polling)) (Time.every (1 * second))
  
 jobsStatsPolling : Signal App.Action
 jobsStatsPolling =
   let
     (model, _)= Stats.init
   in
-    Signal.map (\t -> App.JobsStats (PollMetrics t)) (Time.every (model.interval * second))
+    Signal.map (\t -> App.JobsAction (Jobs.JobsStats (PollMetrics t))) (Time.every (model.interval * second))
  
 port menuPort : Signal (String, String, String)
 

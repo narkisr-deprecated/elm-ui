@@ -6,8 +6,7 @@ import Effects exposing (Effects, Never, batch, map)
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Systems.Core as Systems 
 import Stacks.Core as Stacks 
-import Jobs.List exposing (Action(Polling))
-import Jobs.Stats
+import Jobs.Core as Jobs
 import Common.Utils exposing (none)
 import Types.Core as Types
 import Users.Core as Users
@@ -30,8 +29,7 @@ import Systems.Routing exposing (Route(List))
 init : (Model, Effects Action)
 init =
   let 
-    (jobsList, jobsListAction) = Jobs.List.init
-    (jobsStat, jobsStatAction) = Jobs.Stats.init
+    (jobs, jobsAction) = Jobs.init
     (types, typesAction) = Types.init
     (users, usersAction) = Users.init
     (templates, templatesAction) = Templates.init
@@ -44,18 +42,16 @@ init =
               , Effects.map SystemsAction systemsAction
               , Effects.map StacksAction stacksAction
               , Effects.map NavAction navAction
-              , Effects.map JobsList jobsListAction
-              , Effects.map JobsStats jobsStatAction
+              , Effects.map JobsAction jobsAction
               ]
   in
-    (Model systems stacks jobsList jobsStat types templates users nav defaultRoute newLocation, Effects.batch effects) 
+    (Model systems stacks jobs types templates users nav defaultRoute newLocation, Effects.batch effects) 
 
 type alias Model = 
   { 
     systems : Systems.Model
   , stacks : Stacks.Model
-  , jobsList : Jobs.List.Model
-  , jobsStats : Jobs.Stats.Model
+  , jobs : Jobs.Model
   , types : Types.Model
   , templates : Templates.Model
   , users : Users.Model
@@ -71,30 +67,20 @@ type Action =
     | SystemsAction Systems.Action
     | NavAction Nav.Action
     | StacksAction Stacks.Action
-    | JobsList Jobs.List.Action
-    | JobsStats Jobs.Stats.Action
+    | JobsAction Jobs.Action
     | TypesAction Types.Action
     | TemplatesAction Templates.Action
     | UsersAction Users.Action
     | NoOp
 
 route : Action ->  Model -> (Model , Effects Action)
-route action ({nav, types, users, jobsList, jobsStats, systems, templates, stacks} as model) =
+route action ({nav, types, users, jobs, systems, templates, stacks} as model) =
   case action of 
-    JobsList jobAction -> 
-      if jobAction == Polling then
-        (model, Effects.none)
-      else
-        let 
-          (newJobList, effects) = Jobs.List.update jobAction jobsList 
-        in
-          ({model | jobsList = newJobList}, Effects.map JobsList effects) 
-
-    JobsStats jobAction -> 
-      let 
-        (newJobsStats, effects) = Jobs.Stats.update jobAction jobsStats
+    JobsAction jobAction -> 
+      let
+        (newJob, effects) = Jobs.update jobAction jobs
       in
-        ({model | jobsStats= newJobsStats }, Effects.map JobsStats effects) 
+        ({model | jobs = newJob}, Effects.map JobsAction effects) 
 
     TypesAction action -> 
       let 
@@ -148,7 +134,7 @@ update action model =
    route action model
 
 activeView : Signal.Address Action -> Model -> List Html
-activeView address ({jobsList, jobsStats, route, systems, types, templates, stacks, users} as model) =
+activeView address ({jobs, route, systems, types, templates, stacks, users} as model) =
     case route of
       SystemsRoute nested -> 
         Systems.view (Signal.forwardTo address SystemsAction) systems nested
@@ -158,6 +144,9 @@ activeView address ({jobsList, jobsStats, route, systems, types, templates, stac
 
       TemplatesRoute nested -> 
         Templates.view (Signal.forwardTo address TemplatesAction) templates nested
+      
+      JobsRoute nested -> 
+        Jobs.view (Signal.forwardTo address JobsAction) jobs nested
       
       _ ->
          Systems.view (Signal.forwardTo address SystemsAction) systems List
