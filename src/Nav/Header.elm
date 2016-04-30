@@ -45,7 +45,7 @@ update action model =
      (model, logout Redirect)
 
     Redirect _ -> 
-     (model, redirect NoOp)
+     (model, redirect NoOp "login")
 
     LoadSwagger -> 
       (model, (newtab NoOp "swagger/index.html"))
