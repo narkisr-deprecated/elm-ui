@@ -50,6 +50,8 @@ app =
         parsingInput (Search.Result False) parsingErr,
         menuClick menuPort,
         editorValue editorInPort,
+        jobsListPolling,
+        jobsStatsPolling,
         routerSignal
       ]
     }
