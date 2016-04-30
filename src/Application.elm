@@ -22,7 +22,7 @@ import Hop.Types exposing (Location, Query,newLocation)
 import Hop.Navigate exposing (navigateTo, setQuery)
 
 -- Routing
-import Routing as BaseRoute exposing (config,Route(..), defaultRoute)
+import Routing as BaseRoute exposing (config, Route(..), defaultRoute)
 import Systems.Routing exposing (Route(List))
 
 
@@ -74,7 +74,7 @@ type Action =
     | NoOp
 
 route : Action ->  Model -> (Model , Effects Action)
-route action ({nav, types, users, jobs, systems, templates, stacks} as model) =
+route action ({route, types, users, jobs, systems, templates, stacks} as model) =
   case action of 
     JobsAction jobAction -> 
       let
@@ -110,9 +110,9 @@ route action ({nav, types, users, jobs, systems, templates, stacks} as model) =
 
     SystemsAction action -> 
       let 
-        (newSystems, effects) = Systems.update action systems
+        (newSystems, effects) = navigate (Systems.update action systems) SystemsAction
       in
-        ({ model | systems = newSystems}, Effects.map SystemsAction effects)
+        ({ model | systems = newSystems}, effects)
 
     ApplyRoute (route, location) ->
       case route of 
@@ -127,6 +127,20 @@ route action ({nav, types, users, jobs, systems, templates, stacks} as model) =
 
     _ -> 
         none model
+
+navigate ({navChange} as model, effects) action = 
+  case navChange of 
+    Just path -> 
+      let 
+       withNavChange = [
+           Effects.map action effects
+         , Effects.map HopAction (navigateTo config path)
+        ]
+      in
+       ({model | navChange = Nothing }, Effects.batch withNavChange)
+
+    Nothing -> 
+      (model, Effects.map action effects)
 
 
 update : Action ->  Model -> (Model , Effects Action)
