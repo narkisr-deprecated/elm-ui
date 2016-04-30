@@ -6,15 +6,17 @@ import Debug
 import Task
 
 -- SIGNALS 
-type Action = NoOp | Prompt
+type Action = 
+  NoOp 
+    | To String
 
 redirectActions : Signal.Mailbox Action
 redirectActions =
   Signal.mailbox NoOp
 
-redirect : a -> Effects a
-redirect noop = 
-  (Signal.send redirectActions.address Prompt)
+redirect : a -> String -> Effects a
+redirect noop dest = 
+  (Signal.send redirectActions.address (To dest))
      |> Task.map (always noop)
      |> Effects.task 
 

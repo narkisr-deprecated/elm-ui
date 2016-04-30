@@ -56,8 +56,7 @@
   main.ports.redirectPort.subscribe(function(event) {
     var url = window.location.href;
     var arr = url.split("/");
-    window.location =  arr[0] + "//" + arr[2] + "/login";
-    console.log(event);
+    window.location =  arr[0] + "//" + arr[2] + "/"+event;
   });
 
 
