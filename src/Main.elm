@@ -64,23 +64,33 @@ port tasks : Signal (Task.Task Never ())
 port tasks =
   app.tasks
 
-port redirectPort : Signal ()
+
+toResource action = 
+  case action of 
+    Redirect.To s -> 
+      s
+
+    _ -> 
+      ""
+
+port redirectPort : Signal String
 port redirectPort =
    redirectActions.signal
-     |> filter (\s -> s == Redirect.Prompt) Redirect.NoOp
-     |> map (always ())
+     |> filter (\s -> s /= Redirect.NoOp) Redirect.NoOp
+     |> map toResource
 
 toUrl action = 
   case action of 
     NewTab.Open s -> 
       s
 
-    _ -> ""
+    _ -> 
+      ""
 
 port newtabPort : Signal String
 port newtabPort =
    newtabActions.signal
-     |> filter (\s -> s /= NewTab.NoOp ) NewTab.NoOp
+     |> filter (\s -> s /= NewTab.NoOp) NewTab.NoOp
      |> map toUrl
 
 editJson action = 
