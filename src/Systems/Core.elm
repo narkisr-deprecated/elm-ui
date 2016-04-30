@@ -9,6 +9,7 @@ import Nav.Common exposing (Active(Systems, Jobs, Templates), Section(Stats, Lau
 import Html exposing (..)
 import Effects exposing (Effects, batch, map)
 import Common.Utils exposing (none)
+import Common.Redirect exposing (redirect)
 import Table as Table
 import Set
 
@@ -17,7 +18,7 @@ type alias Model =
   , systemsAdd : Add.Model
   , systemsView : View.Model
   , systemsLaunch : Launch.Model
-  , navChange : Maybe (Active, Section)
+  , navChange : Maybe String
   }
 
   
@@ -43,9 +44,10 @@ type Action =
    | SystemsAdd Add.Action
    | SystemsView View.Action
    | SystemsLaunch Launch.Action
+   | NoOp
 
 setupJob : Launch.Action -> Model -> (Model, Effects Action)
-setupJob action ({ systemsList, systemsLaunch } as model) =
+setupJob action ({systemsList, systemsLaunch} as model) =
   let
     (_, systems) = systemsList.systems
     table = systemsList.table
@@ -54,12 +56,12 @@ setupJob action ({ systemsList, systemsLaunch } as model) =
     (newLaunch, effect) = Launch.update action { systemsLaunch |  table =  selectedTable }
   in
     if List.isEmpty selected then
-      ({ model | systemsList = { systemsList | error = NoSystemSelected}} , Effects.none)
+      none { model | systemsList = { systemsList | error = NoSystemSelected}}
     else
       let
         newList = { systemsList | error = NoError}
       in
-      ({model | systemsLaunch = newLaunch, navChange = Just (Systems, Launch), systemsList = newList}, Effects.map SystemsLaunch effect)
+       ({model | systemsLaunch = newLaunch, systemsList = newList, navChange = Just "systems/launch"}, Effects.map SystemsLaunch effect)
 
 update : Action ->  Model-> (Model , Effects Action)
 update action ({systemsView, systemsList, systemsAdd} as model) =
@@ -76,7 +78,7 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
           let 
             (newSystems, effects) = View.update (View.ViewSystem id) systemsView
           in
-           ({model | systemsView = newSystems, navChange = Just (Systems,View)}, Effects.map SystemsView effects)        
+           ({model | systemsView = newSystems, navChange = Just("systems/view/" ++ id)}, Effects.map SystemsView effects)        
         _ ->
 
           let 
@@ -87,10 +89,10 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
     SystemsAdd systemsAction -> 
       case systemsAction of
         Add.JobLaunched _ -> 
-          none {model | navChange =  Just (Jobs, List)}
+          none {model | navChange = Just "jobs/list"}
 
         Add.SaveTemplate -> 
-          none {model | navChange =  Just (Templates, Add)}
+          none {model | navChange = Just "templates/add"}
 
         Add.Saved next result -> 
           let
@@ -99,7 +101,7 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
           in
             -- If not the default case
             if newEffects/= Effects.none && next == Add.NoOp then
-              ({model | navChange = Just (Systems, List), systemsAdd = initial}, Effects.map SystemsAdd initEffects)
+              ({model | navChange = Just "systems/list", systemsAdd = initial}, Effects.map SystemsAdd initEffects)
             else  
               ({model | systemsAdd = newSystems }, Effects.map SystemsAdd newEffects)
 
@@ -110,12 +112,12 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
             ({model | systemsAdd = newSystems }, Effects.map SystemsAdd effect)
 
     SystemsLaunch launchAction -> 
-      case launchAction of 
+      case Debug.log "" launchAction of 
         Launch.Cancel -> 
-          none { model | navChange = Just (Systems,List) }
+          none { model | navChange = Just "systems/list"}
 
         Launch.JobLaunched _ -> 
-          none {model | navChange = Just (Jobs, List)}
+          none {model | navChange = Just "jobs/list"}
 
         SetupJob job -> 
           setupJob launchAction model
@@ -127,7 +129,10 @@ update action ({systemsView, systemsList, systemsAdd} as model) =
            ({ model | systemsLaunch = newLaunch}, Effects.map SystemsLaunch effect)
 
         _ -> 
-          (model, Effects.none)
+          none model
+
+    NoOp -> 
+      none model
 
 
 view : Signal.Address Action -> Model -> Route -> List Html
