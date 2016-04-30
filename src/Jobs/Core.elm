@@ -5,7 +5,7 @@ import Html exposing (..)
 import Jobs.Routing as Routing exposing (Route)
 import Common.Utils exposing (none)
 
-import Jobs.List as List 
+import Jobs.List as List exposing (Action(Polling))
 import Jobs.Stats as Stats
 
 type alias Model = 
@@ -33,17 +33,26 @@ type Action =
     | JobsStats Stats.Action
     | NoOp
 
+isPolling action = 
+  case action of
+    JobsListing Polling -> 
+      True
+
+    JobsStats (Stats.PollMetrics _) -> 
+      True
+
+    _ -> 
+      False
+
+
 update : Action ->  Model-> (Model , Effects Action)
 update action ({list, stats} as model)=
   case action of 
     JobsListing listing -> 
-      if listing == List.Polling then
-        none model
-      else
-        let
-         (newListing, effects) = List.update listing list
-        in
-          ({model | list = newListing}, Effects.map JobsListing effects) 
+      let
+        (newListing, effects) = List.update listing list
+      in
+        ({model | list = newListing}, Effects.map JobsListing effects) 
 
     JobsStats sts -> 
       let

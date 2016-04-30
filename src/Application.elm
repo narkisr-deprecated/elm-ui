@@ -76,11 +76,14 @@ type Action =
 route : Action ->  Model -> (Model , Effects Action)
 route action ({route, types, users, jobs, systems, templates, stacks} as model) =
   case action of 
-    JobsAction jobAction -> 
-      let
-        (newJob, effects) = Jobs.update jobAction jobs
-      in
-        ({model | jobs = newJob}, Effects.map JobsAction effects) 
+    JobsAction action -> 
+      if Jobs.isPolling action &&  BaseRoute.notJobs route then
+        none model 
+      else 
+        let
+          (newJob, effects) = Jobs.update action jobs
+        in
+          ({model | jobs = newJob}, Effects.map JobsAction effects) 
 
     TypesAction action -> 
       let 

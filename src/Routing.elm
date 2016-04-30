@@ -15,6 +15,13 @@ type Route =
   | NotFoundRoute
 
 
+notJobs route = 
+  case route of 
+    JobsRoute _ ->
+      False
+    _ -> 
+      True
+
 defaultRoute = 
   SystemsRoute Systems.List
 

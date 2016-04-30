@@ -14570,11 +14570,11 @@ Elm.Common.Redirect.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $Task = Elm.Task.make(_elm);
    var _op = {};
-   var Prompt = {ctor: "Prompt"};
+   var To = function (a) {    return {ctor: "To",_0: a};};
    var NoOp = {ctor: "NoOp"};
    var redirectActions = $Signal.mailbox(NoOp);
-   var redirect = function (noop) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,redirectActions.address,Prompt)));};
-   return _elm.Common.Redirect.values = {_op: _op,NoOp: NoOp,Prompt: Prompt,redirectActions: redirectActions,redirect: redirect};
+   var redirect = F2(function (noop,dest) {    return $Effects.task(A2($Task.map,$Basics.always(noop),A2($Signal.send,redirectActions.address,To(dest))));});
+   return _elm.Common.Redirect.values = {_op: _op,NoOp: NoOp,To: To,redirectActions: redirectActions,redirect: redirect};
 };
 Elm.Native.Http = {};
 Elm.Native.Http.make = function(localRuntime) {
@@ -15532,7 +15532,7 @@ Elm.Common.Errors.make = function (_elm) {
             _v8_2: do {
                if (_p13.ctor === "BadResponse") {
                      switch (_p13._0)
-                     {case 401: return A2($Debug.log,$Basics.toString(_p14),{ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(noop)});
+                     {case 401: return A2($Debug.log,$Basics.toString(_p14),{ctor: "_Tuple2",_0: model,_1: A2($Common$Redirect.redirect,noop,"login")});
                         case 400: return fail(decodeError(_p13._2));
                         default: break _v8_2;}
                   } else {
@@ -20181,9 +20181,10 @@ Elm.Systems.Routing.make = function (_elm) {
    var List = {ctor: "List"};
    var matcherList = A2($Hop$Matchers.match1,List,"/list");
    var Launch = {ctor: "Launch"};
+   var matcherLaunch = A2($Hop$Matchers.match1,Launch,"/launch");
    var Add = {ctor: "Add"};
    var matcherAdd = A2($Hop$Matchers.match1,Add,"/add");
-   var matchers = _U.list([matcherAdd,matcherList]);
+   var matchers = _U.list([matcherAdd,matcherList,matcherLaunch]);
    return _elm.Systems.Routing.values = {_op: _op
                                         ,Add: Add
                                         ,Launch: Launch
@@ -20192,6 +20193,7 @@ Elm.Systems.Routing.make = function (_elm) {
                                         ,Delete: Delete
                                         ,matcherAdd: matcherAdd
                                         ,matcherList: matcherList
+                                        ,matcherLaunch: matcherLaunch
                                         ,matchers: matchers};
 };
 Elm.Nav = Elm.Nav || {};
@@ -20252,7 +20254,6 @@ Elm.Systems.Core.make = function (_elm) {
    $Html = Elm.Html.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
-   $Nav$Common = Elm.Nav.Common.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Set = Elm.Set.make(_elm),
    $Signal = Elm.Signal.make(_elm),
@@ -20263,6 +20264,7 @@ Elm.Systems.Core.make = function (_elm) {
    $Systems$View = Elm.Systems.View.make(_elm),
    $Table = Elm.Table.make(_elm);
    var _op = {};
+   var NoOp = {ctor: "NoOp"};
    var SystemsLaunch = function (a) {    return {ctor: "SystemsLaunch",_0: a};};
    var setupJob = F2(function (action,_p0) {
       var _p1 = _p0;
@@ -20276,13 +20278,10 @@ Elm.Systems.Core.make = function (_elm) {
       var _p5 = A2($Systems$Launch.update,action,_U.update(_p1.systemsLaunch,{table: selectedTable}));
       var newLaunch = _p5._0;
       var effect = _p5._1;
-      if ($List.isEmpty(selected)) return {ctor: "_Tuple2"
-                                          ,_0: _U.update(_p6,{systemsList: _U.update(_p7,{error: $Systems$List.NoSystemSelected})})
-                                          ,_1: $Effects.none}; else {
+      if ($List.isEmpty(selected)) return $Common$Utils.none(_U.update(_p6,{systemsList: _U.update(_p7,{error: $Systems$List.NoSystemSelected})})); else {
             var newList = _U.update(_p7,{error: $Systems$List.NoError});
             return {ctor: "_Tuple2"
-                   ,_0: _U.update(_p6,
-                   {systemsLaunch: newLaunch,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Systems,_1: $Nav$Common.Launch}),systemsList: newList})
+                   ,_0: _U.update(_p6,{systemsLaunch: newLaunch,systemsList: newList,navChange: $Maybe.Just("systems/launch")})
                    ,_1: A2($Effects.map,SystemsLaunch,effect)};
          }
    });
@@ -20291,75 +20290,71 @@ Elm.Systems.Core.make = function (_elm) {
    var SystemsListing = function (a) {    return {ctor: "SystemsListing",_0: a};};
    var update = F2(function (action,_p8) {
       var _p9 = _p8;
-      var _p26 = _p9.systemsView;
-      var _p25 = _p9.systemsAdd;
-      var _p24 = _p9;
+      var _p27 = _p9.systemsView;
+      var _p26 = _p9.systemsAdd;
+      var _p25 = _p9;
       var _p10 = action;
       switch (_p10.ctor)
-      {case "SystemsView": var _p11 = A2($Systems$View.update,_p10._0,_p26);
+      {case "SystemsView": var _p11 = A2($Systems$View.update,_p10._0,_p27);
            var newSystems = _p11._0;
            var effects = _p11._1;
-           return {ctor: "_Tuple2",_0: _U.update(_p24,{systemsView: newSystems}),_1: A2($Effects.map,SystemsView,effects)};
-         case "SystemsListing": var _p15 = _p10._0;
-           var _p12 = _p15;
+           return {ctor: "_Tuple2",_0: _U.update(_p25,{systemsView: newSystems}),_1: A2($Effects.map,SystemsView,effects)};
+         case "SystemsListing": var _p16 = _p10._0;
+           var _p12 = _p16;
            if (_p12.ctor === "LoadPage" && _p12._0.ctor === "View") {
-                 var _p13 = A2($Systems$View.update,$Systems$View.ViewSystem(_p12._0._0),_p26);
+                 var _p14 = _p12._0._0;
+                 var _p13 = A2($Systems$View.update,$Systems$View.ViewSystem(_p14),_p27);
                  var newSystems = _p13._0;
                  var effects = _p13._1;
                  return {ctor: "_Tuple2"
-                        ,_0: _U.update(_p24,{systemsView: newSystems,navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Systems,_1: $Nav$Common.View})})
+                        ,_0: _U.update(_p25,{systemsView: newSystems,navChange: $Maybe.Just(A2($Basics._op["++"],"systems/view/",_p14))})
                         ,_1: A2($Effects.map,SystemsView,effects)};
               } else {
-                 var _p14 = A2($Systems$List.update,_p15,_p9.systemsList);
-                 var newSystems = _p14._0;
-                 var effect = _p14._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p24,{systemsList: newSystems}),_1: A2($Effects.map,SystemsListing,effect)};
+                 var _p15 = A2($Systems$List.update,_p16,_p9.systemsList);
+                 var newSystems = _p15._0;
+                 var effect = _p15._1;
+                 return {ctor: "_Tuple2",_0: _U.update(_p25,{systemsList: newSystems}),_1: A2($Effects.map,SystemsListing,effect)};
               }
-         case "SystemsAdd": var _p20 = _p10._0;
-           var _p16 = _p20;
-           switch (_p16.ctor)
-           {case "JobLaunched": return $Common$Utils.none(_U.update(_p24,
-                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Jobs,_1: $Nav$Common.List})}));
-              case "SaveTemplate": return $Common$Utils.none(_U.update(_p24,
-                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Templates,_1: $Nav$Common.Add})}));
-              case "Saved": var _p17 = $Systems$Add.init;
-                var initial = _p17._0;
-                var initEffects = _p17._1;
-                var _p18 = A2($Systems$Add.update,_p20,_p25);
-                var newSystems = _p18._0;
-                var newEffects = _p18._1;
-                return !_U.eq(newEffects,$Effects.none) && _U.eq(_p16._0,$Systems$Add.NoOp) ? {ctor: "_Tuple2"
-                                                                                              ,_0: _U.update(_p24,
-                                                                                              {navChange: $Maybe.Just({ctor: "_Tuple2"
-                                                                                                                      ,_0: $Nav$Common.Systems
-                                                                                                                      ,_1: $Nav$Common.List})
-                                                                                              ,systemsAdd: initial})
+         case "SystemsAdd": var _p21 = _p10._0;
+           var _p17 = _p21;
+           switch (_p17.ctor)
+           {case "JobLaunched": return $Common$Utils.none(_U.update(_p25,{navChange: $Maybe.Just("jobs/list")}));
+              case "SaveTemplate": return $Common$Utils.none(_U.update(_p25,{navChange: $Maybe.Just("templates/add")}));
+              case "Saved": var _p18 = $Systems$Add.init;
+                var initial = _p18._0;
+                var initEffects = _p18._1;
+                var _p19 = A2($Systems$Add.update,_p21,_p26);
+                var newSystems = _p19._0;
+                var newEffects = _p19._1;
+                return !_U.eq(newEffects,$Effects.none) && _U.eq(_p17._0,$Systems$Add.NoOp) ? {ctor: "_Tuple2"
+                                                                                              ,_0: _U.update(_p25,
+                                                                                              {navChange: $Maybe.Just("systems/list"),systemsAdd: initial})
                                                                                               ,_1: A2($Effects.map,SystemsAdd,initEffects)} : {ctor: "_Tuple2"
-                                                                                                                                              ,_0: _U.update(_p24,
+                                                                                                                                              ,_0: _U.update(_p25,
                                                                                                                                               {systemsAdd: newSystems})
                                                                                                                                               ,_1: A2($Effects.map,
                                                                                                                                               SystemsAdd,
                                                                                                                                               newEffects)};
-              default: var _p19 = A2($Systems$Add.update,_p20,_p25);
-                var newSystems = _p19._0;
-                var effect = _p19._1;
-                return {ctor: "_Tuple2",_0: _U.update(_p24,{systemsAdd: newSystems}),_1: A2($Effects.map,SystemsAdd,effect)};}
-         default: var _p23 = _p10._0;
-           var _p21 = _p23;
-           switch (_p21.ctor)
-           {case "Cancel": return $Common$Utils.none(_U.update(_p24,{navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Systems,_1: $Nav$Common.List})}));
-              case "JobLaunched": return $Common$Utils.none(_U.update(_p24,
-                {navChange: $Maybe.Just({ctor: "_Tuple2",_0: $Nav$Common.Jobs,_1: $Nav$Common.List})}));
-              case "SetupJob": return A2(setupJob,_p23,_p24);
-              case "Run": var _p22 = A2($Systems$Launch.update,_p23,_p24.systemsLaunch);
-                var newLaunch = _p22._0;
-                var effect = _p22._1;
-                return {ctor: "_Tuple2",_0: _U.update(_p24,{systemsLaunch: newLaunch}),_1: A2($Effects.map,SystemsLaunch,effect)};
-              default: return {ctor: "_Tuple2",_0: _p24,_1: $Effects.none};}}
+              default: var _p20 = A2($Systems$Add.update,_p21,_p26);
+                var newSystems = _p20._0;
+                var effect = _p20._1;
+                return {ctor: "_Tuple2",_0: _U.update(_p25,{systemsAdd: newSystems}),_1: A2($Effects.map,SystemsAdd,effect)};}
+         case "SystemsLaunch": var _p24 = _p10._0;
+           var _p22 = A2($Debug.log,"",_p24);
+           switch (_p22.ctor)
+           {case "Cancel": return $Common$Utils.none(_U.update(_p25,{navChange: $Maybe.Just("systems/list")}));
+              case "JobLaunched": return $Common$Utils.none(_U.update(_p25,{navChange: $Maybe.Just("jobs/list")}));
+              case "SetupJob": return A2(setupJob,_p24,_p25);
+              case "Run": var _p23 = A2($Systems$Launch.update,_p24,_p25.systemsLaunch);
+                var newLaunch = _p23._0;
+                var effect = _p23._1;
+                return {ctor: "_Tuple2",_0: _U.update(_p25,{systemsLaunch: newLaunch}),_1: A2($Effects.map,SystemsLaunch,effect)};
+              default: return $Common$Utils.none(_p25);}
+         default: return $Common$Utils.none(_p25);}
    });
    var view = F3(function (address,model,route) {
-      var _p27 = route;
-      switch (_p27.ctor)
+      var _p28 = route;
+      switch (_p28.ctor)
       {case "List": return A2($Systems$List.view,A2($Signal.forwardTo,address,SystemsListing),model.systemsList);
          case "Launch": return A2($Systems$Launch.view,A2($Signal.forwardTo,address,SystemsLaunch),model.systemsLaunch);
          case "Add": return A2($Systems$Add.view,A2($Signal.forwardTo,address,SystemsAdd),model.systemsAdd);
@@ -20371,16 +20366,16 @@ Elm.Systems.Core.make = function (_elm) {
    };
    var Model = F5(function (a,b,c,d,e) {    return {systemsList: a,systemsAdd: b,systemsView: c,systemsLaunch: d,navChange: e};});
    var init = function () {
-      var _p28 = $Systems$Launch.init;
-      var systemsLaunch = _p28._0;
-      var _p29 = $Systems$Add.init;
-      var systemsAdd = _p29._0;
-      var systemsAddAction = _p29._1;
-      var _p30 = $Systems$View.init;
-      var systemsView = _p30._0;
-      var _p31 = $Systems$List.init;
-      var systemsList = _p31._0;
-      var systemsListAction = _p31._1;
+      var _p29 = $Systems$Launch.init;
+      var systemsLaunch = _p29._0;
+      var _p30 = $Systems$Add.init;
+      var systemsAdd = _p30._0;
+      var systemsAddAction = _p30._1;
+      var _p31 = $Systems$View.init;
+      var systemsView = _p31._0;
+      var _p32 = $Systems$List.init;
+      var systemsList = _p32._0;
+      var systemsListAction = _p32._1;
       var effects = _U.list([A2($Effects.map,SystemsListing,systemsListAction),A2($Effects.map,SystemsAdd,systemsAddAction)]);
       return {ctor: "_Tuple2",_0: A5(Model,systemsList,systemsAdd,systemsView,systemsLaunch,$Maybe.Nothing),_1: $Effects.batch(effects)};
    }();
@@ -20392,6 +20387,7 @@ Elm.Systems.Core.make = function (_elm) {
                                      ,SystemsAdd: SystemsAdd
                                      ,SystemsView: SystemsView
                                      ,SystemsLaunch: SystemsLaunch
+                                     ,NoOp: NoOp
                                      ,setupJob: setupJob
                                      ,update: update
                                      ,view: view};
@@ -25083,22 +25079,37 @@ Elm.Jobs.Core.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var isPolling = function (action) {
+      var _p0 = action;
+      _v0_2: do {
+         switch (_p0.ctor)
+         {case "JobsListing": if (_p0._0.ctor === "Polling") {
+                    return true;
+                 } else {
+                    break _v0_2;
+                 }
+            case "JobsStats": if (_p0._0.ctor === "PollMetrics") {
+                    return true;
+                 } else {
+                    break _v0_2;
+                 }
+            default: break _v0_2;}
+      } while (false);
+      return false;
+   };
    var NoOp = {ctor: "NoOp"};
    var JobsStats = function (a) {    return {ctor: "JobsStats",_0: a};};
    var JobsListing = function (a) {    return {ctor: "JobsListing",_0: a};};
-   var update = F2(function (action,_p0) {
-      var _p1 = _p0;
-      var _p6 = _p1;
-      var _p2 = action;
-      switch (_p2.ctor)
-      {case "JobsListing": var _p4 = _p2._0;
-           if (_U.eq(_p4,$Jobs$List.Polling)) return $Common$Utils.none(_p6); else {
-                 var _p3 = A2($Jobs$List.update,_p4,_p1.list);
-                 var newListing = _p3._0;
-                 var effects = _p3._1;
-                 return {ctor: "_Tuple2",_0: _U.update(_p6,{list: newListing}),_1: A2($Effects.map,JobsListing,effects)};
-              }
-         case "JobsStats": var _p5 = A2($Jobs$Stats.update,_p2._0,_p1.stats);
+   var update = F2(function (action,_p1) {
+      var _p2 = _p1;
+      var _p6 = _p2;
+      var _p3 = action;
+      switch (_p3.ctor)
+      {case "JobsListing": var _p4 = A2($Jobs$List.update,_p3._0,_p2.list);
+           var newListing = _p4._0;
+           var effects = _p4._1;
+           return {ctor: "_Tuple2",_0: _U.update(_p6,{list: newListing}),_1: A2($Effects.map,JobsListing,effects)};
+         case "JobsStats": var _p5 = A2($Jobs$Stats.update,_p3._0,_p2.stats);
            var newStats = _p5._0;
            var effects = _p5._1;
            return {ctor: "_Tuple2",_0: _U.update(_p6,{stats: newStats}),_1: A2($Effects.map,JobsStats,effects)};
@@ -25124,7 +25135,15 @@ Elm.Jobs.Core.make = function (_elm) {
       var effects = _U.list([A2($Effects.map,JobsListing,listEffects),A2($Effects.map,JobsStats,statsEffects)]);
       return {ctor: "_Tuple2",_0: A2(Model,list,stats),_1: $Effects.batch(effects)};
    }();
-   return _elm.Jobs.Core.values = {_op: _op,Model: Model,init: init,JobsListing: JobsListing,JobsStats: JobsStats,NoOp: NoOp,update: update,view: view};
+   return _elm.Jobs.Core.values = {_op: _op
+                                  ,Model: Model
+                                  ,init: init
+                                  ,JobsListing: JobsListing
+                                  ,JobsStats: JobsStats
+                                  ,NoOp: NoOp
+                                  ,isPolling: isPolling
+                                  ,update: update
+                                  ,view: view};
 };
 Elm.Form = Elm.Form || {};
 Elm.Form.Error = Elm.Form.Error || {};
@@ -28297,7 +28316,7 @@ Elm.Nav.Header.make = function (_elm) {
       switch (_p0.ctor)
       {case "SetSession": return $Common$Utils.none(_U.update(model,{session: _p0._0}));
          case "SignOut": return {ctor: "_Tuple2",_0: model,_1: $Users$Session.logout(Redirect)};
-         case "Redirect": return {ctor: "_Tuple2",_0: model,_1: $Common$Redirect.redirect(NoOp)};
+         case "Redirect": return {ctor: "_Tuple2",_0: model,_1: A2($Common$Redirect.redirect,NoOp,"login")};
          case "LoadSwagger": return {ctor: "_Tuple2",_0: model,_1: A2($Common$NewTab.newtab,NoOp,"swagger/index.html")};
          default: return $Common$Utils.none(model);}
    });
@@ -28682,6 +28701,7 @@ Elm.Routing.make = function (_elm) {
    $Templates$Routing = Elm.Templates.Routing.make(_elm),
    $Types$Routing = Elm.Types.Routing.make(_elm);
    var _op = {};
+   var notJobs = function (route) {    var _p0 = route;if (_p0.ctor === "JobsRoute") {    return false;} else {    return true;}};
    var NotFoundRoute = {ctor: "NotFoundRoute"};
    var TemplatesRoute = function (a) {    return {ctor: "TemplatesRoute",_0: a};};
    var matcherTemplates = A3($Hop$Matchers.nested1,TemplatesRoute,"/templates",$Templates$Routing.matchers);
@@ -28700,6 +28720,7 @@ Elm.Routing.make = function (_elm) {
                                 ,JobsRoute: JobsRoute
                                 ,TemplatesRoute: TemplatesRoute
                                 ,NotFoundRoute: NotFoundRoute
+                                ,notJobs: notJobs
                                 ,defaultRoute: defaultRoute
                                 ,matcherSystems: matcherSystems
                                 ,matcherTypes: matcherTypes
@@ -28768,81 +28789,96 @@ Elm.Application.make = function (_elm) {
    });
    var NavigateTo = function (a) {    return {ctor: "NavigateTo",_0: a};};
    var HopAction = function (a) {    return {ctor: "HopAction",_0: a};};
-   var route = F2(function (action,_p7) {
+   var navigate = F2(function (_p7,action) {
       var _p8 = _p7;
-      var _p18 = _p8;
-      var _p9 = action;
-      _v4_8: do {
-         switch (_p9.ctor)
-         {case "JobsAction": var _p10 = A2($Jobs$Core.update,_p9._0,_p8.jobs);
-              var newJob = _p10._0;
-              var effects = _p10._1;
-              return {ctor: "_Tuple2",_0: _U.update(_p18,{jobs: newJob}),_1: A2($Effects.map,JobsAction,effects)};
-            case "TypesAction": var _p11 = A2($Types$Core.update,_p9._0,_p8.types);
-              var newTypes = _p11._0;
-              var effects = _p11._1;
-              return {ctor: "_Tuple2",_0: _U.update(_p18,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
-            case "UsersAction": var _p12 = A2($Users$Core.update,_p9._0,_p8.users);
-              var newUsers = _p12._0;
-              var effects = _p12._1;
-              return {ctor: "_Tuple2",_0: _U.update(_p18,{users: newUsers}),_1: A2($Effects.map,UsersAction,effects)};
-            case "StacksAction": var _p13 = A2($Stacks$Core.update,_p9._0,_p8.stacks);
-              var newStacks = _p13._0;
-              var effects = _p13._1;
-              return {ctor: "_Tuple2",_0: _U.update(_p18,{stacks: newStacks}),_1: A2($Effects.map,StacksAction,effects)};
-            case "TemplatesAction": var _p14 = A2($Templates$Core.update,_p9._0,_p8.templates);
-              var newTemplates = _p14._0;
-              var effects = _p14._1;
-              return {ctor: "_Tuple2",_0: _U.update(_p18,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
-            case "SystemsAction": var _p15 = A2($Systems$Core.update,_p9._0,_p8.systems);
-              var newSystems = _p15._0;
-              var effects = _p15._1;
-              return {ctor: "_Tuple2",_0: _U.update(_p18,{systems: newSystems}),_1: A2($Effects.map,SystemsAction,effects)};
-            case "ApplyRoute": if (_p9._0.ctor === "_Tuple2") {
-                    var _p17 = _p9._0._0;
-                    var _p16 = _p17;
-                    if (_p16.ctor === "NotFoundRoute") {
-                          return {ctor: "_Tuple2",_0: _p18,_1: A2($Effects.map,HopAction,A2($Hop$Navigate.navigateTo,$Routing.config,"systems/list"))};
+      var _p11 = _p8._0;
+      var _p10 = _p8._1;
+      var _p9 = _p8._0.navChange;
+      if (_p9.ctor === "Just") {
+            var withNavChange = _U.list([A2($Effects.map,action,_p10),A2($Effects.map,HopAction,A2($Hop$Navigate.navigateTo,$Routing.config,_p9._0))]);
+            return {ctor: "_Tuple2",_0: _U.update(_p11,{navChange: $Maybe.Nothing}),_1: $Effects.batch(withNavChange)};
+         } else {
+            return {ctor: "_Tuple2",_0: _p11,_1: A2($Effects.map,action,_p10)};
+         }
+   });
+   var route = F2(function (action,_p12) {
+      var _p13 = _p12;
+      var _p24 = _p13;
+      var _p14 = action;
+      _v6_8: do {
+         switch (_p14.ctor)
+         {case "JobsAction": var _p16 = _p14._0;
+              if ($Jobs$Core.isPolling(_p16) && $Routing.notJobs(_p13.route)) return $Common$Utils.none(_p24); else {
+                    var _p15 = A2($Jobs$Core.update,_p16,_p13.jobs);
+                    var newJob = _p15._0;
+                    var effects = _p15._1;
+                    return {ctor: "_Tuple2",_0: _U.update(_p24,{jobs: newJob}),_1: A2($Effects.map,JobsAction,effects)};
+                 }
+            case "TypesAction": var _p17 = A2($Types$Core.update,_p14._0,_p13.types);
+              var newTypes = _p17._0;
+              var effects = _p17._1;
+              return {ctor: "_Tuple2",_0: _U.update(_p24,{types: newTypes}),_1: A2($Effects.map,TypesAction,effects)};
+            case "UsersAction": var _p18 = A2($Users$Core.update,_p14._0,_p13.users);
+              var newUsers = _p18._0;
+              var effects = _p18._1;
+              return {ctor: "_Tuple2",_0: _U.update(_p24,{users: newUsers}),_1: A2($Effects.map,UsersAction,effects)};
+            case "StacksAction": var _p19 = A2($Stacks$Core.update,_p14._0,_p13.stacks);
+              var newStacks = _p19._0;
+              var effects = _p19._1;
+              return {ctor: "_Tuple2",_0: _U.update(_p24,{stacks: newStacks}),_1: A2($Effects.map,StacksAction,effects)};
+            case "TemplatesAction": var _p20 = A2($Templates$Core.update,_p14._0,_p13.templates);
+              var newTemplates = _p20._0;
+              var effects = _p20._1;
+              return {ctor: "_Tuple2",_0: _U.update(_p24,{templates: newTemplates}),_1: A2($Effects.map,TemplatesAction,effects)};
+            case "SystemsAction": var _p21 = A2(navigate,A2($Systems$Core.update,_p14._0,_p13.systems),SystemsAction);
+              var newSystems = _p21._0;
+              var effects = _p21._1;
+              return {ctor: "_Tuple2",_0: _U.update(_p24,{systems: newSystems}),_1: effects};
+            case "ApplyRoute": if (_p14._0.ctor === "_Tuple2") {
+                    var _p23 = _p14._0._0;
+                    var _p22 = _p23;
+                    if (_p22.ctor === "NotFoundRoute") {
+                          return {ctor: "_Tuple2",_0: _p24,_1: A2($Effects.map,HopAction,A2($Hop$Navigate.navigateTo,$Routing.config,"systems/list"))};
                        } else {
-                          return $Common$Utils.none(_U.update(_p18,{route: _p17,location: _p9._0._1}));
+                          return $Common$Utils.none(_U.update(_p24,{route: _p23,location: _p14._0._1}));
                        }
                  } else {
-                    break _v4_8;
+                    break _v6_8;
                  }
-            case "HopAction": if (_p9._0.ctor === "_Tuple0") {
-                    return $Common$Utils.none(_p18);
+            case "HopAction": if (_p14._0.ctor === "_Tuple0") {
+                    return $Common$Utils.none(_p24);
                  } else {
-                    break _v4_8;
+                    break _v6_8;
                  }
-            default: break _v4_8;}
+            default: break _v6_8;}
       } while (false);
-      return $Common$Utils.none(_p18);
+      return $Common$Utils.none(_p24);
    });
    var update = F2(function (action,model) {    return A2(route,action,model);});
    var ApplyRoute = function (a) {    return {ctor: "ApplyRoute",_0: a};};
    var Model = F9(function (a,b,c,d,e,f,g,h,i) {    return {systems: a,stacks: b,jobs: c,types: d,templates: e,users: f,nav: g,route: h,location: i};});
    var init = function () {
-      var _p19 = $Stacks$Core.init;
-      var stacks = _p19._0;
-      var stacksAction = _p19._1;
-      var _p20 = $Systems$Core.init;
-      var systems = _p20._0;
-      var systemsAction = _p20._1;
-      var _p21 = $Nav$Core.init;
-      var nav = _p21._0;
-      var navAction = _p21._1;
-      var _p22 = $Templates$Core.init;
-      var templates = _p22._0;
-      var templatesAction = _p22._1;
-      var _p23 = $Users$Core.init;
-      var users = _p23._0;
-      var usersAction = _p23._1;
-      var _p24 = $Types$Core.init;
-      var types = _p24._0;
-      var typesAction = _p24._1;
-      var _p25 = $Jobs$Core.init;
-      var jobs = _p25._0;
-      var jobsAction = _p25._1;
+      var _p25 = $Stacks$Core.init;
+      var stacks = _p25._0;
+      var stacksAction = _p25._1;
+      var _p26 = $Systems$Core.init;
+      var systems = _p26._0;
+      var systemsAction = _p26._1;
+      var _p27 = $Nav$Core.init;
+      var nav = _p27._0;
+      var navAction = _p27._1;
+      var _p28 = $Templates$Core.init;
+      var templates = _p28._0;
+      var templatesAction = _p28._1;
+      var _p29 = $Users$Core.init;
+      var users = _p29._0;
+      var usersAction = _p29._1;
+      var _p30 = $Types$Core.init;
+      var types = _p30._0;
+      var typesAction = _p30._1;
+      var _p31 = $Jobs$Core.init;
+      var jobs = _p31._0;
+      var jobsAction = _p31._1;
       var effects = _U.list([A2($Effects.map,TemplatesAction,templatesAction)
                             ,A2($Effects.map,TypesAction,typesAction)
                             ,A2($Effects.map,UsersAction,usersAction)
@@ -28869,6 +28905,7 @@ Elm.Application.make = function (_elm) {
                                     ,UsersAction: UsersAction
                                     ,NoOp: NoOp
                                     ,route: route
+                                    ,navigate: navigate
                                     ,update: update
                                     ,activeView: activeView
                                     ,view: view};
@@ -29049,13 +29086,14 @@ Elm.Main.make = function (_elm) {
       return v;
    },
    A2($Signal.map,toUrl,A3($Signal.filter,function (s) {    return !_U.eq(s,$Common$NewTab.NoOp);},$Common$NewTab.NoOp,$Common$NewTab.newtabActions.signal)));
+   var toResource = function (action) {    var _p14 = action;if (_p14.ctor === "To") {    return _p14._0;} else {    return "";}};
    var redirectPort = Elm.Native.Port.make(_elm).outboundSignal("redirectPort",
    function (v) {
-      return [];
+      return v;
    },
    A2($Signal.map,
-   $Basics.always({ctor: "_Tuple0"}),
-   A3($Signal.filter,function (s) {    return _U.eq(s,$Common$Redirect.Prompt);},$Common$Redirect.NoOp,$Common$Redirect.redirectActions.signal)));
+   toResource,
+   A3($Signal.filter,function (s) {    return !_U.eq(s,$Common$Redirect.NoOp);},$Common$Redirect.NoOp,$Common$Redirect.redirectActions.signal)));
    var app = $StartApp.start({init: $Application.init
                              ,update: $Application.update
                              ,view: $Application.view
@@ -29063,12 +29101,15 @@ Elm.Main.make = function (_elm) {
                                               ,A2(parsingInput,$Search.Result(false),parsingErr)
                                               ,menuClick(menuPort)
                                               ,editorValue(editorInPort)
+                                              ,jobsListPolling
+                                              ,jobsStatsPolling
                                               ,routerSignal])});
    var main = app.html;
    var tasks = Elm.Native.Task.make(_elm).performSignal("tasks",app.tasks);
    return _elm.Main.values = {_op: _op
                              ,app: app
                              ,main: main
+                             ,toResource: toResource
                              ,toUrl: toUrl
                              ,editJson: editJson
                              ,editorValue: editorValue
