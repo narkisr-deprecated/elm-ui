@@ -33,7 +33,7 @@ type alias System =
 
 emptyMachine : Machine
 emptyMachine =
-  Machine "" "" "" (Just "") "" Nothing Nothing
+  Machine "" "" "" Nothing "" Nothing Nothing
 
 resourcedMachine : Int -> Int -> Machine
 resourcedMachine cpu ram =

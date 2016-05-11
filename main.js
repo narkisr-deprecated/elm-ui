@@ -16052,7 +16052,7 @@ Elm.Systems.Model.Common.make = function (_elm) {
       };
    };
    var Machine = F7(function (a,b,c,d,e,f,g) {    return {user: a,hostname: b,domain: c,ip: d,os: e,ram: f,cpu: g};});
-   var emptyMachine = A7(Machine,"","","",$Maybe.Just(""),"",$Maybe.Nothing,$Maybe.Nothing);
+   var emptyMachine = A7(Machine,"","","",$Maybe.Nothing,"",$Maybe.Nothing,$Maybe.Nothing);
    var emptySystem = function () {
       var base = A3(System,"","","");
       return A7(base,emptyMachine,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing,$Maybe.Nothing);
