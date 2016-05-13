@@ -109,10 +109,10 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
       MenuClick (job,name) -> 
         case job of 
          "edit" -> 
-            ({ model | navChange = Just ("/types/edit/" ++ name) }, effects)
+            ({ model | navChange = Just ("/types/edit/" ++ name)}, effects)
           
          "clear" -> 
-            ({ model | navChange = Just "/types/delete" }, effects)
+            ({ model | navChange = Just ("/types/delete/" ++ name)}, effects)
 
          _ -> 
            result

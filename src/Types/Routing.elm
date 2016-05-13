@@ -26,6 +26,10 @@ matcherView: PathMatcher Route
 matcherView =
     match2 View "/view/" str
 
+matcherDelete: PathMatcher Route
+matcherDelete =
+    match2 Delete "/delete/" str
+
 matchers : List (PathMatcher Route)
 matchers =
-  [ matcherAdd, matcherList, matcherEdit, matcherView]
+  [ matcherAdd, matcherList, matcherEdit, matcherView, matcherDelete]
