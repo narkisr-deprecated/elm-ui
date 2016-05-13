@@ -2,18 +2,19 @@ module Users.Core where
 
 import Effects exposing (Effects)
 import Html exposing (..)
-import Nav.Common exposing (Section(Add, List, View, Edit, Delete), Active(Users))
 import Users.List as List exposing (Action)
 import Users.Add as Add exposing (Action)
 import Common.Utils exposing (none)
+import Common.Components exposing (notImplemented, asList)
 
-
+-- Routing
+import Users.Routing as Routing exposing (Route)
 
 type alias Model = 
   {
    list : List.Model 
   , add : Add.Model 
-  , navChange : Maybe (Active, Section)
+  , navChange : Maybe String
   }
  
 init : (Model , Effects Action)
@@ -40,13 +41,13 @@ type Action =
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
 navigate action ((({list} as model), effects) as result) =
   case action of 
-    MenuClick (job,_) -> 
+    MenuClick (job,name) -> 
       case job of 
         "edit" -> 
-          ({ model | navChange = Just (Users, Edit) }, effects)
+          ({ model | navChange = Just ("/users/edit/" ++ name) }, effects)
            
         "clear" -> 
-          ({ model | navChange = Just (Users, Delete) }, effects)
+          ({ model | navChange = Just ("/users/delete/" ++ name) }, effects)
 
         _ -> 
             none model
@@ -80,14 +81,15 @@ update action model =
 
 -- View
 
-view : Signal.Address Action -> Model -> Section -> List Html
+view : Signal.Address Action -> Model -> Route -> List Html
 view address ({list, add} as model) section =
-  case section of 
-     List -> 
-       List.view (Signal.forwardTo address Listing) list
+   case section of
+     Routing.List -> 
+        List.view (Signal.forwardTo address Listing) list
 
-     Add -> 
-       Add.view (Signal.forwardTo address Adding) add
-
+     Routing.Add -> 
+        Add.view (Signal.forwardTo address Adding) add
+      
      _ -> 
-       [div [] [text "not implemented"]]
+       asList notImplemented
+

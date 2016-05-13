@@ -93,9 +93,9 @@ route action ({route, types, users, jobs, systems, templates, stacks} as model) 
 
     UsersAction action -> 
       let 
-       (newUsers, effects) = Users.update action users
+       (newUsers, effects) = navigate (Users.update action users) UsersAction
       in
-       ({ model | users = newUsers}, Effects.map UsersAction effects) 
+       ({ model | users = newUsers}, effects) 
 
 
     StacksAction action -> 
@@ -163,6 +163,9 @@ activeView address ({jobs, route, systems, types, templates, stacks, users} as m
       
       JobsRoute nested -> 
         Jobs.view (Signal.forwardTo address JobsAction) jobs nested
+
+      UsersRoute nested -> 
+        Users.view (Signal.forwardTo address UsersAction) users nested
       
       _ ->
          Systems.view (Signal.forwardTo address SystemsAction) systems List
