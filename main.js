@@ -20178,13 +20178,14 @@ Elm.Systems.Routing.make = function (_elm) {
    var _op = {};
    var Delete = function (a) {    return {ctor: "Delete",_0: a};};
    var View = function (a) {    return {ctor: "View",_0: a};};
+   var matcherView = A3($Hop$Matchers.match2,View,"/view/",$Hop$Matchers.$int);
    var List = {ctor: "List"};
    var matcherList = A2($Hop$Matchers.match1,List,"/list");
    var Launch = {ctor: "Launch"};
    var matcherLaunch = A2($Hop$Matchers.match1,Launch,"/launch");
    var Add = {ctor: "Add"};
    var matcherAdd = A2($Hop$Matchers.match1,Add,"/add");
-   var matchers = _U.list([matcherAdd,matcherList,matcherLaunch]);
+   var matchers = _U.list([matcherAdd,matcherList,matcherLaunch,matcherView]);
    return _elm.Systems.Routing.values = {_op: _op
                                         ,Add: Add
                                         ,Launch: Launch
@@ -20194,6 +20195,7 @@ Elm.Systems.Routing.make = function (_elm) {
                                         ,matcherAdd: matcherAdd
                                         ,matcherList: matcherList
                                         ,matcherLaunch: matcherLaunch
+                                        ,matcherView: matcherView
                                         ,matchers: matchers};
 };
 Elm.Nav = Elm.Nav || {};

@@ -22,7 +22,11 @@ matcherLaunch: PathMatcher Route
 matcherLaunch =
     match1 Launch "/launch"
 
+matcherView: PathMatcher Route
+matcherView =
+    match2 View "/view/" int
+
 
 matchers : List (PathMatcher Route)
 matchers =
-  [ matcherAdd, matcherList, matcherLaunch ]
+  [ matcherAdd, matcherList, matcherLaunch, matcherView ]
