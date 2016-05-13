@@ -23,7 +23,7 @@ type alias Model =
   , view : TypesView.Model
   , delete : TypesDelete.Model
   , edit : TypesEdit.Model
-  , navChange : Maybe (Active, Section)
+  , navChange : Maybe String
   }
   
 init : (Model , Effects Action)
@@ -61,7 +61,7 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
             let 
               (newSystems, effects) = TypesView.update (TypesView.ViewType id) view
             in
-              ({model | view = view, navChange = Just (Types, View)}, Effects.map Viewing effects)        
+              ({model | view = view, navChange = Just ("/types/view/" ++ id)}, Effects.map Viewing effects)        
 
           _ -> 
             (model, effects)
@@ -69,7 +69,7 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
       Adding adding -> 
         case adding of 
           TypesAdd.Saved (Result.Ok _) -> 
-            refreshList True ({model | navChange = Just (Types, List)}, effects)
+            refreshList True ({model | navChange = Just "/types/list"}, effects)
 
           _ -> 
             (model, effects)
@@ -79,7 +79,7 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
           TypesEdit.AddAction addAction -> 
             case addAction of
               TypesAdd.Saved (Result.Ok _) -> 
-                 refreshList True ({model | navChange = Just (Types, List)}, effects)
+                 refreshList True ({model | navChange = Just "/types/list"}, effects)
 
               _ -> 
                (model, effects)
@@ -93,26 +93,26 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
         case deleting of 
            TypesDelete.Deleted _  -> 
             if delete.errorMsg == "" then
-              ({ model | navChange = Just (Types, List)}, effects)
+              ({ model | navChange = Just "/types/list"}, effects)
             else
               result
 
            TypesDelete.Cancel -> 
-             refreshList True ({ model | navChange = Just (Types, List)}, effects)
+             refreshList True ({ model | navChange = Just "/types/list"}, effects)
 
            TypesDelete.Done -> 
-             refreshList True ({ model | navChange = Just (Types, List)}, effects)
+             refreshList True ({ model | navChange = Just "/types/list"}, effects)
          
            _ -> 
             result
 
-      MenuClick (job,_) -> 
+      MenuClick (job,name) -> 
         case job of 
          "edit" -> 
-            ({ model | navChange = Just (Types, Edit) }, effects)
+            ({ model | navChange = Just ("/types/edit/" ++ name) }, effects)
           
          "clear" -> 
-            ({ model | navChange = Just (Types, Delete) }, effects)
+            ({ model | navChange = Just "/types/delete" }, effects)
 
          _ -> 
            result

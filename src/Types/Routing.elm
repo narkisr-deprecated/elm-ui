@@ -6,9 +6,9 @@ import Hop.Matchers exposing (..)
 type Route = 
   Add
     | List
-    | View Int
-    | Delete Int
-    | Edit Int
+    | View String
+    | Delete String
+    | Edit String
 
 matcherAdd: PathMatcher Route
 matcherAdd =
@@ -18,7 +18,14 @@ matcherList: PathMatcher Route
 matcherList =
     match1 List "/list"
 
+matcherEdit: PathMatcher Route
+matcherEdit =
+    match2 Edit "/edit/" str
+
+matcherView: PathMatcher Route
+matcherView =
+    match2 View "/view/" str
 
 matchers : List (PathMatcher Route)
 matchers =
-  [ matcherAdd, matcherList ]
+  [ matcherAdd, matcherList, matcherEdit, matcherView]

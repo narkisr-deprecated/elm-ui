@@ -11,7 +11,6 @@ import Common.Utils exposing (none)
 import Types.Core as Types
 import Users.Core as Users
 import Templates.Core as Templates
--- import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))
 import Nav.Core as Nav
 
 import Bootstrap.Html exposing (..)
@@ -87,9 +86,9 @@ route action ({route, types, users, jobs, systems, templates, stacks} as model) 
 
     TypesAction action -> 
       let 
-       (newTypes, effects) = Types.update action types
+       (newTypes, effects) = navigate (Types.update action types) TypesAction
       in
-       ({ model | types = newTypes}, Effects.map TypesAction effects) 
+       ({ model | types = newTypes}, effects) 
 
 
     UsersAction action -> 
