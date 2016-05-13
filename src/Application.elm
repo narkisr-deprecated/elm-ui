@@ -106,9 +106,9 @@ route action ({route, types, users, jobs, systems, templates, stacks} as model) 
 
     TemplatesAction action -> 
       let 
-        (newTemplates, effects) = Templates.update action templates
+        (newTemplates, effects) = navigate (Templates.update action templates) TemplatesAction
       in
-        ({ model | templates = newTemplates} , Effects.map TemplatesAction effects)
+        ({ model | templates = newTemplates} , effects)
 
     SystemsAction action -> 
       let 

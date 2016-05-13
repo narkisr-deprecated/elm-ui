@@ -9,7 +9,6 @@ import Templates.Add as Add
 import Templates.List as List
 import Templates.Launch as Launch
 import Templates.Delete as Delete
-import Nav.Common exposing (Active(Templates, Jobs), Section(Add, Launch, List, Delete))
 import Templates.Routing as Route exposing (Route)
 import Systems.Model.Common exposing (System)
 
@@ -19,7 +18,7 @@ type alias Model =
   , list: List.Model
   , launch: Launch.Model
   , delete: Delete.Model
-  , navChange : Maybe (Active, Section)
+  , navChange : Maybe String
   }
 
 init : (Model, Effects Action)
@@ -50,13 +49,13 @@ type Action =
 navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
 navigate action ((({launch, delete} as model), effects) as result) =
   case action of 
-    SetupJob (job,_) -> 
+    SetupJob (job,id) -> 
        case job of 
          "launch" -> 
-            ({ model | navChange = Just (Templates, Launch) }, effects)
+            ({ model | navChange = Just ("/templates/launch/" ++ id) }, effects)
           
          "clear" -> 
-            ({ model | navChange = Just (Templates, Delete) }, effects)
+            ({ model | navChange = Just ("/templates/delete/" ++ id ) }, effects)
 
          _ -> 
            result
@@ -64,13 +63,13 @@ navigate action ((({launch, delete} as model), effects) as result) =
     TemplatesAdd add -> 
       case add of 
         Add.Saved (Result.Ok _) -> 
-          ({ model | navChange = Just (Templates, List) }, effects)
+          ({ model | navChange = Just "/templates/list" }, effects)
 
         Add.Cancel -> 
-          ({ model | navChange = Just (Templates, List)}, effects)
+          ({ model | navChange = Just "/templates/list"}, effects)
 
         Add.Done -> 
-          ({ model | navChange = Just (Templates, List)}, effects)
+          ({ model | navChange = Just "/templates/list"}, effects)
 
         _ -> 
           result
@@ -78,10 +77,10 @@ navigate action ((({launch, delete} as model), effects) as result) =
     TemplatesLaunch launchAction -> 
        case launchAction of
           Launch.Cancel -> 
-            ({ model | navChange = Just (Templates, List)}, effects)
+            ({ model | navChange = Just "/templates/list" }, effects)
 
           Launch.JobLaunched r -> 
-            ({ model | navChange = Just (Jobs, List)}, effects)
+            ({ model | navChange = Just "/jobs/list"}, effects)
 
           _ -> 
             result
@@ -90,15 +89,15 @@ navigate action ((({launch, delete} as model), effects) as result) =
        case deleteAction of 
           Delete.Deleted _  -> 
            if delete.errorMsg == "" then
-             ({ model | navChange = Just (Templates, List)}, effects)
+             ({ model | navChange = Just "/templates/list"}, effects)
            else
              result
 
           Delete.Cancel -> 
-            refreshList True ({ model | navChange = Just (Templates, List)}, effects)
+            refreshList True ({ model | navChange = Just "/templates/list"}, effects)
 
           Delete.Done -> 
-            refreshList True ({ model | navChange = Just (Templates, List)}, effects)
+            refreshList True ({ model | navChange = Just "/templates/list"}, effects)
          
           _ -> 
             result

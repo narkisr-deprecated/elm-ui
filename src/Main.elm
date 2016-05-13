@@ -175,7 +175,6 @@ intoActions (dest, job, target) =
     "Users" ->
        App.UsersAction (UsersCore.MenuClick (job, target))
 
-
     _ -> 
        App.NoOp
 
