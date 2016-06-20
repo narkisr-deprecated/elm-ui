@@ -1,6 +1,6 @@
 module Systems.List exposing (..)
 
-import Effects exposing (Effects, Never, map)
+import Cmd exposing (map)
 
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)

@@ -2,7 +2,7 @@ module Types.Persistency exposing (..)
 
 import Common.Model exposing (..)
 import Types.Model exposing (Type) 
-import Effects exposing (Effects)
+
 import Json.Encode as E exposing (..)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)

@@ -1,7 +1,7 @@
 module Application exposing (..)
 
 import Html exposing (..)
-import Effects exposing (Effects, Never, batch, map)
+import Cmd exposing (batch, map)
 
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Systems.Core as Systems 

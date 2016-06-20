@@ -5,7 +5,7 @@ import Json.Decode as Json exposing (..)
 import Common.Errors exposing (successHandler)
 import Html exposing (..)
 import Html.Events exposing (onClick)
-import Effects exposing (Effects, Never, batch, map)
+import Cmd exposing (batch, map)
 import Task
 import Html.Attributes exposing (class, id)
 import Table exposing (view)

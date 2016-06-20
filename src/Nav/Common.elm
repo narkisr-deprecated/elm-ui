@@ -1,6 +1,6 @@
 module Nav.Common exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 
 type Active = 

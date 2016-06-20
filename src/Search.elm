@@ -1,13 +1,10 @@
 module Search exposing (..)
 
 import Task
-import Effects exposing (Effects, Never, map)
-import Signal exposing (Signal, map, filter)
 import Dict exposing (Dict, get)
 
 -- Html
 
-import Bootstrap.Html exposing (..)
 import Html.Attributes exposing (type', class, id, for, placeholder, attribute)
 import Html.Events exposing (targetValue, on, onClick, onKeyPress)
 import Html exposing (..)

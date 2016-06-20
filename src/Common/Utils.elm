@@ -1,6 +1,6 @@
 module Common.Utils exposing (..)
 
-import Effects exposing (Effects, Never, batch, map)
+import Cmd exposing (batch, map)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)

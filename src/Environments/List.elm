@@ -1,13 +1,13 @@
 module Environments.List exposing (..)
 
-import Effects exposing (Effects)
+
 import Dict exposing (Dict)
 import Common.Http exposing (getJson)
 import Common.Model exposing (Options, option)
 
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
-import Effects exposing (Effects)
+
 import Task
 
 

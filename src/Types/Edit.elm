@@ -1,7 +1,7 @@
 module Types.Edit exposing (..)
 
 import Http exposing (Error(BadResponse))
-import Effects exposing (Effects)
+
 import Common.Components exposing (asList)
 import Common.Utils exposing (none)
 import Html exposing (..)

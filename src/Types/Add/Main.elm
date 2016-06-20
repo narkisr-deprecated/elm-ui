@@ -1,6 +1,6 @@
 module Types.Add.Main exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, id, attribute, readonly, type')
 import Common.FormComponents exposing (formControl, formGroup)

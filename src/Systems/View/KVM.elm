@@ -8,7 +8,7 @@ import Systems.Model.KVM exposing (KVM)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
-import Effects exposing (Effects, Never, map)
+import Cmd exposing (map)
 import Common.Summary exposing (..)
 import String
 

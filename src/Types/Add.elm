@@ -4,7 +4,7 @@ import Html exposing (..)
 import Bootstrap.Html exposing (..)
 import Types.Model exposing (..)
 import Dict exposing (Dict)
-import Effects exposing (Effects)
+
 import Common.Errors exposing (errorsHandler, successHandler)
 import Environments.List exposing (Environments, getEnvironments)
 import Common.Components exposing (..)

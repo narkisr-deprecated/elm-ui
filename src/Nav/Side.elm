@@ -6,7 +6,7 @@ import Html exposing (..)
 import Users.Session exposing (isUser)
 import Html.Attributes exposing (class , href, attribute)
 import Users.Session exposing (Session, emptySession)
-import Effects exposing (Effects)
+
 import Html.Events exposing (onClick)
 import Common.Utils exposing (none)
 import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))

@@ -1,7 +1,7 @@
 module Types.List exposing (..)
 
 import Html exposing (..)
-import Effects exposing (Effects)
+
 import Dict exposing (Dict)
 import Common.Http exposing (getJson)
 
@@ -13,7 +13,7 @@ import Bootstrap.Html exposing (..)
 import Json.Decode as Json exposing (..)
 import Html.Attributes exposing (type', class, id, style, attribute)
 import Http exposing (Error(BadResponse))
-import Effects exposing (Effects)
+
 import Task
 import Maybe exposing (withDefault)
 import Common.Errors exposing (successHandler)

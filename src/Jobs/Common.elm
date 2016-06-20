@@ -1,6 +1,6 @@
 module Jobs.Common exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))

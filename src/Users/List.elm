@@ -1,6 +1,6 @@
 module Users.List exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (none)
 import Users.Model exposing (User, getUsers)

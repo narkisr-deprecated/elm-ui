@@ -1,6 +1,6 @@
 module Templates.List exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Maybe exposing (withDefault)
 import Task

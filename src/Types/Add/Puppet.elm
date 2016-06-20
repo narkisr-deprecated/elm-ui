@@ -2,7 +2,7 @@ module Types.Add.Puppet exposing (..)
 
 import Common.Model exposing (Options(BoolOption))
 import Types.Model exposing (PuppetStd, emptyPuppet)
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (none, defaultEmpty)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)

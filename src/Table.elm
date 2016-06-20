@@ -4,7 +4,7 @@ import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, for, placeholder, style, tabindex, href, attribute)
-import Effects exposing (Effects, Never, map)
+import Cmd exposing (map)
 import Html.Events exposing (onClick, onDoubleClick)
 import Set exposing (Set)
 

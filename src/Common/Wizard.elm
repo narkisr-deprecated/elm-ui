@@ -1,6 +1,6 @@
 module Common.Wizard exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import Maybe exposing (withDefault)

@@ -7,7 +7,7 @@ import Types.View as TypesView
 import Types.Edit as TypesEdit
 import Types.Delete as TypesDelete
 import Nav.Common exposing (Section(Add, List, View, Edit, Delete), Active(Types))
-import Effects exposing (Effects, Never, batch, map)
+import Cmd exposing (batch, map)
 import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none)
 import Common.Delete exposing (refresh, succeeded)

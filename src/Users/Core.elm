@@ -1,6 +1,6 @@
 module Users.Core exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Users.List as List exposing (Action)
 import Users.Add as Add exposing (Action)

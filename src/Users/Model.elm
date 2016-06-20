@@ -1,6 +1,6 @@
 module Users.Model exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 
 import Http exposing (Error(BadResponse))
@@ -10,7 +10,7 @@ import Common.Http exposing (getJson)
 import Dict exposing (Dict)
 import String
 
-import Effects exposing (Effects)
+
 import Task
 
 -- Model

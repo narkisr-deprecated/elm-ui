@@ -1,7 +1,7 @@
 module Pager exposing (..)
 
 import Bootstrap.Html exposing (..)
-import Effects exposing (Effects, Never)
+
 import Html.Shorthand exposing (..)
 import Html.Shorthand.Type exposing (AnchorParam)
 import Html exposing (..)

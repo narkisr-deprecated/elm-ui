@@ -2,7 +2,7 @@ module Templates.Launch exposing (..)
 
 import Html.Shorthand exposing (..)
 import Bootstrap.Html exposing (..)
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Templates.Model.Common exposing (emptyTemplate, Template)
 import Common.Utils exposing (none)

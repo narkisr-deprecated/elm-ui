@@ -6,7 +6,7 @@ import Nav.Side as Side exposing (Action(SetSession))
 import Users.Session exposing (getSession, Session)
 import Http exposing (Error(BadResponse))
 import Common.Errors exposing (successHandler)
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (none)
 

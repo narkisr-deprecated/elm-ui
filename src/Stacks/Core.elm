@@ -1,6 +1,6 @@
 module Stacks.Core exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Stacks.Add as Add
 import Nav.Common exposing (Active(Jobs), Section(Stats, Launch, Add, List, View))

@@ -1,6 +1,6 @@
 module Users.View exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Users.Model as Model exposing (User, emptyUser)
 import Common.Model exposing (valueOf)

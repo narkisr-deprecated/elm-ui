@@ -1,6 +1,6 @@
 module Templates.Delete exposing (..)
 
-import Effects exposing (Effects)
+
 import Common.Utils exposing (none)
 import Html exposing (..)
 import Task

@@ -4,7 +4,7 @@ module Users.Add exposing (..)
 import Html exposing (..)
 import Bootstrap.Html exposing (..)
 import Dict exposing (Dict)
-import Effects exposing (Effects)
+
 import Common.Errors exposing (errorsHandler, successHandler)
 import Environments.List exposing (Environments, getEnvironmentKeys)
 import Common.Components exposing (..)

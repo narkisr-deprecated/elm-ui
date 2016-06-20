@@ -3,7 +3,7 @@ module Templates.Core exposing (..)
 import String
 import Common.Utils exposing (none)
 import Common.Delete exposing (refresh, succeeded)
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Templates.Add as Add
 import Templates.List as List

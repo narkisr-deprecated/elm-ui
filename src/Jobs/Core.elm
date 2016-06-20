@@ -1,6 +1,6 @@
 module Jobs.Core exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Jobs.Routing as Routing exposing (Route)
 import Common.Utils exposing (none)

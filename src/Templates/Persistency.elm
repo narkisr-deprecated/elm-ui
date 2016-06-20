@@ -2,7 +2,7 @@ module Templates.Persistency exposing (..)
 
 import Templates.Model.Common exposing (Template, emptyOpenstackDefaults, Defaults, OpenstackDefaults)
 import Systems.Add.Encoders exposing (encoderOf, machineEncoder, optional)
-import Effects exposing (Effects)
+
 import Json.Encode as E exposing (..)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)

@@ -1,6 +1,6 @@
 module Systems.View exposing (..)
 
-import Effects exposing (Effects)
+
 import Systems.Model.Common exposing (System, Machine, emptySystem)
 import Systems.Model.AWS exposing (emptyAws)
 import Common.Http exposing (getJson)

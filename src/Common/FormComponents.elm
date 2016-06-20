@@ -1,6 +1,6 @@
 module Common.FormComponents exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, for, placeholder, attribute, type', checked, value, style, id)
 import Maybe exposing (withDefault)

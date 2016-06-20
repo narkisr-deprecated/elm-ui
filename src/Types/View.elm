@@ -1,6 +1,6 @@
 module Types.View exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
 import Common.Model exposing (valueOf)

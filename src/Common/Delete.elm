@@ -1,6 +1,6 @@
 module Common.Delete exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Components exposing (message)
 import Json.Decode exposing (..)

@@ -1,6 +1,6 @@
 module Types.Delete exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (none)
 import Common.Components exposing (asList)

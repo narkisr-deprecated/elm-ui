@@ -1,6 +1,6 @@
 module Stacks.Add exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Components exposing (panel, panelContents, infoCallout, info, onSelect, group', inputText, checkbox, selector)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)

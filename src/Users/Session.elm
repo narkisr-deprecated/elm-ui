@@ -3,7 +3,7 @@ module Users.Session exposing (..)
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
 import Common.Http exposing (getJson)
-import Effects exposing (Effects)
+
 import Task
 
 type alias Session = 
