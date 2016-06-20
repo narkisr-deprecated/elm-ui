@@ -1,4 +1,4 @@
-module Templates.Routing where
+module Templates.Routing exposing (..)
 
 import Hop.Types exposing (PathMatcher)
 import Hop.Matchers exposing (..)

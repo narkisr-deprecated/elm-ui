@@ -1,4 +1,4 @@
-module Nav.Core where
+module Nav.Core exposing (..)
 
 import Nav.Common as NavCommon exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Nav.Header as Header exposing (Action(SetSession))

@@ -1,4 +1,4 @@
-module Jobs.Common where
+module Jobs.Common exposing (..)
 
 import Effects exposing (Effects)
 import Html exposing (..)

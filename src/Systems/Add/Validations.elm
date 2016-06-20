@@ -1,4 +1,4 @@
-module Systems.Add.Validations where
+module Systems.Add.Validations exposing (..)
 
 import String 
 import Regex exposing (regex, HowMany(All), find)

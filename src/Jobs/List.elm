@@ -1,4 +1,4 @@
-module Jobs.List where
+module Jobs.List exposing (..)
 
 -- view
 import Html exposing (..)

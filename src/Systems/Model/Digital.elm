@@ -1,4 +1,4 @@
-module Systems.Model.Digital where
+module Systems.Model.Digital exposing (..)
 import Maybe exposing (withDefault)
 
 type alias Digital = 

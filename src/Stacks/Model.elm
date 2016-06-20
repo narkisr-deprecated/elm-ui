@@ -1,4 +1,4 @@
-module Stacks.Model where
+module Stacks.Model exposing (..)
 
 type alias System = 
   {

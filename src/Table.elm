@@ -1,4 +1,4 @@
-module Table where
+module Table exposing (..)
 
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)

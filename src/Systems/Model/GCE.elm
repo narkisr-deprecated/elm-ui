@@ -1,4 +1,4 @@
-module Systems.Model.GCE where
+module Systems.Model.GCE exposing (..)
 import Maybe exposing (withDefault)
 
 type alias GCE = 

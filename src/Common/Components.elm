@@ -1,4 +1,4 @@
-module Common.Components where
+module Common.Components exposing (..)
 
 import Html.Attributes exposing (class, style)
 import Html exposing (..)

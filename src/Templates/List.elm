@@ -1,4 +1,4 @@
-module Templates.List where
+module Templates.List exposing (..)
 
 import Effects exposing (Effects)
 import Html exposing (..)

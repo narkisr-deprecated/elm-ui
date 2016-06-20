@@ -1,4 +1,4 @@
-module Common.Errors where
+module Common.Errors exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)

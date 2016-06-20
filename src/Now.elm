@@ -1,4 +1,4 @@
-module Now where
+module Now exposing (..)
 
 import Native.Now
 

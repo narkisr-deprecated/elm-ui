@@ -1,4 +1,4 @@
-module Common.Summary where
+module Common.Summary exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)

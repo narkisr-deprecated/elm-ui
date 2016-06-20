@@ -1,4 +1,4 @@
-module Users.List where
+module Users.List exposing (..)
 
 import Effects exposing (Effects)
 import Html exposing (..)

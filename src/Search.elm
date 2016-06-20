@@ -1,4 +1,4 @@
-module Search where
+module Search exposing (..)
 
 import Task
 import Effects exposing (Effects, Never, map)

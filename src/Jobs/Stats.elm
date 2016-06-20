@@ -1,4 +1,4 @@
-module Jobs.Stats where
+module Jobs.Stats exposing (..)
 
 import Users.Session exposing (getSession, Session)
 import Common.Utils exposing (none)

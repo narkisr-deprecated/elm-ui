@@ -1,4 +1,4 @@
-module Types.Edit where
+module Types.Edit exposing (..)
 
 import Http exposing (Error(BadResponse))
 import Effects exposing (Effects)

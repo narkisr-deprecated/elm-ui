@@ -1,4 +1,4 @@
-module Pager where
+module Pager exposing (..)
 
 import Bootstrap.Html exposing (..)
 import Effects exposing (Effects, Never)

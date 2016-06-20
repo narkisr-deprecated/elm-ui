@@ -1,4 +1,4 @@
-module Common.Editor where
+module Common.Editor exposing (..)
 
 import Signal exposing (Signal)
 import Effects exposing (Effects)

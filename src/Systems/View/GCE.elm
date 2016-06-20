@@ -1,4 +1,4 @@
-module Systems.View.GCE where
+module Systems.View.GCE exposing (..)
 
 import Html exposing (..)
 import Common.Utils exposing (partition, withDefaultProp)

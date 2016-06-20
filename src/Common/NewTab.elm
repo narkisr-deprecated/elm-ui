@@ -1,4 +1,4 @@
-module Common.NewTab where
+module Common.NewTab exposing (..)
 
 import Signal exposing (Signal)
 import Effects exposing (Effects)

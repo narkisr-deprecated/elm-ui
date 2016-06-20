@@ -1,4 +1,4 @@
-module Types.View where
+module Types.View exposing (..)
 
 import Effects exposing (Effects)
 import Html exposing (..)

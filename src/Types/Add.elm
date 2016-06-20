@@ -1,4 +1,4 @@
-module Types.Add where
+module Types.Add exposing (..)
 
 import Html exposing (..)
 import Bootstrap.Html exposing (..)

@@ -1,4 +1,4 @@
-module Templates.Add where
+module Templates.Add exposing (..)
 
 import Html.Shorthand exposing (..)
 import Bootstrap.Html exposing (..)

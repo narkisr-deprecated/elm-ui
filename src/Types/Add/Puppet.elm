@@ -1,4 +1,4 @@
-module Types.Add.Puppet where
+module Types.Add.Puppet exposing (..)
 
 import Common.Model exposing (Options(BoolOption))
 import Types.Model exposing (PuppetStd, emptyPuppet)

@@ -1,4 +1,4 @@
-module Templates.Core where
+module Templates.Core exposing (..)
 
 import String
 import Common.Utils exposing (none)

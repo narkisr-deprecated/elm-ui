@@ -1,4 +1,4 @@
-module Templates.Model.Common where
+module Templates.Model.Common exposing (..)
 
 import Json.Decode as Json exposing (..)
 import Systems.Model.AWS exposing (AWS)

@@ -1,4 +1,4 @@
-module Nav.Header where
+module Nav.Header exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src, style)

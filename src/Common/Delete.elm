@@ -1,4 +1,4 @@
-module Common.Delete where
+module Common.Delete exposing (..)
 
 import Effects exposing (Effects)
 import Html exposing (..)

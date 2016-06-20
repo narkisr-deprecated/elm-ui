@@ -1,4 +1,4 @@
-module Application where
+module Application exposing (..)
 
 import Html exposing (..)
 import Effects exposing (Effects, Never, batch, map)

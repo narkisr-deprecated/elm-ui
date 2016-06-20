@@ -1,4 +1,4 @@
-module Users.Session where
+module Users.Session exposing (..)
 
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))

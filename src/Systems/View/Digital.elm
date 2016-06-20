@@ -1,4 +1,4 @@
-module Systems.View.Digital where
+module Systems.View.Digital exposing (..)
 
 import Html exposing (..)
 import Common.Utils exposing (partition, withDefaultProp)

@@ -1,4 +1,4 @@
-module Types.Persistency where
+module Types.Persistency exposing (..)
 
 import Common.Model exposing (..)
 import Types.Model exposing (Type) 

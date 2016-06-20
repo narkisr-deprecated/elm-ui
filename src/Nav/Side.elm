@@ -1,4 +1,4 @@
-module Nav.Side where
+module Nav.Side exposing (..)
 
 import Bootstrap.Html exposing (..)
 import Html.Shorthand exposing (..)

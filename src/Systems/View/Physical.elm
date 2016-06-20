@@ -1,4 +1,4 @@
-module Systems.View.Physical where
+module Systems.View.Physical exposing (..)
 
 import Html exposing (..)
 import Common.Utils exposing (partition, withDefaultProp)

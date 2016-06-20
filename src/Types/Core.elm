@@ -1,4 +1,4 @@
-module Types.Core where
+module Types.Core exposing (..)
 
 import Html exposing (..)
 import Types.List as TypesList
