@@ -1,5 +1,5 @@
 {
-    "version": "0.0.1",
+    "version": "0.1.0",
     "summary": "Celestial 2.0 Web UI",
     "repository": "https://github.com/narkisr/elm-ui.git",
     "license": "Apache V2",
@@ -12,15 +12,11 @@
     ],
     "exposed-modules": [],
     "dependencies": {
-	  "elm-lang/core": "2.0.1 <= v < 4.0.0",
-	  "evancz/elm-effects": "2.0.0 <= v < 3.0.0",
-	  "elm-lang/html": "3.0.0 <= v < 5.0.0",
-        "evancz/start-app": "2.0.0 <= v < 3.0.0",
-	  "circuithub/elm-bootstrap-html":"6.3.2 <= v < 7.0.0",
-        "circuithub/elm-html-shorthand":"9.0.3 <= v < 10.0.0",
-	  "evancz/focus":"2.0.0 <= v < 3.0.0",
-	  "mgold/elm-date-format": "1.0.3 <= v < 2.0.0",
-	  "sporto/hop": "4.0.1 <= v < 5.0.0"
+	  "elm-lang/html": "1.0.0 <= v < 2.0.0",
+	  "elm-lang/core": "4.0.1 <= v < 5.0.0",
+	  "evancz/focus":"2.0.1 <= v < 3.0.0",
+	  "mgold/elm-date-format": "1.1.4 <= v < 2.0.0",
+	  "sporto/hop": "5.0.1 <= v < 6.0.0"
     },
     "native-modules": true,
     "elm-version": "0.17.0 <= v < 0.18.0"
