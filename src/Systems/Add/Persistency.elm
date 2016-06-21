@@ -1,6 +1,6 @@
 module Systems.Add.Persistency exposing (..)
 
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Systems.Add.Encoders exposing (encode)
 import Json.Encode as E
 import Dict exposing (Dict)

@@ -7,7 +7,7 @@ import Systems.Launch as Launch exposing (Action(Cancel, SetupJob, Run))
 import Systems.Routing as Routing exposing (Route)
 import Nav.Common exposing (Active(Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Html exposing (..)
-import Effects exposing (Effects, batch, map)
+import Platform.Cmd exposing (batch, map)
 import Common.Utils exposing (none)
 import Common.Redirect exposing (redirect)
 import Table as Table

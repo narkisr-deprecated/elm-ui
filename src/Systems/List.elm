@@ -1,9 +1,8 @@
 module Systems.List exposing (..)
 
-import Cmd exposing (map)
+import Platform.Cmd exposing (map)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, style, attribute)
 

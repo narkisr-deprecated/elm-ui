@@ -2,7 +2,7 @@ module Systems.Add.General exposing (..)
 
 import Dict exposing (Dict)
 import Common.Errors exposing (successHandler)
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Http exposing (Error(BadResponse))
 import Admin.Core as Admin 
 import Common.Components exposing (..)

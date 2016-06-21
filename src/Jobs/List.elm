@@ -9,7 +9,7 @@ import Common.Http exposing (getJson)
 -- remoting
 import Json.Decode as Json exposing (..)
 import Task
-import Effects exposing (Effects, map, batch)
+import Platform.Cmd exposing (map, batch)
 import Http exposing (Error(BadResponse))
 import Debug
 import Date

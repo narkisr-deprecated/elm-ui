@@ -1,6 +1,6 @@
 module Templates.Launch exposing (..)
 
-import Html.Shorthand exposing (..)
+
 import Bootstrap.Html exposing (..)
 
 import Html exposing (..)

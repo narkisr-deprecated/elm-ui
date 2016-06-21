@@ -1,6 +1,6 @@
 module Common.Utils exposing (..)
 
-import Cmd exposing (batch, map)
+import Platform.Cmd exposing (batch, map)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)

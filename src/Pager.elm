@@ -2,8 +2,6 @@ module Pager exposing (..)
 
 import Bootstrap.Html exposing (..)
 
-import Html.Shorthand exposing (..)
-import Html.Shorthand.Type exposing (AnchorParam)
 import Html exposing (..)
 import Html.Attributes exposing (src, style , class)
 import Html.Events exposing (onClick)
@@ -100,10 +98,9 @@ pageLinks address ({maxButtons, slice} as model) =
 
 view : Signal.Address Action -> Model -> Html
 view address model = 
-  p' { class = "text-center"} [
-    nav_ 
-    [ul' { class = "pagination" } 
-      (pageLinks address model)
+  p [ class "text-center"] [
+    nav [] [
+      ul [class = "pagination"] (pageLinks address model)
     ]
   ]
  

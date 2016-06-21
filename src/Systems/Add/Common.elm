@@ -1,7 +1,6 @@
 module Systems.Add.Common exposing (..)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick)
 

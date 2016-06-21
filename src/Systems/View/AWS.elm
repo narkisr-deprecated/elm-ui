@@ -8,7 +8,7 @@ import Systems.Model.AWS exposing (AWS)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel, asList)
-import Cmd exposing (map)
+import Platform.Cmd exposing (map)
 import Common.Summary exposing (..)
 import String
 

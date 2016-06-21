@@ -1,6 +1,6 @@
 module Admin.Core exposing (..)
 
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Html exposing (..)
 import Common.Errors exposing (successHandler)
 import Environments.List exposing (Environments, Environment, getEnvironments)

@@ -1,6 +1,6 @@
 module Templates.Add exposing (..)
 
-import Html.Shorthand exposing (..)
+
 import Bootstrap.Html exposing (..)
 import Common.Http exposing (postJson)
 import Common.Errors exposing (errorsHandler, successHandler)
@@ -10,7 +10,7 @@ import Html.Events exposing (onClick)
 import Http exposing (Error(BadResponse))
 import Task exposing (Task)
 import Json.Decode exposing (..)
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Dict exposing (Dict)
 import Systems.Model.Common exposing (System)
 import String exposing (toLower)

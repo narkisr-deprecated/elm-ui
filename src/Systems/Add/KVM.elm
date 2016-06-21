@@ -1,7 +1,7 @@
 module Systems.Add.KVM exposing (..)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -12,7 +12,7 @@ import Environments.List as ENV exposing (Environment, Template, Hypervisor(KVM)
 import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, resourcedMachine)
 import Systems.Model.KVM exposing (..)
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Common.Components exposing (fixedPanel, asList, withErrors)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String

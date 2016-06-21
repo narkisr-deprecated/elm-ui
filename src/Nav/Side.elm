@@ -1,7 +1,7 @@
 module Nav.Side exposing (..)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
+
 import Html exposing (..)
 import Users.Session exposing (isUser)
 import Html.Attributes exposing (class , href, attribute)

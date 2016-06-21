@@ -9,7 +9,7 @@ import Common.Summary exposing (..)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
-import Cmd exposing (map)
+import Platform.Cmd exposing (map)
 import String
 
 -- Model 

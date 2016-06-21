@@ -2,7 +2,7 @@ module Common.Errors exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Common.Redirect exposing (redirect)
 import Http exposing (Error(BadResponse))
 import Systems.Add.Common exposing (..)

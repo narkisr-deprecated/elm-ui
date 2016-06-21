@@ -1,10 +1,9 @@
 module Table exposing (..)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, for, placeholder, style, tabindex, href, attribute)
-import Cmd exposing (map)
+import Platform.Cmd exposing (map)
 import Html.Events exposing (onClick, onDoubleClick)
 import Set exposing (Set)
 
@@ -79,9 +78,9 @@ view : Signal.Address (Action a) -> Model a -> List Html
 view address model =
   [table [class "table table-bordered", id model.id]
      (withCaption model.caption model.title 
-        [ thead_
+        [ thead []
             [tr [onClick address SelectAll] (headersMap model.headers)]
-        , tbody_
+        , tbody []
             (List.map (\(id, item) -> applySelect address model id (model.rowFn id item) ) model.rows)
         ])
   ]
