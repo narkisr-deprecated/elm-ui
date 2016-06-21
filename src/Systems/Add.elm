@@ -56,7 +56,7 @@ type alias Model =
   , stage : Stage
   }
 
-type Action = 
+type Msg = 
   Next
   | SaveSystem
   | SaveTemplate
@@ -64,18 +64,18 @@ type Action =
   | Stage
   | Back
   | NoOp
-  | AWSView AWS.Action
-  | GCEView GCE.Action
-  | PhysicalView Physical.Action
-  | DigitalView Digital.Action
-  | OpenstackView Openstack.Action
-  | KVMView KVM.Action
-  | GeneralView General.Action
-  | ErrorsView Errors.Action
-  | Saved Action (Result Http.Error SaveResponse)
+  | AWSView AWS.Msg
+  | GCEView GCE.Msg
+  | PhysicalView Physical.Msg
+  | DigitalView Digital.Msg
+  | OpenstackView Openstack.Msg
+  | KVMView KVM.Msg
+  | GeneralView General.Msg
+  | ErrorsView Errors.Msg
+  | Saved Msg (Result Http.Error SaveResponse)
   | JobLaunched (Result Http.Error JobResponse)
 
-init : (Model, Effects Action)
+init : (Model, Effects Msg)
 init =
   let 
     (general, effects) = General.init 
@@ -84,7 +84,7 @@ init =
     (withModels True Errors.init General, Effects.map GeneralView effects)
 
 
-setSaved : Action -> Model -> SaveResponse -> (Model, Effects Action)
+setSaved : Msg -> Model -> SaveResponse -> (Model, Effects Msg)
 setSaved next model {id} =
   case id of 
     Just num -> 
@@ -139,9 +139,9 @@ intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, kvmModel
   in 
     baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical) (Just kvmModel.kvm)
   
-update : Action ->  Model-> (Model , Effects Action)
-update action ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel, stage} as model) =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel, stage} as model) =
+  case msg of
     Next -> 
       let 
         {admin} = general
@@ -191,45 +191,45 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
     Back -> 
      none (getBack model general.hypervisor)
 
-    AWSView action -> 
+    AWSView msg -> 
       let
-        newAws = AWS.update action awsModel 
+        newAws = AWS.update msg awsModel 
       in
         none { model | awsModel = newAws }
 
-    GCEView action -> 
+    GCEView msg -> 
       let
-        newGce= GCE.update action gceModel
+        newGce= GCE.update msg gceModel
       in
         none { model | gceModel = newGce }
 
-    DigitalView action -> 
+    DigitalView msg -> 
       let
-        newDigital= Digital.update action digitalModel
+        newDigital= Digital.update msg digitalModel
       in
         none { model | digitalModel = newDigital }
 
-    PhysicalView action -> 
+    PhysicalView msg -> 
       let
-        newPhysical= Physical.update action physicalModel
+        newPhysical= Physical.update msg physicalModel
       in
         none { model | physicalModel = newPhysical }
 
-    OpenstackView action -> 
+    OpenstackView msg -> 
       let
-        newOpenstack = Openstack.update action openstackModel
+        newOpenstack = Openstack.update msg openstackModel
       in
         none { model | openstackModel = newOpenstack }
 
-    KVMView action -> 
+    KVMView msg -> 
       let
-        newKvm = KVM.update action kvmModel
+        newKvm = KVM.update msg kvmModel
       in
         none { model | kvmModel = newKvm }
 
-    GeneralView action -> 
+    GeneralView msg -> 
       let
-        (newGeneral, effects) = General.update action general
+        (newGeneral, effects) = General.update msg general
       in
         ({ model | general = newGeneral }, Effects.map GeneralView effects)
 
@@ -257,7 +257,7 @@ update action ({general, awsModel, gceModel, digitalModel, openstackModel, physi
     _ -> 
      none model
 
-currentView : Signal.Address Action -> Model -> Html
+currentView : Signal.Address Msg -> Model -> Html
 currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, kvmModel, saveErrors, general} as model)=
   case model.stage of 
     General -> 
@@ -284,7 +284,7 @@ currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstack
     _ -> 
       notImplemented
 
-saveMenu : Signal.Address Action -> Html 
+saveMenu : Signal.Address Msg -> Html 
 saveMenu address =
   ul [class "dropdown-menu"] [
     li [] [a [class "SaveSystem", href "#", onClick address SaveSystem ] [text "Save system"]]
@@ -309,7 +309,7 @@ errorsView address {saveErrors} =
      dialogPanel "danger" (error "Failed to save system") (panel (panelContents body))
 
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({stage} as model) =
  [ row_ [
      (if stage /= Error then
@@ -324,7 +324,7 @@ view address ({stage} as model) =
 
 -- Effects
 
-saveSystem : Action -> String -> Effects Action
+saveSystem : Msg -> String -> Effects Msg
 saveSystem next json  = 
   postJson (Http.string json) saveResponse "/systems"  
     |> Task.toResult

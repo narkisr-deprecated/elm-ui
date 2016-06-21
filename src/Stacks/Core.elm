@@ -13,7 +13,7 @@ type alias Model =
   , navChange : Maybe (Active, Section)
   }
  
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let
     (add, addEffects) = Add.init
@@ -25,16 +25,16 @@ init =
 
 -- Update 
 
-type Action = 
+type Msg = 
   NoOp
-    | StacksAdd Add.Action
+    | StacksAdd Add.Msg
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({add} as model) =
-  case action of 
-    StacksAdd addAction -> 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({add} as model) =
+  case msg of 
+    StacksAdd addMsg -> 
       let
-        (newAdd, effects) = Add.update addAction add
+        (newAdd, effects) = Add.update addMsg add
       in
         ({model | add = newAdd}, Effects.map StacksAdd effects)
     
@@ -43,8 +43,8 @@ update action ({add} as model) =
 
 -- View
 
-view : Signal.Address Action -> Model -> Section -> List Html
-view address model section =
+view : Signal.Address Msg -> Model -> Section -> List Html
+view model section =
   case section of
     Add ->
       asList (Add.view (Signal.forwardTo address StacksAdd) model.add)

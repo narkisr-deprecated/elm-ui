@@ -55,30 +55,30 @@ validate =
         ("hostname" := string)
         ("domain" := string))
     
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let 
     (admin, effects) = Admin.init
     errors = Errors.init
   in 
-    (Model "" (Form.initial [] validate) admin errors, Effects.map AdminAction effects)
+    (Model "" (Form.initial [] validate) admin errors, Effects.map AdminMsg effects)
 
 
 -- Update 
 
-type Action = 
+type Msg = 
   SetupJob (String, String)
-    | AdminAction Admin.Action 
-    | ErrorsView Errors.Action
+    | AdminMsg Admin.Msg 
+    | ErrorsView Errors.Msg
     | Launched (Result Http.Error SaveResponse)
-    | FormAction Form.Action
+    | FormMsg Form.Msg
     | JobLaunched (Result Http.Error JobResponse)
     | Launch
     | Done
     | Cancel
     | NoOp
 
-stage : Model -> SaveResponse -> (Model, Effects Action)
+stage : Model -> SaveResponse -> (Model, Effects Msg)
 stage model {id} =
   case id of
    Just num ->
@@ -87,18 +87,18 @@ stage model {id} =
    Nothing -> 
      none model
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({saveErrors, form, admin, name} as model) =
-  case action of 
-    FormAction formAction ->
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({saveErrors, form, admin, name} as model) =
+  case msg of 
+    FormMsg formMsg ->
        let 
-         newForm = Form.update formAction form
+         newForm = Form.update formMsg form
        in
          none { model | form = Form.update Form.Validate newForm}
 
     Launch -> 
       let
-        (newModel, _) = update (FormAction Form.Validate) model
+        (newModel, _) = update (FormMsg Form.Validate) model
       in
         if List.isEmpty (Form.getErrors newModel.form) then
           case (Form.getOutput newModel.form) of
@@ -110,11 +110,11 @@ update action ({saveErrors, form, admin, name} as model) =
         else
           none newModel
 
-    AdminAction action -> 
+    AdminMsg msg -> 
       let
-        (newAdmin, effects) = Admin.update action admin
+        (newAdmin, effects) = Admin.update msg admin
       in  
-        ({ model | admin = newAdmin}, Effects.map AdminAction effects)
+        ({ model | admin = newAdmin}, Effects.map AdminMsg effects)
     
     Launched result -> 
        errorsSuccessHandler result model (stage model) NoOp
@@ -137,7 +137,7 @@ infoMessage name =
 
 machineView address form =
   let 
-    formAddress = Signal.forwardTo address FormAction
+    formAddress = Signal.forwardTo address FormMsg
     hostname = (Form.getFieldAsString "machine.hostname" form)
     domain = (Form.getFieldAsString "machine.domain" form)
   in 
@@ -152,7 +152,7 @@ launchView address {name, form, admin} =
           div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
            (List.append
               (machineView address form) 
-              (Admin.view (Signal.forwardTo address AdminAction) admin))
+              (Admin.view (Signal.forwardTo address AdminMsg) admin))
       ])
     ]
   ]
@@ -165,7 +165,7 @@ errorMessage =
   ]
 
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({name, saveErrors} as model) =
   let
     errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
@@ -177,7 +177,7 @@ view address ({name, saveErrors} as model) =
 
 -- Effects
 
-intoSystem : String -> String -> Effects Action
+intoSystem : String -> String -> Effects Msg
 intoSystem name json = 
   postJson (Http.string json) saveResponse ("/systems/template/"  ++ name)
     |> Task.toResult

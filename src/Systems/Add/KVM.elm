@@ -39,8 +39,8 @@ init =
   in 
     Model wizard emptyKVM (resourcedMachine 1 512) Dict.empty Dict.empty
 
-type Action = 
-  WizardAction Wizard.Action
+type Msg = 
+  WizardMsg Wizard.Msg
    | Update Environment
    | SelectOS String
    | SelectNode String
@@ -98,10 +98,10 @@ next : Model -> Environment -> Model
 next model environment =
       model 
          |> update (Update environment) 
-         |> update (WizardAction Wizard.Next)
+         |> update (WizardMsg Wizard.Next)
 
 back model =
-  (update (WizardAction Wizard.Back) model)
+  (update (WizardMsg Wizard.Back) model)
 
 setKVM : (KVM -> KVM) -> Model -> Model
 setKVM f ({kvm, errors} as model) =
@@ -110,13 +110,13 @@ setKVM f ({kvm, errors} as model) =
   in
    { model | kvm = newKvm }
 
-update : Action ->  Model -> Model
-update action ({wizard} as model) =
-  case action of 
-    WizardAction action -> 
+update : Msg ->  Model -> Model
+update msg ({wizard} as model) =
+  case msg of 
+    WizardMsg msg -> 
       let
         ({errors} as newModel) = (validateKvm wizard.step model)
-        newWizard = Wizard.update (notAny errors) action wizard
+        newWizard = Wizard.update (notAny errors) msg wizard
       in
        { newModel | wizard = newWizard } 
 
@@ -169,7 +169,7 @@ update action ({wizard} as model) =
 
 -- View
 
-instance : Signal.Address Action -> Model -> List Html
+instance : Signal.Address Msg -> Model -> List Html
 instance address ({kvm, machine, errors} as model) =
   let
     check = withErrors errors
@@ -191,7 +191,7 @@ instance address ({kvm, machine, errors} as model) =
        ]
     ]
 
-stepView :  Signal.Address Action -> Model -> List Html
+stepView :  Signal.Address Msg -> Model -> List Html
 stepView address ({wizard, kvm, machine} as model) =
   case wizard.step of
     Instance -> 
@@ -204,6 +204,6 @@ stepView address ({wizard, kvm, machine} as model) =
       [div [] []]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   fixedPanel (Html.form [] (stepView address model))

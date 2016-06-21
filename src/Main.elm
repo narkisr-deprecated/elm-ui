@@ -1,9 +1,7 @@
 import Html.App as Html -- was StartA
 import Task
-import Common.Redirect as Redirect exposing (redirectActions)
-import Common.NewTab as NewTab exposing (newtabActions)
-import Common.Editor as Editor exposing (editorActions)
-import Search exposing (searchActions)
+import Common.Redirect as Redirect exposing (redirectMsgs)
+import Common.NewTab as NewTab exposing (newtabMsgs)
 import Application as App exposing (init, view, update) 
 import Users.Core as UsersCore
 import Json.Encode as E exposing (list, string)
@@ -34,8 +32,8 @@ import Stacks.Core as StacksCore
 
 -- Jobs 
 import Time exposing (every, second)
-import Jobs.List exposing (Action(Polling))
-import Jobs.Stats as Stats exposing (Action(PollMetrics))
+import Jobs.List exposing (Msg(Polling))
+import Jobs.Stats as Stats exposing (Msg(PollMetrics))
 import Jobs.Core as Jobs
 
 main =  
@@ -63,8 +61,8 @@ main =
 --     }
 
 
-toResource action = 
-  case action of 
+toResource msg = 
+  case msg of 
     Redirect.To s -> 
       s
 
@@ -72,59 +70,59 @@ toResource action =
       ""
 
 
-toQuery : (Search.Action -> String)
-toQuery action =
-   case action of
+toQuery : (Search.Msg -> String)
+toQuery msg =
+   case msg of
      Search.Parse query -> 
        query
 
      _ -> ""
 
-port parserPort : Signal String
-port parserPort =
-   searchActions.signal
-     |> filter (\s -> s /= Search.NoOp) Search.NoOp
-     |> map toQuery
-
+-- port parserPort : Signal String
+-- port parserPort =
+--    searchMsgs.signal
+--      |> filter (\s -> s /= Search.NoOp) Search.NoOp
+--      |> map toQuery
+--
 port parsingOk : Signal Search.ParseResult
 
-parsingInput action p =
-  Signal.map (\r -> App.SystemsAction (SystemsCore.SystemsListing (Systems.List.Searching (action r)))) p
+parsingInput msg p =
+  Signal.map (\r -> App.SystemsMsg (SystemsCore.SystemsListing (Systems.List.Searching (msg r)))) p
 
 port parsingErr : Signal Search.ParseResult
 
-jobsListPolling : Signal App.Action
+jobsListPolling : Signal App.Msg
 jobsListPolling =
-  Signal.map (\_ -> App.JobsAction (Jobs.JobsListing Polling)) (Time.every (1 * second))
+  Signal.map (\_ -> App.JobsMsg (Jobs.JobsListing Polling)) (Time.every (1 * second))
 
-jobsStatsPolling : Signal App.Action
+jobsStatsPolling : Signal App.Msg
 jobsStatsPolling =
   let
     (model, _)= Stats.init
   in
-    Signal.map (\t -> App.JobsAction (Jobs.JobsStats (PollMetrics t))) (Time.every (model.interval * second))
+    Signal.map (\t -> App.JobsMsg (Jobs.JobsStats (PollMetrics t))) (Time.every (model.interval * second))
 
 port menuPort : Signal (String, String, String)
 
-intoActions (dest, job, target) = 
+intoMsgs (dest, job, target) = 
   case dest of
     "Systems" ->
-       App.SystemsAction (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
+       App.SystemsMsg (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
 
     "Templates" ->
-       App.TemplatesAction (TemplatesCore.SetupJob (job, target))
+       App.TemplatesMsg (TemplatesCore.SetupJob (job, target))
 
     "Types" ->
-       App.TypesAction (TypesCore.MenuClick (job, target))
+       App.TypesMsg (TypesCore.MenuClick (job, target))
 
     "Users" ->
-       App.UsersAction (UsersCore.MenuClick (job, target))
+       App.UsersMsg (UsersCore.MenuClick (job, target))
 
     _ -> 
        App.NoOp
 
 menuClick p =
- Signal.map intoActions p
+ Signal.map intoMsgs p
 
 
 router : Router Route
@@ -132,7 +130,7 @@ router =
   Hop.new Routing.config
 
 
-routerSignal : App.Action
+routerSignal : App.Msg
 routerSignal =
   Signal.map App.ApplyRoute router.signal
 

@@ -32,30 +32,30 @@ type alias Model =
   , admin : Admin.Model
   }
 
-type Action = 
+type Msg = 
   NoOp
   | SetEnvironments (Result Http.Error Environments)
-  | AdminAction Admin.Action 
+  | AdminMsg Admin.Msg 
   | SetTypes (Result Http.Error (List Type))
   | SelectType String
   | SelectHypervisor String
 
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let
     (admin, adminEffects) = Admin.init
     effects = Effects.batch [
              getTypes SetTypes
            , getEnvironments SetEnvironments
-           , (Effects.map AdminAction adminEffects)
+           , (Effects.map AdminMsg adminEffects)
     ]
   in
     (Model "" [] "" [] admin, effects)
 
 -- Update
 
-setEnvironments : Model -> Environments -> (Model, Effects Action)
+setEnvironments : Model -> Environments -> (Model, Effects Msg)
 setEnvironments model es =
   let 
      environment = Maybe.withDefault "" (List.head (Dict.keys es))
@@ -65,7 +65,7 @@ setEnvironments model es =
   in 
     none {model | hypervisors = hypervisors, hypervisor = hypervisor}
 
-setTypes : Model -> List Type -> (Model, Effects Action)
+setTypes : Model -> List Type -> (Model, Effects Msg)
 setTypes model types =
   let
     typesList = List.map .type' types
@@ -73,17 +73,17 @@ setTypes model types =
   in
     ({model | types = typesList , type' = firstType}, Effects.none)
 
-update : Action ->  Model-> (Model, Effects Action)
-update action ({admin} as model) =
-  case action of
+update : Msg ->  Model-> (Model, Effects Msg)
+update msg ({admin} as model) =
+  case msg of
     SetEnvironments result ->
      (successHandler result model (setEnvironments model) NoOp)
 
-    AdminAction adminAction -> 
+    AdminMsg adminMsg -> 
       let
-        (newAdmin, effects) = Admin.update adminAction admin
+        (newAdmin, effects) = Admin.update adminMsg admin
       in  
-        ({ model | admin = newAdmin}, Effects.map AdminAction effects)
+        ({ model | admin = newAdmin}, Effects.map AdminMsg effects)
 
     SelectHypervisor hypervisor -> 
       none {model | hypervisor = hypervisor}
@@ -102,14 +102,14 @@ update action ({admin} as model) =
 general address {admin, type', types, hypervisors, hypervisor} =
   div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
     (List.append
-       (Admin.view (Signal.forwardTo address AdminAction) admin)
+       (Admin.view (Signal.forwardTo address AdminMsg) admin)
           [ group' "Type" (selector address SelectType types type')
           , group' "Hypervisor" (selector address SelectHypervisor hypervisors hypervisor)
           ]
         )
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   fixedPanel (Html.form [] (asList (general address model)))
 
 

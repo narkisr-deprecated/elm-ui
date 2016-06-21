@@ -52,20 +52,20 @@ usersList =
 
 -- Effects
 
-getUsers action = 
+getUsers msg = 
   getJson usersList "/users" 
     |> Task.toResult
-    |> Task.map action
+    |> Task.map msg
     |> Effects.task
 
 rolesList : Decoder (Dict String String)
 rolesList =
   at ["roles"] (dict string)
 
-getRoles action = 
+getRoles msg = 
   getJson rolesList "/users/roles" 
     |> Task.toResult
-    |> Task.map action
+    |> Task.map msg
     |> Effects.task
 
 

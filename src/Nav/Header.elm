@@ -19,12 +19,12 @@ type alias Model =
     session : Session
   }
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   none (Model emptySession)
 
 
-type Action = 
+type Msg = 
    SignOut
     | SetSession Session
     | Redirect (Result Http.Error String)
@@ -35,9 +35,9 @@ type Action =
 setSession model session = 
    none {model | session = session }
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of
     SetSession session -> 
        none { model | session = session }
 
@@ -63,7 +63,7 @@ navHeader  =
 dropdown attrs = 
   List.append [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ] attrs
 
-gearsButton : Signal.Address Action  -> Session -> Html
+gearsButton : Signal.Address Msg  -> Session -> Html
 gearsButton address session =
   if isUser session then 
      i [ class "fa fa-gears", style [("color", "gray"), ("pointer-events", "none")]] [ ] 
@@ -76,7 +76,7 @@ gearsButton address session =
         ] 
       ]
 
-topNav : Signal.Address Action  -> Session -> Html
+topNav : Signal.Address Msg  -> Session -> Html
 topNav address ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
@@ -113,7 +113,7 @@ topNav address ({username, envs} as session) =
      ]
   ]
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({session} as model) =
   [header [class "main-header"] [
       a [href "/index.html", class "logo"] [

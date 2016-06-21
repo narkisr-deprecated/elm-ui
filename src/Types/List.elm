@@ -34,20 +34,20 @@ typeRow id {type', description } =
     , td [] [ text (withDefault "" description)]
     ]
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let 
     table = Table.init "typesListing" True ["Name", "Provisioner", "Description"] typeRow "Types"
   in 
     (Model [] table Pager.init , getTypes SetTypes)
 
-type Action = 
-  LoadPage (Table.Action Type)
-    | GotoPage Pager.Action
+type Msg = 
+  LoadPage (Table.Msg Type)
+    | GotoPage Pager.Msg
     | SetTypes (Result Http.Error (List Type))
     | NoOp
 
-setTypes: Model -> List Type -> (Model , Effects Action)
+setTypes: Model -> List Type -> (Model , Effects Msg)
 setTypes ({pager, table} as model) types = 
   let
     total = List.length types
@@ -58,16 +58,16 @@ setTypes ({pager, table} as model) types =
     none { model | types = types, pager = newPager, table = newTable }
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of
     SetTypes result ->
       successHandler result model (setTypes model) NoOp
      
     _ -> 
       none model
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({types, pager, table} as model) =
   [ div [class ""] [
     row_ [
@@ -86,10 +86,10 @@ typesList =
    at ["types"] (list Model.type')
 
 -- Effects
-getTypes action = 
+getTypes msg = 
   getJson typesList "/types" 
     |> Task.toResult
-    |> Task.map action
+    |> Task.map msg
     |> Effects.task
 
 

@@ -29,17 +29,17 @@ session  =
     ("username" := string )
 
 
-getSession action = 
+getSession msg = 
   getJson session "/sessions" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.map msg
+    |> Task.perform Err Ok 
 
-logout action =
+logout msg =
     Http.getString "/logout" 
       |> Task.toResult
-      |> Task.map action
-      |> Effects.task
+      |> Task.map msg
+      |> Task.perform Err Ok 
 
 isUser: Session -> Bool
 isUser {roles} =

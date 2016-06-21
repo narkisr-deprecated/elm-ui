@@ -31,7 +31,7 @@ templateRow id {name, type', description } =
     ]
 
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let 
     table = Table.init "templateListing" True ["Name", "Type", "Description"] templateRow "Templates"
@@ -40,13 +40,13 @@ init =
 
 -- Update 
 
-type Action = 
-  LoadPage (Table.Action Template)
-    | GotoPage Pager.Action
+type Msg = 
+  LoadPage (Table.Msg Template)
+    | GotoPage Pager.Msg
     | SetTemplates (Result Http.Error (List Template))
     | NoOp
 
-setTemplates: Model -> List Template -> (Model , Effects Action)
+setTemplates: Model -> List Template -> (Model , Effects Msg)
 setTemplates model templates = 
   let
     total = List.length templates
@@ -58,9 +58,9 @@ setTemplates model templates =
 
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    SetTemplates result ->
      successHandler result model (setTemplates model) NoOp
    
@@ -69,7 +69,7 @@ update action model =
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({pager, table} as model) =
   [
     div [] [
@@ -91,10 +91,10 @@ templateList =
    at ["templates"] (list templateDecoder)
 
 -- Effects
-getTemplates action = 
+getTemplates msg = 
   getJson templateList "/templates" 
     |> Task.toResult
-    |> Task.map action
+    |> Task.map msg
     |> Effects.task
 
 

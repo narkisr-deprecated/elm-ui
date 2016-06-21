@@ -15,7 +15,6 @@ import Html.Events exposing (onClick)
 import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Http exposing (Error(BadResponse))
-import Common.Editor exposing (loadEditor, unloadEditor)
 import Json.Decode exposing (..)
 import Common.Http exposing (saveResponse, postJson, putJson, SaveResponse)
 import Task exposing (Task)
@@ -48,7 +47,7 @@ step model value =
   , value = value
   }
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let
     errors = Errors.init
@@ -64,10 +63,10 @@ init =
   in
     (Model wizard errors False [] [] [],Effects.batch effects)
 
-type Action = 
-   ErrorsView Errors.Action
-    | WizardAction Wizard.Action
-    | FormAction Form.Action
+type Msg = 
+   ErrorsView Errors.Msg
+    | WizardMsg Wizard.Msg
+    | FormMsg Form.Msg
     | SetRoles (Result Http.Error (Dict String String))
     | SetEnvironments (Result Http.Error (List String))
     | SetOperations (Result Http.Error (List String))
@@ -75,7 +74,7 @@ type Action =
     | Done
     | Back
     | Next
-    | Save (String -> Effects Action)
+    | Save (String -> Effects Msg)
     | Saved (Result Http.Error SaveResponse)
     | NoOp
 
@@ -117,30 +116,30 @@ setOperation model keys =
 
 
 
-update : Action ->  Model -> (Model , Effects Action)
-update action ({wizard} as model) =
-  case action of 
+update : Msg ->  Model -> (Model , Effects Msg)
+update msg ({wizard} as model) =
+  case msg of 
     Next -> 
-      update (WizardAction Wizard.Next) model
+      update (WizardMsg Wizard.Next) model
 
     Back -> 
-       update (WizardAction Wizard.Back) model
+       update (WizardMsg Wizard.Back) model
 
     Reset -> 
       let
-        (back,_) = (update (WizardAction Wizard.Back) model)
+        (back,_) = (update (WizardMsg Wizard.Back) model)
       in
         none { back | saveErrors = Errors.init }
 
-    WizardAction wizardAction -> 
+    WizardMsg wizardMsg -> 
       let 
-        newWizard = Wizard.update wizardAction wizard
+        newWizard = Wizard.update wizardMsg wizard
       in
         none { model | wizard = newWizard }
 
-    FormAction formAction -> 
+    FormMsg formMsg -> 
       let 
-        newWizard = Wizard.update (Wizard.FormAction formAction) wizard
+        newWizard = Wizard.update (Wizard.FormMsg formMsg) wizard
       in
         none { model | wizard = newWizard }
 
@@ -163,18 +162,18 @@ update action ({wizard} as model) =
     _ -> 
       (none model)
 
-currentView : Signal.Address Action -> Model -> List Html
+currentView : Signal.Address Msg -> Model -> List Html
 currentView address ({wizard, roles, environments, operations} as model) =
   case wizard.step of 
     Just ({value} as current) ->
       case value of 
         Main -> 
           dialogPanel "info" (info "Add a new User") 
-             (panel (fixedPanel (Main.view roles (Signal.forwardTo address FormAction) current)) )
+             (panel (fixedPanel (Main.view roles (Signal.forwardTo address FormMsg) current)) )
 
         Perm -> 
            dialogPanel "info" (info "User permissions") 
-               (panel (fixedPanel (Perm.view environments operations (Signal.forwardTo address FormAction) current)))
+               (panel (fixedPanel (Perm.view environments operations (Signal.forwardTo address FormMsg) current)))
           
     Nothing -> 
         dialogPanel "info" (info "Save new user") 
@@ -202,7 +201,7 @@ rows contents buttons =
  ,row_ buttons
  ]
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({wizard, saveErrors} as model) =
   let 
     buttons' = (buttons address { model | hasNext = Wizard.notDone model})
@@ -216,14 +215,14 @@ view address ({wizard, saveErrors} as model) =
       (div [class "col-md-offset-2 col-md-8"] (currentView address model))
       (buttons' Next Back (saveButton address))
 
-saveUser: String -> Effects Action
+saveUser: String -> Effects Msg
 saveUser json = 
   postJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
     |> Task.map Saved
     |> Effects.task
 
-updateUser: String -> Effects Action
+updateUser: String -> Effects Msg
 updateUser json = 
   putJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
@@ -236,10 +235,10 @@ environmentsKeys=
   at ["operations"] (list string)
 
 
-getOperations action = 
+getOperations msg = 
   getJson environmentsKeys "/users/operations" 
     |> Task.toResult
-    |> Task.map action
+    |> Task.map msg
     |> Effects.task
 
 

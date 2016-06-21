@@ -17,7 +17,6 @@ import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none, setEnvironments)
 import Templates.Persistency exposing (persistTemplate, encodeDefaults)
-import Common.Editor exposing (loadEditor)
 import Common.Errors as Errors exposing (..)
 import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
 import Environments.List exposing (Environments, getEnvironments)
@@ -34,7 +33,7 @@ type alias Model =
   , environments : List String
   }
 
-type Action = 
+type Msg = 
   Save
   | Done
   | NoOp
@@ -47,7 +46,7 @@ type Action =
   | DescriptionInput String
   | DefaultsInput String
   | SetEnvironments (Result Http.Error Environments)
-  | ErrorsView Errors.Action
+  | ErrorsView Errors.Msg
 
 init =
   let
@@ -63,21 +62,21 @@ intoTemplate ({template} as model) {type', machine, openstack, physical, aws, di
       {model | template = newTemplate, hyp = hyp}
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({template, hyp, editDefaults, environments} as model) =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({template, hyp, editDefaults, environments} as model) =
+  case msg of
     Save -> 
       (model, persistTemplate saveTemplate template hyp)
 
     SetSystem hyp system -> 
       none (intoTemplate model system hyp)
 
-    LoadEditor -> 
-      let
-        encoded = (encodeDefaults (defaultsByEnv environments) hyp)
-      in 
-      ({ model | editDefaults = not editDefaults}, loadEditor "templates" NoOp encoded)
-    
+    -- LoadEditor -> 
+    --   let
+    --     encoded = (encodeDefaults (defaultsByEnv environments) hyp)
+    --   in 
+    --   ({ model | editDefaults = not editDefaults}, loadEditor "templates" NoOp encoded)
+    --
     NameInput name -> 
       let 
         newTemplate = { template | name = name }
@@ -122,7 +121,7 @@ editing address {template, editDefaults} =
           ])
         )
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({saveErrors} as model) =
   let
     errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
@@ -145,7 +144,7 @@ saveResponse =
   object1 SaveResponse
     ("message" := string) 
 
-saveTemplate: String -> Effects Action
+saveTemplate: String -> Effects Msg
 saveTemplate json = 
   postJson (Http.string json) saveResponse "/templates"  
     |> Task.toResult

@@ -24,25 +24,25 @@ type alias Model =
    type' : Type 
   }
  
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   none (Model emptyType)
 
 -- Update 
 
-type Action = 
+type Msg = 
   ViewType String
     | SetType (Result Http.Error Type)
     | NoOp
 
-setType : Model -> Type -> (Model , Effects Action)
+setType : Model -> Type -> (Model , Effects Msg)
 setType model type' =
   none {model | type' = type'}
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    ViewType id -> 
      (model, getType id SetType)
 
@@ -92,14 +92,14 @@ summarize model =
                             |> (List.map List.concat) 
                             |> (List.map row_))
 
-view : Signal.Address Action -> Model -> List Html
-view address model =
+view : Signal.Address Msg -> Model -> List Html
+view model =
   asList (div [] [h4 [] [(text "Type")], (summarize model.type')])
   
 
-getType id action = 
+getType id msg = 
   getJson Model.type' ("/types/" ++ id)
     |> Task.toResult
-    |> Task.map action
+    |> Task.map msg
     |> Effects.task
 

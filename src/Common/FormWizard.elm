@@ -30,9 +30,9 @@ init first steps =
 
 -- Update 
 
-type Action = 
+type Msg = 
   Next 
-    | FormAction Form.Action
+    | FormMsg Form.Msg
     | Back
     | NoOp
 
@@ -61,15 +61,15 @@ prepend step target =
       target
 
 
-update : Action -> Model s f -> Model s f
-update action ({next, prev, step} as model)  =
-  case action of 
+update : Msg -> Model s f -> Model s f
+update msg ({next, prev, step} as model)  =
+  case msg of 
     Next -> 
       let
         nextStep = (List.head next)
         nextSteps = defaultEmpty (List.tail next)
         prevSteps = append step prev
-        -- newModel = update (FormAction Form.Validate) model
+        -- newModel = update (FormMsg Form.Validate) model
       in
         if noErrors model then
            { model | step = nextStep, next = nextSteps, prev = prevSteps}
@@ -81,18 +81,18 @@ update action ({next, prev, step} as model)  =
         prevStep = List.head (List.reverse prev)
         prevSteps = List.take ((List.length prev) - 1) prev
         nextSteps = prepend step next
-        -- newModel = update (FormAction Form.Validate) model
+        -- newModel = update (FormMsg Form.Validate) model
       in
         if (noErrors model && prevStep /= Nothing) then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}
         else 
           model
 
-    FormAction formAction ->
+    FormMsg formMsg ->
       case step of 
         Just ({form} as currStep) -> 
          let 
-           newForm = Form.update formAction form
+           newForm = Form.update formMsg form
            newStep = { currStep | form = newForm }
          in
            { model | step = Just newStep }

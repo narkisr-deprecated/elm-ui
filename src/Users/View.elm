@@ -24,25 +24,25 @@ type alias Model =
    user : User
   }
  
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   none (Model emptyUser)
 
 -- Update 
 
-type Action = 
+type Msg = 
   ViewUser String
     | SetUser (Result Http.Error User)
     | NoOp
 
-setUser: Model -> User -> (Model , Effects Action)
+setUser: Model -> User -> (Model , Effects Msg)
 setUser model user =
   none {model | user = user}
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    ViewUser id -> 
      (model, getUser id SetUser)
 
@@ -58,13 +58,13 @@ summarize: User -> Html
 summarize model =
    div [style [("line-height", "1.8"), ("list-style-type","none")]] []
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address {user} =
   asList (div [] [h4 [] [(text "User")], (summarize user)])
   
-getUser name action = 
+getUser name msg = 
   getJson Model.user ("/users/" ++ name)
     |> Task.toResult
-    |> Task.map action
+    |> Task.map msg
     |> Effects.task
 

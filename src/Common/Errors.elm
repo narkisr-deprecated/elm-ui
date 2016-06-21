@@ -31,7 +31,7 @@ init : Model
 init =
   Model (Errors "" Nothing Nothing)
 
-type Action = 
+type Msg = 
   NoOp
 
 mapValues : (comparable -> a -> b) -> Dict comparable a -> List b
@@ -90,7 +90,7 @@ errorsText errors =
       text (withDefault "" errors.message)
     ]
 
-view : Signal.Address Action -> Model -> Html
+view : Model -> Html Msg
 view address {errors} =
    div [class "panel-body"] [
      h4 [] [

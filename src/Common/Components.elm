@@ -2,7 +2,7 @@ module Common.Components exposing (..)
 
 import Html.Attributes exposing (class, style)
 import Html exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Bootstrap.Html exposing (..)
 import Html.Attributes exposing (class, for, placeholder, attribute, type', checked, value, style, id)
 import Systems.Add.Validations exposing (Error(Invalid,None))
@@ -57,14 +57,14 @@ info msg =
 error msg = 
    message "Error!" [text msg]
 
-dialogButtons address cancel ok =
+dialogButtons cancel ok =
   row_ [
      div [class "text-center"] [
        div [class "btn-group col-md-offset-5 col-md-10"] [
-           button [class "btn btn-danger btn-sm col-md-1 col-md-offset-1", onClick address cancel ] [
+           button [class "btn btn-danger btn-sm col-md-1 col-md-offset-1", onClick cancel ] [
             text (toString cancel)
           ]
-       ,  button [class "btn btn-primary btn-sm col-md-1", onClick address ok ][
+       ,  button [class "btn btn-primary btn-sm col-md-1", onClick ok][
            text (toString ok) 
          ]
       ]
@@ -76,7 +76,7 @@ callout type' message =
     div [ class ("callout callout-" ++ type') ] message
   ]
 
-dialogPanel : String -> List Html -> Html -> List Html
+dialogPanel : String -> List (Html msg) -> (Html msg) -> List (Html msg)
 dialogPanel type' message body = 
   [ row_ [
       callout type' message
@@ -88,20 +88,20 @@ dialogPanel type' message body =
     ]
   ]
 
-withButtons address cancel ok panel = 
-  List.append panel (asList (dialogButtons address cancel ok))
+withButtons cancel ok panel = 
+  List.append panel (asList (dialogButtons cancel ok))
 
-infoCallout address message body cancel ok = 
+infoCallout message body cancel ok = 
   dialogPanel "info" message body
-    |> withButtons address cancel ok
+    |> withButtons cancel ok
 
-dangerCallout address message body cancel ok = 
+dangerCallout message body cancel ok = 
   dialogPanel "danger" message body 
-    |> withButtons address cancel ok
+    |> withButtons cancel ok
 
-warningCallout address message body cancel ok = 
+warningCallout message body cancel ok = 
   dialogPanel "warning" message body
-    |> withButtons address cancel ok
+    |> withButtons cancel ok
 
 
 -- Form groups
@@ -113,7 +113,7 @@ withError errors class =
   else 
     class ++ " has-error"
         
-toHtml : Error -> Html
+toHtml : Error -> (Html msg)
 toHtml error =
   case error of
     Invalid message -> 
@@ -121,7 +121,7 @@ toHtml error =
     None ->
       span [class "help-block"] []
 
-withMessage : List Error -> Html 
+withMessage : List Error -> (Html msg)
 withMessage errors = 
   if List.isEmpty errors then 
     div [] [] 
@@ -131,7 +131,7 @@ withMessage errors =
     in
       withDefault (div [] []) (List.head messages)
  
-group : String -> Html -> List Error -> Html
+group : String -> (Html msg) -> List Error -> (Html msg)
 group title widget errors = 
   div [class (withError errors "form-group"), id title] 
     [ label [for title, class "col-sm-3 control-label"] [(text title)]
@@ -139,73 +139,67 @@ group title widget errors =
     , withMessage errors
     ]
 
-group' : String -> Html -> Html
+group' : String -> (Html msg) -> (Html msg)
 group' title widget = 
   group title widget []
 
-selected : String -> String -> List Attribute
+selected : String -> String -> List (Attribute msg)
 selected value default =
   if value == default then
     [attribute "selected" "true"]
   else 
     []
 
-onSelect : Signal.Address a -> (String -> a) -> Attribute
-onSelect address action = 
-  Html.Events.on "change" (at ["target", "value"] string) (Signal.message address << action)
+onSelect : (String -> msg) -> Attribute msg
+onSelect msg = 
+  Html.Events.on "change" (Json.map msg (at ["target", "value"] string))
 
-onMultiSelect : Signal.Address a -> (String -> a) -> Attribute
-onMultiSelect address action = 
-  Html.Events.on "change" (at ["target"] string) 
-    (\str -> Debug.log str ((Signal.message address << action) str))
+onMultiSelect : (String -> msg) -> Attribute msg
+onMultiSelect msg = 
+  Html.Events.on "change" (Json.map msg (at ["target"] string))
 
 
-selector : Signal.Address a -> (String -> a) -> List String -> String -> Html
-selector address action options default =
-  select [class "form-control", onSelect address action ] 
+selector : (String -> msg) -> List String -> String -> (Html msg)
+selector msg options default =
+  select [class "form-control", onSelect msg ] 
     (List.map (\opt -> option (selected opt default) [text opt]) options)
 
-onInput : Signal.Address a -> (String -> a) -> Attribute
-onInput address action =
-   Html.Events.on "input" (at ["target", "value"] string) (Signal.message address << action)
 
-
-typedInput : Signal.Address a -> (String -> a) -> String -> String -> String -> Html
-typedInput address action place currentValue typed =
+typedInput : (String -> msg) -> String -> String -> String -> (Html msg)
+typedInput msg place currentValue typed =
   input 
     [ class "form-control"
     , type' typed
     , placeholder place
     , value currentValue
-    , onInput address action
+    , onInput msg
     ] []
 
-inputNumber : Signal.Address a -> (String -> a) -> String -> String -> Html
-inputNumber address action place currentValue =
-  typedInput address action place currentValue "number"
+inputNumber : (String -> msg) -> String -> String -> (Html msg)
+inputNumber msg place currentValue =
+  typedInput msg place currentValue "number"
 
-inputText : Signal.Address a -> (String -> a) -> String -> String -> Html
-inputText address action place currentValue =
-  typedInput address action place currentValue "text"
+inputText : (String -> msg) -> String -> String -> (Html msg)
+inputText msg place currentValue =
+  typedInput msg place currentValue "text"
 
-checkbox : Signal.Address a -> a -> Bool -> Html
-checkbox address action currentValue= 
-   input [type' "checkbox", onClick address action, checked currentValue] []
+checkbox : msg -> Bool -> (Html msg)
+checkbox msg currentValue= 
+   input [type' "checkbox", onClick msg, checked currentValue] []
 
-withErrors : Dict String (List Error) -> String ->  Html -> Html
+withErrors : Dict String (List Error) -> String ->  (Html msg) -> (Html msg)
 withErrors errors key widget =
   group key widget (defaultEmpty (Dict.get key errors))
 
-buttons address ({hasNext} as model) next back last =
+buttons ({hasNext} as model) next back last =
   let
     margin = style [("margin-left", "30%")]
-    click = onClick address
   in 
     [ 
-      button [id "Back", class "btn btn-primary", margin, click back] [text "<< Back"]
+      button [id "Back", class "btn btn-primary", margin, onClick back] [text "<< Back"]
     , if hasNext then
        div [class "btn-group", margin]
-           [button [id "Next", class "btn btn-primary", click next] [text "Next >>"]]
+           [button [id "Next", class "btn btn-primary", onClick next] [text "Next >>"]]
       else
         div [class "btn-group", margin] last
     ]

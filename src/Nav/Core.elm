@@ -1,8 +1,8 @@
 module Nav.Core exposing (..)
 
 import Nav.Common as NavCommon exposing (Active(Stacks, Types, Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
-import Nav.Header as Header exposing (Action(SetSession))
-import Nav.Side as Side exposing (Action(SetSession))
+import Nav.Header as Header exposing (Msg(SetSession))
+import Nav.Side as Side exposing (Msg(SetSession))
 import Users.Session exposing (getSession, Session)
 import Http exposing (Error(BadResponse))
 import Common.Errors exposing (successHandler)
@@ -18,7 +18,7 @@ type alias Model =
   , section : Section 
   }
  
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let
     (header, _) = Header.init
@@ -27,16 +27,16 @@ init =
 
 -- Update 
 
-type Action = 
-  SideAction Side.Action
-   | HeaderAction Header.Action
+type Msg = 
+  SideMsg Side.Msg
+   | HeaderMsg Header.Msg
    | LoadSession (Result Http.Error Session)
    | NoOp
 
 --
 -- goto active section ({nav} as model) effects =
 --   let
---     (newNav, _) = update (SideAction (Side.Goto active section)) nav
+--     (newNav, _) = update (SideMsg (Side.Goto active section)) nav
 --   in 
 --    ({model | nav = newNav }, effects)
 
@@ -47,20 +47,20 @@ setSession ({side, header} as model) session =
   in 
     none { model | side = newSide, header = newHeader }
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({side, header} as model) =
-  case action of 
-    SideAction navAction ->  
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({side, header} as model) =
+  case msg of 
+    SideMsg navMsg ->  
        let 
-         (newSide, _) = Side.update navAction side
+         (newSide, _) = Side.update navMsg side
        in
          none { model | side = newSide }
 
-    HeaderAction navAction -> 
+    HeaderMsg navMsg -> 
       let 
-        (newHeader, effects) = Header.update navAction header
+        (newHeader, effects) = Header.update navMsg header
       in
-       ({ model | header = newHeader}, Effects.map HeaderAction effects)
+       ({ model | header = newHeader}, Effects.map HeaderMsg effects)
 
     LoadSession result -> 
       (successHandler result model (setSession model) NoOp)
@@ -71,9 +71,9 @@ update action ({side, header} as model) =
 -- View
 
 sideView address {side} = 
-  Side.view (Signal.forwardTo address SideAction) side
+  Side.view (Signal.forwardTo address SideMsg) side
 
 headerView address {header} = 
-  Header.view (Signal.forwardTo address HeaderAction) header
+  Header.view (Signal.forwardTo address HeaderMsg) header
 
 

@@ -48,7 +48,7 @@ typeField address {form} =
     ({isDirty, value, isChanged} as type') = Form.getFieldAsString "type" form
     inEdit = (not isDirty && value /= Nothing && not isChanged )
   in
-    formGroup "Type" Input.textInput type' address [class "form-control", readonly inEdit]
+    formGroup "Type" Input.textInput type' [class "form-control", readonly inEdit]
 
 view environments address ({form} as model) =
   let 
@@ -58,9 +58,8 @@ view environments address ({form} as model) =
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
         typeField address model
-      , formControl "Description" Input.textInput description address
-      , formControl "Environment"  (Input.selectInput environments) environment address
-      ]
+      , formControl "Description" Input.textInput description 
+      , formControl "Environment"  (Input.selectInput environments) environment ]
     ])
 
 

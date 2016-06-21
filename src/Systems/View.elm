@@ -28,23 +28,23 @@ type alias Model =
     system : System
    }
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   (Model emptySystem, Effects.none)
 
 -- Update
-type Action = 
+type Msg = 
   ViewSystem String
     | SetSystem (Result Http.Error System)
     | NoOp
 
-setSystem : Model -> System -> (Model , Effects Action)
+setSystem : Model -> System -> (Model , Effects Msg)
 setSystem model system =
   ({model | system = system}, Effects.none)
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of
     ViewSystem id -> 
       (model, getSystem id)
 
@@ -63,7 +63,7 @@ toHtml ({system} as model) f prop=
     Nothing -> 
        []
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({system} as model) =
     let
       options = [ toHtml  model AWSView.summarize system.aws
@@ -76,7 +76,7 @@ view address ({system} as model) =
 
 -- Effects
 
-getSystem : String -> Effects Action
+getSystem : String -> Effects Msg
 getSystem id = 
   getJson systemDecoder ("/systems/" ++ id)
     |> Task.toResult

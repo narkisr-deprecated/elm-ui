@@ -1,5 +1,5 @@
-module Common.Redirect exposing (..)
+port module Common.Redirect exposing (..)
 
 import Debug
 
-port redirect : String -> Msg String
+port redirect : String -> Cmd msg

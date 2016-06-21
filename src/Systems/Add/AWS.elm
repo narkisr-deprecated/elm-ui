@@ -40,8 +40,8 @@ init =
   in 
     Model wizard emptyAws emptyMachine Dict.empty Dict.empty emptyVolume emptyBlock
 
-type Action = 
-  WizardAction Wizard.Action
+type Msg = 
+  WizardMsg Wizard.Msg
    | Update Environment
    | SelectInstanceType String
    | SelectOS String
@@ -145,13 +145,13 @@ ignoreDevices ({errors} as model) =
     { model | errors =  ignored }
 
 
-update : Action -> Model-> Model
-update action ({wizard, aws, machine, volume, block} as model) =
-  case action of
-    WizardAction action -> 
+update : Msg -> Model-> Model
+update msg ({wizard, aws, machine, volume, block} as model) =
+  case msg of
+    WizardMsg msg -> 
       let
         ({errors} as newModel) = ignoreDevices (validateAWS wizard.step model)
-        newWizard = Wizard.update (notAny errors) action wizard
+        newWizard = Wizard.update (notAny errors) msg wizard
       in
        { newModel | wizard = newWizard } 
 
@@ -308,12 +308,12 @@ next : Model -> Environment -> Model
 next model environment =
       model 
          |> update (Update environment) 
-         |> update (WizardAction Wizard.Next)
+         |> update (WizardMsg Wizard.Next)
 
 back model =
-  (update (WizardAction Wizard.Back) model)
+  (update (WizardMsg Wizard.Back) model)
 
-instance : Signal.Address Action -> Model -> List Html
+instance : Signal.Address Msg -> Model -> List Html
 instance address ({aws, machine, errors} as model) =
   let
     check = withErrors errors
@@ -336,7 +336,7 @@ instance address ({aws, machine, errors} as model) =
        , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
    ]
 
-networking: Signal.Address Action -> Model -> List Html
+networking: Signal.Address Msg -> Model -> List Html
 networking address ({errors, aws, machine} as model) =
   let 
     check = withErrors errors
@@ -360,7 +360,7 @@ ebsTypes = Dict.fromList [
    , ("Provisioned IOPS (SSD)", "io1")
   ]
 
-volumeRow : Signal.Address Action -> Volume -> Html
+volumeRow : Signal.Address Msg -> Volume -> Html
 volumeRow address ({device} as v) = 
   let
     remove = span [ class "glyphicon glyphicon-remove"
@@ -372,7 +372,7 @@ volumeRow address ({device} as v) =
   in
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
-volumes : Signal.Address Action -> List Volume -> Html
+volumes : Signal.Address Msg -> List Volume -> Html
 volumes address vs = 
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "ebsVolumes"]
@@ -384,7 +384,7 @@ volumes address vs =
      ]
   ]
 
-blockRow : Signal.Address Action -> Block -> Html
+blockRow : Signal.Address Msg -> Block -> Html
 blockRow address ({device} as v) = 
   let
     remove = span [ class "glyphicon glyphicon-remove"
@@ -397,7 +397,7 @@ blockRow address ({device} as v) =
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
 
-blocks: Signal.Address Action -> List Block -> Html
+blocks: Signal.Address Msg -> List Block -> Html
 blocks address bs = 
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "instanceVolumes"]
@@ -408,7 +408,7 @@ blocks address bs =
      ]
   ]   
 
-ebs: Signal.Address Action -> Model -> List Html
+ebs: Signal.Address Msg -> Model -> List Html
 ebs address ({errors, volume, aws} as model) =
   let
     check = withErrors errors
@@ -432,7 +432,7 @@ ebs address ({errors, volume, aws} as model) =
     ]
   ]
 
-store: Signal.Address Action -> Model -> List Html
+store: Signal.Address Msg -> Model -> List Html
 store address ({errors, block, aws} as model) =
   let
     check = withErrors errors
@@ -448,7 +448,7 @@ store address ({errors, block, aws} as model) =
   ]
 
 
-stepView :  Signal.Address Action -> Model -> List Html
+stepView :  Signal.Address Msg -> Model -> List Html
 stepView address ({wizard, aws, machine} as model) =
   case wizard.step of
     Instance -> 
@@ -470,6 +470,6 @@ stepView address ({wizard, aws, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   fixedPanel (Html.form [] (stepView address model))

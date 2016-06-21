@@ -39,8 +39,8 @@ init =
   in 
     Model wizard emptyDigital emptyMachine Dict.empty Dict.empty
 
-type Action = 
-  WizardAction Wizard.Action
+type Msg = 
+  WizardMsg Wizard.Msg
   | Update Environment
   | SelectSize String
   | SelectOS String
@@ -75,13 +75,13 @@ stringValidations = Dict.fromList [
 
 validateDigital = validateAll [stringValidations]
 
-update : Action -> Model-> Model
-update action ({wizard, digital, machine} as model) =
-  case action of
-    WizardAction action -> 
+update : Msg -> Model-> Model
+update msg ({wizard, digital, machine} as model) =
+  case msg of
+    WizardMsg msg -> 
       let
         ({errors} as newModel) = (validateDigital wizard.step model)
-        newWizard = Wizard.update (notAny errors) action wizard
+        newWizard = Wizard.update (notAny errors) msg wizard
       in
        { newModel | wizard = newWizard } 
 
@@ -129,10 +129,10 @@ next : Model -> Environment -> Model
 next model environment =
       model 
          |> update (Update environment) 
-         |> update (WizardAction Wizard.Next)
+         |> update (WizardMsg Wizard.Next)
 
 back model =
-  (update (WizardAction Wizard.Back) model)
+  (update (WizardMsg Wizard.Back) model)
 
 getOses : Model -> Dict String Template
 getOses model =
@@ -145,7 +145,7 @@ getOses model =
       _ -> 
         Dict.empty
 
-instance : Signal.Address Action -> Model -> List Html
+instance : Signal.Address Msg -> Model -> List Html
 instance address ({digital, machine, errors} as model) =
   let
     check = withErrors errors
@@ -165,7 +165,7 @@ instance address ({digital, machine, errors} as model) =
        ]
     ]
 
-stepView :  Signal.Address Action -> Model -> List Html
+stepView :  Signal.Address Msg -> Model -> List Html
 stepView address ({wizard, digital, machine} as model) =
   case wizard.step of
     Instance -> 
@@ -178,6 +178,6 @@ stepView address ({wizard, digital, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   fixedPanel (Html.form [] (stepView address model))

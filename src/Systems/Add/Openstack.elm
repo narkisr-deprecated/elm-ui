@@ -41,8 +41,8 @@ init =
   in 
     Model wizard emptyOpenstack emptyMachine Dict.empty Dict.empty emptyVolume
 
-type Action = 
-  WizardAction Wizard.Action
+type Msg = 
+  WizardMsg Wizard.Msg
    | Update Environment
    | SelectFlavor String
    | SelectOS String
@@ -146,13 +146,13 @@ setDefaultFlavor hyp ({openstack} as model) =
 
 validateOpenstack = validateAll [stringValidations, listValidations]
 
-update : Action -> Model-> Model
-update action ({wizard, openstack, machine, volume} as model) =
-  case action of
-    WizardAction action -> 
+update : Msg -> Model-> Model
+update msg ({wizard, openstack, machine, volume} as model) =
+  case msg of
+    WizardMsg msg -> 
       let
         ({errors} as newModel) = ignoreDevices (validateOpenstack wizard.step model)
-        newWizard = Wizard.update (notAny errors) action wizard
+        newWizard = Wizard.update (notAny errors) msg wizard
       in
        { newModel | wizard = newWizard } 
 
@@ -255,12 +255,12 @@ next : Model -> Environment -> Model
 next model environment =
       model 
          |> update (Update environment) 
-         |> update (WizardAction Wizard.Next)
+         |> update (WizardMsg Wizard.Next)
 
 back model =
-  (update (WizardAction Wizard.Back) model)
+  (update (WizardMsg Wizard.Back) model)
 
-instance : Signal.Address Action -> Model -> List Html
+instance : Signal.Address Msg -> Model -> List Html
 instance address ({openstack, machine, errors} as model) =
   let
     check = withErrors errors
@@ -280,7 +280,7 @@ instance address ({openstack, machine, errors} as model) =
        , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
    ]
 
-networking: Signal.Address Action -> Model -> List Html
+networking: Signal.Address Msg -> Model -> List Html
 networking address ({errors, openstack, machine} as model) =
   let 
     check = withErrors errors
@@ -297,7 +297,7 @@ networking address ({errors, openstack, machine} as model) =
      ]
   ]
 
-volumeRow : Signal.Address Action -> Volume -> Html
+volumeRow : Signal.Address Msg -> Volume -> Html
 volumeRow address ({device} as v) = 
   let
     remove = span [ class "glyphicon glyphicon-remove"
@@ -309,7 +309,7 @@ volumeRow address ({device} as v) =
   in
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
-volumes : Signal.Address Action -> List Volume -> Html
+volumes : Signal.Address Msg -> List Volume -> Html
 volumes address vs = 
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "ebsVolumes"]
@@ -322,7 +322,7 @@ volumes address vs =
   ]
 
 
-cinder: Signal.Address Action -> Model -> List Html
+cinder: Signal.Address Msg -> Model -> List Html
 cinder address ({errors, volume, openstack} as model) =
   let
     check = withErrors errors
@@ -339,7 +339,7 @@ cinder address ({errors, volume, openstack} as model) =
     ]
   ]
 
-stepView :  Signal.Address Action -> Model -> List Html
+stepView :  Signal.Address Msg -> Model -> List Html
 stepView address ({wizard, openstack, machine} as model) =
   case wizard.step of
     Instance -> 
@@ -358,6 +358,6 @@ stepView address ({wizard, openstack, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   fixedPanel (Html.form [] (stepView address model))

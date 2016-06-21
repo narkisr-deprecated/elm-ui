@@ -15,7 +15,6 @@ import Html.Events exposing (onClick)
 import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Http exposing (Error(BadResponse))
-import Common.Editor exposing (loadEditor, unloadEditor)
 import Json.Decode exposing (..)
 import Common.Http exposing (saveResponse, postJson, putJson, SaveResponse)
 import Task exposing (Task)
@@ -49,7 +48,7 @@ step model value =
   , value = value
   }
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let
     errors = Errors.init
@@ -69,10 +68,10 @@ reinit model ({puppetStd} as type') env  =
   in
     { model | wizard = newWizard, classes = classes, editClasses = False, saveErrors = Errors.init } 
 
-type Action = 
-   ErrorsView Errors.Action
-    | WizardAction Wizard.Action
-    | FormAction Form.Action
+type Msg = 
+   ErrorsView Errors.Msg
+    | WizardMsg Wizard.Msg
+    | FormMsg Form.Msg
     | SetEnvironments (Result Http.Error Environments)
     | LoadEditor String
     | SetClasses String
@@ -80,7 +79,7 @@ type Action =
     | Done
     | Back
     | Next
-    | Save (String -> Effects Action)
+    | Save (String -> Effects Msg)
     | Saved (Result Http.Error SaveResponse)
     | NoOp
 
@@ -111,46 +110,46 @@ merge classes ({value, form} as step) acc =
 merged {wizard, classes} =
   List.foldl (merge classes) emptyType wizard.prev 
 
-update : Action ->  Model -> (Model , Effects Action)
-update action ({wizard, editClasses, classes} as model) =
-  case action of 
-    Next -> 
-      let
-       (next, effects) = update (WizardAction Wizard.Next) model
-      in
-       (next, Effects.batch [effects , unloadEditor NoOp])
-
-    Back -> 
-      let
-        (back, _) = (update (WizardAction Wizard.Back) model)
-      in
-       ({ back | editClasses = False}, unloadEditor NoOp)
-
+update : Msg ->  Model -> (Model , Effects Msg)
+update msg ({wizard, editClasses, classes} as model) =
+  case msg of 
+    -- Next -> 
+    --   let
+    --    (next, effects) = update (WizardMsg Wizard.Next) model
+    --   in
+    --    (next, Effects.batch [effects , unloadEditor NoOp])
+    --
+    -- Back -> 
+    --   let
+    --     (back, _) = (update (WizardMsg Wizard.Back) model)
+    --   in
+    --    ({ back | editClasses = False}, unloadEditor NoOp)
+    --
     Reset -> 
       let
-        (back,_) = (update (WizardAction Wizard.Back) model)
+        (back,_) = (update (WizardMsg Wizard.Back) model)
       in
        ({ back | editClasses = False, saveErrors = Errors.init }, unloadEditor NoOp)
 
 
-    WizardAction wizardAction -> 
+    WizardMsg wizardMsg -> 
       let 
-        newWizard = Wizard.update wizardAction wizard
+        newWizard = Wizard.update wizardMsg wizard
       in
         none { model | wizard = newWizard }
 
-    FormAction formAction -> 
+    FormMsg formMsg -> 
       let 
-        newWizard = Wizard.update (Wizard.FormAction formAction) wizard
+        newWizard = Wizard.update (Wizard.FormMsg formMsg) wizard
       in
         none { model | wizard = newWizard }
 
     SetEnvironments result ->
        (successHandler result model (setEnvironment model) NoOp)
 
-    LoadEditor dest -> 
-      ({ model | editClasses = not editClasses}, loadEditor dest NoOp (encodeClasses classes))
-
+    -- LoadEditor dest -> 
+    --   ({ model | editClasses = not editClasses}, loadEditor dest NoOp (encodeClasses classes))
+    --
     SetClasses json -> 
         none { model | classes = decodeClasses json }
 
@@ -163,7 +162,7 @@ update action ({wizard, editClasses, classes} as model) =
     _ -> 
       (none model)
 
-currentView : Signal.Address Action -> Model -> List Html
+currentView : Signal.Address Msg -> Model -> List Html
 currentView address ({wizard, environments, editClasses, classes} as model) =
   let 
     environmentList = List.map (\e -> (e,e)) environments
@@ -173,14 +172,14 @@ currentView address ({wizard, environments, editClasses, classes} as model) =
         case value of 
           Main -> 
            dialogPanel "info" (info "Add a new Type") 
-            (panel (fixedPanel (Main.view environmentList (Signal.forwardTo address FormAction) current)) )
+            (panel (fixedPanel (Main.view environmentList (Signal.forwardTo address FormMsg) current)) )
 
           Puppet -> 
             let
              check = (checkbox address (LoadEditor "typesAdd") editClasses)
             in 
              dialogPanel "info" (info "Module properties") 
-               (panel (fixedPanel (Puppet.view check (Signal.forwardTo address FormAction) current)))
+               (panel (fixedPanel (Puppet.view check (Signal.forwardTo address FormMsg) current)))
           
       Nothing -> 
         dialogPanel "info" (info "Save new type") 
@@ -208,7 +207,7 @@ rows contents buttons =
  ,row_ buttons
  ]
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({wizard, saveErrors} as model) =
   let 
     buttons' = (buttons address { model | hasNext = Wizard.notDone model})
@@ -222,14 +221,14 @@ view address ({wizard, saveErrors} as model) =
       (div [class "col-md-offset-2 col-md-8"] (currentView address model))
       (buttons' Next Back (saveButton address))
 
-saveType: String -> Effects Action
+saveType: String -> Effects Msg
 saveType json = 
   postJson (Http.string json) saveResponse "/types"  
     |> Task.toResult
     |> Task.map Saved
     |> Effects.task
 
-updateType: String -> Effects Action
+updateType: String -> Effects Msg
 updateType json = 
   putJson (Http.string json) saveResponse "/types"  
     |> Task.toResult

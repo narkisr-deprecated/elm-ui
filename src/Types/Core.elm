@@ -26,35 +26,35 @@ type alias Model =
   , navChange : Maybe String
   }
   
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
    let
-     (list, listAction)  = TypesList.init 
-     (add, addAction)  = TypesAdd.init 
-     (view, viewAction)  = TypesView.init 
-     (edit, editAction)  = TypesEdit.init 
-     (delete, deleteAction)  = TypesDelete.init 
+     (list, listMsg)  = TypesList.init 
+     (add, addMsg)  = TypesAdd.init 
+     (view, viewMsg)  = TypesView.init 
+     (edit, editMsg)  = TypesEdit.init 
+     (delete, deleteMsg)  = TypesDelete.init 
      effects = [
-        Effects.map Listing listAction
-      , Effects.map Adding addAction
-      , Effects.map Viewing viewAction
-      , Effects.map Deleting deleteAction
-      , Effects.map Editing editAction
+        Effects.map Listing listMsg
+      , Effects.map Adding addMsg
+      , Effects.map Viewing viewMsg
+      , Effects.map Deleting deleteMsg
+      , Effects.map Editing editMsg
      ]
    in
      (Model list add view delete edit Nothing, Effects.batch effects) 
 
-type Action = 
-  Listing TypesList.Action
+type Msg = 
+  Listing TypesList.Msg
     | MenuClick (String, String)
-    | Adding TypesAdd.Action
-    | Viewing TypesView.Action
-    | Deleting TypesDelete.Action
-    | Editing TypesEdit.Action
+    | Adding TypesAdd.Msg
+    | Viewing TypesView.Msg
+    | Deleting TypesDelete.Msg
+    | Editing TypesEdit.Msg
 
-navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ((({list, add, view, delete, edit} as model), effects) as result) =
-    case action of 
+navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
+navigate msg ((({list, add, view, delete, edit} as model), effects) as result) =
+    case msg of 
       Listing listing -> 
         case listing of 
           TypesList.LoadPage (Table.View id) ->
@@ -76,8 +76,8 @@ navigate action ((({list, add, view, delete, edit} as model), effects) as result
 
       Editing editing -> 
         case editing of 
-          TypesEdit.AddAction addAction -> 
-            case addAction of
+          TypesEdit.AddMsg addMsg -> 
+            case addMsg of
               TypesAdd.Saved (Result.Ok _) -> 
                  refreshList True ({model | navChange = Just "/types/list"}, effects)
 
@@ -127,37 +127,37 @@ setName model name =
   { model | name = name } 
 
 
-route : Action ->  Model -> (Model , Effects Action)
-route action ({list, add, view, delete, edit} as model) =
-  case action of
-    Listing action -> 
+route : Msg ->  Model -> (Model , Effects Msg)
+route msg ({list, add, view, delete, edit} as model) =
+  case msg of
+    Listing msg -> 
       let 
-        (newTypes, effect ) = TypesList.update action list
+        (newTypes, effect ) = TypesList.update msg list
       in
         ({ model | list = newTypes }, Effects.map Listing effect)
 
-    Adding action -> 
+    Adding msg -> 
       let 
-        (newTypes, effect ) = TypesAdd.update action add
+        (newTypes, effect ) = TypesAdd.update msg add
       in
         ({ model | add = newTypes }, Effects.map Adding effect)
 
-    Editing action -> 
+    Editing msg -> 
       let 
-        (newTypes, effect ) = TypesEdit.update action edit
+        (newTypes, effect ) = TypesEdit.update msg edit
       in
         ({ model | edit = newTypes }, Effects.map Editing effect)
 
-    Viewing action -> 
+    Viewing msg -> 
       let 
-        (newTypes, effect ) = TypesView.update action view
+        (newTypes, effect ) = TypesView.update msg view
       in
         ({ model | view = newTypes }, Effects.map Viewing effect)
 
-    Deleting action -> 
+    Deleting msg -> 
       let 
-        (newDelete, effects) = (TypesDelete.update action delete)
-        success = (succeeded action TypesDelete.Deleted "Type deleted")
+        (newDelete, effects) = (TypesDelete.update msg delete)
+        success = (succeeded msg TypesDelete.Deleted "Type deleted")
       in
         refreshList success ({ model | delete = newDelete } , Effects.map Deleting effects)
 
@@ -175,11 +175,11 @@ route action ({list, add, view, delete, edit} as model) =
         _ -> 
           none model
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  navigate action (route action model)
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  navigate msg (route msg model)
 
-view : Signal.Address Action -> Model -> Route -> List Html
+view : Signal.Address Msg -> Model -> Route -> List Html
 view address ({list, add, view, delete, edit} as model) section =
    case section of
      Routing.List -> 

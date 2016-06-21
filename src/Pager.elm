@@ -18,7 +18,7 @@ type alias Model =
   , maxButtons : Int 
   , slice : Int}
 
-type Action = 
+type Msg = 
    NextPage Int 
      | UpdateTotal Float 
      | NoOp
@@ -28,9 +28,9 @@ init =
 
 -- Update
 
-update : Action ->  Model-> Model
-update action ({slice, maxButtons, page} as model) =
-  case action of
+update : Msg ->  Model-> Model
+update msg ({slice, maxButtons, page} as model) =
+  case msg of
     NextPage curr ->
       let 
         start = slice 
@@ -65,27 +65,27 @@ pageCount : Model -> Int
 pageCount model = 
   model.total / model.offset |> Basics.ceiling
 
-arrows : Signal.Address Action -> ((String,Int),  (String,Int)) -> Bool -> List Html
-arrows address shapes active = 
+arrows : ((String,Int),  (String,Int)) -> Bool -> List (Html Msg)
+arrows shapes active = 
   let
    operation p = if active then (NextPage p) else NoOp
    isActive = if active then "" else "disabled"
    ((firstShape,firstPos), (secondShape,secondPos)) = shapes
   in
-  [li [class isActive] [a [onClick address (operation firstPos)]  [text firstShape]],
-   li [class isActive] [a [onClick address (operation secondPos)]  [text secondShape]]]
+  [li [class isActive] [a [onClick (operation firstPos)]  [text firstShape]],
+   li [class isActive] [a [onClick (operation secondPos)]  [text secondShape]]]
 
-pageLinks : Signal.Address Action -> Model -> List Html
-pageLinks address ({maxButtons, slice} as model) =
+pageLinks : Model -> List (Html Msg)
+pageLinks ({maxButtons, slice} as model) =
   let 
     isActive page =
       if model.page == page then "active" else ""
     pageLink page = 
-      li [class (isActive page)] [a [ onClick address (NextPage page)]  [text (toString page)]]
+      li [class (isActive page)] [a [ onClick (NextPage page)]  [text (toString page)]]
     next = 
-      arrows address ((">", (model.page + 1)), (">>",(pageCount model))) (model.page < (pageCount model))  
+      arrows ((">", (model.page + 1)), (">>",(pageCount model))) (model.page < (pageCount model))  
     last = 
-      arrows address (("<<",1), ("<" , (model.page - 1))) (model.page > 1)
+      arrows (("<<",1), ("<" , (model.page - 1))) (model.page > 1)
     links =
       (Array.map (\p -> pageLink ( p + 1)) (Array.initialize (pageCount model) identity))
     sliced = Array.slice slice (slice + maxButtons) links
@@ -96,11 +96,11 @@ pageLinks address ({maxButtons, slice} as model) =
   in
     List.concat [last, (Array.toList windowed), next]
 
-view : Signal.Address Action -> Model -> Html
-view address model = 
+view : Model -> Html Msg
+view model = 
   p [ class "text-center"] [
     nav [] [
-      ul [class = "pagination"] (pageLinks address model)
+      ul [class "pagination"] (pageLinks model)
     ]
   ]
  

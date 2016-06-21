@@ -53,7 +53,7 @@ encode ({type', description, puppetStd}) =
  ] 
 
 
-persistModel : (String -> Effects a) -> Value -> Effects a
+-- persistModel : (String -> Effects a) -> Value -> Effects a
 persistModel f value =
     (f (E.encode 0 value))
 

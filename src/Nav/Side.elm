@@ -22,12 +22,12 @@ init =
 
 -- Update
 
-type Action = 
+type Msg = 
   NavigateTo String | SetSession Session
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-   case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+   case msg of
      SetSession session -> 
        none { model | session = session }
 
@@ -36,15 +36,15 @@ update action model =
 
 -- View
 
-sectionItem : Signal.Address Action -> String -> String -> Html
-sectionItem address resource nested =
-  li_ [a [class (resource ++ nested), href ("#/" ++ resource ++ "/" ++ nested)] 
+sectionItem : String -> String -> (Html Msg)
+sectionItem resource nested =
+  li [] [a [class (resource ++ nested), href ("#/" ++ resource ++ "/" ++ nested)] 
         [ i [class "fa fa-circle-o"][]
         , text nested ]
       ]
 
-drop : Signal.Address Action -> String -> List String -> String -> Html
-drop address resource actions icon =
+drop : String -> List String -> String -> (Html Msg)
+drop resource msgs icon =
   li [class "treeview"] [
     a [class (resource ++ "Menu"), href "#"]  [
       i [class icon] []
@@ -53,34 +53,34 @@ drop address resource actions icon =
     ] 
       
   , ul [ class "treeview-menu" ] 
-      (List.map (\nested -> sectionItem address resource nested) actions)
+      (List.map (\nested -> sectionItem resource nested) msgs)
   ]
 
-adminMenus : Signal.Address Action -> List Html
-adminMenus address =
-   [  drop address "systems" ["list", "add"] "fa fa-server"
-    , drop address "templates" ["list"] "fa fa-clone"
-    , drop address "types" ["list", "add"] "fa fa-archive"
-    , drop address "jobs" ["list", "stats"] "fa fa-tasks"
-    , drop address "users" ["list", "add"] "fa fa-users"
+adminMenus : List (Html Msg)
+adminMenus =
+   [  drop "systems" ["list", "add"] "fa fa-server"
+    , drop "templates" ["list"] "fa fa-clone"
+    , drop "types" ["list", "add"] "fa fa-archive"
+    , drop "jobs" ["list", "stats"] "fa fa-tasks"
+    , drop "users" ["list", "add"] "fa fa-users"
    ]
 
-userMenus : Signal.Address Action -> List Html
-userMenus address =
-   [   drop address "systems" ["list", "add"] "fa fa-server"
-     , drop address "templates" ["list"] "fa fa-clone"
-     , drop address "jobs" ["list", "stats"] "fa fa-tasks"
+userMenus : List (Html Msg)
+userMenus =
+   [   drop "systems" ["list", "add"] "fa fa-server"
+     , drop "templates" ["list"] "fa fa-clone"
+     , drop "jobs" ["list", "stats"] "fa fa-tasks"
    ]
 
-view : Signal.Address Action -> Model -> List Html
-view address {session} =
+view : Model -> List (Html Msg)
+view {session} =
  [aside [class "main-sidebar"] 
    [section [class "sidebar"] [
        ul [class "sidebar-menu"]
         (if isUser session then
-          (userMenus address)
+          (userMenus)
         else
-          (adminMenus address))
+          (adminMenus))
      ]
    ]
  ] 

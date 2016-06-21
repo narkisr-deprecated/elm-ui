@@ -16,10 +16,10 @@ jobResponse =
     ("id" := Json.string)
     ("job" := Json.string)
 
-runJob : String -> String -> (Result Error JobResponse -> a) -> Effects a
-runJob id job action =
+runJob : String -> String -> (Result Error JobResponse -> a) -> Cmd (Result a a)
+runJob id job msg =
   Http.post jobResponse ("/jobs/" ++  job ++ "/" ++ id) Http.empty
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.map msg
+    |> Task.perform Err Ok
 

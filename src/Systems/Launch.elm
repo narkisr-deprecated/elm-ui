@@ -24,9 +24,9 @@ type alias Model =
   , table : Table.Model System
   }
 
-type Action = 
+type Msg = 
   SetupJob String
-  | LoadPage (Table.Action System)
+  | LoadPage (Table.Msg System)
   | JobLaunched (Result Http.Error JobResponse)
   | Run
   | NoOp
@@ -43,7 +43,7 @@ systemRow id {env, owner, type', machine} =
  ]
 
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let
     table = Table.init "launchListing" False ["#","Hostname", "Type", "Env","Owner"] systemRow "Systems"
@@ -53,18 +53,18 @@ init =
 
 -- Update
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({job} as model) =
-  case action  of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({job} as model) =
+  case msg  of
     JobLaunched result ->
       successHandler result model (\ res -> (model, Effects.none)) NoOp 
 
     SetupJob job ->
       ({ model | job = job }, Effects.none)
 
-    LoadPage tableAction -> 
+    LoadPage tableMsg -> 
       let
-        newTable = Table.update tableAction model.table
+        newTable = Table.update tableMsg model.table
       in
        ({ model | table = newTable }, Effects.none)
 
@@ -98,7 +98,7 @@ message job =
      ]
  ]
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address {table, job} =
  let 
    systemsTable = (panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table))

@@ -22,13 +22,13 @@ type alias Model =
   , editDefaults : Bool
   }
  
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   (Model emptyStack "" [] False, getTemplates SetTemplates)
 
 -- Update 
 
-type Action = 
+type Msg = 
   LoadTemplates
    | NameInput String
    | SelectTemplate String
@@ -40,14 +40,14 @@ type Action =
    | Cancel
    | NoOp
 
-setTemplates: Model -> List Template -> (Model , Effects Action)
+setTemplates: Model -> List Template -> (Model , Effects Msg)
 setTemplates model newTemplates = 
   none { model | templates = (List.map (\{name} -> name) newTemplates)}
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    LoadTemplates -> 
      (model, getTemplates SetTemplates)
 
@@ -78,7 +78,7 @@ addView address ({template, templates, stack, editDefaults} as model) =
         )
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   div [] 
     (infoCallout address (info "Add a new Stack" ) (addView address model) Cancel Save)

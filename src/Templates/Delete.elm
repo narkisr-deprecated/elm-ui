@@ -17,13 +17,13 @@ type alias Model =
   , errorMsg : String
   }
  
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   none (Model "" "")
 
 -- Update 
 
-type Action = 
+type Msg = 
   NoOp
   | Cancel
   | Delete
@@ -31,9 +31,9 @@ type Action =
   | Deleted (Result Http.Error DeleteResponse)
   | Error String
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({name} as model) =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({name} as model) =
+  case msg of 
     Deleted result -> 
       failHandler result model (\{message} -> none { model | errorMsg = withDefault "Failed to delete template" message }) NoOp
        
@@ -45,19 +45,19 @@ update action ({name} as model) =
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
-view address model =
-  Delete.view address model "Template" Cancel Delete Done
+view : Signal.Address Msg -> Model -> List Html
+view model =
+  Delete.view model "Template" Cancel Delete Done
 
-deleteTemplate : String -> Effects Action
+deleteTemplate : String -> Effects Msg
 deleteTemplate  name = 
   delete deleteResponse ("/templates/" ++ name)
     |> Task.toResult
     |> Task.map Deleted
     |> Effects.task
 
-succeeded action {errorMsg} = 
-  if action == (Deleted (Result.Ok { message = "Template deleted"} )) then
+succeeded msg {errorMsg} = 
+  if msg == (Deleted (Result.Ok { message = "Template deleted"} )) then
     True
   else
     False

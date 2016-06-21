@@ -35,9 +35,9 @@ defaultEmpty list =
     Nothing -> 
       []
 
-none : a -> (a, Effects b)
+none : a -> (a, Cmd b)
 none a =
-  (a, Effects.none)
+  (a, Cmd.none)
 
 setEnvironments model es =
    none {model | environments = Dict.keys es}

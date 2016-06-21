@@ -18,12 +18,12 @@ type alias Model =
    id : Int
   }
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   (Model 0 , Effects.none)
   
 -- Update
-type Action = 
+type Msg = 
   NoOp
 
 -- View
@@ -50,8 +50,8 @@ summarize model =
   ]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
     fixedPanel (div [] [])
 
 

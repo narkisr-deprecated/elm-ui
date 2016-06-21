@@ -56,7 +56,7 @@ type alias Model =
   , enabled : Bool
   }
 
-type Action = 
+type Msg = 
   PollMetrics Time
     | Load (Result Http.Error Metrics)
     | LoadSession (Result Http.Error Session)
@@ -66,7 +66,7 @@ emptyTimer : Timer
 emptyTimer =
   {min = 0, max = 0, mean = 0}
 
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
    (Model [] [] Now.loadTime 15 False, getSession LoadSession)
 
@@ -106,7 +106,7 @@ meanMaxMin polls =
     )
 
 
-setMetrics: Model -> Metrics -> (Model, Effects Action)
+setMetrics: Model -> Metrics -> (Model, Effects Msg)
 setMetrics ({polls} as model) metrics =
   let 
     newPolls = pollingTrim model metrics
@@ -122,9 +122,9 @@ setEnabled model ({roles, username} as session) =
      none {model | enabled = True } 
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({polls, lastPoll, enabled} as model) =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({polls, lastPoll, enabled} as model) =
+  case msg of
     PollMetrics time ->
       if enabled then 
         ({model | lastPoll = time}, getMetrics)
@@ -175,7 +175,7 @@ chart ((labels,series) as config) header =
    ]
 
 
-view : Signal.Address Action -> Model -> List Html
+view : Signal.Address Msg -> Model -> List Html
 view address ({charts} as model)=
   List.map row_ (partition 2 (List.map (\(header,config) -> chart config header) charts))
 
@@ -198,7 +198,7 @@ metricsDecoder =
 
 -- Effects
 
-getMetrics : Effects Action
+getMetrics : Effects Msg
 getMetrics = 
   getJson metricsDecoder "/metrics" 
     |> Task.toResult

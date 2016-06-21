@@ -56,22 +56,22 @@ environmentsList =
    at ["environments"] (dict environment)
 
 -- Effects
-getEnvironments action = 
+getEnvironments msg = 
   getJson environmentsList "/environments" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.map msg
+    |> Task.perform Err Ok
 
 environmentsKeys: Decoder (List String)
 environmentsKeys=
   at ["environments"] (list string)
 
 
-getEnvironmentKeys action = 
+getEnvironmentKeys msg = 
   getJson environmentsKeys "/environments/keys" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.map msg
+    |> Task.perform Err Ok
 
 
 

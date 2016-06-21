@@ -5,7 +5,7 @@ import Html exposing (..)
 import Jobs.Routing as Routing exposing (Route)
 import Common.Utils exposing (none)
 
-import Jobs.List as List exposing (Action(Polling))
+import Jobs.List as List exposing (Msg(Polling))
 import Jobs.Stats as Stats
 
 type alias Model = 
@@ -14,7 +14,7 @@ type alias Model =
    , stats : Stats.Model 
   }
  
-init : (Model , Effects Action)
+init : (Model , Effects Msg)
 init =
   let
     (stats,statsEffects) = Stats.init
@@ -28,13 +28,13 @@ init =
 
 -- Update 
 
-type Action = 
-  JobsListing List.Action
-    | JobsStats Stats.Action
+type Msg = 
+  JobsListing List.Msg
+    | JobsStats Stats.Msg
     | NoOp
 
-isPolling action = 
-  case action of
+isPolling msg = 
+  case msg of
     JobsListing Polling -> 
       True
 
@@ -45,9 +45,9 @@ isPolling action =
       False
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({list, stats} as model)=
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({list, stats} as model)=
+  case msg of 
     JobsListing listing -> 
       let
         (newListing, effects) = List.update listing list
@@ -66,7 +66,7 @@ update action ({list, stats} as model)=
 
 -- View
 
-view : Signal.Address Action -> Model -> Route -> List Html
+view : Signal.Address Msg -> Model -> Route -> List Html
 view address {list, stats} route =
   case route of
     Routing.List -> 

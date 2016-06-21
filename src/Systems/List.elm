@@ -44,7 +44,7 @@ type alias Model =
   , table : Table.Model System
   , search : Search.Model}
 
-init : (Model, Effects Action)
+init : (Model, Effects Msg)
 init =
  let 
    systems = (Dict.empty, [("", emptySystem)])
@@ -55,11 +55,11 @@ init =
 
 -- Update
 
-type Action = 
+type Msg = 
       SetSystems(Result Http.Error Systems)
-    | GotoPage Pager.Action
-    | LoadPage (Table.Action System)
-    | Searching Search.Action
+    | GotoPage Pager.Msg
+    | LoadPage (Table.Msg System)
+    | Searching Search.Msg
     | NoOp
 
 setSystems model ((meta, items) as systemsResult) = 
@@ -70,19 +70,19 @@ setSystems model ((meta, items) as systemsResult) =
   in
     ({ model | systems = systemsResult, pager = newPager, table = newTable } , Effects.none)
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({error, table} as model) =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({error, table} as model) =
+  case msg of
 
     SetSystems result ->
       successHandler result model (setSystems model) NoOp
       
-    GotoPage pageAction -> 
-      case pageAction of
+    GotoPage pageMsg -> 
+      case pageMsg of
 
         Pager.NextPage page -> 
           let
-            newPager = (Pager.update pageAction model.pager)
+            newPager = (Pager.update pageMsg model.pager)
           in
            if isEmpty model.search.input then
             ({model | pager = newPager}, getSystems page 10)
@@ -92,11 +92,11 @@ update action ({error, table} as model) =
         _ ->
           (model , Effects.none)
 
-    Searching searchAction -> 
+    Searching searchMsg -> 
       let 
-        newSearch = (Search.update searchAction model.search)
+        newSearch = (Search.update searchMsg model.search)
       in
-      case searchAction of 
+      case searchMsg of 
         Search.Result True res ->
            ({ model | search = newSearch , error = NoError}, getSystemsQuery model.pager.page 10 newSearch.parsed)
 
@@ -109,9 +109,9 @@ update action ({error, table} as model) =
         _ -> 
           (model, Effects.none)
 
-    LoadPage tableAction -> 
+    LoadPage tableMsg -> 
       let
-        newTable = Table.update tableAction model.table
+        newTable = Table.update tableMsg model.table
       in
         if error == NoSystemSelected && newTable.selected /= Set.empty then
           ({ model | table = newTable , error = NoError }, Effects.none)
@@ -149,8 +149,8 @@ flash model =
         callout "danger" (info error)
 
 
-view : Signal.Address Action -> Model -> List Html
-view address model = 
+view : Signal.Address Msg -> Model -> List Html
+view model = 
   let 
    (meta,systems) = model.systems
   in
@@ -184,14 +184,14 @@ systemPage =
     ("systems" := list systemPair)
 
 -- Effects
-getSystems : Int -> Int -> Effects Action
+getSystems : Int -> Int -> Effects Msg
 getSystems page offset = 
   getJson systemPage ("/systems?page=" ++ (toString page) ++  "&offset=" ++ (toString offset)) 
     |> Task.toResult
     |> Task.map SetSystems
     |> Effects.task
 
-getSystemsQuery : Int -> Int  -> String -> Effects Action
+getSystemsQuery : Int -> Int  -> String -> Effects Msg
 getSystemsQuery page offset query= 
   getJson systemPage ("/systems/query?page=" ++ (toString page) ++  "&offset=" ++ (toString offset) ++ "&query=" ++ query)
     |> Task.toResult

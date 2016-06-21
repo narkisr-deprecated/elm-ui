@@ -39,8 +39,8 @@ init =
   in 
     Model wizard emptyGce emptyMachine Dict.empty Dict.empty
 
-type Action = 
-  WizardAction Wizard.Action
+type Msg = 
+  WizardMsg Wizard.Msg
    | Update Environment
    | SelectMachineType String
    | SelectOS String
@@ -87,13 +87,13 @@ listValidations = Dict.fromList [
 
 validateGce = validateAll [listValidations, stringValidations]
 
-update : Action -> Model-> Model
-update action ({wizard, gce, machine} as model) =
-  case action of
-    WizardAction action -> 
+update : Msg -> Model-> Model
+update msg ({wizard, gce, machine} as model) =
+  case msg of
+    WizardMsg msg -> 
       let
         ({errors} as newModel) = (validateGce wizard.step model)
-        newWizard = Wizard.update (notAny errors) action wizard
+        newWizard = Wizard.update (notAny errors) msg wizard
       in
        { newModel | wizard = newWizard } 
 
@@ -156,10 +156,10 @@ next : Model -> Environment -> Model
 next model environment =
       model 
          |> update (Update environment) 
-         |> update (WizardAction Wizard.Next)
+         |> update (WizardMsg Wizard.Next)
 
 back model =
-  (update (WizardAction Wizard.Back) model)
+  (update (WizardMsg Wizard.Back) model)
 
 
 getOses : Model -> Dict String Template
@@ -173,7 +173,7 @@ getOses model =
       _ -> 
         Dict.empty
 
-networking: Signal.Address Action -> Model -> List Html
+networking: Signal.Address Msg -> Model -> List Html
 networking address ({errors, gce, machine} as model) =
   let 
     check = withErrors errors
@@ -188,7 +188,7 @@ networking address ({errors, gce, machine} as model) =
   ]
 
 
-instance : Signal.Address Action -> Model -> List Html
+instance : Signal.Address Msg -> Model -> List Html
 instance address ({gce, machine, errors} as model) =
   let
     check = withErrors errors
@@ -207,7 +207,7 @@ instance address ({gce, machine, errors} as model) =
        , check "Tags" (inputText address TagsInput " " tags)]
    ]
 
-stepView:  Signal.Address Action -> Model -> List Html
+stepView:  Signal.Address Msg -> Model -> List Html
 stepView address ({wizard, gce, machine} as model) =
   case wizard.step of
     Instance -> 
@@ -223,6 +223,6 @@ stepView address ({wizard, gce, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   (fixedPanel (Html.form [] (stepView address model)))
