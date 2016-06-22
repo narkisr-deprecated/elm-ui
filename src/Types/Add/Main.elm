@@ -43,21 +43,21 @@ reinit env type' =
   Model (Form.initial (editDefaults env type') validate)
 
 -- View
-typeField address {form} = 
+typeField {form} = 
   let
     ({isDirty, value, isChanged} as type') = Form.getFieldAsString "type" form
     inEdit = (not isDirty && value /= Nothing && not isChanged )
   in
     formGroup "Type" Input.textInput type' [class "form-control", readonly inEdit]
 
-view environments address ({form} as model) =
+view environments ({form} as model) =
   let 
     environment = (Form.getFieldAsString "environment" form)
     description = (Form.getFieldAsString "description" form)
   in 
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        typeField address model
+        typeField model
       , formControl "Description" Input.textInput description 
       , formControl "Environment"  (Input.selectInput environments) environment ]
     ])

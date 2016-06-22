@@ -53,7 +53,7 @@ encode ({type', machine, defaults, name, description} as template) hyp =
  ] 
 
 
-persistModel : (String -> Effects a) -> Value -> Effects a
+persistModel : (String -> Cmd a) -> Value -> Cmd a
 persistModel f value =
     (f (E.encode 0 value))
 

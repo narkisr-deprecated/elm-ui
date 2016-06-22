@@ -173,23 +173,23 @@ getOses model =
       _ -> 
         Dict.empty
 
-networking: Signal.Address Msg -> Model -> List Html
-networking address ({errors, gce, machine} as model) =
+networking: Model -> List (Html Msg)
+networking ({errors, gce, machine} as model) =
   let 
     check = withErrors errors
   in
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
      [
        legend [] [text "DNS"]
-     , check "Hostname" (inputText address HostnameInput "" machine.hostname)
-     , check "Domain"  (inputText address DomainInput "" machine.domain)
-     , check "IP" (inputText address IPInput "" (withDefault "" gce.staticIp))
+     , check "Hostname" (inputText HostnameInput "" machine.hostname)
+     , check "Domain"  (inputText DomainInput "" machine.domain)
+     , check "IP" (inputText IPInput "" (withDefault "" gce.staticIp))
      ]
   ]
 
 
-instance : Signal.Address Msg -> Model -> List Html
-instance address ({gce, machine, errors} as model) =
+instance : Model -> List (Html Msg)
+instance ({gce, machine, errors} as model) =
   let
     check = withErrors errors
     tags = (String.join " " (defaultEmpty gce.tags))
@@ -198,23 +198,23 @@ instance address ({gce, machine, errors} as model) =
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
-       , group' "Machine type" (selector address SelectMachineType machineTypes gce.machineType)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os)
-       , group' "Zone" (selector address SelectZone zones gce.zone)
-       , check "Project id" (inputText address ProjectIdInput "" gce.projectId)
+       , group' "Machine type" (selector SelectMachineType machineTypes gce.machineType)
+       , group' "OS" (selector SelectOS (Dict.keys (getOses model)) machine.os)
+       , group' "Zone" (selector SelectZone zones gce.zone)
+       , check "Project id" (inputText ProjectIdInput "" gce.projectId)
        , legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" model.machine.user) 
-       , check "Tags" (inputText address TagsInput " " tags)]
+       , check "User" (inputText UserInput "" model.machine.user) 
+       , check "Tags" (inputText TagsInput " " tags)]
    ]
 
-stepView:  Signal.Address Msg -> Model -> List Html
-stepView address ({wizard, gce, machine} as model) =
+stepView:  Model -> List (Html Msg)
+stepView ({wizard, gce, machine} as model) =
   case wizard.step of
     Instance -> 
-      instance address model 
+      instance model 
 
     Networking -> 
-      networking address model
+      networking model
 
     Summary -> 
       summarize (gce, machine)
@@ -225,4 +225,4 @@ stepView address ({wizard, gce, machine} as model) =
 
 view : Model -> Html Msg
 view model =
-  (fixedPanel (Html.form [] (stepView address model)))
+  (fixedPanel (Html.form [] (stepView model)))

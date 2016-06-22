@@ -28,7 +28,7 @@ type alias Model =
     system : System
    }
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   (Model emptySystem, Effects.none)
 
@@ -63,8 +63,8 @@ toHtml ({system} as model) f prop=
     Nothing -> 
        []
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({system} as model) =
+view : Model -> List (Html Msg)
+view ({system} as model) =
     let
       options = [ toHtml  model AWSView.summarize system.aws
                 , toHtml  model GCEView.summarize system.gce

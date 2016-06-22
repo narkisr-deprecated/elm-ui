@@ -145,8 +145,8 @@ getOses model =
       _ -> 
         Dict.empty
 
-instance : Signal.Address Msg -> Model -> List Html
-instance address ({digital, machine, errors} as model) =
+instance : Model -> List (Html Msg)
+instance ({digital, machine, errors} as model) =
   let
     check = withErrors errors
     region = withDefault "" (List.head regions)
@@ -154,22 +154,22 @@ instance address ({digital, machine, errors} as model) =
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
-       , group' "Size" (selector address SelectSize sizes digital.size)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os) , group' "Region" (selector address SelectRegion regions digital.region)
+       , group' "Size" (selector SelectSize sizes digital.size)
+       , group' "OS" (selector SelectOS (Dict.keys (getOses model)) machine.os) , group' "Region" (selector SelectRegion regions digital.region)
        , legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" machine.user) 
+       , check "User" (inputText UserInput "" machine.user) 
        , legend [] [text "Networking"]
-       , check "Hostname" (inputText address HostnameInput "" machine.hostname)
-       , check "Domain"  (inputText address DomainInput "" machine.domain)
-       , group' "Private Networking" (checkbox address PrivateNetworking digital.privateNetworking)
+       , check "Hostname" (inputText HostnameInput "" machine.hostname)
+       , check "Domain"  (inputText DomainInput "" machine.domain)
+       , group' "Private Networking" (checkbox PrivateNetworking digital.privateNetworking)
        ]
     ]
 
-stepView :  Signal.Address Msg -> Model -> List Html
-stepView address ({wizard, digital, machine} as model) =
+stepView :  Model -> List (Html Msg)
+stepView ({wizard, digital, machine} as model) =
   case wizard.step of
     Instance -> 
-      instance address model 
+      instance model 
 
     Summary -> 
       summarize (digital, machine)
@@ -180,4 +180,4 @@ stepView address ({wizard, digital, machine} as model) =
 
 view : Model -> Html Msg
 view model =
-  fixedPanel (Html.form [] (stepView address model))
+  fixedPanel (Html.form [] (stepView model))

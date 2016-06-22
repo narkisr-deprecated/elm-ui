@@ -18,7 +18,7 @@ type alias Model =
   , section : Section 
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
     (header, _) = Header.init
@@ -70,10 +70,10 @@ update msg ({side, header} as model) =
 
 -- View
 
-sideView address {side} = 
-  Side.view (Signal.forwardTo address SideMsg) side
+sideView {side} = 
+  Side.view (Signal.forwardTo SideMsg) side
 
-headerView address {header} = 
-  Header.view (Signal.forwardTo address HeaderMsg) header
+headerView {header} = 
+  Header.view (Signal.forwardTo HeaderMsg) header
 
 

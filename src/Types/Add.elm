@@ -48,7 +48,7 @@ step model value =
   , value = value
   }
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
     errors = Errors.init
@@ -162,8 +162,8 @@ update msg ({wizard, editClasses, classes} as model) =
     _ -> 
       (none model)
 
-currentView : Signal.Address Msg -> Model -> List Html
-currentView address ({wizard, environments, editClasses, classes} as model) =
+currentView : Model -> List (Html Msg)
+currentView ({wizard, environments, editClasses, classes} as model) =
   let 
     environmentList = List.map (\e -> (e,e)) environments
   in 
@@ -172,31 +172,31 @@ currentView address ({wizard, environments, editClasses, classes} as model) =
         case value of 
           Main -> 
            dialogPanel "info" (info "Add a new Type") 
-            (panel (fixedPanel (Main.view environmentList (Signal.forwardTo address FormMsg) current)) )
+            (panel (fixedPanel (Main.view environmentList (Signal.forwardTo FormMsg) current)) )
 
           Puppet -> 
             let
-             check = (checkbox address (LoadEditor "typesAdd") editClasses)
+             check = (checkbox (LoadEditor "typesAdd") editClasses)
             in 
              dialogPanel "info" (info "Module properties") 
-               (panel (fixedPanel (Puppet.view check (Signal.forwardTo address FormMsg) current)))
+               (panel (fixedPanel (Puppet.view check (Signal.forwardTo FormMsg) current)))
           
       Nothing -> 
         dialogPanel "info" (info "Save new type") 
            (panel (fixedPanel (summarize (merged model))))
 
 
-errorsView address {saveErrors} = 
+errorsView {saveErrors} = 
    let
-     body = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+     body = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
    in
      dialogPanel "danger" (error "Failed to save type") (panel (panelContents body))
 
-saveButton address =
-    [button [id "Save", class "btn btn-primary", onClick address (Save saveType) ] [text "Save  "]]
+saveButton =
+    [button [id "Save", class "btn btn-primary", onClick (Save saveType) ] [text "Save  "]]
 
-doneButton address =
-    [button [id "Done", class "btn btn-primary", onClick address (Save saveType) ] [text "Done "]]
+doneButton =
+    [button [id "Done", class "btn btn-primary", onClick (Save saveType) ] [text "Done "]]
 
 
 rows contents buttons = 
@@ -207,18 +207,18 @@ rows contents buttons =
  ,row_ buttons
  ]
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({wizard, saveErrors} as model) =
+view : Model -> List (Html Msg)
+view ({wizard, saveErrors} as model) =
   let 
-    buttons' = (buttons address { model | hasNext = Wizard.notDone model})
+    buttons' = (buttons { model | hasNext = Wizard.notDone model})
   in 
    if Errors.hasErrors saveErrors then
     rows 
-     (div [] (errorsView address model))
+     (div [] (errorsView model))
      (buttons' Done Reset (doneButton address))
     else
      rows 
-      (div [class "col-md-offset-2 col-md-8"] (currentView address model))
+      (div [class "col-md-offset-2 col-md-8"] (currentView model))
       (buttons' Next Back (saveButton address))
 
 saveType: String -> Effects Msg

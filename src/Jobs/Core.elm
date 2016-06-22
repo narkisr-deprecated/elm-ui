@@ -14,7 +14,7 @@ type alias Model =
    , stats : Stats.Model 
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
     (stats,statsEffects) = Stats.init
@@ -66,14 +66,14 @@ update msg ({list, stats} as model)=
 
 -- View
 
-view : Signal.Address Msg -> Model -> Route -> List Html
-view address {list, stats} route =
+view : Model -> Route -> List (Html Msg)
+view {list, stats} route =
   case route of
     Routing.List -> 
-      List.view (Signal.forwardTo address JobsListing) list
+      List.view (Signal.forwardTo JobsListing) list
 
     Routing.Stats -> 
-      Stats.view (Signal.forwardTo address JobsStats) stats
+      Stats.view (Signal.forwardTo JobsStats) stats
 
 
 

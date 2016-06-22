@@ -55,7 +55,7 @@ validate =
         ("hostname" := string)
         ("domain" := string))
     
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let 
     (admin, effects) = Admin.init
@@ -123,7 +123,7 @@ update msg ({saveErrors, form, admin, name} as model) =
       none model
 
 -- View
-infoMessage : String -> List Html
+infoMessage : String -> List (Html Msg)
 infoMessage name =
   [
      h4 [] [ text "Info" ]
@@ -135,9 +135,9 @@ infoMessage name =
  ]
 
 
-machineView address form =
+machineView form =
   let 
-    formAddress = Signal.forwardTo address FormMsg
+    formAddress = Signal.forwardTo FormMsg
     hostname = (Form.getFieldAsString "machine.hostname" form)
     domain = (Form.getFieldAsString "machine.domain" form)
   in 
@@ -145,19 +145,19 @@ machineView address form =
    , formControl "Domain" Input.textInput domain formAddress 
    ]
 
-launchView address {name, form, admin} =
+launchView {name, form, admin} =
    div [class "panel panel-default"] [
      div [class "panel-body"] [
        (Html.form [] [
           div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
            (List.append
-              (machineView address form) 
-              (Admin.view (Signal.forwardTo address AdminMsg) admin))
+              (machineView form) 
+              (Admin.view (Signal.forwardTo AdminMsg) admin))
       ])
     ]
   ]
 
-errorMessage : List Html
+errorMessage : List (Html Msg)
 errorMessage =
   [
     h4 [] [ text "Error!" ]
@@ -165,15 +165,15 @@ errorMessage =
   ]
 
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({name, saveErrors} as model) =
+view : Model -> List (Html Msg)
+view ({name, saveErrors} as model) =
   let
-    errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+    errorsView = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
   in
     if Errors.hasErrors saveErrors then
-      dangerCallout address errorMessage (panel (panelContents errorsView)) Cancel Done
+      dangerCallout errorMessage (panel (panelContents errorsView)) Cancel Done
     else 
-      infoCallout address (infoMessage name) (launchView address model) Cancel Launch
+      infoCallout (infoMessage name) (launchView model) Cancel Launch
 
 -- Effects
 

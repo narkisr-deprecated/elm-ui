@@ -17,7 +17,7 @@ type alias Model =
   , navChange : Maybe String
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let 
     (list, listMsgs) = List.init
@@ -81,14 +81,14 @@ update msg model =
 
 -- View
 
-view : Signal.Address Msg -> Model -> Route -> List Html
-view address ({list, add} as model) section =
+view : Model -> Route -> List (Html Msg)
+view ({list, add} as model) section =
    case section of
      Routing.List -> 
-        List.view (Signal.forwardTo address Listing) list
+        List.view (Signal.forwardTo Listing) list
 
      Routing.Add -> 
-        Add.view (Signal.forwardTo address Adding) add
+        Add.view (Signal.forwardTo Adding) add
       
      _ -> 
        asList notImplemented

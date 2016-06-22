@@ -148,30 +148,30 @@ getOses model =
       _ -> 
         Dict.empty
 
-instance : Signal.Address Msg -> Model -> List Html
-instance address ({physical, machine, errors} as model) =
+instance : Model -> List (Html Msg)
+instance ({physical, machine, errors} as model) =
   let
     check = withErrors errors
   in
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" machine.user) 
+       , check "User" (inputText UserInput "" machine.user) 
        , legend [] [text "Networking"]
-       , check "IP"  (inputText address IPInput "" (withDefault "" machine.ip))
-       , check "Hostname" (inputText address HostnameInput "" machine.hostname)
-       , check "Domain"  (inputText address DomainInput "" machine.domain)
+       , check "IP"  (inputText IPInput "" (withDefault "" machine.ip))
+       , check "Hostname" (inputText HostnameInput "" machine.hostname)
+       , check "Domain"  (inputText DomainInput "" machine.domain)
        , legend [] [text "WOL"]
-       , check "Mac"  (inputText address MacInput "" (withDefault "" physical.mac))
-       , check "Broadcast"  (inputText address BroadcastInput "" (withDefault "" physical.broadcast))
+       , check "Mac"  (inputText MacInput "" (withDefault "" physical.mac))
+       , check "Broadcast"  (inputText BroadcastInput "" (withDefault "" physical.broadcast))
        ]
     ]
 
-stepView :  Signal.Address Msg -> Model -> List Html
-stepView address ({wizard, physical, machine} as model) =
+stepView : Model -> List (Html Msg)
+stepView ({wizard, physical, machine} as model) =
   case wizard.step of
     Instance -> 
-      instance address model 
+      instance model 
 
     Summary -> 
       summarize (physical, machine)
@@ -182,4 +182,4 @@ stepView address ({wizard, physical, machine} as model) =
 
 view : Model -> Html Msg
 view model =
-  fixedPanel (Html.form [] (stepView address model))
+  fixedPanel (Html.form [] (stepView model))

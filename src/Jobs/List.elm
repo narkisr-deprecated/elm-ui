@@ -61,7 +61,7 @@ type Msg =
   | NoOp
   | GotoPage Pager.Msg
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
     running = Table.init "runningJobs" False ["#","Queue", "Status"] runningRow "Running Jobs"
@@ -71,21 +71,21 @@ init =
 
 -- Update
 
-setRunningJobs : Model -> List RunningJob -> (Model , Effects Msg)
+setRunningJobs : Model -> List RunningJob -> (Model , Cmd Msg)
 setRunningJobs ({running} as model) res =
   let 
     jobsList = List.map (\({tid} as r) -> (tid, r)) res
   in  
-    ({model | running = (Table.update (Table.UpdateRows jobsList) running)} , Effects.none)
+    ({model | running = (Table.update (Table.UpdateRows jobsList) running)} , Cmd.none)
 
-setDoneJobs : Model -> (Int, List DoneJob) -> (Model , Effects Msg)
+setDoneJobs : Model -> (Int, List DoneJob) -> (Model , Cmd Msg)
 setDoneJobs ({done, pager} as model) (total, doneJobs) =
   let 
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) pager)
     jobsList = List.map (\({tid} as r) -> (tid, r)) doneJobs
     newDone = (Table.update (Table.UpdateRows jobsList) done)
   in  
-   ({model | done = newDone, pager = newPager} , Effects.none)
+   ({model | done = newDone, pager = newPager} , Cmd.none)
   
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({running, done, pager} as model) =
@@ -107,7 +107,7 @@ update msg ({running, done, pager} as model) =
           in
             ({model | pager = newPager}, getDone page 10)
         _  ->
-          (model , Effects.none)
+          (model , Cmd.none)
     LoadDone (Select tid) ->
        let
          emptyRow = DoneJob 0 0 "" "" "" "" "" "" ""
@@ -123,11 +123,11 @@ update msg ({running, done, pager} as model) =
          (model, (newtab NoOp job.tid_link))
 
     _ -> 
-      (model , Effects.none)
+      (model , Cmd.none)
 
 -- View
 
-runningRow : String -> RunningJob -> List Html
+runningRow : String -> RunningJob -> List (Html Msg)
 runningRow tableId {type', status,id } = 
  [
    td [] [ text id ]
@@ -142,7 +142,7 @@ runningRow tableId {type', status,id } =
    ]
  ]
 
-doneRow : String -> DoneJob -> List Html
+doneRow : String -> DoneJob -> List (Html Msg)
 doneRow tableid {hostname, start, end, queue, identity, status} = 
   let 
    min = (toString ((round (end - start)) // (1000 * 60)))
@@ -184,19 +184,19 @@ accordionPanel active ident body =
       ]
 
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({running, done, pager} as model) =
+view : Model -> List (Html Msg)
+view ({running, done, pager} as model) =
   [div [class "panel-group", id "accordion", attribute "role" "tablist"] 
      [ accordionPanel (not (List.isEmpty running.rows)) "Running" 
-         (panelDefault_ (Table.view (Signal.forwardTo address LoadRunning) running))
+         (panelDefault_ (Table.view (Signal.forwardTo LoadRunning) running))
      , accordionPanel (not (List.isEmpty done.rows)) "Done" 
          (div [] 
            [ row_ [
                div [class "col-md-12"][
-                 (panelDefault_ (Table.view (Signal.forwardTo address LoadDone) done))
+                 (panelDefault_ (Table.view (Signal.forwardTo LoadDone) done))
                ]
              ]
-           , row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+           , row_ [(Pager.view (Signal.forwardTo GotoPage) pager)]
            ]
          ) 
      ]
@@ -244,21 +244,21 @@ doneList =
     ("jobs" := (list doneJob))
 
 
--- Effects
+-- Cmd
 
-getRunning : Effects Msg
+getRunning : Cmd Msg
 getRunning = 
   getJson runningList "/jobs/running" 
     |> Task.toResult
     |> Task.map SetRunning
-    |> Effects.task
+    |> Cmd.task
 
-getDone : Int -> Int -> Effects Msg
+getDone : Int -> Int -> Cmd Msg
 getDone page offset= 
   getJson doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page))
     |> Task.toResult
     |> Task.map SetDone
-    |> Effects.task
+    |> Task.perform Err Ok
 
     
    

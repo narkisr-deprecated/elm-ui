@@ -36,7 +36,7 @@ transform ({aws, openstack} as system) stage =
     _ -> 
        system
 
-persistModel : (String -> Effects a) -> System -> String -> Effects a
+persistModel : (String -> Cmd a) -> System -> String -> Cmd a
 persistModel f system stage =
     (f (E.encode 0 (encode (transform system stage) stage)))
 

@@ -56,7 +56,7 @@ getUsers msg =
   getJson usersList "/users" 
     |> Task.toResult
     |> Task.map msg
-    |> Effects.task
+    |> Task.perform Err Ok
 
 rolesList : Decoder (Dict String String)
 rolesList =
@@ -66,6 +66,6 @@ getRoles msg =
   getJson rolesList "/users/roles" 
     |> Task.toResult
     |> Task.map msg
-    |> Effects.task
+    |> Task.perform Err Ok
 
 

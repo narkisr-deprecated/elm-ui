@@ -17,14 +17,14 @@ import Common.Http exposing (getJson)
 import Task
 import Dict exposing (Dict)
 import String
-
+import Common.Utils exposing (none)
 
 type alias Model = 
   {
    user : User
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   none (Model emptyUser)
 
@@ -35,7 +35,7 @@ type Msg =
     | SetUser (Result Http.Error User)
     | NoOp
 
-setUser: Model -> User -> (Model , Effects Msg)
+setUser: Model -> User -> (Model , Cmd Msg)
 setUser model user =
   none {model | user = user}
 
@@ -50,21 +50,21 @@ update msg model =
       successHandler result model (setUser model) NoOp
  
    NoOp -> 
-     (model, Effects.none)
+     none model
 
 -- View
 
-summarize: User -> Html
+summarize: User -> Html Msg
 summarize model =
    div [style [("line-height", "1.8"), ("list-style-type","none")]] []
 
-view : Signal.Address Msg -> Model -> List Html
-view address {user} =
+view : Model -> List (Html Msg)
+view {user} =
   asList (div [] [h4 [] [(text "User")], (summarize user)])
   
+getUser : String -> Msg -> Cmd (Result Error Msg)
 getUser name msg = 
   getJson Model.user ("/users/" ++ name)
-    |> Task.toResult
     |> Task.map msg
-    |> Effects.task
+    |> Task.perform Err Ok
 

@@ -28,7 +28,7 @@ init =
 
 -- View
 
-view envs operations address ({form} as model) =
+view envs operations ({form} as model) =
  let 
     environment = (Form.getFieldAsStringList "envs" form)
     operation = (Form.getFieldAsStringList "operations" form)

@@ -123,7 +123,7 @@ update msg ({error, table} as model) =
 
 -- View
 
-systemRow : String -> System -> List Html
+systemRow : String -> System -> List (Html Msg)
 systemRow id {env, owner, type', machine} = 
  [
    td_ [ text id ]
@@ -149,7 +149,7 @@ flash model =
         callout "danger" (info error)
 
 
-view : Signal.Address Msg -> Model -> List Html
+view : Model -> List (Html Msg)
 view model = 
   let 
    (meta,systems) = model.systems
@@ -157,17 +157,17 @@ view model =
     [
      row_ [
       div [class "col-md-12"] [
-         Search.view (Signal.forwardTo address Searching) model.search
+         Search.view (Signal.forwardTo Searching) model.search
        ]
      ],
 
      row_ [
        flash model
      , div [class "col-md-offset-1 col-md-10"] [
-         panelDefault_ (Table.view (Signal.forwardTo address LoadPage) model.table)
+         panelDefault_ (Table.view (Signal.forwardTo LoadPage) model.table)
        ]
      ],
-      row_ [(Pager.view (Signal.forwardTo address GotoPage) model.pager)]
+      row_ [(Pager.view (Signal.forwardTo GotoPage) model.pager)]
     ]
        
 

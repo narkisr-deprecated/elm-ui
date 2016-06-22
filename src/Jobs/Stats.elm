@@ -66,7 +66,7 @@ emptyTimer : Timer
 emptyTimer =
   {min = 0, max = 0, mean = 0}
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
    (Model [] [] Now.loadTime 15 False, getSession LoadSession)
 
@@ -175,8 +175,8 @@ chart ((labels,series) as config) header =
    ]
 
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({charts} as model)=
+view : Model -> List (Html Msg)
+view ({charts} as model)=
   List.map row_ (partition 2 (List.map (\(header,config) -> chart config header) charts))
 
 -- Decoding

@@ -260,8 +260,8 @@ next model environment =
 back model =
   (update (WizardMsg Wizard.Back) model)
 
-instance : Signal.Address Msg -> Model -> List Html
-instance address ({openstack, machine, errors} as model) =
+instance : Model -> List (Html Msg)
+instance ({openstack, machine, errors} as model) =
   let
     check = withErrors errors
     groups = (String.join " " (defaultEmpty openstack.securityGroups))
@@ -271,17 +271,17 @@ instance address ({openstack, machine, errors} as model) =
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
-       , group' "Flavor" (selector address SelectFlavor flavors openstack.flavor)
-       , group' "OS" (selector address SelectOS oses machine.os)
-       , check "Tenant" (inputText address TenantInput "" openstack.tenant) 
+       , group' "Flavor" (selector SelectFlavor flavors openstack.flavor)
+       , group' "OS" (selector SelectOS oses machine.os)
+       , check "Tenant" (inputText TenantInput "" openstack.tenant) 
        , legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" machine.user) 
-       , check "Keypair" (inputText address KeyPairInput "" openstack.keyName)
-       , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
+       , check "User" (inputText UserInput "" machine.user) 
+       , check "Keypair" (inputText KeyPairInput "" openstack.keyName)
+       , check "Security groups" (inputText SecurityGroupsInput " " groups)]
    ]
 
-networking: Signal.Address Msg -> Model -> List Html
-networking address ({errors, openstack, machine} as model) =
+networking: Model -> List (Html Msg)
+networking ({errors, openstack, machine} as model) =
   let 
     check = withErrors errors
     networks = (String.join " " openstack.networks)
@@ -289,67 +289,67 @@ networking address ({errors, openstack, machine} as model) =
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
      [
        legend [] [text "Networking"]
-     , check "Hostname" (inputText address HostnameInput "" machine.hostname)
-     , check "Domain"  (inputText address DomainInput "" machine.domain)
-     , check "IP" (inputText address IPInput "" (withDefault "" openstack.floatingIp))
-     , check "IP-Pool" (inputText address IPPoolInput "" (withDefault "" openstack.floatingIpPool))
-     , check "Networks" (inputText address NetworksInput " " networks)
+     , check "Hostname" (inputText HostnameInput "" machine.hostname)
+     , check "Domain"  (inputText DomainInput "" machine.domain)
+     , check "IP" (inputText IPInput "" (withDefault "" openstack.floatingIp))
+     , check "IP-Pool" (inputText IPPoolInput "" (withDefault "" openstack.floatingIpPool))
+     , check "Networks" (inputText NetworksInput " " networks)
      ]
   ]
 
-volumeRow : Signal.Address Msg -> Volume -> Html
-volumeRow address ({device} as v) = 
+volumeRow : Volume -> Html Msg
+volumeRow ({device} as v) = 
   let
     remove = span [ class "glyphicon glyphicon-remove"
                   , attribute "aria-hidden" "true"
                   , style [("top", "5px")]
-                  , onClick address (VolumeRemove device)
+                  , onClick (VolumeRemove device)
                   ] []
     props = [.device, (toString << .size), (toString << .clear)]
   in
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
-volumes : Signal.Address Msg -> List Volume -> Html
-volumes address vs = 
+volumes : List Volume -> Html Msg
+volumes vs = 
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "ebsVolumes"]
      [thead []
         [tr [] (List.map (\k ->  (th [] [text k])) ["device", "size", "clear", ""])]
          , tbody [] 
-            (List.map (\volume -> volumeRow address volume) vs)
+            (List.map (\volume -> volumeRow volume) vs)
  
      ]
   ]
 
 
-cinder: Signal.Address Msg -> Model -> List Html
-cinder address ({errors, volume, openstack} as model) =
+cinder: Model -> List (Html Msg)
+cinder ({errors, volume, openstack} as model) =
   let
     check = withErrors errors
   in
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
     [ 
       legend [] [text "Devices"]
-    , check "Cinder Device" (inputText address CinderDeviceInput "sdh" volume.device)
-    , group' "Size" (inputNumber address CinderSizeInput "" (toString volume.size))
-    , group' "Clear" (checkbox address CinderClear volume.clear)
-    , group' ""  (button [class "btn btn-sm col-md-2", onClick address VolumeAdd] [text "Add"])
+    , check "Cinder Device" (inputText CinderDeviceInput "sdh" volume.device)
+    , group' "Size" (inputNumber CinderSizeInput "" (toString volume.size))
+    , group' "Clear" (checkbox CinderClear volume.clear)
+    , group' ""  (button [class "btn btn-sm col-md-2", onClick VolumeAdd] [text "Add"])
     , legend [] [text "Volumes"]
-    , volumes address (defaultEmpty openstack.volumes)
+    , volumes (defaultEmpty openstack.volumes)
     ]
   ]
 
-stepView :  Signal.Address Msg -> Model -> List Html
-stepView address ({wizard, openstack, machine} as model) =
+stepView :  Model -> List (Html Msg)
+stepView ({wizard, openstack, machine} as model) =
   case wizard.step of
     Instance -> 
-      instance address model 
+      instance model 
 
     Networking -> 
-      networking address model
+      networking model
 
     Cinder -> 
-      cinder address model
+      cinder model
 
     Summary -> 
       summarize (openstack, machine)
@@ -360,4 +360,4 @@ stepView address ({wizard, openstack, machine} as model) =
 
 view : Model -> Html Msg
 view model =
-  fixedPanel (Html.form [] (stepView address model))
+  fixedPanel (Html.form [] (stepView model))

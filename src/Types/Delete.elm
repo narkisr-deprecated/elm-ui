@@ -18,7 +18,7 @@ type alias Model =
   , errorMsg : String
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   none (Model "" "")
 
@@ -48,7 +48,7 @@ update msg ({name} as model) =
 
 -- View
 
-view : Signal.Address Msg -> Model -> List Html
+view : Model -> List (Html Msg)
 view model =
   Delete.view model "Type" Cancel Delete Done
 

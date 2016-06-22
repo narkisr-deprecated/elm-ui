@@ -25,7 +25,7 @@ type alias Model =
 addedSystem model = 
   ((toString model.systemsAdd.stage), Add.intoSystem model.systemsAdd)
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
      (systemsList, systemsListMsg) = List.init 
@@ -135,20 +135,20 @@ update msg ({systemsView, systemsList, systemsAdd} as model) =
       none model
 
 
-view : Signal.Address Msg -> Model -> Route -> List Html
+view : Model -> Route -> List (Html Msg)
 view model route =
   case route of
     Routing.List -> 
-      List.view (Signal.forwardTo address SystemsListing) model.systemsList 
+      List.view (Signal.forwardTo SystemsListing) model.systemsList 
 
     Routing.Launch ->
-      Launch.view (Signal.forwardTo address SystemsLaunch) model.systemsLaunch
+      Launch.view (Signal.forwardTo SystemsLaunch) model.systemsLaunch
 
     Routing.Add ->
-      Add.view (Signal.forwardTo address SystemsAdd) model.systemsAdd
+      Add.view (Signal.forwardTo SystemsAdd) model.systemsAdd
 
     Routing.View _ -> 
-      View.view (Signal.forwardTo address SystemsView) model.systemsView
+      View.view (Signal.forwardTo SystemsView) model.systemsView
 
     _ -> 
      [div  [] [text "not implemented"]]

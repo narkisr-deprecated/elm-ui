@@ -149,34 +149,34 @@ update : Msg ->  Model -> (Model , Effects Msg)
 update msg model = 
    route msg model
 
-activeView : Signal.Address Msg -> Model -> List Html
-activeView address ({jobs, route, systems, types, templates, stacks, users} as model) =
+activeView : Model -> List (Html Msg)
+activeView ({jobs, route, systems, types, templates, stacks, users} as model) =
     case route of
       SystemsRoute nested -> 
-        Systems.view (Signal.forwardTo address SystemsMsg) systems nested
+        Systems.view (Signal.forwardTo SystemsMsg) systems nested
       
       TypesRoute nested -> 
-        Types.view (Signal.forwardTo address TypesMsg) types nested
+        Types.view (Signal.forwardTo TypesMsg) types nested
 
       TemplatesRoute nested -> 
-        Templates.view (Signal.forwardTo address TemplatesMsg) templates nested
+        Templates.view (Signal.forwardTo TemplatesMsg) templates nested
       
       JobsRoute nested -> 
-        Jobs.view (Signal.forwardTo address JobsMsg) jobs nested
+        Jobs.view (Signal.forwardTo JobsMsg) jobs nested
 
       UsersRoute nested -> 
-        Users.view (Signal.forwardTo address UsersMsg) users nested
+        Users.view (Signal.forwardTo UsersMsg) users nested
       
       _ ->
-         Systems.view (Signal.forwardTo address SystemsMsg) systems List
+         Systems.view (Signal.forwardTo SystemsMsg) systems List
 
 view : Model -> Html Msg
-view address ({nav} as model) = 
+view ({nav} as model) = 
   div [class "wrapper"] 
     (List.append
        (List.append 
-         (Nav.sideView (Signal.forwardTo address NavMsg) nav) 
-         (Nav.headerView (Signal.forwardTo address NavMsg) nav))
+         (Nav.sideView (Signal.forwardTo NavMsg) nav) 
+         (Nav.headerView (Signal.forwardTo NavMsg) nav))
        [div [class "content-wrapper"]
-         [section [class "content"] (activeView address model)]])
+         [section [class "content"] (activeView model)]])
 

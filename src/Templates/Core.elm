@@ -169,20 +169,20 @@ update msg ({add, launch, list} as model) =
 add hyp system = 
   TemplatesAdd (Add.SetSystem hyp system)
 
-view : Signal.Address Msg -> Model -> Route -> List Html
-view address {add, list, launch, delete} route =
+view : Model -> Route -> List (Html Msg)
+view {add, list, launch, delete} route =
   case route of
     Route.Add ->
-      Add.view (Signal.forwardTo address TemplatesAdd) add
+      Add.view (Signal.forwardTo TemplatesAdd) add
 
     Route.List ->
-      List.view (Signal.forwardTo address TemplatesList) list
+      List.view (Signal.forwardTo TemplatesList) list
 
     Route.Launch _ ->
-      Launch.view (Signal.forwardTo address TemplatesLaunch) launch
+      Launch.view (Signal.forwardTo TemplatesLaunch) launch
 
     Route.Delete _ ->
-      Delete.view (Signal.forwardTo address TemplatesDelete) delete
+      Delete.view (Signal.forwardTo TemplatesDelete) delete
 
     Route.View _ -> 
       []

@@ -33,7 +33,7 @@ init role =
  
 -- View
 
-view roles address ({form} as model) =
+view roles ({form} as model) =
   let 
     role = (Form.getFieldAsString "role" form)
     name = (Form.getFieldAsString "username" form)
@@ -41,9 +41,9 @@ view roles address ({form} as model) =
   in 
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Name" Input.textInput name address
-      , formControl "Password" Input.passwordInput password address
-      , formControl "Roles"  (Input.selectInput roles) role address
+        formControl "Name" Input.textInput name 
+      , formControl "Password" Input.passwordInput password 
+      , formControl "Roles"  (Input.selectInput roles) role
       ]
     ])
 

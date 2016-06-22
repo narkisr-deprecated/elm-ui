@@ -22,7 +22,7 @@ type alias Model =
   , editDefaults : Bool
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   (Model emptyStack "" [] False, getTemplates SetTemplates)
 
@@ -62,15 +62,15 @@ update msg model =
 
 -- View
 
-addView address ({template, templates, stack, editDefaults} as model) =
+addView ({template, templates, stack, editDefaults} as model) =
     panel
       (panelContents 
           (Html.form [] [
             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-              group' "Name" (inputText address NameInput " "  stack.name)
-            , group' "Description" (inputText address DescriptionInput " "  stack.description)
-            , group' "Templates" (selector address SelectTemplate templates template)
-            , group' "Edit common" (checkbox address LoadEditor editDefaults)
+              group' "Name" (inputText NameInput " "  stack.name)
+            , group' "Description" (inputText DescriptionInput " "  stack.description)
+            , group' "Templates" (selector SelectTemplate templates template)
+            , group' "Edit common" (checkbox LoadEditor editDefaults)
             , div [ id "jsoneditor"
                   , style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
            ]
@@ -81,4 +81,4 @@ addView address ({template, templates, stack, editDefaults} as model) =
 view : Model -> Html Msg
 view model =
   div [] 
-    (infoCallout address (info "Add a new Stack" ) (addView address model) Cancel Save)
+    (infoCallout (info "Add a new Stack" ) (addView model) Cancel Save)

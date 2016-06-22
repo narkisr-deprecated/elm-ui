@@ -41,7 +41,7 @@ type Msg =
   | SelectHypervisor String
 
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
     (admin, adminEffects) = Admin.init
@@ -99,18 +99,18 @@ update msg ({admin} as model) =
 
 -- View
 
-general address {admin, type', types, hypervisors, hypervisor} =
+general {admin, type', types, hypervisors, hypervisor} =
   div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
     (List.append
-       (Admin.view (Signal.forwardTo address AdminMsg) admin)
-          [ group' "Type" (selector address SelectType types type')
-          , group' "Hypervisor" (selector address SelectHypervisor hypervisors hypervisor)
+       (Admin.view (Signal.forwardTo AdminMsg) admin)
+          [ group' "Type" (selector SelectType types type')
+          , group' "Hypervisor" (selector SelectHypervisor hypervisors hypervisor)
           ]
         )
 
 view : Model -> Html Msg
 view model =
-  fixedPanel (Html.form [] (asList (general address model)))
+  fixedPanel (Html.form [] (asList (general model)))
 
 
 

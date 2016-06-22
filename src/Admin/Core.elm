@@ -25,7 +25,7 @@ partialAdmin : String -> String -> Model
 partialAdmin owner environment =
     Model [] environment Dict.empty [] owner
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   (Model [] "" Dict.empty [] "", Effects.batch [ getEnvironments SetEnvironments, getSession LoadSession])
 
@@ -88,9 +88,9 @@ ownersList {owner, owners} =
   else 
     owners
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({environments, environment, owner} as model) =
+view : Model -> List (Html Msg)
+view ({environments, environment, owner} as model) =
   [ 
-    group' "Environment" (selector address SelectEnvironment environments environment)
-  , group' "Owner" (selector address SelectOwner (ownersList model) owner)
+    group' "Environment" (selector SelectEnvironment environments environment)
+  , group' "Owner" (selector SelectOwner (ownersList model) owner)
   ]

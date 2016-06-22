@@ -19,7 +19,7 @@ type alias Model =
     session : Session
   }
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   none (Model emptySession)
 
@@ -64,20 +64,20 @@ dropdown attrs =
   List.append [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ] attrs
 
 gearsButton : Signal.Address Msg  -> Session -> Html
-gearsButton address session =
+gearsButton session =
   if isUser session then 
      i [ class "fa fa-gears", style [("color", "gray"), ("pointer-events", "none")]] [ ] 
   else
     div [class "dropdown pull-right"] [
         i (dropdown [ class "fa fa-gears", style [("color", "black")]]) []
       , ul [ class "dropdown-menu" ] [
-          li [] [ a [href "#", onClick address (Goto Users List)] [text "Users" ] ]
-        , li [] [ a [href "#", onClick address LoadSwagger] [text "Swagger"] ]
+          li [] [ a [href "#", onClick (Goto Users List)] [text "Users" ] ]
+        , li [] [ a [href "#", onClick LoadSwagger] [text "Swagger"] ]
         ] 
       ]
 
 topNav : Signal.Address Msg  -> Session -> Html
-topNav address ({username, envs} as session) =
+topNav ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
      [li [ class "dropdown user user-menu"] [
@@ -99,7 +99,7 @@ topNav address ({username, envs} as session) =
                    ]
                 ]
                 , div [ class "pull-right" ] [
-                   a [ class "btn btn-default btn-flat", href "#", onClick address SignOut]
+                   a [ class "btn btn-default btn-flat", href "#", onClick SignOut]
                         [ text "Sign out" ]
                    ]
                 ]
@@ -107,14 +107,14 @@ topNav address ({username, envs} as session) =
         ]
     , li [] [
         a [ attribute "data-toggle" "control-sidebar", href "#" ] [
-             (gearsButton address session) 
+             (gearsButton session) 
           ]
         ]
      ]
   ]
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({session} as model) =
+view : Model -> List (Html Msg)
+view ({session} as model) =
   [header [class "main-header"] [
       a [href "/index.html", class "logo"] [
          span [class "logo-mini"] [text "CEL"]   
@@ -125,7 +125,7 @@ view address ({session} as model) =
            attribute "data-toggle" "offcanvas",attribute "role" "button"] [
           span [class "sr-only"][text "Toggle navigation"]
         ]
-      , (topNav address session)
+      , (topNav session)
       ]
     ]
   ]

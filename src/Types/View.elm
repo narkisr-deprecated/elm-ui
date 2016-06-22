@@ -24,7 +24,7 @@ type alias Model =
    type' : Type 
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   none (Model emptyType)
 
@@ -35,7 +35,7 @@ type Msg =
     | SetType (Result Http.Error Type)
     | NoOp
 
-setType : Model -> Type -> (Model , Effects Msg)
+setType : Model -> Type -> (Model , Cmd Msg)
 setType model type' =
   none {model | type' = type'}
 
@@ -50,7 +50,7 @@ update msg model =
       successHandler result model (setType model) NoOp
  
    NoOp -> 
-     (model, Effects.none)
+     none model
 
 -- View
 
@@ -73,12 +73,12 @@ moduleSection env {args, module', classes} =
      ["name", "source", "arguments", "options", "classes"]
      [module'.name, module'.src, args', os, cs]]
 
-puppetSummary :  Dict String PuppetStd -> List (List Html)
+puppetSummary :  Dict String PuppetStd -> List (List (Html Msg))
 puppetSummary puppetStd = 
   Dict.foldl 
     (\env std res -> List.append (moduleSection env std) res) [] puppetStd
 
-summarySections : Type  -> List (List Html)
+summarySections : Type  -> List (List (Html Msg))
 summarySections {type', description, puppetStd} =
     List.append
      [overviewSection "Type" ["type", "description"] [type', withDefault "" description]]
@@ -92,7 +92,7 @@ summarize model =
                             |> (List.map List.concat) 
                             |> (List.map row_))
 
-view : Signal.Address Msg -> Model -> List Html
+view : Model -> List (Html Msg)
 view model =
   asList (div [] [h4 [] [(text "Type")], (summarize model.type')])
   
@@ -101,5 +101,5 @@ getType id msg =
   getJson Model.type' ("/types/" ++ id)
     |> Task.toResult
     |> Task.map msg
-    |> Effects.task
+    |> Task.perform Err Ok
 

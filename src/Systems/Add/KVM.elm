@@ -169,8 +169,8 @@ update msg ({wizard} as model) =
 
 -- View
 
-instance : Signal.Address Msg -> Model -> List Html
-instance address ({kvm, machine, errors} as model) =
+instance : Model -> List (Html Msg)
+instance ({kvm, machine, errors} as model) =
   let
     check = withErrors errors
     oses = (Dict.keys (getOses "kvm" model))
@@ -179,23 +179,23 @@ instance address ({kvm, machine, errors} as model) =
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Domain"]
-       , group' "OS" (selector address SelectOS oses machine.os)
-       , group' "Node" (selector address SelectNode nodes kvm.node)
+       , group' "OS" (selector SelectOS oses machine.os)
+       , group' "Node" (selector SelectNode nodes kvm.node)
        , legend [] [text "Resources"]
-       , check  "Cpu" (inputText address CpuInput "" (toString (withDefault 0 machine.cpu)))
-       , check  "Ram (mb)" (inputText address RamInput "" (toString (withDefault 0 machine.ram)))
+       , check  "Cpu" (inputText CpuInput "" (toString (withDefault 0 machine.cpu)))
+       , check  "Ram (mb)" (inputText RamInput "" (toString (withDefault 0 machine.ram)))
        , legend [] [text "Network"]
-       , check "User" (inputText address UserInput "" machine.user) 
-       , check "Hostname" (inputText address HostnameInput "" machine.hostname)
-       , check "Domain"  (inputText address DomainInput "" machine.domain)
+       , check "User" (inputText UserInput "" machine.user) 
+       , check "Hostname" (inputText HostnameInput "" machine.hostname)
+       , check "Domain"  (inputText DomainInput "" machine.domain)
        ]
     ]
 
-stepView :  Signal.Address Msg -> Model -> List Html
-stepView address ({wizard, kvm, machine} as model) =
+stepView :  Model -> List (Html Msg)
+stepView ({wizard, kvm, machine} as model) =
   case wizard.step of
     Instance -> 
-      instance address model 
+      instance model 
  
     Summary -> 
       summarize (kvm, machine)
@@ -206,4 +206,4 @@ stepView address ({wizard, kvm, machine} as model) =
 
 view : Model -> Html Msg
 view model =
-  fixedPanel (Html.form [] (stepView address model))
+  fixedPanel (Html.form [] (stepView model))

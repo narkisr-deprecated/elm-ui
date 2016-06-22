@@ -26,7 +26,7 @@ type alias Model =
   , navChange : Maybe String
   }
   
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
    let
      (list, listMsg)  = TypesList.init 
@@ -179,20 +179,20 @@ update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
   navigate msg (route msg model)
 
-view : Signal.Address Msg -> Model -> Route -> List Html
-view address ({list, add, view, delete, edit} as model) section =
+view : Model -> Route -> List (Html Msg)
+view ({list, add, view, delete, edit} as model) section =
    case section of
      Routing.List -> 
-        TypesList.view (Signal.forwardTo address Listing) list
+        TypesList.view (Signal.forwardTo Listing) list
 
      Routing.Add -> 
-        TypesAdd.view (Signal.forwardTo address Adding) add
+        TypesAdd.view (Signal.forwardTo Adding) add
 
      Routing.Edit _ -> 
-        TypesEdit.view (Signal.forwardTo address Editing) edit
+        TypesEdit.view (Signal.forwardTo Editing) edit
 
      Routing.View _ -> 
-        TypesView.view (Signal.forwardTo address Viewing) view
+        TypesView.view (Signal.forwardTo Viewing) view
 
      Routing.Delete _ -> 
-        TypesDelete.view (Signal.forwardTo address Deleting) delete
+        TypesDelete.view (Signal.forwardTo Deleting) delete

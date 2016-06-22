@@ -1,6 +1,6 @@
 module Templates.List exposing (..)
 
-
+import Html.App exposing (map)
 import Html exposing (..)
 import Maybe exposing (withDefault)
 import Task
@@ -23,7 +23,7 @@ type alias Model =
   , pager : Pager.Model
   }
  
-templateRow : String -> Template -> List Html
+templateRow : String -> Template -> List (Html Msg)
 templateRow id {name, type', description } = 
     [ td [] [ text name ]
     , td [] [ text type' ]
@@ -31,7 +31,7 @@ templateRow id {name, type', description } =
     ]
 
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let 
     table = Table.init "templateListing" True ["Name", "Type", "Description"] templateRow "Templates"
@@ -69,16 +69,16 @@ update msg model =
 
 -- View
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({pager, table} as model) =
+view : Model -> List (Html Msg)
+view ({pager, table} as model) =
   [
     div [] [
       row_ [
         div [class "col-md-offset-1 col-md-10"] [
-          panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
+          panelDefault_ (map LoadPage (Table.view table))
         ]
       ],
-      row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+      row_ [ (map GotoPage (Pager.view pager))]
     ]
   ]
 
@@ -95,6 +95,6 @@ getTemplates msg =
   getJson templateList "/templates" 
     |> Task.toResult
     |> Task.map msg
-    |> Effects.task
+    |> Task.perform Err Ok
 
 

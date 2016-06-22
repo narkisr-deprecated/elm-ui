@@ -12,6 +12,7 @@ import Common.Summary exposing (..)
 import Platform.Cmd exposing (map)
 import Common.Summary exposing (..)
 import String
+import Common.Utils exposing (none)
 
 -- Model 
 type alias Model = 
@@ -19,16 +20,12 @@ type alias Model =
    id : Int
   }
 
-init : (Model , Effects Msg)
+init : (Model , Cmd msg)
 init =
-  (Model 0 , Effects.none)
+  none (Model 0)
   
--- Update
-type Msg = 
-  NoOp
-
 -- View
-summarySections : (GCE, Machine) -> List (List Html)
+summarySections : (GCE, Machine) -> List (List (Html msg))
 summarySections ((gce, machine) as model)=
    List.filter (not << List.isEmpty) [ 
      overviewSection "Instance"
@@ -43,7 +40,7 @@ summarySections ((gce, machine) as model)=
 
    ]
 
-summarize: (GCE, Machine) -> List Html
+summarize: (GCE, Machine) -> List (Html msg)
 summarize model =
   [div [] [ h4 [] [(text "System overview")] 
           , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
@@ -55,7 +52,7 @@ summarize model =
   ]
 
 
-view : Model -> Html Msg
+view : Model -> Html msg
 view model =
   fixedPanel (div [] [])
 

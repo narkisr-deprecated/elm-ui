@@ -27,14 +27,14 @@ type alias Model =
   , pager : Pager.Model
   } 
 
-typeRow : String -> Type -> List Html
+typeRow : String -> Type -> List (Html Msg)
 typeRow id {type', description } = 
     [ td [] [ text type' ]
     , td [] [ text "Puppet standalone"]
     , td [] [ text (withDefault "" description)]
     ]
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let 
     table = Table.init "typesListing" True ["Name", "Provisioner", "Description"] typeRow "Types"
@@ -67,15 +67,15 @@ update msg model =
     _ -> 
       none model
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({types, pager, table} as model) =
+view : Model -> List (Html Msg)
+view ({types, pager, table} as model) =
   [ div [class ""] [
     row_ [
       div [class "col-md-offset-1 col-md-10"] [
-        panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
+        panelDefault_ (Table.view (Signal.forwardTo LoadPage) table)
       ]
     ],
-   row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+   row_ [(Pager.view (Signal.forwardTo GotoPage) pager)]
   ]]
   
 
@@ -90,6 +90,6 @@ getTypes msg =
   getJson typesList "/types" 
     |> Task.toResult
     |> Task.map msg
-    |> Effects.task
+    |> Task.perform Err Ok
 
 

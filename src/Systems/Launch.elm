@@ -1,5 +1,6 @@
 module Systems.Launch exposing (..)
 
+import Html.App as Html exposing (map)
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
 import Common.Errors exposing (successHandler)
@@ -14,6 +15,7 @@ import Debug
 import Systems.Model.Common exposing (System)
 import Jobs.Common exposing (runJob, JobResponse)
 import Common.Components exposing (dangerCallout)
+import Common.Utils exposing (none)
 
 import Set exposing (Set)
 -- Model 
@@ -32,7 +34,7 @@ type Msg =
   | NoOp
   | Cancel
 
-systemRow : String -> System -> List Html
+systemRow : String -> System -> List (Html Msg)
 systemRow id {env, owner, type', machine} = 
  [
    td [] [ text id ]
@@ -43,12 +45,12 @@ systemRow id {env, owner, type', machine} =
  ]
 
 
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
     table = Table.init "launchListing" False ["#","Hostname", "Type", "Env","Owner"] systemRow "Systems"
   in
-    (Model "" table, Effects.none)
+    none (Model "" table)
 
 
 -- Update
@@ -57,16 +59,16 @@ update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({job} as model) =
   case msg  of
     JobLaunched result ->
-      successHandler result model (\ res -> (model, Effects.none)) NoOp 
+      successHandler result model (\ res -> none model) NoOp 
 
     SetupJob job ->
-      ({ model | job = job }, Effects.none)
+      none ({ model | job = job })
 
     LoadPage tableMsg -> 
       let
         newTable = Table.update tableMsg model.table
       in
-       ({ model | table = newTable }, Effects.none)
+       none { model | table = newTable } 
 
     Run -> 
       let
@@ -78,15 +80,15 @@ update msg ({job} as model) =
         (model, runAll)
 
     Cancel -> 
-     (model, Effects.none)
+      none model
 
     _ -> 
-      (model, Effects.none)
+     none model
 
 
 -- View
 
-message : String -> List Html
+message : String -> List (Html Msg)
 message job =
   [
      h4 [] [ text "Notice!" ]
@@ -98,12 +100,12 @@ message job =
      ]
  ]
 
-view : Signal.Address Msg -> Model -> List Html
-view address {table, job} =
+view : Model -> List (Html Msg)
+view {table, job} =
  let 
-   systemsTable = (panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table))
+   systemsTable = (panelDefault_ (Html.map LoadPage (Table.view table)))
  in
-   dangerCallout address (message job) systemsTable  Cancel Run
+   dangerCallout (message job) systemsTable  Cancel Run
 
 
 

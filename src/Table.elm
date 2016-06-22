@@ -84,3 +84,4 @@ view model =
             (List.map (\(id, item) -> applySelect model id (model.rowFn id item) ) model.rows)
         ])
   ]
+  

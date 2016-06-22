@@ -24,7 +24,7 @@ type alias Model =
   , type' : Type
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let 
     (add, effects) = Add.init
@@ -90,7 +90,7 @@ update msg ({add} as model) =
 
 -- View
 
-view : Signal.Address Msg -> Model -> List Html
+view : Model -> List (Html Msg)
 view model =
-  Add.view (Signal.forwardTo address AddMsg) model.add
+  Add.view (Signal.forwardTo AddMsg) model.add
 

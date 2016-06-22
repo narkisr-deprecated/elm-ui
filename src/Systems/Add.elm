@@ -257,43 +257,43 @@ update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physical
     _ -> 
      none model
 
-currentView : Signal.Address Msg -> Model -> Html
-currentView address ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, kvmModel, saveErrors, general} as model)=
+currentView : Model -> Html
+currentView ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, kvmModel, saveErrors, general} as model)=
   case model.stage of 
     General -> 
-      (General.view (Signal.forwardTo address GeneralView) general)
+      (General.view (Signal.forwardTo GeneralView) general)
 
     AWS -> 
-      (AWS.view (Signal.forwardTo address AWSView) awsModel)
+      (AWS.view (Signal.forwardTo AWSView) awsModel)
 
     GCE -> 
-      (GCE.view (Signal.forwardTo address GCEView) gceModel)
+      (GCE.view (Signal.forwardTo GCEView) gceModel)
 
     Digital -> 
-      (Digital.view (Signal.forwardTo address DigitalView) digitalModel)
+      (Digital.view (Signal.forwardTo DigitalView) digitalModel)
 
     Physical -> 
-      (Physical.view (Signal.forwardTo address PhysicalView) physicalModel)
+      (Physical.view (Signal.forwardTo PhysicalView) physicalModel)
 
     Openstack -> 
-      (Openstack.view (Signal.forwardTo address OpenstackView) openstackModel)
+      (Openstack.view (Signal.forwardTo OpenstackView) openstackModel)
 
     KVM -> 
-      (KVM.view (Signal.forwardTo address KVMView) kvmModel)
+      (KVM.view (Signal.forwardTo KVMView) kvmModel)
 
     _ -> 
       notImplemented
 
-saveMenu : Signal.Address Msg -> Html 
-saveMenu address =
+saveMenu : Html 
+saveMenu =
   ul [class "dropdown-menu"] [
-    li [] [a [class "SaveSystem", href "#", onClick address SaveSystem ] [text "Save system"]]
-  , li [] [a [class "SaveTemplate", href "#", onClick address SaveTemplate ] [text "Save as template"]]
-  , li [] [a [class "Create", href "#", onClick address Create ] [text "Create System"]]
+    li [] [a [class "SaveSystem", href "#", onClick SaveSystem ] [text "Save system"]]
+  , li [] [a [class "SaveTemplate", href "#", onClick SaveTemplate ] [text "Save as template"]]
+  , li [] [a [class "Create", href "#", onClick Create ] [text "Create System"]]
   ]
     
-dropdown address = 
-  [  button [type' "button", class "btn btn-primary", onClick address Stage] [text "Stage"]
+dropdown = 
+  [  button [type' "button", class "btn btn-primary", onClick Stage] [text "Stage"]
   ,  button [class "btn btn-primary dropdown-toggle"
           , attribute "data-toggle" "dropdown"
           , attribute "aria-haspopup" "true"
@@ -302,24 +302,24 @@ dropdown address =
   , saveMenu address
   ]
 
-errorsView address {saveErrors} = 
+errorsView {saveErrors} = 
    let
-     body = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+     body = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
    in
      dialogPanel "danger" (error "Failed to save system") (panel (panelContents body))
 
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({stage} as model) =
+view : Model -> List (Html Msg)
+view ({stage} as model) =
  [ row_ [
      (if stage /= Error then
         div [class "col-md-offset-2 col-md-8"] [
-          (panel (currentView address model))
+          (panel (currentView model))
         ]
        else
-         div [] (errorsView address model))
+         div [] (errorsView model))
    ]
- , row_ (buttons address model Next Back (dropdown address))
+ , row_ (buttons model Next Back (dropdown address))
  ]
 
 -- Effects

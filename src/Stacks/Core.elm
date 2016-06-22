@@ -13,7 +13,7 @@ type alias Model =
   , navChange : Maybe (Active, Section)
   }
  
-init : (Model , Effects Msg)
+init : (Model , Cmd Msg)
 init =
   let
     (add, addEffects) = Add.init
@@ -43,11 +43,11 @@ update msg ({add} as model) =
 
 -- View
 
-view : Signal.Address Msg -> Model -> Section -> List Html
+view : Model -> Section -> List (Html Msg)
 view model section =
   case section of
     Add ->
-      asList (Add.view (Signal.forwardTo address StacksAdd) model.add)
+      asList (Add.view (Signal.forwardTo StacksAdd) model.add)
 
     _ -> 
       asList notImplemented

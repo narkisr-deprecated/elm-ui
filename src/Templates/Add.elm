@@ -107,29 +107,29 @@ update msg ({template, hyp, editDefaults, environments} as model) =
 
 -- View
 
-editing address {template, editDefaults} =
+editing {template, editDefaults} =
     panel
       (panelContents 
           (Html.form [] [
             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-              group' "Name" (inputText address NameInput " "  template.name)
-            , group' "Description" (inputText address DescriptionInput " "  template.description)
-            , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
+              group' "Name" (inputText NameInput " "  template.name)
+            , group' "Description" (inputText DescriptionInput " "  template.description)
+            , group' "Edit defaults" (checkbox LoadEditor editDefaults)
             , div [ id "jsoneditor"
                   , style [("width", "50%"), ("height", "400px"), ("margin-left", "25%")]] []
            ]
           ])
         )
 
-view : Signal.Address Msg -> Model -> List Html
-view address ({saveErrors} as model) =
+view : Model -> List (Html Msg)
+view ({saveErrors} as model) =
   let
-    errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+    errorsView = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
   in
     if Errors.hasErrors saveErrors then
-      dangerCallout address (error "Failed to save template") (panel (panelContents errorsView)) Cancel Done
+      dangerCallout (error "Failed to save template") (panel (panelContents errorsView)) Cancel Done
     else 
-      infoCallout address (info "Save template") (editing address model) Cancel Save
+      infoCallout (info "Save template") (editing model) Cancel Save
 
 
 -- Effects
