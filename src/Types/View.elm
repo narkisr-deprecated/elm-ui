@@ -14,6 +14,7 @@ import Http exposing (Error(BadResponse))
 import Common.Utils exposing (none, capitalize)
 import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 import Task
 import Dict exposing (Dict)
 import String
@@ -100,6 +101,5 @@ view model =
 getType id msg = 
   getJson Model.type' ("/types/" ++ id)
     |> Task.toResult
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.perform never msg
 

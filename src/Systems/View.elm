@@ -4,6 +4,7 @@ module Systems.View exposing (..)
 import Systems.Model.Common exposing (System, Machine, emptySystem)
 import Systems.Model.AWS exposing (emptyAws)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 
 -- Effects
 import Task
@@ -20,6 +21,7 @@ import Systems.View.Openstack as OpenstackView
 import Systems.View.GCE as GCEView
 import Systems.View.Digital as DigitalView
 
+import Common.Utils exposing (none)
 import Maybe exposing (withDefault)
 
 -- Model 
@@ -30,7 +32,7 @@ type alias Model =
 
 init : (Model , Cmd Msg)
 init =
-  (Model emptySystem, Effects.none)
+  none (Model emptySystem)
 
 -- Update
 type Msg = 
@@ -38,9 +40,9 @@ type Msg =
     | SetSystem (Result Http.Error System)
     | NoOp
 
-setSystem : Model -> System -> (Model , Effects Msg)
+setSystem : Model -> System -> (Model , Cmd Msg)
 setSystem model system =
-  ({model | system = system}, Effects.none)
+  none {model | system = system}
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
@@ -52,7 +54,7 @@ update msg model =
       successHandler result model (setSystem model) NoOp
       
     NoOp -> 
-      (model, Effects.none)
+      none model
       
 -- View
 
@@ -74,12 +76,11 @@ view ({system} as model) =
     in 
       withDefault (asList notImplemented) (List.head (List.filter (not << List.isEmpty) options))
 
--- Effects
+-- Http 
 
-getSystem : String -> Effects Msg
+getSystem : String -> Cmd Msg
 getSystem id = 
   getJson systemDecoder ("/systems/" ++ id)
     |> Task.toResult
-    |> Task.map SetSystem
-    |> Effects.task
+    |> Task.perform never SetSystem
 

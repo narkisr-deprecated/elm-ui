@@ -2,6 +2,7 @@ module Users.Model exposing (..)
 
 
 import Html exposing (..)
+import Basics.Extra exposing (never)
 
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
@@ -55,8 +56,7 @@ usersList =
 getUsers msg = 
   getJson usersList "/users" 
     |> Task.toResult
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.perform never msg
 
 rolesList : Decoder (Dict String String)
 rolesList =
@@ -65,7 +65,6 @@ rolesList =
 getRoles msg = 
   getJson rolesList "/users/roles" 
     |> Task.toResult
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.perform never msg
 
 

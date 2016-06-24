@@ -1,6 +1,7 @@
 module Types.Core exposing (..)
 
 import Html exposing (..)
+import Html.App as App
 import Types.List as TypesList
 import Types.Add as TypesAdd
 import Types.View as TypesView
@@ -34,15 +35,15 @@ init =
      (view, viewMsg)  = TypesView.init 
      (edit, editMsg)  = TypesEdit.init 
      (delete, deleteMsg)  = TypesDelete.init 
-     effects = [
-        Effects.map Listing listMsg
-      , Effects.map Adding addMsg
-      , Effects.map Viewing viewMsg
-      , Effects.map Deleting deleteMsg
-      , Effects.map Editing editMsg
+     msgs = [
+        Cmd.map Listing listMsg
+      , Cmd.map Adding addMsg
+      , Cmd.map Viewing viewMsg
+      , Cmd.map Deleting deleteMsg
+      , Cmd.map Editing editMsg
      ]
    in
-     (Model list add view delete edit Nothing, Effects.batch effects) 
+     (Model list add view delete edit Nothing, Effects.batch msgs) 
 
 type Msg = 
   Listing TypesList.Msg
@@ -53,55 +54,55 @@ type Msg =
     | Editing TypesEdit.Msg
 
 navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
-navigate msg ((({list, add, view, delete, edit} as model), effects) as result) =
+navigate msg ((({list, add, view, delete, edit} as model), msgs) as result) =
     case msg of 
       Listing listing -> 
         case listing of 
           TypesList.LoadPage (Table.View id) ->
             let 
-              (newSystems, effects) = TypesView.update (TypesView.ViewType id) view
+              (newSystems, msgs) = TypesView.update (TypesView.ViewType id) view
             in
-              ({model | view = view, navChange = Just ("/types/view/" ++ id)}, Effects.map Viewing effects)        
+              ({model | view = view, navChange = Just ("/types/view/" ++ id)}, Cmd.map Viewing msgs)        
 
           _ -> 
-            (model, effects)
+            (model, msgs)
 
       Adding adding -> 
         case adding of 
           TypesAdd.Saved (Result.Ok _) -> 
-            refreshList True ({model | navChange = Just "/types/list"}, effects)
+            refreshList True ({model | navChange = Just "/types/list"}, msgs)
 
           _ -> 
-            (model, effects)
+            (model, msgs)
 
       Editing editing -> 
         case editing of 
           TypesEdit.AddMsg addMsg -> 
             case addMsg of
               TypesAdd.Saved (Result.Ok _) -> 
-                 refreshList True ({model | navChange = Just "/types/list"}, effects)
+                 refreshList True ({model | navChange = Just "/types/list"}, msgs)
 
               _ -> 
-               (model, effects)
+               (model, msgs)
 
 
           _ -> 
-            (model, effects)
+            (model, msgs)
 
 
       Deleting deleting -> 
         case deleting of 
            TypesDelete.Deleted _  -> 
             if delete.errorMsg == "" then
-              ({ model | navChange = Just "/types/list"}, effects)
+              ({ model | navChange = Just "/types/list"}, msgs)
             else
               result
 
            TypesDelete.Cancel -> 
-             refreshList True ({ model | navChange = Just "/types/list"}, effects)
+             refreshList True ({ model | navChange = Just "/types/list"}, msgs)
 
            TypesDelete.Done -> 
-             refreshList True ({ model | navChange = Just "/types/list"}, effects)
+             refreshList True ({ model | navChange = Just "/types/list"}, msgs)
          
            _ -> 
             result
@@ -109,16 +110,16 @@ navigate msg ((({list, add, view, delete, edit} as model), effects) as result) =
       MenuClick (job,name) -> 
         case job of 
          "edit" -> 
-            ({ model | navChange = Just ("/types/edit/" ++ name)}, effects)
+            ({ model | navChange = Just ("/types/edit/" ++ name)}, msgs)
           
          "clear" -> 
-            ({ model | navChange = Just ("/types/delete/" ++ name)}, effects)
+            ({ model | navChange = Just ("/types/delete/" ++ name)}, msgs)
 
          _ -> 
            result
      
       _ -> 
-        (model, effects)
+        (model, msgs)
 
 refreshList = 
   refresh TypesList.init Listing
@@ -134,32 +135,32 @@ route msg ({list, add, view, delete, edit} as model) =
       let 
         (newTypes, effect ) = TypesList.update msg list
       in
-        ({ model | list = newTypes }, Effects.map Listing effect)
+        ({ model | list = newTypes }, Cmd.map Listing effect)
 
     Adding msg -> 
       let 
         (newTypes, effect ) = TypesAdd.update msg add
       in
-        ({ model | add = newTypes }, Effects.map Adding effect)
+        ({ model | add = newTypes }, Cmd.map Adding effect)
 
     Editing msg -> 
       let 
         (newTypes, effect ) = TypesEdit.update msg edit
       in
-        ({ model | edit = newTypes }, Effects.map Editing effect)
+        ({ model | edit = newTypes }, Cmd.map Editing effect)
 
     Viewing msg -> 
       let 
         (newTypes, effect ) = TypesView.update msg view
       in
-        ({ model | view = newTypes }, Effects.map Viewing effect)
+        ({ model | view = newTypes }, Cmd.map Viewing effect)
 
     Deleting msg -> 
       let 
-        (newDelete, effects) = (TypesDelete.update msg delete)
+        (newDelete, msgs) = (TypesDelete.update msg delete)
         success = (succeeded msg TypesDelete.Deleted "Type deleted")
       in
-        refreshList success ({ model | delete = newDelete } , Effects.map Deleting effects)
+        refreshList success ({ model | delete = newDelete } , Cmd.map Deleting msgs)
 
     MenuClick (job, name) -> 
       case job of
@@ -168,9 +169,9 @@ route msg ({list, add, view, delete, edit} as model) =
            
         "edit" -> 
           let
-            (newEdit, effects) = TypesEdit.update (TypesEdit.LoadType name) edit
+            (newEdit, msgs) = TypesEdit.update (TypesEdit.LoadType name) edit
           in 
-            ({ model | edit = newEdit }, Effects.map Editing effects)
+            ({ model | edit = newEdit }, Cmd.map Editing msgs)
          
         _ -> 
           none model
@@ -183,16 +184,16 @@ view : Model -> Route -> List (Html Msg)
 view ({list, add, view, delete, edit} as model) section =
    case section of
      Routing.List -> 
-        TypesList.view (Signal.forwardTo Listing) list
+       App.map Listing (TypesList.view list)
 
      Routing.Add -> 
-        TypesAdd.view (Signal.forwardTo Adding) add
+       App.map Adding (TypesAdd.view add)
 
      Routing.Edit _ -> 
-        TypesEdit.view (Signal.forwardTo Editing) edit
+       App.map Editing (TypesEdit.view edit)
 
      Routing.View _ -> 
-        TypesView.view (Signal.forwardTo Viewing) view
+       App.map Viewing (TypesView.view view)
 
      Routing.Delete _ -> 
-        TypesDelete.view (Signal.forwardTo Deleting) delete
+       App.map Deleting (TypesDelete.view delete)

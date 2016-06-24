@@ -32,6 +32,9 @@ init : Model
 init =
   Model (Errors "" Nothing Nothing)
 
+type Msg = 
+    NoOp
+
 mapValues : (comparable -> a -> b) -> Dict comparable a -> List b
 mapValues f d =
   Dict.values (Dict.map f d)
@@ -147,7 +150,6 @@ identityFail : m -> Errors -> (m, Cmd a)
 identityFail model res =
   Debug.log ("request failed " ++ (toString res)) (model, Cmd.none)
 
-handler : Result Http.Error r -> m -> (r -> (m, Cmd a)) -> (Errors -> (m, Cmd a)) -> a -> (m, Cmd a)
 handler result model success fail noop = 
   case result of
 
@@ -158,21 +160,18 @@ handler result model success fail noop =
      case e of 
        BadResponse 401 m _ ->
          Debug.log (toString e) (model , (redirect "login"))
-
+       
        BadResponse 400 m resp ->
-         (fail (decodeError resp))
-
+          (fail (decodeError resp))
+       
        _ -> Debug.log (toString e) (model , Cmd.none)
 
-successHandler : Result Http.Error r -> m -> (r -> (m, Cmd a)) -> a -> (m, Cmd a)
 successHandler result model success noop = 
   handler result model success (identityFail model) noop
   
-failHandler : Result Http.Error r -> m -> (Errors -> (m, Cmd a)) -> a -> (m, Cmd a)
 failHandler result model fail noop = 
   handler result model (identitySuccess model) fail noop
 
-errorsHandler : Result Http.Error r -> {m | saveErrors : {errors : Errors }} -> a -> ({m | saveErrors : {errors : Errors } }, Cmd a)
 errorsHandler result model noop = 
   handler result model (identitySuccess model) (setErrors model) noop
 

@@ -74,14 +74,14 @@ withCaption enabled title body =
   else
     body
 
-view : Model a -> List (Html (Msg a))
+view : Model a -> Html (Msg a)
 view model =
-  [table [class "table table-bordered", id model.id]
+  table [class "table table-bordered", id model.id]
      (withCaption model.caption model.title 
         [ thead []
             [tr [onClick SelectAll] (headersMap model.headers)]
         , tbody []
             (List.map (\(id, item) -> applySelect model id (model.rowFn id item) ) model.rows)
         ])
-  ]
+  
   

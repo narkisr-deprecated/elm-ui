@@ -1,8 +1,10 @@
 module Types.List exposing (..)
 
+import Html.App as App 
 import Html exposing (..)
 
 import Dict exposing (Dict)
+import Basics.Extra exposing (never)
 import Common.Http exposing (getJson)
 
 import Types.Model exposing (..)
@@ -72,10 +74,14 @@ view ({types, pager, table} as model) =
   [ div [class ""] [
     row_ [
       div [class "col-md-offset-1 col-md-10"] [
-        panelDefault_ (Table.view (Signal.forwardTo LoadPage) table)
+        panelDefault_ [
+          App.map LoadPage (Table.view table)
+        ]
       ]
     ],
-   row_ [(Pager.view (Signal.forwardTo GotoPage) pager)]
+    row_ [
+     App.map GotoPage (Pager.view pager)
+    ]
   ]]
   
 
@@ -89,7 +95,6 @@ typesList =
 getTypes msg = 
   getJson typesList "/types" 
     |> Task.toResult
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.perform never msg
 
 

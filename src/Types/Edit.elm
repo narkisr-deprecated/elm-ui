@@ -5,6 +5,7 @@ import Http exposing (Error(BadResponse))
 import Common.Components exposing (asList)
 import Common.Utils exposing (none)
 import Html exposing (..)
+import Html.Add as App
 import Types.Add as Add exposing (Msg(FormMsg, Save, LoadEditor), updateType)
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
@@ -27,9 +28,9 @@ type alias Model =
 init : (Model , Cmd Msg)
 init =
   let 
-    (add, effects) = Add.init
+    (add, msgs) = Add.init
   in 
-    (Model add "" emptyType, Effects.map AddMsg effects)
+    (Model add "" emptyType, Cmd.map AddMsg msgs)
 
 -- Update 
 
@@ -63,21 +64,21 @@ update msg ({add} as model) =
       case addMsg of 
         Save _ -> 
           let 
-            (newAdd, effects) = Add.update (Save updateType) add
+            (newAdd, msgs) = Add.update (Save updateType) add
           in
-            ({ model | add = newAdd }, Effects.map AddMsg effects)
+            ({ model | add = newAdd }, Cmd.map AddMsg msgs)
 
         LoadEditor _ -> 
           let 
-            (newAdd, effects) = Add.update (LoadEditor "typesEdit") add
+            (newAdd, msgs) = Add.update (LoadEditor "typesEdit") add
           in
-            ({ model | add = newAdd }, Effects.map AddMsg effects)
+            ({ model | add = newAdd }, Cmd.map AddMsg msgs)
 
         _ -> 
           let 
-            (newAdd, effects) = Add.update addMsg add
+            (newAdd, msgs) = Add.update addMsg add
           in 
-            (envChange addMsg { model | add = newAdd }, Effects.map AddMsg effects)
+            (envChange addMsg { model | add = newAdd }, Cmd.map AddMsg msgs)
 
     LoadType name -> 
        (model, View.getType name SetType)
@@ -92,5 +93,5 @@ update msg ({add} as model) =
 
 view : Model -> List (Html Msg)
 view model =
-  Add.view (Signal.forwardTo AddMsg) model.add
+  App.map AddMsg (Add.view model.add)
 

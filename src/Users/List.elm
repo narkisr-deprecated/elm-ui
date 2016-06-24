@@ -23,7 +23,7 @@ type alias Model =
   , pager : Pager.Model
   } 
 
-userRow : String -> User -> List (Html Msg)
+userRow : String -> User -> List (Html msg)
 userRow name {roles, envs} = 
     [ td [] [ text name ]
     , td [] [ text (String.join ", " (List.map (\r -> String.dropLeft 16 r) roles))]
@@ -73,7 +73,9 @@ view ({pager, table} as model) =
   [ div [class ""] [
     row_ [
        div [class "col-md-offset-1 col-md-10"] [
-         panelDefault_ (map LoadPage (Table.view table))
+         panelDefault_ [
+           (map LoadPage (Table.view table))
+         ]
        ]
     ]
   , row_ [(map GotoPage (Pager.view pager))]

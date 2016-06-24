@@ -19,12 +19,12 @@ init =
   let
     (stats,statsEffects) = Stats.init
     (list, listEffects) = List.init
-    effects = [
-       Effects.map JobsListing listEffects
-     , Effects.map JobsStats statsEffects
+    msgs = [
+       Cmd.map JobsListing listEffects
+     , Cmd.map JobsStats statsEffects
     ]
   in
-    (Model list stats, Effects.batch effects)
+    (Model list stats, Effects.batch msgs)
 
 -- Update 
 
@@ -50,15 +50,15 @@ update msg ({list, stats} as model)=
   case msg of 
     JobsListing listing -> 
       let
-        (newListing, effects) = List.update listing list
+        (newListing, msgs) = List.update listing list
       in
-        ({model | list = newListing}, Effects.map JobsListing effects) 
+        ({model | list = newListing}, Cmd.map JobsListing msgs) 
 
     JobsStats sts -> 
       let
-        (newStats, effects) = Stats.update sts stats
+        (newStats, msgs) = Stats.update sts stats
       in
-        ({model | stats = newStats}, Effects.map JobsStats effects) 
+        ({model | stats = newStats}, Cmd.map JobsStats msgs) 
 
      
     NoOp -> 
@@ -70,10 +70,10 @@ view : Model -> Route -> List (Html Msg)
 view {list, stats} route =
   case route of
     Routing.List -> 
-      List.view (Signal.forwardTo JobsListing) list
+     App.map JobsListing (List.view list)
 
     Routing.Stats -> 
-      Stats.view (Signal.forwardTo JobsStats) stats
+     App.map JobsStats (Stats.view stats)
 
 
 

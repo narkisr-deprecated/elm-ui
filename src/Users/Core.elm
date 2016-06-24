@@ -22,12 +22,12 @@ init =
   let 
     (list, listMsgs) = List.init
     (add, addMsgs) = Add.init
-    effects = [
-        Effects.map Listing listMsgs
-     ,  Effects.map Adding addMsgs
+    msgs = [
+        Cmd.map Listing listMsgs
+     ,  Cmd.map Adding addMsgs
      ]
   in 
-    (Model list add Nothing, Effects.batch effects)
+    (Model list add Nothing, Effects.batch msgs)
 
 -- Update 
 
@@ -39,15 +39,15 @@ type Msg =
 
 
 navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
-navigate msg ((({list} as model), effects) as result) =
+navigate msg ((({list} as model), msgs) as result) =
   case msg of 
     MenuClick (job,name) -> 
       case job of 
         "edit" -> 
-          ({ model | navChange = Just ("/users/edit/" ++ name) }, effects)
+          ({ model | navChange = Just ("/users/edit/" ++ name) }, msgs)
            
         "clear" -> 
-          ({ model | navChange = Just ("/users/delete/" ++ name) }, effects)
+          ({ model | navChange = Just ("/users/delete/" ++ name) }, msgs)
 
         _ -> 
             none model
@@ -60,15 +60,15 @@ route msg ({list, add} as model) =
   case msg of 
     Listing listing -> 
       let
-        (newList, effects) =  List.update listing list 
+        (newList, msgs) =  List.update listing list 
       in
-        ({model | list = newList }, Effects.map Listing effects)
+        ({model | list = newList }, Cmd.map Listing msgs)
 
     Adding adding -> 
       let
-        (newAdd, effects) =  Add.update adding add
+        (newAdd, msgs) =  Add.update adding add
       in
-        ({model | add = newAdd }, Effects.map Adding effects)
+        ({model | add = newAdd }, Cmd.map Adding msgs)
 
 
     _ -> 

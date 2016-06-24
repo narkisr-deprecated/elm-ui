@@ -11,6 +11,7 @@ import Common.Utils exposing (none)
 
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type')
 import Html exposing (..)
+import Html.App as App
 
 import Systems.Add.Common exposing (..)
 import Environments.List exposing (Environments, Environment, getEnvironments)
@@ -45,13 +46,13 @@ init : (Model , Cmd Msg)
 init =
   let
     (admin, adminEffects) = Admin.init
-    effects = Effects.batch [
+    msgs = Effects.batch [
              getTypes SetTypes
            , getEnvironments SetEnvironments
-           , (Effects.map AdminMsg adminEffects)
+           , (Cmd.map AdminMsg adminEffects)
     ]
   in
-    (Model "" [] "" [] admin, effects)
+    (Model "" [] "" [] admin, msgs)
 
 -- Update
 
@@ -71,7 +72,7 @@ setTypes model types =
     typesList = List.map .type' types
     firstType = Maybe.withDefault "" (List.head typesList)
   in
-    ({model | types = typesList , type' = firstType}, Effects.none)
+    none {model | types = typesList , type' = firstType}
 
 update : Msg ->  Model-> (Model, Effects Msg)
 update msg ({admin} as model) =
@@ -81,9 +82,9 @@ update msg ({admin} as model) =
 
     AdminMsg adminMsg -> 
       let
-        (newAdmin, effects) = Admin.update adminMsg admin
+        (newAdmin, msgs) = Admin.update adminMsg admin
       in  
-        ({ model | admin = newAdmin}, Effects.map AdminMsg effects)
+        ({ model | admin = newAdmin}, Cmd.map AdminMsg msgs)
 
     SelectHypervisor hypervisor -> 
       none {model | hypervisor = hypervisor}

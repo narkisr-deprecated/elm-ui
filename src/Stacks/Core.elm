@@ -2,6 +2,7 @@ module Stacks.Core exposing (..)
 
 
 import Html exposing (..)
+import Html.App as App
 import Stacks.Add as Add
 import Nav.Common exposing (Active(Jobs), Section(Stats, Launch, Add, List, View))
 import Common.Components exposing (asList, notImplemented)
@@ -17,11 +18,11 @@ init : (Model , Cmd Msg)
 init =
   let
     (add, addEffects) = Add.init
-    effects = [
-      Effects.map StacksAdd addEffects
+    msgs = [
+      Cmd.map StacksAdd addEffects
     ]
   in
-   (Model add Nothing, Effects.batch effects)
+   (Model add Nothing, Effects.batch msgs)
 
 -- Update 
 
@@ -34,12 +35,12 @@ update msg ({add} as model) =
   case msg of 
     StacksAdd addMsg -> 
       let
-        (newAdd, effects) = Add.update addMsg add
+        (newAdd, msgs) = Add.update addMsg add
       in
-        ({model | add = newAdd}, Effects.map StacksAdd effects)
+        ({model | add = newAdd}, Cmd.map StacksAdd msgs)
     
     _ -> 
-      (model, Effects.none)
+      none model
 
 -- View
 
@@ -47,7 +48,7 @@ view : Model -> Section -> List (Html Msg)
 view model section =
   case section of
     Add ->
-      asList (Add.view (Signal.forwardTo StacksAdd) model.add)
+      asList (App.map StacksAdd (Add.view model.add))
 
     _ -> 
       asList notImplemented
@@ -55,7 +56,7 @@ view model section =
 
 loadTemplates ({add} as model) =
   let
-   (newAdd, effects) = Add.update Add.LoadTemplates add
+   (newAdd, msgs) = Add.update Add.LoadTemplates add
   in
-   ({model | add = newAdd }, Effects.map StacksAdd effects)
+   ({model | add = newAdd }, Cmd.map StacksAdd msgs)
 

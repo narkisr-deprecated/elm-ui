@@ -1,10 +1,12 @@
 module Templates.List exposing (..)
 
-import Html.App exposing (map)
+import Common.Utils exposing (none)
+import Html.App as App 
 import Html exposing (..)
 import Maybe exposing (withDefault)
 import Task
 import Http exposing (Error(BadResponse))
+import Basics.Extra exposing (never)
 import Json.Decode exposing (..)
 import Templates.Model.Common exposing (templateDecoder)
 import Pager exposing (..)
@@ -23,7 +25,7 @@ type alias Model =
   , pager : Pager.Model
   }
  
-templateRow : String -> Template -> List (Html Msg)
+templateRow : String -> Template -> List (Html msg)
 templateRow id {name, type', description } = 
     [ td [] [ text name ]
     , td [] [ text type' ]
@@ -46,7 +48,7 @@ type Msg =
     | SetTemplates (Result Http.Error (List Template))
     | NoOp
 
-setTemplates: Model -> List Template -> (Model , Effects Msg)
+setTemplates: Model -> List Template -> (Model , Cmd Msg)
 setTemplates model templates = 
   let
     total = List.length templates
@@ -54,7 +56,7 @@ setTemplates model templates =
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
     newTable = (Table.update (Table.UpdateRows templatePairs) model.table)
   in
-    ({ model | templates = templates, pager = newPager, table = newTable } , Effects.none)
+    none { model | templates = templates, pager = newPager, table = newTable } 
 
 
 
@@ -65,7 +67,7 @@ update msg model =
      successHandler result model (setTemplates model) NoOp
    
    _ -> 
-     (model, Effects.none)
+     none model
 
 -- View
 
@@ -75,10 +77,10 @@ view ({pager, table} as model) =
     div [] [
       row_ [
         div [class "col-md-offset-1 col-md-10"] [
-          panelDefault_ (map LoadPage (Table.view table))
+          panelDefault_ (App.map LoadPage (Table.view table))
         ]
       ],
-      row_ [ (map GotoPage (Pager.view pager))]
+      row_ [ (App.map GotoPage (Pager.view pager))]
     ]
   ]
 
@@ -90,11 +92,11 @@ templateList : Decoder (List Template)
 templateList =
    at ["templates"] (list templateDecoder)
 
--- Effects
+-- Http 
+
 getTemplates msg = 
   getJson templateList "/templates" 
     |> Task.toResult
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.perform never msg
 
 

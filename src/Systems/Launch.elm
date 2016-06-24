@@ -75,7 +75,7 @@ update msg ({job} as model) =
         runAll = model.table.rows 
           |> (List.map (\(id,_) -> id)) 
           |> (List.map (\id -> runJob id job JobLaunched)) 
-          |> Effects.batch
+          |> batch
       in
         (model, runAll)
 

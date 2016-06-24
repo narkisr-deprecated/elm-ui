@@ -35,8 +35,8 @@ view envs operations ({form} as model) =
  in
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Environment"  (Input.multiSelectInput envs) environment address
-      , formControl "Operation"  (Input.multiSelectInput operations) operation address
+        formControl "Environment" (Input.multiSelectInput envs) environment 
+      , formControl "Operation"  (Input.multiSelectInput operations) operation 
       ]
     ])
 

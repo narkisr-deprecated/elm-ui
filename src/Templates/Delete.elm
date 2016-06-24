@@ -8,6 +8,7 @@ import Http exposing (Error(BadResponse))
 import Common.Components exposing (dangerCallout, error)
 import Common.Errors exposing (failHandler)
 import Common.Http exposing (delete)
+import Basics.Extra exposing (never)
 import Maybe exposing (withDefault)
 import Common.Delete as Delete exposing (deleteResponse, DeleteResponse)
 
@@ -53,8 +54,7 @@ deleteTemplate : String -> Effects Msg
 deleteTemplate  name = 
   delete deleteResponse ("/templates/" ++ name)
     |> Task.toResult
-    |> Task.map Deleted
-    |> Effects.task
+    |> Task.perform never Deleted
 
 succeeded msg {errorMsg} = 
   if msg == (Deleted (Result.Ok { message = "Template deleted"} )) then

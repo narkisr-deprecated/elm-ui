@@ -2,12 +2,14 @@ module Systems.Add exposing (..)
 
 import Bootstrap.Html exposing (..)
 
+import Http exposing (Error(BadResponse))
 import Common.Http exposing (postJson, SaveResponse, saveResponse)
+import Basics.Extra exposing (never)
+
 import Common.Errors as Errors exposing (errorsSuccessHandler)
 import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
-import Http exposing (Error(BadResponse))
 import Task exposing (Task)
 import Json.Decode exposing (..)
 import Json.Encode as E
@@ -78,10 +80,10 @@ type Msg =
 init : (Model, Effects Msg)
 init =
   let 
-    (general, effects) = General.init 
+    (general, msgs) = General.init 
     withModels = Model AWS.init GCE.init Physical.init Digital.init Openstack.init general KVM.init 
   in 
-    (withModels True Errors.init General, Effects.map GeneralView effects)
+    (withModels True Errors.init General, Cmd.map GeneralView msgs)
 
 
 setSaved : Msg -> Model -> SaveResponse -> (Model, Effects Msg)
@@ -186,10 +188,10 @@ update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physical
 
 
           _ -> 
-            (model, Effects.none)
+            none model
 
     Back -> 
-     none (getBack model general.hypervisor)
+      none (getBack model general.hypervisor)
 
     AWSView msg -> 
       let
@@ -229,9 +231,9 @@ update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physical
 
     GeneralView msg -> 
       let
-        (newGeneral, effects) = General.update msg general
+        (newGeneral, msgs) = General.update msg general
       in
-        ({ model | general = newGeneral }, Effects.map GeneralView effects)
+        ({ model | general = newGeneral }, Cmd.map GeneralView msgs)
 
     Stage -> 
        (model, persistModel (saveSystem Stage) (intoSystem model) (toString stage))
@@ -247,12 +249,12 @@ update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physical
 
     Saved next result -> 
       let
-        ({saveErrors} as newModel, effects) = errorsSuccessHandler result model (setSaved next model) NoOp
+        ({saveErrors} as newModel, msgs) = errorsSuccessHandler result model (setSaved next model) NoOp
       in
        if Errors.hasErrors saveErrors then
-          ({newModel | stage = Error} , effects)
+          ({newModel | stage = Error} , msgs)
        else
-          (model, effects)
+          (model, msgs)
 
     _ -> 
      none model
@@ -324,11 +326,10 @@ view ({stage} as model) =
 
 -- Effects
 
-saveSystem : Msg -> String -> Effects Msg
+saveSystem : Msg -> String -> Cmd Msg
 saveSystem next json  = 
   postJson (Http.string json) saveResponse "/systems"  
     |> Task.toResult
-    |> Task.map (Saved next)
-    |> Effects.task
+    |> Task.perform never (Saved next)
 
 

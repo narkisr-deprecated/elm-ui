@@ -13,8 +13,11 @@ import Common.Components exposing (infoCallout, dangerCallout, panelContents, pa
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Admin.Core as Admin 
 import Environments.List exposing (Environments, Environment, getEnvironments)
+
 import Common.Http exposing (postJson, SaveResponse, saveResponse)
+import Basics.Extra exposing (never)
 import Http exposing (Error(BadResponse))
+
 import Templates.Persistency exposing (persistProvided)
 import Task
 import Jobs.Common as Jobs exposing (runJob, JobResponse)
@@ -58,10 +61,10 @@ validate =
 init : (Model , Cmd Msg)
 init =
   let 
-    (admin, effects) = Admin.init
+    (admin, msgs) = Admin.init
     errors = Errors.init
   in 
-    (Model "" (Form.initial [] validate) admin errors, Effects.map AdminMsg effects)
+    (Model "" (Form.initial [] validate) admin errors, Cmd.map AdminMsg msgs)
 
 
 -- Update 
@@ -112,9 +115,9 @@ update msg ({saveErrors, form, admin, name} as model) =
 
     AdminMsg msg -> 
       let
-        (newAdmin, effects) = Admin.update msg admin
+        (newAdmin, msgs) = Admin.update msg admin
       in  
-        ({ model | admin = newAdmin}, Effects.map AdminMsg effects)
+        ({ model | admin = newAdmin}, Cmd.map AdminMsg msgs)
     
     Launched result -> 
        errorsSuccessHandler result model (stage model) NoOp
@@ -181,7 +184,6 @@ intoSystem : String -> String -> Effects Msg
 intoSystem name json = 
   postJson (Http.string json) saveResponse ("/systems/template/"  ++ name)
     |> Task.toResult
-    |> Task.map Launched
-    |> Effects.task
+    |> Task.perform never Launched
 
 

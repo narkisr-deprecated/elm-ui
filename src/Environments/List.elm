@@ -3,6 +3,7 @@ module Environments.List exposing (..)
 
 import Dict exposing (Dict)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 import Common.Model exposing (Options, option)
 
 import Json.Decode as Json exposing (..)
@@ -59,8 +60,7 @@ environmentsList =
 getEnvironments msg = 
   getJson environmentsList "/environments" 
     |> Task.toResult
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.perform never msg
 
 environmentsKeys: Decoder (List String)
 environmentsKeys=
@@ -70,8 +70,7 @@ environmentsKeys=
 getEnvironmentKeys msg = 
   getJson environmentsKeys "/environments/keys" 
     |> Task.toResult
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.perform never msg
 
 
 

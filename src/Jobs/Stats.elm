@@ -19,6 +19,7 @@ import Color exposing (..)
 
 -- view
 import Html exposing (..)
+import Basics.Extra exposing (never)
 import Html.Attributes exposing (type', class, id, style, attribute, href)
 import Bootstrap.Html exposing (..)
 
@@ -113,7 +114,7 @@ setMetrics ({polls} as model) metrics =
     (selectors, titles, styles, samples, headers) = meanMaxMin polls
     newCharts = List.map2 (\ sample header -> (header,(timerChart sample selectors titles styles))) samples headers
    in 
-    ({model | polls = newPolls, charts = newCharts} , Effects.none)
+    none {model | polls = newPolls, charts = newCharts}
 
 setEnabled model ({roles, username} as session) = 
   if List.member "celestial.roles/user" roles then
@@ -138,7 +139,7 @@ update msg ({polls, lastPoll, enabled} as model) =
       (successHandler result model (setEnabled model) NoOp)
 
     _ -> 
-      (model, Effects.none)
+      none model
 
 -- View
 
@@ -202,7 +203,6 @@ getMetrics : Effects Msg
 getMetrics = 
   getJson metricsDecoder "/metrics" 
     |> Task.toResult
-    |> Task.map Load
-    |> Effects.task
+    |> Task.perform never Load
 
 

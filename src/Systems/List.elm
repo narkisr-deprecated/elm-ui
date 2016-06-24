@@ -1,9 +1,11 @@
 module Systems.List exposing (..)
 
-import Platform.Cmd exposing (map)
+import Platform.Cmd as Cmd 
+import Basics.Extra exposing (never)
 
 import Bootstrap.Html exposing (..)
 import Html exposing (..)
+import Html.App as App 
 import Html.Attributes exposing (type', class, id, style, attribute)
 
 import Http exposing (Error(BadResponse))
@@ -17,6 +19,7 @@ import Systems.Model.AWS exposing (emptyAws)
 import Systems.Decoders exposing (..)
 import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
+import Common.Utils exposing (none)
 
 import String exposing (isEmpty)
 import Set exposing (Set)
@@ -44,7 +47,7 @@ type alias Model =
   , table : Table.Model System
   , search : Search.Model}
 
-init : (Model, Effects Msg)
+init : (Model, Cmd Msg)
 init =
  let 
    systems = (Dict.empty, [("", emptySystem)])
@@ -68,7 +71,7 @@ setSystems model ((meta, items) as systemsResult) =
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
     newTable = (Table.update (Table.UpdateRows items) model.table)
   in
-    ({ model | systems = systemsResult, pager = newPager, table = newTable } , Effects.none)
+    none ({ model | systems = systemsResult, pager = newPager, table = newTable })
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({error, table} as model) =
@@ -90,7 +93,7 @@ update msg ({error, table} as model) =
             ({model | pager = newPager}, getSystemsQuery page 10 model.search.parsed)
 
         _ ->
-          (model , Effects.none)
+          none model
 
     Searching searchMsg -> 
       let 
@@ -104,33 +107,33 @@ update msg ({error, table} as model) =
           if isEmpty newSearch.input then
             ({ model | search = newSearch, error = NoError }, getSystems model.pager.page 10)
           else
-            ({ model | search = newSearch, error = SearchParseFailed newSearch.error }, Effects.none)
+            none { model | search = newSearch, error = SearchParseFailed newSearch.error }
 
         _ -> 
-          (model, Effects.none)
+          none model
 
     LoadPage tableMsg -> 
       let
         newTable = Table.update tableMsg model.table
       in
         if error == NoSystemSelected && newTable.selected /= Set.empty then
-          ({ model | table = newTable , error = NoError }, Effects.none)
+          none {model | table = newTable , error = NoError }
         else 
-          ({ model | table = newTable }, Effects.none)
+          none {model | table = newTable }
 
     NoOp ->
-      (model , Effects.none)
+      none model
 
 -- View
 
 systemRow : String -> System -> List (Html Msg)
 systemRow id {env, owner, type', machine} = 
  [
-   td_ [ text id ]
- , td_ [ text (.hostname machine) ]
- , td_ [ text type' ]
- , td_ [ text env]
- , td_ [ text owner]
+   td [] [ text id ]
+ , td [] [ text (.hostname machine) ]
+ , td [] [ text type' ]
+ , td [] [ text env]
+ , td [] [ text owner]
  ]
 
 flash : Model -> Html
@@ -157,17 +160,19 @@ view model =
     [
      row_ [
       div [class "col-md-12"] [
-         Search.view (Signal.forwardTo Searching) model.search
+         App.map Searching (Search.view model.search)
        ]
      ],
 
      row_ [
        flash model
      , div [class "col-md-offset-1 col-md-10"] [
-         panelDefault_ (Table.view (Signal.forwardTo LoadPage) model.table)
+         panelDefault_ [
+           App.map LoadPage (Table.view model.table)
+         ]
        ]
      ],
-      row_ [(Pager.view (Signal.forwardTo GotoPage) model.pager)]
+      row_ [App.map GotoPage (Pager.view model.pager)]
     ]
        
 
@@ -183,18 +188,19 @@ systemPage =
     ("meta" := dict int) 
     ("systems" := list systemPair)
 
--- Effects
-getSystems : Int -> Int -> Effects Msg
+
+-- Http
+
+getSystems : Int -> Int -> Cmd Msg
 getSystems page offset = 
   getJson systemPage ("/systems?page=" ++ (toString page) ++  "&offset=" ++ (toString offset)) 
     |> Task.toResult
-    |> Task.map SetSystems
-    |> Effects.task
+    |> Task.perform never SetSystems
 
-getSystemsQuery : Int -> Int  -> String -> Effects Msg
+getSystemsQuery : Int -> Int  -> String -> Cmd Msg
 getSystemsQuery page offset query= 
   getJson systemPage ("/systems/query?page=" ++ (toString page) ++  "&offset=" ++ (toString offset) ++ "&query=" ++ query)
     |> Task.toResult
-    |> Task.map SetSystems
-    |> Effects.task
+    |> Task.perform never SetSystems
+
 

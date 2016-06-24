@@ -18,6 +18,7 @@ import Task
 import Dict exposing (Dict)
 import String
 import Common.Utils exposing (none)
+import Basics.Extra exposing (never)
 
 type alias Model = 
   {
@@ -62,9 +63,8 @@ view : Model -> List (Html Msg)
 view {user} =
   asList (div [] [h4 [] [(text "User")], (summarize user)])
   
-getUser : String -> Msg -> Cmd (Result Error Msg)
 getUser name msg = 
   getJson Model.user ("/users/" ++ name)
-    |> Task.map msg
-    |> Task.perform Err Ok
+    |> Task.toResult
+    |> Task.perform never msg
 

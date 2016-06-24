@@ -32,12 +32,12 @@ init =
      (systemsView, _) = View.init 
      (systemsAdd, systemsAddMsg ) = Add.init 
      (systemsLaunch, _) = Launch.init 
-     effects = [ 
-       Effects.map SystemsListing systemsListMsg 
-     , Effects.map SystemsAdd systemsAddMsg 
+     msgs = [ 
+       Cmd.map SystemsListing systemsListMsg 
+     , Cmd.map SystemsAdd systemsAddMsg 
      ]
   in
-    (Model systemsList systemsAdd systemsView systemsLaunch Nothing, Effects.batch effects)
+    (Model systemsList systemsAdd systemsView systemsLaunch Nothing, Effects.batch msgs)
 
 type Msg = 
   SystemsListing List.Msg
@@ -61,30 +61,30 @@ setupJob msg ({systemsList, systemsLaunch} as model) =
       let
         newList = { systemsList | error = NoError}
       in
-       ({model | systemsLaunch = newLaunch, systemsList = newList, navChange = Just "systems/launch"}, Effects.map SystemsLaunch effect)
+       ({model | systemsLaunch = newLaunch, systemsList = newList, navChange = Just "systems/launch"}, Cmd.map SystemsLaunch effect)
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({systemsView, systemsList, systemsAdd} as model) =
  case msg of 
     SystemsView msg -> 
       let
-        (newSystems, effects) = View.update msg systemsView
+        (newSystems, msgs) = View.update msg systemsView
       in
-        ({model | systemsView = newSystems}, Effects.map SystemsView effects)
+        ({model | systemsView = newSystems}, Cmd.map SystemsView msgs)
 
     SystemsListing systemsMsg -> 
       case systemsMsg of 
         List.LoadPage (Table.View id) ->
           let 
-            (newSystems, effects) = View.update (View.ViewSystem id) systemsView
+            (newSystems, msgs) = View.update (View.ViewSystem id) systemsView
           in
-           ({model | systemsView = newSystems, navChange = Just("systems/view/" ++ id)}, Effects.map SystemsView effects)        
+           ({model | systemsView = newSystems, navChange = Just("systems/view/" ++ id)}, Cmd.map SystemsView msgs)        
         _ ->
 
           let 
             (newSystems, effect ) = List.update systemsMsg systemsList
           in
-            ({ model | systemsList = newSystems }, Effects.map SystemsListing effect)
+            ({ model | systemsList = newSystems }, Cmd.map SystemsListing effect)
 
     SystemsAdd systemsMsg -> 
       case systemsMsg of
@@ -100,16 +100,16 @@ update msg ({systemsView, systemsList, systemsAdd} as model) =
             (initial, initEffects) = Add.init
           in
             -- If not the default case
-            if newEffects/= Effects.none && next == Add.NoOp then
-              ({model | navChange = Just "systems/list", systemsAdd = initial}, Effects.map SystemsAdd initEffects)
+            if newEffects /= Cmd.none && next == Add.NoOp then
+              ({model | navChange = Just "systems/list", systemsAdd = initial}, Cmd.map SystemsAdd initEffects)
             else  
-              ({model | systemsAdd = newSystems }, Effects.map SystemsAdd newEffects)
+              ({model | systemsAdd = newSystems }, Cmd.map SystemsAdd newEffects)
 
         _ -> 
           let 
             (newSystems, effect) = Add.update systemsMsg systemsAdd
           in
-            ({model | systemsAdd = newSystems }, Effects.map SystemsAdd effect)
+            ({model | systemsAdd = newSystems }, Cmd.map SystemsAdd effect)
 
     SystemsLaunch launchMsg -> 
       case Debug.log "" launchMsg of 
@@ -126,7 +126,7 @@ update msg ({systemsView, systemsList, systemsAdd} as model) =
           let 
              (newLaunch, effect) = Launch.update launchMsg model.systemsLaunch
           in 
-           ({ model | systemsLaunch = newLaunch}, Effects.map SystemsLaunch effect)
+           ({ model | systemsLaunch = newLaunch}, Cmd.map SystemsLaunch effect)
 
         _ -> 
           none model

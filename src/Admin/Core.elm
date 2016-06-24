@@ -27,7 +27,7 @@ partialAdmin owner environment =
 
 init : (Model , Cmd Msg)
 init =
-  (Model [] "" Dict.empty [] "", Effects.batch [ getEnvironments SetEnvironments, getSession LoadSession])
+  (Model [] "" Dict.empty [] "", batch [ getEnvironments SetEnvironments, getSession LoadSession])
 
 -- Update 
 
@@ -39,7 +39,7 @@ type Msg =
     | LoadSession (Result Http.Error Session)
     | NoOp
 
-setOwners : Model -> List User -> (Model, Effects Msg)
+setOwners : Model -> List User -> (Model, Cmd Msg)
 setOwners model owners =
   let
     users = List.map .username owners
@@ -47,7 +47,7 @@ setOwners model owners =
   in
     none {model | owners = users, owner = user}
 
-setEnvironments : Model -> Environments -> (Model, Effects Msg)
+setEnvironments : Model -> Environments -> (Model, Cmd Msg)
 setEnvironments model es =
   let 
     environment = (Maybe.withDefault "" (List.head (Dict.keys es)))

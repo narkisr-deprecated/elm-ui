@@ -8,6 +8,7 @@ import Http exposing (Error(BadResponse))
 import Common.Errors exposing (successHandler)
 
 import Html exposing (..)
+import Html.App as App
 import Common.Utils exposing (none)
 
 type alias Model = 
@@ -34,11 +35,11 @@ type Msg =
    | NoOp
 
 --
--- goto active section ({nav} as model) effects =
+-- goto active section ({nav} as model) msgs =
 --   let
 --     (newNav, _) = update (SideMsg (Side.Goto active section)) nav
 --   in 
---    ({model | nav = newNav }, effects)
+--    ({model | nav = newNav }, msgs)
 
 setSession ({side, header} as model) session = 
   let 
@@ -58,9 +59,9 @@ update msg ({side, header} as model) =
 
     HeaderMsg navMsg -> 
       let 
-        (newHeader, effects) = Header.update navMsg header
+        (newHeader, msgs) = Header.update navMsg header
       in
-       ({ model | header = newHeader}, Effects.map HeaderMsg effects)
+       ({ model | header = newHeader}, Cmd.map HeaderMsg msgs)
 
     LoadSession result -> 
       (successHandler result model (setSession model) NoOp)
@@ -71,9 +72,9 @@ update msg ({side, header} as model) =
 -- View
 
 sideView {side} = 
-  Side.view (Signal.forwardTo SideMsg) side
+  App.map SideMsg (Side.view side)
 
 headerView {header} = 
-  Header.view (Signal.forwardTo HeaderMsg) header
+  App.map HeaderMsg (Header.view header)
 
 

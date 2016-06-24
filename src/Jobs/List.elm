@@ -2,9 +2,11 @@ module Jobs.List exposing (..)
 
 -- view
 import Html exposing (..)
+import Html.App as App
 import Html.Attributes as Attr exposing (type', class, id, attribute, href, style)
 import Bootstrap.Html exposing (..)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 
 -- remoting
 import Json.Decode as Json exposing (..)
@@ -186,17 +188,19 @@ accordionPanel active ident body =
 
 view : Model -> List (Html Msg)
 view ({running, done, pager} as model) =
-  [div [class "panel-group", id "accordion", attribute "role" "tablist"] 
-     [ accordionPanel (not (List.isEmpty running.rows)) "Running" 
-         (panelDefault_ (Table.view (Signal.forwardTo LoadRunning) running))
+  [div [class "panel-group", id "accordion", attribute "role" "tablist"] [
+       accordionPanel (not (List.isEmpty running.rows)) "Running" 
+         (panelDefault_ (App.map LoadRunning (Table.view running)))
      , accordionPanel (not (List.isEmpty done.rows)) "Done" 
          (div [] 
            [ row_ [
                div [class "col-md-12"][
-                 (panelDefault_ (Table.view (Signal.forwardTo LoadDone) done))
+                 (panelDefault_ (App.map LoadDone (Table.viewdone)))
                ]
              ]
-           , row_ [(Pager.view (Signal.forwardTo GotoPage) pager)]
+           , row_ [
+              (App.map GotoPage (Pager.view pager))
+             ]
            ]
          ) 
      ]
@@ -250,15 +254,13 @@ getRunning : Cmd Msg
 getRunning = 
   getJson runningList "/jobs/running" 
     |> Task.toResult
-    |> Task.map SetRunning
-    |> Cmd.task
+    |> Task.perform never SetRunning
 
 getDone : Int -> Int -> Cmd Msg
 getDone page offset= 
   getJson doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page))
     |> Task.toResult
-    |> Task.map SetDone
-    |> Task.perform Err Ok
+    |> Task.perform never SetDone
 
     
    

@@ -1,6 +1,7 @@
 module Types.Add exposing (..)
 
 import Html exposing (..)
+import Html.App as App
 import Bootstrap.Html exposing (..)
 import Types.Model exposing (..)
 import Dict exposing (Dict)
@@ -16,6 +17,7 @@ import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Http exposing (Error(BadResponse))
 import Json.Decode exposing (..)
+import Basics.Extra exposing (never)
 import Common.Http exposing (saveResponse, postJson, putJson, SaveResponse)
 import Task exposing (Task)
 import Types.Persistency exposing (persistType, encodeClasses)
@@ -115,9 +117,9 @@ update msg ({wizard, editClasses, classes} as model) =
   case msg of 
     -- Next -> 
     --   let
-    --    (next, effects) = update (WizardMsg Wizard.Next) model
+    --    (next, msgs) = update (WizardMsg Wizard.Next) model
     --   in
-    --    (next, Effects.batch [effects , unloadEditor NoOp])
+    --    (next, Effects.batch [msgs , unloadEditor NoOp])
     --
     -- Back -> 
     --   let
@@ -172,23 +174,23 @@ currentView ({wizard, environments, editClasses, classes} as model) =
         case value of 
           Main -> 
            dialogPanel "info" (info "Add a new Type") 
-            (panel (fixedPanel (Main.view environmentList (Signal.forwardTo FormMsg) current)) )
+            (panel (fixedPanel (App.map FormMsg (Main.view environmentList current))))
 
           Puppet -> 
             let
              check = (checkbox (LoadEditor "typesAdd") editClasses)
             in 
              dialogPanel "info" (info "Module properties") 
-               (panel (fixedPanel (Puppet.view check (Signal.forwardTo FormMsg) current)))
+               (panel (fixedPanel (App.map FormMsg (Puppet.view check current))))
           
       Nothing -> 
         dialogPanel "info" (info "Save new type") 
-           (panel (fixedPanel (summarize (merged model))))
+           (panel (fixedPanel (App.map NoOp (summarize (merged model)))))
 
 
 errorsView {saveErrors} = 
    let
-     body = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
+     body = (App.map ErrorsView (Errors.view saveErrors))
    in
      dialogPanel "danger" (error "Failed to save type") (panel (panelContents body))
 
@@ -225,14 +227,12 @@ saveType: String -> Effects Msg
 saveType json = 
   postJson (Http.string json) saveResponse "/types"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
 updateType: String -> Effects Msg
 updateType json = 
   putJson (Http.string json) saveResponse "/types"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
 

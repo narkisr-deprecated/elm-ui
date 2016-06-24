@@ -19,7 +19,8 @@
 	  "mgold/elm-date-format": "1.1.4 <= v < 2.0.0",
 	  "sporto/hop": "5.0.1 <= v < 6.0.0",
 	  "circuithub/elm-bootstrap-html": "7.0.0 <= v < 8.0.0",
-	  "evancz/elm-graphics": "1.0.0 <= v < 2.0.0"
+	  "evancz/elm-graphics": "1.0.0 <= v < 2.0.0",
+	  "elm-community/basics-extra": "1.1.0 <= v < 2.0.0"
     },
     "native-modules": true,
     "elm-version": "0.17.0 <= v < 0.18.0"

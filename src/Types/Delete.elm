@@ -6,6 +6,7 @@ import Common.Utils exposing (none)
 import Common.Components exposing (asList)
 import Common.Delete as Delete exposing (deleteResponse, DeleteResponse)
 import Common.Http exposing (delete)
+import Basics.Extra exposing (never)
 import Http exposing (Error(BadResponse))
 import Task
 import Maybe exposing (withDefault)
@@ -44,7 +45,7 @@ update msg ({name} as model) =
 
 
     _ -> 
-     (model, Effects.none)
+     none model
 
 -- View
 
@@ -52,12 +53,11 @@ view : Model -> List (Html Msg)
 view model =
   Delete.view model "Type" Cancel Delete Done
 
-deleteType : String -> Effects Msg
+deleteType : String -> Cmd Msg
 deleteType name = 
   delete deleteResponse ("/types/" ++ name)
     |> Task.toResult
-    |> Task.map Deleted
-    |> Effects.task
+    |> Task.perform never Deleted
 
 succeeded msg {error} = 
   if msg == (Deleted (Result.Ok { message = "Type deleted"} )) then

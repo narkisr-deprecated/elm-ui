@@ -2,6 +2,7 @@ module Templates.Add exposing (..)
 
 
 import Bootstrap.Html exposing (..)
+import Basics.Extra exposing (never)
 import Common.Http exposing (postJson)
 import Common.Errors exposing (errorsHandler, successHandler)
 import Html exposing (..)
@@ -103,7 +104,7 @@ update msg ({template, hyp, editDefaults, environments} as model) =
        (successHandler result model (setEnvironments model) NoOp)
 
     _ -> 
-      (model, Effects.none)
+      none model
 
 -- View
 
@@ -148,7 +149,6 @@ saveTemplate: String -> Effects Msg
 saveTemplate json = 
   postJson (Http.string json) saveResponse "/templates"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
 

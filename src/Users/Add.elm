@@ -2,6 +2,7 @@ module Users.Add exposing (..)
 
 
 import Html exposing (..)
+import Html.App as App 
 import Bootstrap.Html exposing (..)
 import Dict exposing (Dict)
 
@@ -20,6 +21,7 @@ import Common.Http exposing (saveResponse, postJson, putJson, SaveResponse)
 import Task exposing (Task)
 import Common.Model exposing (Options)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 
 import Users.Model exposing (User, emptyUser, getRoles)
 import Users.Add.Perm as Perm
@@ -54,14 +56,14 @@ init =
     steps = [(step Perm.init Perm)]
     mainStep = (step (Main.init "") Main)
     wizard = Wizard.init mainStep steps
-    effects = [
+    msgs = [
        getRoles SetRoles
     ,  getEnvironmentKeys SetEnvironments
     ,  getOperations SetOperations
     ]
 
   in
-    (Model wizard errors False [] [] [],Effects.batch effects)
+    (Model wizard errors False [] [] [], Cmd.batch msgs)
 
 type Msg = 
    ErrorsView Errors.Msg
@@ -74,7 +76,7 @@ type Msg =
     | Done
     | Back
     | Next
-    | Save (String -> Effects Msg)
+    | Save (String -> Cmd Msg)
     | Saved (Result Http.Error SaveResponse)
     | NoOp
 
@@ -112,11 +114,11 @@ setOperation model keys =
     op = (Maybe.withDefault "" (List.head keys))
     pairs = List.map (\key -> (key,key) ) keys
   in 
-   none { model | operations = pairs }
+    none { model | operations = pairs }
 
 
 
-update : Msg ->  Model -> (Model , Effects Msg)
+update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({wizard} as model) =
   case msg of 
     Next -> 
@@ -169,20 +171,20 @@ currentView ({wizard, roles, environments, operations} as model) =
       case value of 
         Main -> 
           dialogPanel "info" (info "Add a new User") 
-             (panel (fixedPanel (Main.view roles (Signal.forwardTo FormMsg) current)) )
+             (panel (fixedPanel (App.map FormMsg (Main.view roles current)) ))
 
         Perm -> 
            dialogPanel "info" (info "User permissions") 
-               (panel (fixedPanel (Perm.view environments operations (Signal.forwardTo FormMsg) current)))
+             (panel (fixedPanel (App.map FormMsg (Perm.view environments operations current))))
           
     Nothing -> 
         dialogPanel "info" (info "Save new user") 
-           (panel (fixedPanel (summarize (merged model))))
+           (panel (fixedPanel (App.map NoOp (summarize (merged model)))))
 
 
 errorsView {saveErrors} = 
    let
-     body = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
+     body = (App.map ErrorsView (Errors.view saveErrors))
    in
      dialogPanel "danger" (error "Failed to save user") (panel (panelContents body))
 
@@ -215,19 +217,17 @@ view ({wizard, saveErrors} as model) =
       (div [class "col-md-offset-2 col-md-8"] (currentView model))
       (buttons' Next Back (saveButton address))
 
-saveUser: String -> Effects Msg
+saveUser: String -> Cmd Msg
 saveUser json = 
   postJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
-updateUser: String -> Effects Msg
+updateUser: String -> Cmd Msg
 updateUser json = 
   putJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
 
 environmentsKeys: Decoder (List String)
@@ -238,8 +238,7 @@ environmentsKeys=
 getOperations msg = 
   getJson environmentsKeys "/users/operations" 
     |> Task.toResult
-    |> Task.map msg
-    |> Effects.task
+    |> Task.perform never msg
 
 
 
