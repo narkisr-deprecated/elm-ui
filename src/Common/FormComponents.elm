@@ -1,6 +1,6 @@
-module Common.FormComponents where
+module Common.FormComponents exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, for, placeholder, attribute, type', checked, value, style, id)
 import Maybe exposing (withDefault)
@@ -26,16 +26,16 @@ withError field class =
     Nothing ->
      class
 
-formControl title widget field address  = 
-  formGroup title widget field address [class "form-control"]
+formControl title widget field  = 
+  formGroup title widget field [class "form-control"]
 
-formGroup title widget field address attrs = 
+formGroup title widget field attrs = 
   div [class (withError field "form-group"), id title] 
     [ label [for title, class "col-sm-3 control-label"] [
        (text title)
       ]
     , div [class "col-sm-6"] [
-       widget field address attrs
+       widget field attrs
       ]
     , errorFor field
     ]

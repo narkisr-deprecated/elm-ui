@@ -1,12 +1,13 @@
-module Common.Delete where
+module Common.Delete exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Components exposing (message)
 import Json.Decode exposing (..)
 import Common.Components exposing (dangerCallout, error)
+import Platform.Cmd as Cmd exposing (batch)
 
-deleteMessage : String -> String -> List Html
+deleteMessage : String -> String -> List (Html msg)
 deleteMessage item name =
   message "Notice!" [
     text (item ++ " ")
@@ -14,14 +15,14 @@ deleteMessage item name =
   , text " will be deleted! "
   ]
 
-deleteView address {name} type' cancel delete  =
-   dangerCallout address (deleteMessage name type' ) (div [] []) cancel delete
+deleteView {name} type' cancel delete  =
+   dangerCallout (deleteMessage name type' ) (div [] []) cancel delete
 
-view address ({errorMsg} as model) type' cancel delete done=
+view ({errorMsg} as model) type' cancel delete done=
   if errorMsg /= "" then
-    dangerCallout address (error errorMsg) (div [] []) cancel done
+    dangerCallout (error errorMsg) (div [] []) cancel done
   else
-    deleteView address model type' cancel delete
+    deleteView model type' cancel delete
 
 
 type alias DeleteResponse = 
@@ -32,18 +33,18 @@ deleteResponse =
   object1 DeleteResponse
     ("message" := string) 
 
-refresh init action succeeded ((model, effect) as original)  =
+refresh init msg succeeded ((model, effect) as original)  =
   if succeeded then
     let 
-      (_ , listEffects) = init
-      effects = [effect , Effects.map action listEffects ]
+      (_ , listMsgs) = init
+      msgs= [effect , Cmd.map msg listMsgs]
     in
-      (model ,Effects.batch effects)
+      (model ,Cmd.batch msgs)
   else 
     original
 
-succeeded action deleted expected = 
-  if action == (deleted (Result.Ok { message = expected } )) then
+succeeded msg deleted expected = 
+  if msg == (deleted (Result.Ok { message = expected } )) then
     True
   else
     False

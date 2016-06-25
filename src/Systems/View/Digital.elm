@@ -1,4 +1,4 @@
-module Systems.View.Digital where
+module Systems.View.Digital exposing (..)
 
 import Html exposing (..)
 import Common.Utils exposing (partition, withDefaultProp)
@@ -8,9 +8,10 @@ import Systems.Model.Digital exposing (Digital)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
-import Effects exposing (Effects, Never, map)
+import Platform.Cmd exposing (map)
 import Common.Summary exposing (..)
 import String
+import Common.Utils exposing (none)
 
 -- Model 
 type alias Model = 
@@ -18,17 +19,13 @@ type alias Model =
    id : Int
   }
 
-init : (Model , Effects Action)
+init : (Model , Cmd msg)
 init =
-  (Model 0 , Effects.none)
+  none (Model 0)
   
--- Update
-type Action = 
-  NoOp
-
 -- View
    
-summarySections : (Digital, Machine) -> List (List Html)
+summarySections : (Digital, Machine) -> List (List (Html msg))
 summarySections ((digital, machine) as model) =
    [ 
      overviewSection "Instance" ["size", "os", "region"] 
@@ -38,7 +35,7 @@ summarySections ((digital, machine) as model) =
       [ machine.hostname, machine.domain, (toString digital.privateNetworking)]
    ]
 
-summarize: (Digital, Machine) -> List Html
+summarize: (Digital, Machine) -> List (Html msg)
 summarize model =
   [div [] [ h4 [] [(text "System overview")] 
           , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
@@ -50,8 +47,8 @@ summarize model =
   ]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html msg
+view model =
     fixedPanel (div [] [])
 
 

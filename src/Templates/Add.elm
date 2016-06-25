@@ -1,7 +1,8 @@
-module Templates.Add where
+module Templates.Add exposing (..)
 
-import Html.Shorthand exposing (..)
+
 import Bootstrap.Html exposing (..)
+import Basics.Extra exposing (never)
 import Common.Http exposing (postJson)
 import Common.Errors exposing (errorsHandler, successHandler)
 import Html exposing (..)
@@ -10,14 +11,13 @@ import Html.Events exposing (onClick)
 import Http exposing (Error(BadResponse))
 import Task exposing (Task)
 import Json.Decode exposing (..)
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Dict exposing (Dict)
 import Systems.Model.Common exposing (System)
 import String exposing (toLower)
 import Maybe exposing (withDefault)
 import Common.Utils exposing (none, setEnvironments)
 import Templates.Persistency exposing (persistTemplate, encodeDefaults)
-import Common.Editor exposing (loadEditor)
 import Common.Errors as Errors exposing (..)
 import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
 import Environments.List exposing (Environments, getEnvironments)
@@ -34,7 +34,7 @@ type alias Model =
   , environments : List String
   }
 
-type Action = 
+type Msg = 
   Save
   | Done
   | NoOp
@@ -47,7 +47,7 @@ type Action =
   | DescriptionInput String
   | DefaultsInput String
   | SetEnvironments (Result Http.Error Environments)
-  | ErrorsView Errors.Action
+  | ErrorsView Errors.Msg
 
 init =
   let
@@ -63,21 +63,21 @@ intoTemplate ({template} as model) {type', machine, openstack, physical, aws, di
       {model | template = newTemplate, hyp = hyp}
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({template, hyp, editDefaults, environments} as model) =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({template, hyp, editDefaults, environments} as model) =
+  case msg of
     Save -> 
       (model, persistTemplate saveTemplate template hyp)
 
     SetSystem hyp system -> 
       none (intoTemplate model system hyp)
 
-    LoadEditor -> 
-      let
-        encoded = (encodeDefaults (defaultsByEnv environments) hyp)
-      in 
-      ({ model | editDefaults = not editDefaults}, loadEditor "templates" NoOp encoded)
-    
+    -- LoadEditor -> 
+    --   let
+    --     encoded = (encodeDefaults (defaultsByEnv environments) hyp)
+    --   in 
+    --   ({ model | editDefaults = not editDefaults}, loadEditor "templates" NoOp encoded)
+    --
     NameInput name -> 
       let 
         newTemplate = { template | name = name }
@@ -104,33 +104,33 @@ update action ({template, hyp, editDefaults, environments} as model) =
        (successHandler result model (setEnvironments model) NoOp)
 
     _ -> 
-      (model, Effects.none)
+      none model
 
 -- View
 
-editing address {template, editDefaults} =
+editing {template, editDefaults} =
     panel
       (panelContents 
           (Html.form [] [
             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-              group' "Name" (inputText address NameInput " "  template.name)
-            , group' "Description" (inputText address DescriptionInput " "  template.description)
-            , group' "Edit defaults" (checkbox address LoadEditor editDefaults)
+              group' "Name" (inputText NameInput " "  template.name)
+            , group' "Description" (inputText DescriptionInput " "  template.description)
+            , group' "Edit defaults" (checkbox LoadEditor editDefaults)
             , div [ id "jsoneditor"
                   , style [("width", "50%"), ("height", "400px"), ("margin-left", "25%")]] []
            ]
           ])
         )
 
-view : Signal.Address Action -> Model -> List Html
-view address ({saveErrors} as model) =
+view : Model -> List (Html Msg)
+view ({saveErrors} as model) =
   let
-    errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+    errorsView = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
   in
     if Errors.hasErrors saveErrors then
-      dangerCallout address (error "Failed to save template") (panel (panelContents errorsView)) Cancel Done
+      dangerCallout (error "Failed to save template") (panel (panelContents errorsView)) Cancel Done
     else 
-      infoCallout address (info "Save template") (editing address model) Cancel Save
+      infoCallout (info "Save template") (editing model) Cancel Save
 
 
 -- Effects
@@ -145,11 +145,10 @@ saveResponse =
   object1 SaveResponse
     ("message" := string) 
 
-saveTemplate: String -> Effects Action
+saveTemplate: String -> Effects Msg
 saveTemplate json = 
   postJson (Http.string json) saveResponse "/templates"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
 

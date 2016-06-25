@@ -1,7 +1,7 @@
-module Systems.Add.AWS where
+module Systems.Add.AWS exposing (..)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -11,7 +11,7 @@ import Systems.Add.Validations exposing (..)
 import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTemplates))
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Model.AWS exposing (..)
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Common.Components exposing (fixedPanel, asList)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
@@ -40,8 +40,8 @@ init =
   in 
     Model wizard emptyAws emptyMachine Dict.empty Dict.empty emptyVolume emptyBlock
 
-type Action = 
-  WizardAction Wizard.Action
+type Msg = 
+  WizardMsg Wizard.Msg
    | Update Environment
    | SelectInstanceType String
    | SelectOS String
@@ -145,13 +145,13 @@ ignoreDevices ({errors} as model) =
     { model | errors =  ignored }
 
 
-update : Action -> Model-> Model
-update action ({wizard, aws, machine, volume, block} as model) =
-  case action of
-    WizardAction action -> 
+update : Msg -> Model-> Model
+update msg ({wizard, aws, machine, volume, block} as model) =
+  case msg of
+    WizardMsg msg -> 
       let
         ({errors} as newModel) = ignoreDevices (validateAWS wizard.step model)
-        newWizard = Wizard.update (notAny errors) action wizard
+        newWizard = Wizard.update (notAny errors) msg wizard
       in
        { newModel | wizard = newWizard } 
 
@@ -308,13 +308,13 @@ next : Model -> Environment -> Model
 next model environment =
       model 
          |> update (Update environment) 
-         |> update (WizardAction Wizard.Next)
+         |> update (WizardMsg Wizard.Next)
 
 back model =
-  (update (WizardAction Wizard.Back) model)
+  (update (WizardMsg Wizard.Back) model)
 
-instance : Signal.Address Action -> Model -> List Html
-instance address ({aws, machine, errors} as model) =
+instance : Model -> List (Html Msg)
+instance ({aws, machine, errors} as model) =
   let
     check = withErrors errors
     groups = (String.join " " (defaultEmpty aws.securityGroups))
@@ -326,31 +326,31 @@ instance address ({aws, machine, errors} as model) =
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
-       , group' "Instance type" (selector address SelectInstanceType instanceTypes aws.instanceType)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses "aws" model)) machine.os)
-       , group' "Endpoint" (selector address SelectEndpoint points name)
-       , group' "Availability Zone" (selector address SelectZone zoneOptions (withDefault "" aws.availabilityZone))
+       , group' "Instance type" (selector SelectInstanceType instanceTypes aws.instanceType)
+       , group' "OS" (selector SelectOS (Dict.keys (getOses "aws" model)) machine.os)
+       , group' "Endpoint" (selector SelectEndpoint points name)
+       , group' "Availability Zone" (selector SelectZone zoneOptions (withDefault "" aws.availabilityZone))
        , legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" model.machine.user) 
-       , check "Keypair" (inputText address KeyPairInput "" aws.keyName)
-       , check "Security groups" (inputText address SecurityGroupsInput " " groups)]
+       , check "User" (inputText UserInput "" model.machine.user) 
+       , check "Keypair" (inputText KeyPairInput "" aws.keyName)
+       , check "Security groups" (inputText SecurityGroupsInput " " groups)]
    ]
 
-networking: Signal.Address Action -> Model -> List Html
-networking address ({errors, aws, machine} as model) =
+networking: Model -> List (Html Msg)
+networking ({errors, aws, machine} as model) =
   let 
     check = withErrors errors
   in
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
      [
        legend [] [text "DNS"]
-     , check "Hostname" (inputText address HostnameInput "" machine.hostname)
-     , check "Domain"  (inputText address DomainInput "" machine.domain)
-     , check "IP" (inputText address IPInput "" (withDefault "" machine.ip))
+     , check "Hostname" (inputText HostnameInput "" machine.hostname)
+     , check "Domain"  (inputText DomainInput "" machine.domain)
+     , check "IP" (inputText IPInput "" (withDefault "" machine.ip))
      , legend [] [text "VPC"]
-     , check "VPC Id" (inputText address VPCIdInput "" (withDefaultProp aws.vpc "" .vpcId))
-     , check "Subnet Id"  (inputText address SubnetIdInput "" (withDefaultProp aws.vpc "" .subnetId))
-     , group' "Assign public IP" (checkbox address AssignIp (withDefaultProp aws.vpc False .assignPublic))
+     , check "VPC Id" (inputText VPCIdInput "" (withDefaultProp aws.vpc "" .vpcId))
+     , check "Subnet Id"  (inputText SubnetIdInput "" (withDefaultProp aws.vpc "" .subnetId))
+     , group' "Assign public IP" (checkbox AssignIp (withDefaultProp aws.vpc False .assignPublic))
      ]
   ]
 
@@ -360,108 +360,108 @@ ebsTypes = Dict.fromList [
    , ("Provisioned IOPS (SSD)", "io1")
   ]
 
-volumeRow : Signal.Address Action -> Volume -> Html
-volumeRow address ({device} as v) = 
+volumeRow : Volume -> Html Msg
+volumeRow ({device} as v) = 
   let
     remove = span [ class "glyphicon glyphicon-remove"
                   , attribute "aria-hidden" "true"
                   , style [("top", "5px")]
-                  , onClick address (VolumeRemove device)
+                  , onClick (VolumeRemove device)
                   ] []
     props = [.device, (toString << .size), .type', (toString << .clear)]
   in
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
-volumes : Signal.Address Action -> List Volume -> Html
-volumes address vs = 
+volumes : List Volume -> Html Msg
+volumes vs = 
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "ebsVolumes"]
      [thead []
         [tr [] (List.map (\k ->  (th [] [text k])) ["device", "size", "type", "clear", ""])]
          , tbody [] 
-            (List.map (\volume -> volumeRow address volume) vs)
+            (List.map (\volume -> volumeRow volume) vs)
  
      ]
   ]
 
-blockRow : Signal.Address Action -> Block -> Html
-blockRow address ({device} as v) = 
+blockRow : Block -> Html Msg
+blockRow ({device} as v) = 
   let
     remove = span [ class "glyphicon glyphicon-remove"
                   , attribute "aria-hidden" "true"
                   , style [("top", "5px")]
-                  , onClick address (BlockRemove device)
+                  , onClick (BlockRemove device)
                   ] []
     props = [.device, .volume ]
   in
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
 
-blocks: Signal.Address Action -> List Block -> Html
-blocks address bs = 
+blocks: List Block -> Html Msg
+blocks bs = 
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "instanceVolumes"]
-     [thead_
+     [thead []
         [tr [] (List.map (\k ->  (th [] [text k])) ["device", "volume", ""])]
          , tbody [] 
-            (List.map (\block-> blockRow address block) bs)
+            (List.map (\block-> blockRow block) bs)
      ]
   ]   
 
-ebs: Signal.Address Action -> Model -> List Html
-ebs address ({errors, volume, aws} as model) =
+ebs: Model -> List (Html Msg)
+ebs ({errors, volume, aws} as model) =
   let
     check = withErrors errors
   in
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
     [ 
       legend [] [text "Global"]
-    , group' "EBS Optimized" (checkbox address EBSOptimized (withDefault False aws.ebsOptimized))
+    , group' "EBS Optimized" (checkbox EBSOptimized (withDefault False aws.ebsOptimized))
     , legend [] [text "Devices"]
-    , check "EBS Device" (inputText address EBSDeviceInput "sdh" volume.device)
-    , group' "Size" (inputNumber address EBSSizeInput "" (toString volume.size))
-    , group' "Type" (selector address SelectEBSType (Dict.keys ebsTypes) volume.type')
+    , check "EBS Device" (inputText EBSDeviceInput "sdh" volume.device)
+    , group' "Size" (inputNumber EBSSizeInput "" (toString volume.size))
+    , group' "Type" (selector SelectEBSType (Dict.keys ebsTypes) volume.type')
     , if volume.type' == "Provisioned IOPS (SSD)" then 
-        group' "IOPS" (inputNumber address EBSIOPSInput "50" (toString (withDefault 50 volume.iops)))
+        group' "IOPS" (inputNumber EBSIOPSInput "50" (toString (withDefault 50 volume.iops)))
       else 
         div  [] []
-    , group' "Clear" (checkbox address EBSClear volume.clear)
-    , group' ""  (button [class "btn btn-sm col-md-2", onClick address VolumeAdd] [text "Add"])
+    , group' "Clear" (checkbox EBSClear volume.clear)
+    , group' ""  (button [class "btn btn-sm col-md-2", onClick VolumeAdd] [text "Add"])
     , legend [] [text "Volumes"]
-    , volumes address (defaultEmpty aws.volumes)
+    , volumes (defaultEmpty aws.volumes)
     ]
   ]
 
-store: Signal.Address Action -> Model -> List Html
-store address ({errors, block, aws} as model) =
+store: Model -> List (Html Msg)
+store ({errors, block, aws} as model) =
   let
     check = withErrors errors
   in
   [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
     [ 
       legend [] [text "Instance Store"]
-    , check "Instance Device" (inputText address InstanceDeviceInput "sdb" block.device)
-    , check "Volume" (inputText address InstanceVolumeInput "ephemeral0" block.volume)
-    , group' ""  (button [class "btn btn-sm col-md-2", onClick address BlockAdd] [text "Add"])
-    , blocks address (defaultEmpty aws.blockDevices)
+    , check "Instance Device" (inputText InstanceDeviceInput "sdb" block.device)
+    , check "Volume" (inputText InstanceVolumeInput "ephemeral0" block.volume)
+    , group' ""  (button [class "btn btn-sm col-md-2", onClick BlockAdd] [text "Add"])
+    , blocks (defaultEmpty aws.blockDevices)
     ]
   ]
 
 
-stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({wizard, aws, machine} as model) =
+stepView :  Model -> List (Html Msg)
+stepView ({wizard, aws, machine} as model) =
   case wizard.step of
     Instance -> 
-      instance address model 
+      instance model 
 
     Networking -> 
-      networking address model
+      networking model
 
     EBS -> 
-      ebs address model
+      ebs model
 
     Store -> 
-      store address model
+      store model
 
     Summary -> 
       summarize (aws, machine)
@@ -470,6 +470,6 @@ stepView address ({wizard, aws, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-  fixedPanel (Html.form [] (stepView address model))
+view : Model -> Html Msg
+view model =
+  fixedPanel (Html.form [] (stepView model))

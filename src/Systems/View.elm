@@ -1,9 +1,10 @@
-module Systems.View where
+module Systems.View exposing (..)
 
-import Effects exposing (Effects)
+
 import Systems.Model.Common exposing (System, Machine, emptySystem)
 import Systems.Model.AWS exposing (emptyAws)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 
 -- Effects
 import Task
@@ -20,6 +21,7 @@ import Systems.View.Openstack as OpenstackView
 import Systems.View.GCE as GCEView
 import Systems.View.Digital as DigitalView
 
+import Common.Utils exposing (none)
 import Maybe exposing (withDefault)
 
 -- Model 
@@ -28,23 +30,23 @@ type alias Model =
     system : System
    }
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
-  (Model emptySystem, Effects.none)
+  none (Model emptySystem)
 
 -- Update
-type Action = 
+type Msg = 
   ViewSystem String
     | SetSystem (Result Http.Error System)
     | NoOp
 
-setSystem : Model -> System -> (Model , Effects Action)
+setSystem : Model -> System -> (Model , Cmd Msg)
 setSystem model system =
-  ({model | system = system}, Effects.none)
+  none {model | system = system}
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of
     ViewSystem id -> 
       (model, getSystem id)
 
@@ -52,7 +54,7 @@ update action model =
       successHandler result model (setSystem model) NoOp
       
     NoOp -> 
-      (model, Effects.none)
+      none model
       
 -- View
 
@@ -63,8 +65,8 @@ toHtml ({system} as model) f prop=
     Nothing -> 
        []
 
-view : Signal.Address Action -> Model -> List Html
-view address ({system} as model) =
+view : Model -> List (Html Msg)
+view ({system} as model) =
     let
       options = [ toHtml  model AWSView.summarize system.aws
                 , toHtml  model GCEView.summarize system.gce
@@ -74,12 +76,11 @@ view address ({system} as model) =
     in 
       withDefault (asList notImplemented) (List.head (List.filter (not << List.isEmpty) options))
 
--- Effects
+-- Http 
 
-getSystem : String -> Effects Action
+getSystem : String -> Cmd Msg
 getSystem id = 
   getJson systemDecoder ("/systems/" ++ id)
     |> Task.toResult
-    |> Task.map SetSystem
-    |> Effects.task
+    |> Task.perform never SetSystem
 

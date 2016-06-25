@@ -1,8 +1,10 @@
-module Types.List where
+module Types.List exposing (..)
 
+import Html.App as App 
 import Html exposing (..)
-import Effects exposing (Effects)
+
 import Dict exposing (Dict)
+import Basics.Extra exposing (never)
 import Common.Http exposing (getJson)
 
 import Types.Model exposing (..)
@@ -13,7 +15,7 @@ import Bootstrap.Html exposing (..)
 import Json.Decode as Json exposing (..)
 import Html.Attributes exposing (type', class, id, style, attribute)
 import Http exposing (Error(BadResponse))
-import Effects exposing (Effects)
+
 import Task
 import Maybe exposing (withDefault)
 import Common.Errors exposing (successHandler)
@@ -27,27 +29,27 @@ type alias Model =
   , pager : Pager.Model
   } 
 
-typeRow : String -> Type -> List Html
+typeRow : String -> Type -> List (Html Msg)
 typeRow id {type', description } = 
     [ td [] [ text type' ]
     , td [] [ text "Puppet standalone"]
     , td [] [ text (withDefault "" description)]
     ]
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let 
     table = Table.init "typesListing" True ["Name", "Provisioner", "Description"] typeRow "Types"
   in 
     (Model [] table Pager.init , getTypes SetTypes)
 
-type Action = 
-  LoadPage (Table.Action Type)
-    | GotoPage Pager.Action
+type Msg = 
+  LoadPage (Table.Msg Type)
+    | GotoPage Pager.Msg
     | SetTypes (Result Http.Error (List Type))
     | NoOp
 
-setTypes: Model -> List Type -> (Model , Effects Action)
+setTypes: Model -> List Type -> (Model , Effects Msg)
 setTypes ({pager, table} as model) types = 
   let
     total = List.length types
@@ -58,24 +60,28 @@ setTypes ({pager, table} as model) types =
     none { model | types = types, pager = newPager, table = newTable }
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of
     SetTypes result ->
       successHandler result model (setTypes model) NoOp
      
     _ -> 
       none model
 
-view : Signal.Address Action -> Model -> List Html
-view address ({types, pager, table} as model) =
+view : Model -> List (Html Msg)
+view ({types, pager, table} as model) =
   [ div [class ""] [
     row_ [
       div [class "col-md-offset-1 col-md-10"] [
-        panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
+        panelDefault_ [
+          App.map LoadPage (Table.view table)
+        ]
       ]
     ],
-   row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+    row_ [
+     App.map GotoPage (Pager.view pager)
+    ]
   ]]
   
 
@@ -86,10 +92,9 @@ typesList =
    at ["types"] (list Model.type')
 
 -- Effects
-getTypes action = 
+getTypes msg = 
   getJson typesList "/types" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 
 

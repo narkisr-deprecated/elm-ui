@@ -1,4 +1,4 @@
-module Systems.View.GCE where
+module Systems.View.GCE exposing (..)
 
 import Html exposing (..)
 import Common.Utils exposing (partition, withDefaultProp)
@@ -9,9 +9,10 @@ import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
 import Common.Summary exposing (..)
-import Effects exposing (Effects, Never, map)
+import Platform.Cmd exposing (map)
 import Common.Summary exposing (..)
 import String
+import Common.Utils exposing (none)
 
 -- Model 
 type alias Model = 
@@ -19,16 +20,12 @@ type alias Model =
    id : Int
   }
 
-init : (Model , Effects Action)
+init : (Model , Cmd msg)
 init =
-  (Model 0 , Effects.none)
+  none (Model 0)
   
--- Update
-type Action = 
-  NoOp
-
 -- View
-summarySections : (GCE, Machine) -> List (List Html)
+summarySections : (GCE, Machine) -> List (List (Html msg))
 summarySections ((gce, machine) as model)=
    List.filter (not << List.isEmpty) [ 
      overviewSection "Instance"
@@ -43,7 +40,7 @@ summarySections ((gce, machine) as model)=
 
    ]
 
-summarize: (GCE, Machine) -> List Html
+summarize: (GCE, Machine) -> List (Html msg)
 summarize model =
   [div [] [ h4 [] [(text "System overview")] 
           , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
@@ -55,8 +52,8 @@ summarize model =
   ]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html msg
+view model =
   fixedPanel (div [] [])
 
 

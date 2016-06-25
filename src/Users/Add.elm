@@ -1,10 +1,11 @@
-module Users.Add where
+module Users.Add exposing (..)
 
 
 import Html exposing (..)
+import Html.App as App 
 import Bootstrap.Html exposing (..)
 import Dict exposing (Dict)
-import Effects exposing (Effects)
+
 import Common.Errors exposing (errorsHandler, successHandler)
 import Environments.List exposing (Environments, getEnvironmentKeys)
 import Common.Components exposing (..)
@@ -15,12 +16,12 @@ import Html.Events exposing (onClick)
 import Common.FormWizard as Wizard
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Http exposing (Error(BadResponse))
-import Common.Editor exposing (loadEditor, unloadEditor)
 import Json.Decode exposing (..)
 import Common.Http exposing (saveResponse, postJson, putJson, SaveResponse)
 import Task exposing (Task)
 import Common.Model exposing (Options)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 
 import Users.Model exposing (User, emptyUser, getRoles)
 import Users.Add.Perm as Perm
@@ -48,26 +49,26 @@ step model value =
   , value = value
   }
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let
     errors = Errors.init
     steps = [(step Perm.init Perm)]
     mainStep = (step (Main.init "") Main)
     wizard = Wizard.init mainStep steps
-    effects = [
+    msgs = [
        getRoles SetRoles
     ,  getEnvironmentKeys SetEnvironments
     ,  getOperations SetOperations
     ]
 
   in
-    (Model wizard errors False [] [] [],Effects.batch effects)
+    (Model wizard errors False [] [] [], Cmd.batch msgs)
 
-type Action = 
-   ErrorsView Errors.Action
-    | WizardAction Wizard.Action
-    | FormAction Form.Action
+type Msg = 
+   ErrorsView Errors.Msg
+    | WizardMsg Wizard.Msg
+    | FormMsg Form.Msg
     | SetRoles (Result Http.Error (Dict String String))
     | SetEnvironments (Result Http.Error (List String))
     | SetOperations (Result Http.Error (List String))
@@ -75,7 +76,7 @@ type Action =
     | Done
     | Back
     | Next
-    | Save (String -> Effects Action)
+    | Save (String -> Cmd Msg)
     | Saved (Result Http.Error SaveResponse)
     | NoOp
 
@@ -113,34 +114,34 @@ setOperation model keys =
     op = (Maybe.withDefault "" (List.head keys))
     pairs = List.map (\key -> (key,key) ) keys
   in 
-   none { model | operations = pairs }
+    none { model | operations = pairs }
 
 
 
-update : Action ->  Model -> (Model , Effects Action)
-update action ({wizard} as model) =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({wizard} as model) =
+  case msg of 
     Next -> 
-      update (WizardAction Wizard.Next) model
+      update (WizardMsg Wizard.Next) model
 
     Back -> 
-       update (WizardAction Wizard.Back) model
+       update (WizardMsg Wizard.Back) model
 
     Reset -> 
       let
-        (back,_) = (update (WizardAction Wizard.Back) model)
+        (back,_) = (update (WizardMsg Wizard.Back) model)
       in
         none { back | saveErrors = Errors.init }
 
-    WizardAction wizardAction -> 
+    WizardMsg wizardMsg -> 
       let 
-        newWizard = Wizard.update wizardAction wizard
+        newWizard = Wizard.update wizardMsg wizard
       in
         none { model | wizard = newWizard }
 
-    FormAction formAction -> 
+    FormMsg formMsg -> 
       let 
-        newWizard = Wizard.update (Wizard.FormAction formAction) wizard
+        newWizard = Wizard.update (Wizard.FormMsg formMsg) wizard
       in
         none { model | wizard = newWizard }
 
@@ -163,35 +164,35 @@ update action ({wizard} as model) =
     _ -> 
       (none model)
 
-currentView : Signal.Address Action -> Model -> List Html
-currentView address ({wizard, roles, environments, operations} as model) =
+currentView : Model -> List (Html Msg)
+currentView ({wizard, roles, environments, operations} as model) =
   case wizard.step of 
     Just ({value} as current) ->
       case value of 
         Main -> 
           dialogPanel "info" (info "Add a new User") 
-             (panel (fixedPanel (Main.view roles (Signal.forwardTo address FormAction) current)) )
+             (panel (fixedPanel (App.map FormMsg (Main.view roles current)) ))
 
         Perm -> 
            dialogPanel "info" (info "User permissions") 
-               (panel (fixedPanel (Perm.view environments operations (Signal.forwardTo address FormAction) current)))
+             (panel (fixedPanel (App.map FormMsg (Perm.view environments operations current))))
           
     Nothing -> 
         dialogPanel "info" (info "Save new user") 
-           (panel (fixedPanel (summarize (merged model))))
+           (panel (fixedPanel (App.map NoOp (summarize (merged model)))))
 
 
-errorsView address {saveErrors} = 
+errorsView {saveErrors} = 
    let
-     body = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+     body = (App.map ErrorsView (Errors.view saveErrors))
    in
      dialogPanel "danger" (error "Failed to save user") (panel (panelContents body))
 
-saveButton address =
-    [button [id "Save", class "btn btn-primary", onClick address (Save saveUser) ] [text "Save  "]]
+saveButton =
+    [button [id "Save", class "btn btn-primary", onClick (Save saveUser) ] [text "Save  "]]
 
-doneButton address =
-    [button [id "Done", class "btn btn-primary", onClick address (Save saveUser) ] [text "Done "]]
+doneButton =
+    [button [id "Done", class "btn btn-primary", onClick (Save saveUser) ] [text "Done "]]
 
 
 rows contents buttons = 
@@ -202,33 +203,31 @@ rows contents buttons =
  ,row_ buttons
  ]
 
-view : Signal.Address Action -> Model -> List Html
-view address ({wizard, saveErrors} as model) =
+view : Model -> List (Html Msg)
+view ({wizard, saveErrors} as model) =
   let 
-    buttons' = (buttons address { model | hasNext = Wizard.notDone model})
+    buttons' = (buttons { model | hasNext = Wizard.notDone model})
   in 
    if Errors.hasErrors saveErrors then
     rows 
-     (div [] (errorsView address model))
+     (div [] (errorsView model))
      (buttons' Done Reset (doneButton address))
     else
      rows 
-      (div [class "col-md-offset-2 col-md-8"] (currentView address model))
+      (div [class "col-md-offset-2 col-md-8"] (currentView model))
       (buttons' Next Back (saveButton address))
 
-saveUser: String -> Effects Action
+saveUser: String -> Cmd Msg
 saveUser json = 
   postJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
-updateUser: String -> Effects Action
+updateUser: String -> Cmd Msg
 updateUser json = 
   putJson (Http.string json) saveResponse "/users"  
     |> Task.toResult
-    |> Task.map Saved
-    |> Effects.task
+    |> Task.perform never Saved
 
 
 environmentsKeys: Decoder (List String)
@@ -236,11 +235,10 @@ environmentsKeys=
   at ["operations"] (list string)
 
 
-getOperations action = 
+getOperations msg = 
   getJson environmentsKeys "/users/operations" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 
 
 

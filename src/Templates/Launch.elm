@@ -1,8 +1,8 @@
-module Templates.Launch where
+module Templates.Launch exposing (..)
 
-import Html.Shorthand exposing (..)
+
 import Bootstrap.Html exposing (..)
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Templates.Model.Common exposing (emptyTemplate, Template)
 import Common.Utils exposing (none)
@@ -13,8 +13,11 @@ import Common.Components exposing (infoCallout, dangerCallout, panelContents, pa
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Admin.Core as Admin 
 import Environments.List exposing (Environments, Environment, getEnvironments)
+
 import Common.Http exposing (postJson, SaveResponse, saveResponse)
+import Basics.Extra exposing (never)
 import Http exposing (Error(BadResponse))
+
 import Templates.Persistency exposing (persistProvided)
 import Task
 import Jobs.Common as Jobs exposing (runJob, JobResponse)
@@ -55,30 +58,30 @@ validate =
         ("hostname" := string)
         ("domain" := string))
     
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let 
-    (admin, effects) = Admin.init
+    (admin, msgs) = Admin.init
     errors = Errors.init
   in 
-    (Model "" (Form.initial [] validate) admin errors, Effects.map AdminAction effects)
+    (Model "" (Form.initial [] validate) admin errors, Cmd.map AdminMsg msgs)
 
 
 -- Update 
 
-type Action = 
+type Msg = 
   SetupJob (String, String)
-    | AdminAction Admin.Action 
-    | ErrorsView Errors.Action
+    | AdminMsg Admin.Msg 
+    | ErrorsView Errors.Msg
     | Launched (Result Http.Error SaveResponse)
-    | FormAction Form.Action
+    | FormMsg Form.Msg
     | JobLaunched (Result Http.Error JobResponse)
     | Launch
     | Done
     | Cancel
     | NoOp
 
-stage : Model -> SaveResponse -> (Model, Effects Action)
+stage : Model -> SaveResponse -> (Model, Effects Msg)
 stage model {id} =
   case id of
    Just num ->
@@ -87,18 +90,18 @@ stage model {id} =
    Nothing -> 
      none model
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({saveErrors, form, admin, name} as model) =
-  case action of 
-    FormAction formAction ->
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({saveErrors, form, admin, name} as model) =
+  case msg of 
+    FormMsg formMsg ->
        let 
-         newForm = Form.update formAction form
+         newForm = Form.update formMsg form
        in
          none { model | form = Form.update Form.Validate newForm}
 
     Launch -> 
       let
-        (newModel, _) = update (FormAction Form.Validate) model
+        (newModel, _) = update (FormMsg Form.Validate) model
       in
         if List.isEmpty (Form.getErrors newModel.form) then
           case (Form.getOutput newModel.form) of
@@ -110,11 +113,11 @@ update action ({saveErrors, form, admin, name} as model) =
         else
           none newModel
 
-    AdminAction action -> 
+    AdminMsg msg -> 
       let
-        (newAdmin, effects) = Admin.update action admin
+        (newAdmin, msgs) = Admin.update msg admin
       in  
-        ({ model | admin = newAdmin}, Effects.map AdminAction effects)
+        ({ model | admin = newAdmin}, Cmd.map AdminMsg msgs)
     
     Launched result -> 
        errorsSuccessHandler result model (stage model) NoOp
@@ -123,7 +126,7 @@ update action ({saveErrors, form, admin, name} as model) =
       none model
 
 -- View
-infoMessage : String -> List Html
+infoMessage : String -> List (Html Msg)
 infoMessage name =
   [
      h4 [] [ text "Info" ]
@@ -135,9 +138,9 @@ infoMessage name =
  ]
 
 
-machineView address form =
+machineView form =
   let 
-    formAddress = Signal.forwardTo address FormAction
+    formAddress = Signal.forwardTo FormMsg
     hostname = (Form.getFieldAsString "machine.hostname" form)
     domain = (Form.getFieldAsString "machine.domain" form)
   in 
@@ -145,19 +148,19 @@ machineView address form =
    , formControl "Domain" Input.textInput domain formAddress 
    ]
 
-launchView address {name, form, admin} =
+launchView {name, form, admin} =
    div [class "panel panel-default"] [
      div [class "panel-body"] [
        (Html.form [] [
           div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
            (List.append
-              (machineView address form) 
-              (Admin.view (Signal.forwardTo address AdminAction) admin))
+              (machineView form) 
+              (Admin.view (Signal.forwardTo AdminMsg) admin))
       ])
     ]
   ]
 
-errorMessage : List Html
+errorMessage : List (Html Msg)
 errorMessage =
   [
     h4 [] [ text "Error!" ]
@@ -165,23 +168,22 @@ errorMessage =
   ]
 
 
-view : Signal.Address Action -> Model -> List Html
-view address ({name, saveErrors} as model) =
+view : Model -> List (Html Msg)
+view ({name, saveErrors} as model) =
   let
-    errorsView = (Errors.view (Signal.forwardTo address ErrorsView) saveErrors)
+    errorsView = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
   in
     if Errors.hasErrors saveErrors then
-      dangerCallout address errorMessage (panel (panelContents errorsView)) Cancel Done
+      dangerCallout errorMessage (panel (panelContents errorsView)) Cancel Done
     else 
-      infoCallout address (infoMessage name) (launchView address model) Cancel Launch
+      infoCallout (infoMessage name) (launchView model) Cancel Launch
 
 -- Effects
 
-intoSystem : String -> String -> Effects Action
+intoSystem : String -> String -> Effects Msg
 intoSystem name json = 
   postJson (Http.string json) saveResponse ("/systems/template/"  ++ name)
     |> Task.toResult
-    |> Task.map Launched
-    |> Effects.task
+    |> Task.perform never Launched
 
 

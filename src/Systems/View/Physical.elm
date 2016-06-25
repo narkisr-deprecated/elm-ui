@@ -1,4 +1,4 @@
-module Systems.View.Physical where
+module Systems.View.Physical exposing (..)
 
 import Html exposing (..)
 import Common.Utils exposing (partition, withDefaultProp)
@@ -9,7 +9,8 @@ import Common.Summary exposing (..)
 import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
-import Effects exposing (Effects, Never, map)
+import Common.Utils exposing (none)
+import Platform.Cmd exposing (map)
 import String
 
 -- Model 
@@ -18,17 +19,13 @@ type alias Model =
    id : Int
   }
 
-init : (Model , Effects Action)
+init : (Model , Cmd msg)
 init =
-  (Model 0 , Effects.none)
+  none (Model 0)
   
--- Update
-type Action = 
-  NoOp
-
 -- View
    
-summarySections : (Physical, Machine) -> List (List Html)
+summarySections : (Physical, Machine) -> List (List (Html msg))
 summarySections ((physical, machine) as model) =
    [ 
      overviewSection "Instance" ["os", "user"] 
@@ -38,7 +35,7 @@ summarySections ((physical, machine) as model) =
    , overviewSection "Interface" ["MAC", "Broadcast"] [ withDefault "" physical.mac, withDefault "" physical.broadcast]
    ]
 
-summarize: (Physical, Machine) -> List Html
+summarize: (Physical, Machine) -> List (Html msg)
 summarize model =
   [div [] [ h4 [] [(text "System overview")] 
           , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
@@ -50,8 +47,8 @@ summarize model =
   ]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html msg
+view model =
   fixedPanel (div [] [])
 
 

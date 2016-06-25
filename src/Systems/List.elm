@@ -1,10 +1,11 @@
-module Systems.List where
+module Systems.List exposing (..)
 
-import Effects exposing (Effects, Never, map)
+import Platform.Cmd as Cmd 
+import Basics.Extra exposing (never)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
 import Html exposing (..)
+import Html.App as App 
 import Html.Attributes exposing (type', class, id, style, attribute)
 
 import Http exposing (Error(BadResponse))
@@ -18,6 +19,7 @@ import Systems.Model.AWS exposing (emptyAws)
 import Systems.Decoders exposing (..)
 import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
+import Common.Utils exposing (none)
 
 import String exposing (isEmpty)
 import Set exposing (Set)
@@ -45,7 +47,7 @@ type alias Model =
   , table : Table.Model System
   , search : Search.Model}
 
-init : (Model, Effects Action)
+init : (Model, Cmd Msg)
 init =
  let 
    systems = (Dict.empty, [("", emptySystem)])
@@ -56,11 +58,11 @@ init =
 
 -- Update
 
-type Action = 
+type Msg = 
       SetSystems(Result Http.Error Systems)
-    | GotoPage Pager.Action
-    | LoadPage (Table.Action System)
-    | Searching Search.Action
+    | GotoPage Pager.Msg
+    | LoadPage (Table.Msg System)
+    | Searching Search.Msg
     | NoOp
 
 setSystems model ((meta, items) as systemsResult) = 
@@ -69,21 +71,21 @@ setSystems model ((meta, items) as systemsResult) =
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
     newTable = (Table.update (Table.UpdateRows items) model.table)
   in
-    ({ model | systems = systemsResult, pager = newPager, table = newTable } , Effects.none)
+    none ({ model | systems = systemsResult, pager = newPager, table = newTable })
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({error, table} as model) =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({error, table} as model) =
+  case msg of
 
     SetSystems result ->
       successHandler result model (setSystems model) NoOp
       
-    GotoPage pageAction -> 
-      case pageAction of
+    GotoPage pageMsg -> 
+      case pageMsg of
 
         Pager.NextPage page -> 
           let
-            newPager = (Pager.update pageAction model.pager)
+            newPager = (Pager.update pageMsg model.pager)
           in
            if isEmpty model.search.input then
             ({model | pager = newPager}, getSystems page 10)
@@ -91,13 +93,13 @@ update action ({error, table} as model) =
             ({model | pager = newPager}, getSystemsQuery page 10 model.search.parsed)
 
         _ ->
-          (model , Effects.none)
+          none model
 
-    Searching searchAction -> 
+    Searching searchMsg -> 
       let 
-        newSearch = (Search.update searchAction model.search)
+        newSearch = (Search.update searchMsg model.search)
       in
-      case searchAction of 
+      case searchMsg of 
         Search.Result True res ->
            ({ model | search = newSearch , error = NoError}, getSystemsQuery model.pager.page 10 newSearch.parsed)
 
@@ -105,33 +107,33 @@ update action ({error, table} as model) =
           if isEmpty newSearch.input then
             ({ model | search = newSearch, error = NoError }, getSystems model.pager.page 10)
           else
-            ({ model | search = newSearch, error = SearchParseFailed newSearch.error }, Effects.none)
+            none { model | search = newSearch, error = SearchParseFailed newSearch.error }
 
         _ -> 
-          (model, Effects.none)
+          none model
 
-    LoadPage tableAction -> 
+    LoadPage tableMsg -> 
       let
-        newTable = Table.update tableAction model.table
+        newTable = Table.update tableMsg model.table
       in
         if error == NoSystemSelected && newTable.selected /= Set.empty then
-          ({ model | table = newTable , error = NoError }, Effects.none)
+          none {model | table = newTable , error = NoError }
         else 
-          ({ model | table = newTable }, Effects.none)
+          none {model | table = newTable }
 
     NoOp ->
-      (model , Effects.none)
+      none model
 
 -- View
 
-systemRow : String -> System -> List Html
+systemRow : String -> System -> List (Html Msg)
 systemRow id {env, owner, type', machine} = 
  [
-   td_ [ text id ]
- , td_ [ text (.hostname machine) ]
- , td_ [ text type' ]
- , td_ [ text env]
- , td_ [ text owner]
+   td [] [ text id ]
+ , td [] [ text (.hostname machine) ]
+ , td [] [ text type' ]
+ , td [] [ text env]
+ , td [] [ text owner]
  ]
 
 flash : Model -> Html
@@ -150,25 +152,27 @@ flash model =
         callout "danger" (info error)
 
 
-view : Signal.Address Action -> Model -> List Html
-view address model = 
+view : Model -> List (Html Msg)
+view model = 
   let 
    (meta,systems) = model.systems
   in
     [
      row_ [
       div [class "col-md-12"] [
-         Search.view (Signal.forwardTo address Searching) model.search
+         App.map Searching (Search.view model.search)
        ]
      ],
 
      row_ [
        flash model
      , div [class "col-md-offset-1 col-md-10"] [
-         panelDefault_ (Table.view (Signal.forwardTo address LoadPage) model.table)
+         panelDefault_ [
+           App.map LoadPage (Table.view model.table)
+         ]
        ]
      ],
-      row_ [(Pager.view (Signal.forwardTo address GotoPage) model.pager)]
+      row_ [App.map GotoPage (Pager.view model.pager)]
     ]
        
 
@@ -184,18 +188,19 @@ systemPage =
     ("meta" := dict int) 
     ("systems" := list systemPair)
 
--- Effects
-getSystems : Int -> Int -> Effects Action
+
+-- Http
+
+getSystems : Int -> Int -> Cmd Msg
 getSystems page offset = 
   getJson systemPage ("/systems?page=" ++ (toString page) ++  "&offset=" ++ (toString offset)) 
     |> Task.toResult
-    |> Task.map SetSystems
-    |> Effects.task
+    |> Task.perform never SetSystems
 
-getSystemsQuery : Int -> Int  -> String -> Effects Action
+getSystemsQuery : Int -> Int  -> String -> Cmd Msg
 getSystemsQuery page offset query= 
   getJson systemPage ("/systems/query?page=" ++ (toString page) ++  "&offset=" ++ (toString offset) ++ "&query=" ++ query)
     |> Task.toResult
-    |> Task.map SetSystems
-    |> Effects.task
+    |> Task.perform never SetSystems
+
 

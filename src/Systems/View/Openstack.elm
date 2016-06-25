@@ -1,4 +1,4 @@
-module Systems.View.Openstack where
+module Systems.View.Openstack exposing (..)
 
 import Html exposing (..)
 import Common.Utils exposing (partition, withDefaultProp)
@@ -9,8 +9,9 @@ import Bootstrap.Html exposing (..)
 import Maybe exposing (withDefault)
 import Common.Components exposing (fixedPanel)
 import Common.Summary exposing (..)
-import Effects exposing (Effects, Never, map)
+import Platform.Cmd exposing (map)
 import String
+import Common.Utils exposing (none)
 
 -- Model 
 type alias Model = 
@@ -18,16 +19,12 @@ type alias Model =
    id : Int
   }
 
-init : (Model , Effects Action)
+init : (Model , Cmd msg)
 init =
-  (Model 0 , Effects.none)
+  none (Model 0)
   
--- Update
-type Action = 
-  NoOp
-
 -- View
-summarySections : (Openstack, Machine) -> List (List Html)
+summarySections : (Openstack, Machine) -> List (List (Html msg))
 summarySections ((openstack, machine) as model)=
    List.filter (not << List.isEmpty) [ 
      overviewSection "Instance"
@@ -45,7 +42,7 @@ summarySections ((openstack, machine) as model)=
        [.device, (toString << .size), (toString << .clear)]
    ]
 
-summarize: (Openstack, Machine) -> List Html
+summarize: (Openstack, Machine) -> List (Html msg)
 summarize model =
   [div [] [ h4 [] [(text "System overview")] 
           , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
@@ -57,8 +54,8 @@ summarize model =
   ]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html msg
+view model =
   fixedPanel (div [] [])
 
 

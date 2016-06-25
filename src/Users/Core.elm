@@ -1,9 +1,9 @@
-module Users.Core where
+module Users.Core exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
-import Users.List as List exposing (Action)
-import Users.Add as Add exposing (Action)
+import Users.List as List exposing (Msg)
+import Users.Add as Add exposing (Msg)
 import Common.Utils exposing (none)
 import Common.Components exposing (notImplemented, asList)
 
@@ -17,37 +17,37 @@ type alias Model =
   , navChange : Maybe String
   }
  
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let 
-    (list, listActions) = List.init
-    (add, addActions) = Add.init
-    effects = [
-        Effects.map Listing listActions
-     ,  Effects.map Adding addActions
+    (list, listMsgs) = List.init
+    (add, addMsgs) = Add.init
+    msgs = [
+        Cmd.map Listing listMsgs
+     ,  Cmd.map Adding addMsgs
      ]
   in 
-    (Model list add Nothing, Effects.batch effects)
+    (Model list add Nothing, Effects.batch msgs)
 
 -- Update 
 
-type Action = 
-  Listing List.Action
-    | Adding Add.Action
+type Msg = 
+  Listing List.Msg
+    | Adding Add.Msg
     | MenuClick (String, String)
     | NoOp
 
 
-navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ((({list} as model), effects) as result) =
-  case action of 
+navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
+navigate msg ((({list} as model), msgs) as result) =
+  case msg of 
     MenuClick (job,name) -> 
       case job of 
         "edit" -> 
-          ({ model | navChange = Just ("/users/edit/" ++ name) }, effects)
+          ({ model | navChange = Just ("/users/edit/" ++ name) }, msgs)
            
         "clear" -> 
-          ({ model | navChange = Just ("/users/delete/" ++ name) }, effects)
+          ({ model | navChange = Just ("/users/delete/" ++ name) }, msgs)
 
         _ -> 
             none model
@@ -55,40 +55,40 @@ navigate action ((({list} as model), effects) as result) =
     _ -> 
      none model
 
-route : Action ->  Model -> (Model , Effects Action)
-route action ({list, add} as model) =
-  case action of 
+route : Msg ->  Model -> (Model , Effects Msg)
+route msg ({list, add} as model) =
+  case msg of 
     Listing listing -> 
       let
-        (newList, effects) =  List.update listing list 
+        (newList, msgs) =  List.update listing list 
       in
-        ({model | list = newList }, Effects.map Listing effects)
+        ({model | list = newList }, Cmd.map Listing msgs)
 
     Adding adding -> 
       let
-        (newAdd, effects) =  Add.update adding add
+        (newAdd, msgs) =  Add.update adding add
       in
-        ({model | add = newAdd }, Effects.map Adding effects)
+        ({model | add = newAdd }, Cmd.map Adding msgs)
 
 
     _ -> 
       none model
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  navigate action (route action model)
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  navigate msg (route msg model)
 
 
 -- View
 
-view : Signal.Address Action -> Model -> Route -> List Html
-view address ({list, add} as model) section =
+view : Model -> Route -> List (Html Msg)
+view ({list, add} as model) section =
    case section of
      Routing.List -> 
-        List.view (Signal.forwardTo address Listing) list
+        List.view (Signal.forwardTo Listing) list
 
      Routing.Add -> 
-        Add.view (Signal.forwardTo address Adding) add
+        Add.view (Signal.forwardTo Adding) add
       
      _ -> 
        asList notImplemented

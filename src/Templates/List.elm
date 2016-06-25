@@ -1,10 +1,12 @@
-module Templates.List where
+module Templates.List exposing (..)
 
-import Effects exposing (Effects)
+import Common.Utils exposing (none)
+import Html.App as App 
 import Html exposing (..)
 import Maybe exposing (withDefault)
 import Task
 import Http exposing (Error(BadResponse))
+import Basics.Extra exposing (never)
 import Json.Decode exposing (..)
 import Templates.Model.Common exposing (templateDecoder)
 import Pager exposing (..)
@@ -23,7 +25,7 @@ type alias Model =
   , pager : Pager.Model
   }
  
-templateRow : String -> Template -> List Html
+templateRow : String -> Template -> List (Html msg)
 templateRow id {name, type', description } = 
     [ td [] [ text name ]
     , td [] [ text type' ]
@@ -31,7 +33,7 @@ templateRow id {name, type', description } =
     ]
 
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let 
     table = Table.init "templateListing" True ["Name", "Type", "Description"] templateRow "Templates"
@@ -40,13 +42,13 @@ init =
 
 -- Update 
 
-type Action = 
-  LoadPage (Table.Action Template)
-    | GotoPage Pager.Action
+type Msg = 
+  LoadPage (Table.Msg Template)
+    | GotoPage Pager.Msg
     | SetTemplates (Result Http.Error (List Template))
     | NoOp
 
-setTemplates: Model -> List Template -> (Model , Effects Action)
+setTemplates: Model -> List Template -> (Model , Cmd Msg)
 setTemplates model templates = 
   let
     total = List.length templates
@@ -54,31 +56,31 @@ setTemplates model templates =
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
     newTable = (Table.update (Table.UpdateRows templatePairs) model.table)
   in
-    ({ model | templates = templates, pager = newPager, table = newTable } , Effects.none)
+    none { model | templates = templates, pager = newPager, table = newTable } 
 
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    SetTemplates result ->
      successHandler result model (setTemplates model) NoOp
    
    _ -> 
-     (model, Effects.none)
+     none model
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
-view address ({pager, table} as model) =
+view : Model -> List (Html Msg)
+view ({pager, table} as model) =
   [
     div [] [
       row_ [
         div [class "col-md-offset-1 col-md-10"] [
-          panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
+          panelDefault_ (App.map LoadPage (Table.view table))
         ]
       ],
-      row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+      row_ [ (App.map GotoPage (Pager.view pager))]
     ]
   ]
 
@@ -90,11 +92,11 @@ templateList : Decoder (List Template)
 templateList =
    at ["templates"] (list templateDecoder)
 
--- Effects
-getTemplates action = 
+-- Http 
+
+getTemplates msg = 
   getJson templateList "/templates" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 
 

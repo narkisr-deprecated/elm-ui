@@ -1,4 +1,4 @@
-module Common.Http where
+module Common.Http exposing (..)
 
 import Task exposing (Task)
 import Http exposing (Error(BadResponse))

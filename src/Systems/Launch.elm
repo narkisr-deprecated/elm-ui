@@ -1,11 +1,12 @@
-module Systems.Launch where
+module Systems.Launch exposing (..)
 
+import Html.App as Html exposing (map)
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
 import Common.Errors exposing (successHandler)
 import Html exposing (..)
 import Html.Events exposing (onClick)
-import Effects exposing (Effects, Never, batch, map)
+import Platform.Cmd exposing (batch, map)
 import Task
 import Html.Attributes exposing (class, id)
 import Table exposing (view)
@@ -14,6 +15,7 @@ import Debug
 import Systems.Model.Common exposing (System)
 import Jobs.Common exposing (runJob, JobResponse)
 import Common.Components exposing (dangerCallout)
+import Common.Utils exposing (none)
 
 import Set exposing (Set)
 -- Model 
@@ -24,15 +26,15 @@ type alias Model =
   , table : Table.Model System
   }
 
-type Action = 
+type Msg = 
   SetupJob String
-  | LoadPage (Table.Action System)
+  | LoadPage (Table.Msg System)
   | JobLaunched (Result Http.Error JobResponse)
   | Run
   | NoOp
   | Cancel
 
-systemRow : String -> System -> List Html
+systemRow : String -> System -> List (Html Msg)
 systemRow id {env, owner, type', machine} = 
  [
    td [] [ text id ]
@@ -43,50 +45,50 @@ systemRow id {env, owner, type', machine} =
  ]
 
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let
     table = Table.init "launchListing" False ["#","Hostname", "Type", "Env","Owner"] systemRow "Systems"
   in
-    (Model "" table, Effects.none)
+    none (Model "" table)
 
 
 -- Update
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({job} as model) =
-  case action  of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({job} as model) =
+  case msg  of
     JobLaunched result ->
-      successHandler result model (\ res -> (model, Effects.none)) NoOp 
+      successHandler result model (\ res -> none model) NoOp 
 
     SetupJob job ->
-      ({ model | job = job }, Effects.none)
+      none ({ model | job = job })
 
-    LoadPage tableAction -> 
+    LoadPage tableMsg -> 
       let
-        newTable = Table.update tableAction model.table
+        newTable = Table.update tableMsg model.table
       in
-       ({ model | table = newTable }, Effects.none)
+       none { model | table = newTable } 
 
     Run -> 
       let
         runAll = model.table.rows 
           |> (List.map (\(id,_) -> id)) 
           |> (List.map (\id -> runJob id job JobLaunched)) 
-          |> Effects.batch
+          |> batch
       in
         (model, runAll)
 
     Cancel -> 
-     (model, Effects.none)
+      none model
 
     _ -> 
-      (model, Effects.none)
+     none model
 
 
 -- View
 
-message : String -> List Html
+message : String -> List (Html Msg)
 message job =
   [
      h4 [] [ text "Notice!" ]
@@ -98,12 +100,12 @@ message job =
      ]
  ]
 
-view : Signal.Address Action -> Model -> List Html
-view address {table, job} =
+view : Model -> List (Html Msg)
+view {table, job} =
  let 
-   systemsTable = (panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table))
+   systemsTable = (panelDefault_ (Html.map LoadPage (Table.view table)))
  in
-   dangerCallout address (message job) systemsTable  Cancel Run
+   dangerCallout (message job) systemsTable  Cancel Run
 
 
 

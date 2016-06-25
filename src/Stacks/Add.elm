@@ -1,6 +1,6 @@
-module Stacks.Add where
+module Stacks.Add exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Components exposing (panel, panelContents, infoCallout, info, onSelect, group', inputText, checkbox, selector)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
@@ -22,13 +22,13 @@ type alias Model =
   , editDefaults : Bool
   }
  
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   (Model emptyStack "" [] False, getTemplates SetTemplates)
 
 -- Update 
 
-type Action = 
+type Msg = 
   LoadTemplates
    | NameInput String
    | SelectTemplate String
@@ -40,14 +40,14 @@ type Action =
    | Cancel
    | NoOp
 
-setTemplates: Model -> List Template -> (Model , Effects Action)
+setTemplates: Model -> List Template -> (Model , Effects Msg)
 setTemplates model newTemplates = 
   none { model | templates = (List.map (\{name} -> name) newTemplates)}
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    LoadTemplates -> 
      (model, getTemplates SetTemplates)
 
@@ -62,15 +62,15 @@ update action model =
 
 -- View
 
-addView address ({template, templates, stack, editDefaults} as model) =
+addView ({template, templates, stack, editDefaults} as model) =
     panel
       (panelContents 
           (Html.form [] [
             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-              group' "Name" (inputText address NameInput " "  stack.name)
-            , group' "Description" (inputText address DescriptionInput " "  stack.description)
-            , group' "Templates" (selector address SelectTemplate templates template)
-            , group' "Edit common" (checkbox address LoadEditor editDefaults)
+              group' "Name" (inputText NameInput " "  stack.name)
+            , group' "Description" (inputText DescriptionInput " "  stack.description)
+            , group' "Templates" (selector SelectTemplate templates template)
+            , group' "Edit common" (checkbox LoadEditor editDefaults)
             , div [ id "jsoneditor"
                   , style [("width", "550px"), ("height", "400px"), ("margin-left", "25%")]] []
            ]
@@ -78,7 +78,7 @@ addView address ({template, templates, stack, editDefaults} as model) =
         )
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   div [] 
-    (infoCallout address (info "Add a new Stack" ) (addView address model) Cancel Save)
+    (infoCallout (info "Add a new Stack" ) (addView model) Cancel Save)

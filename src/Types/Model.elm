@@ -1,4 +1,4 @@
-module Types.Model where
+module Types.Model exposing (..)
 
 import Json.Decode as Json exposing (..)
 import Dict exposing (Dict)

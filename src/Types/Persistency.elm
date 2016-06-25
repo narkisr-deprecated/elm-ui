@@ -1,8 +1,8 @@
-module Types.Persistency where
+module Types.Persistency exposing (..)
 
 import Common.Model exposing (..)
 import Types.Model exposing (Type) 
-import Effects exposing (Effects)
+
 import Json.Encode as E exposing (..)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)
@@ -53,7 +53,7 @@ encode ({type', description, puppetStd}) =
  ] 
 
 
-persistModel : (String -> Effects a) -> Value -> Effects a
+-- persistModel : (String -> Effects a) -> Value -> Effects a
 persistModel f value =
     (f (E.encode 0 value))
 

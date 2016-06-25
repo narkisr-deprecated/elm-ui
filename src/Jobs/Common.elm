@@ -1,9 +1,10 @@
-module Jobs.Common where
+module Jobs.Common exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
+import Basics.Extra exposing (never)
 import Task
 
 type alias JobResponse = 
@@ -16,10 +17,9 @@ jobResponse =
     ("id" := Json.string)
     ("job" := Json.string)
 
-runJob : String -> String -> (Result Error JobResponse -> a) -> Effects a
-runJob id job action =
+runJob : String -> String -> (Result Error JobResponse -> a) -> Cmd a
+runJob id job msg =
   Http.post jobResponse ("/jobs/" ++  job ++ "/" ++ id) Http.empty
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 

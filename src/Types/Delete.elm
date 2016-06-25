@@ -1,11 +1,12 @@
-module Types.Delete where
+module Types.Delete exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (none)
 import Common.Components exposing (asList)
 import Common.Delete as Delete exposing (deleteResponse, DeleteResponse)
 import Common.Http exposing (delete)
+import Basics.Extra exposing (never)
 import Http exposing (Error(BadResponse))
 import Task
 import Maybe exposing (withDefault)
@@ -18,13 +19,13 @@ type alias Model =
   , errorMsg : String
   }
  
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   none (Model "" "")
 
 -- Update 
 
-type Action = 
+type Msg = 
   NoOp
   | Cancel
   | Delete
@@ -33,9 +34,9 @@ type Action =
   | Error String
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({name} as model) =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({name} as model) =
+  case msg of 
     Deleted result -> 
       failHandler result model (\{message} -> none { model | errorMsg = withDefault "Failed to delete template" message }) NoOp
        
@@ -44,23 +45,22 @@ update action ({name} as model) =
 
 
     _ -> 
-     (model, Effects.none)
+     none model
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
-view address model =
-  Delete.view address model "Type" Cancel Delete Done
+view : Model -> List (Html Msg)
+view model =
+  Delete.view model "Type" Cancel Delete Done
 
-deleteType : String -> Effects Action
+deleteType : String -> Cmd Msg
 deleteType name = 
   delete deleteResponse ("/types/" ++ name)
     |> Task.toResult
-    |> Task.map Deleted
-    |> Effects.task
+    |> Task.perform never Deleted
 
-succeeded action {error} = 
-  if action == (Deleted (Result.Ok { message = "Type deleted"} )) then
+succeeded msg {error} = 
+  if msg == (Deleted (Result.Ok { message = "Type deleted"} )) then
     True
   else
     False

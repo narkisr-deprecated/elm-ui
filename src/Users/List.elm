@@ -1,7 +1,8 @@
-module Users.List where
+module Users.List exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
+import Html.App exposing (map)
 import Common.Utils exposing (none)
 import Users.Model exposing (User, getUsers)
 import Http exposing (Error(BadResponse))
@@ -22,14 +23,14 @@ type alias Model =
   , pager : Pager.Model
   } 
 
-userRow : String -> User -> List Html
+userRow : String -> User -> List (Html msg)
 userRow name {roles, envs} = 
     [ td [] [ text name ]
     , td [] [ text (String.join ", " (List.map (\r -> String.dropLeft 16 r) roles))]
     , td [] [ text (String.join ", " envs)]
     ]
  
-init : (Model, Effects Action)
+init : (Model, Cmd Msg)
 init =
   let 
     table = Table.init "usersListing" True ["Name", "Roles", "Environments"] userRow "Users"
@@ -39,13 +40,13 @@ init =
 
 -- Update 
 
-type Action = 
+type Msg = 
   SetUsers (Result Http.Error (List User))
-    | GotoPage Pager.Action
-    | LoadPage (Table.Action User)
+    | GotoPage Pager.Msg
+    | LoadPage (Table.Msg User)
     | NoOp
 
-setUsers : Model -> List User -> (Model , Effects Action)
+setUsers : Model -> List User -> (Model , Cmd Msg)
 setUsers ({pager, table} as model) users = 
   let
     total = List.length users
@@ -56,9 +57,9 @@ setUsers ({pager, table} as model) users =
     none { model | users = users, pager = newPager, table = newTable }
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    SetUsers result ->
       successHandler result model (setUsers model) NoOp
 
@@ -67,14 +68,16 @@ update action model =
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
-view address ({pager, table} as model) =
+view : Model -> List (Html Msg)
+view ({pager, table} as model) =
   [ div [class ""] [
     row_ [
        div [class "col-md-offset-1 col-md-10"] [
-         panelDefault_ (Table.view (Signal.forwardTo address LoadPage) table)
+         panelDefault_ [
+           (map LoadPage (Table.view table))
+         ]
        ]
     ]
-  , row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+  , row_ [(map GotoPage (Pager.view pager))]
   ]]
  

@@ -1,13 +1,14 @@
-module Environments.List where
+module Environments.List exposing (..)
 
-import Effects exposing (Effects)
+
 import Dict exposing (Dict)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 import Common.Model exposing (Options, option)
 
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadResponse))
-import Effects exposing (Effects)
+
 import Task
 
 
@@ -56,22 +57,20 @@ environmentsList =
    at ["environments"] (dict environment)
 
 -- Effects
-getEnvironments action = 
+getEnvironments msg = 
   getJson environmentsList "/environments" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 
 environmentsKeys: Decoder (List String)
 environmentsKeys=
   at ["environments"] (list string)
 
 
-getEnvironmentKeys action = 
+getEnvironmentKeys msg = 
   getJson environmentsKeys "/environments/keys" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 
 
 

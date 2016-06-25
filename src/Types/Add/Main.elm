@@ -1,6 +1,6 @@
-module Types.Add.Main where
+module Types.Add.Main exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, id, attribute, readonly, type')
 import Common.FormComponents exposing (formControl, formGroup)
@@ -43,24 +43,23 @@ reinit env type' =
   Model (Form.initial (editDefaults env type') validate)
 
 -- View
-typeField address {form} = 
+typeField {form} = 
   let
     ({isDirty, value, isChanged} as type') = Form.getFieldAsString "type" form
     inEdit = (not isDirty && value /= Nothing && not isChanged )
   in
-    formGroup "Type" Input.textInput type' address [class "form-control", readonly inEdit]
+    formGroup "Type" Input.textInput type' [class "form-control", readonly inEdit]
 
-view environments address ({form} as model) =
+view environments ({form} as model) =
   let 
     environment = (Form.getFieldAsString "environment" form)
     description = (Form.getFieldAsString "description" form)
   in 
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        typeField address model
-      , formControl "Description" Input.textInput description address
-      , formControl "Environment"  (Input.selectInput environments) environment address
-      ]
+        typeField model
+      , formControl "Description" Input.textInput description 
+      , formControl "Environment"  (Input.selectInput environments) environment ]
     ])
 
 

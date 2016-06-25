@@ -1,6 +1,6 @@
-module Common.Utils where
+module Common.Utils exposing (..)
 
-import Effects exposing (Effects, Never, batch, map)
+import Platform.Cmd exposing (batch, map)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)
@@ -35,9 +35,9 @@ defaultEmpty list =
     Nothing -> 
       []
 
-none : a -> (a, Effects b)
+none : a -> (a, Cmd b)
 none a =
-  (a, Effects.none)
+  (a, Cmd.none)
 
 setEnvironments model es =
    none {model | environments = Dict.keys es}

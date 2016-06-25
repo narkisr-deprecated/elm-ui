@@ -1,6 +1,6 @@
-module Users.Add.Perm where
+module Users.Add.Perm exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, id, attribute, readonly, type')
 import Common.FormComponents exposing (formControl, formGroup)
@@ -28,15 +28,15 @@ init =
 
 -- View
 
-view envs operations address ({form} as model) =
+view envs operations ({form} as model) =
  let 
     environment = (Form.getFieldAsStringList "envs" form)
     operation = (Form.getFieldAsStringList "operations" form)
  in
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Environment"  (Input.multiSelectInput envs) environment address
-      , formControl "Operation"  (Input.multiSelectInput operations) operation address
+        formControl "Environment" (Input.multiSelectInput envs) environment 
+      , formControl "Operation"  (Input.multiSelectInput operations) operation 
       ]
     ])
 

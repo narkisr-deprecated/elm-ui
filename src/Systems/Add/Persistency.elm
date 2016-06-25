@@ -1,6 +1,6 @@
-module Systems.Add.Persistency where
+module Systems.Add.Persistency exposing (..)
 
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Systems.Add.Encoders exposing (encode)
 import Json.Encode as E
 import Dict exposing (Dict)
@@ -36,7 +36,7 @@ transform ({aws, openstack} as system) stage =
     _ -> 
        system
 
-persistModel : (String -> Effects a) -> System -> String -> Effects a
+persistModel : (String -> Cmd a) -> System -> String -> Cmd a
 persistModel f system stage =
     (f (E.encode 0 (encode (transform system stage) stage)))
 

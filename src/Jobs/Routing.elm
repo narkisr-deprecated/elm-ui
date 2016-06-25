@@ -1,4 +1,4 @@
-module Jobs.Routing where
+module Jobs.Routing exposing (..)
 
 import Hop.Types exposing (PathMatcher)
 import Hop.Matchers exposing (..)

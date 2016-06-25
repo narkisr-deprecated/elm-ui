@@ -1,6 +1,6 @@
-module Users.View where
+module Users.View exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Users.Model as Model exposing (User, emptyUser)
 import Common.Model exposing (valueOf)
@@ -17,32 +17,33 @@ import Common.Http exposing (getJson)
 import Task
 import Dict exposing (Dict)
 import String
-
+import Common.Utils exposing (none)
+import Basics.Extra exposing (never)
 
 type alias Model = 
   {
    user : User
   }
  
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   none (Model emptyUser)
 
 -- Update 
 
-type Action = 
+type Msg = 
   ViewUser String
     | SetUser (Result Http.Error User)
     | NoOp
 
-setUser: Model -> User -> (Model , Effects Action)
+setUser: Model -> User -> (Model , Cmd Msg)
 setUser model user =
   none {model | user = user}
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    ViewUser id -> 
      (model, getUser id SetUser)
 
@@ -50,21 +51,20 @@ update action model =
       successHandler result model (setUser model) NoOp
  
    NoOp -> 
-     (model, Effects.none)
+     none model
 
 -- View
 
-summarize: User -> Html
+summarize: User -> Html Msg
 summarize model =
    div [style [("line-height", "1.8"), ("list-style-type","none")]] []
 
-view : Signal.Address Action -> Model -> List Html
-view address {user} =
+view : Model -> List (Html Msg)
+view {user} =
   asList (div [] [h4 [] [(text "User")], (summarize user)])
   
-getUser name action = 
+getUser name msg = 
   getJson Model.user ("/users/" ++ name)
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 

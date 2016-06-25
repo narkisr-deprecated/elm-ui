@@ -1,4 +1,4 @@
-module Types.Routing where
+module Types.Routing exposing (..)
 
 import Hop.Types exposing (PathMatcher, newLocation)
 import Hop.Matchers exposing (..)

@@ -1,9 +1,9 @@
-module Templates.Core where
+module Templates.Core exposing (..)
 
 import String
 import Common.Utils exposing (none)
 import Common.Delete exposing (refresh, succeeded)
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Templates.Add as Add
 import Templates.List as List
@@ -21,41 +21,41 @@ type alias Model =
   , navChange : Maybe String
   }
 
-init : (Model, Effects Action)
+init : (Model, Effects Msg)
 init =
   let
     (add, addEffects) = Add.init
     (list, listEffects) = List.init
     (launch, launchEffects) = Launch.init
     (delete, deleteEffects) = Delete.init
-    effects = [
-      Effects.map TemplatesAdd addEffects
-    , Effects.map TemplatesList listEffects
-    , Effects.map TemplatesLaunch launchEffects
-    , Effects.map TemplatesDelete deleteEffects
+    msgs = [
+      Cmd.map TemplatesAdd addEffects
+    , Cmd.map TemplatesList listEffects
+    , Cmd.map TemplatesLaunch launchEffects
+    , Cmd.map TemplatesDelete deleteEffects
     ]
   in
-    (Model add list launch delete Nothing, Effects.batch effects)
+    (Model add list launch delete Nothing, Effects.batch msgs)
 
-type Action = 
-  TemplatesAdd Add.Action
-    | TemplatesList List.Action
-    | TemplatesLaunch Launch.Action
-    | TemplatesDelete Delete.Action
+type Msg = 
+  TemplatesAdd Add.Msg
+    | TemplatesList List.Msg
+    | TemplatesLaunch Launch.Msg
+    | TemplatesDelete Delete.Msg
     | SetupJob (String, String)
     | NoOp
 
 
-navigate : Action -> (Model , Effects Action) -> (Model , Effects Action)
-navigate action ((({launch, delete} as model), effects) as result) =
-  case action of 
+navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
+navigate msg ((({launch, delete} as model), msgs) as result) =
+  case msg of 
     SetupJob (job,id) -> 
        case job of 
          "launch" -> 
-            ({ model | navChange = Just ("/templates/launch/" ++ id) }, effects)
+            ({ model | navChange = Just ("/templates/launch/" ++ id) }, msgs)
           
          "clear" -> 
-            ({ model | navChange = Just ("/templates/delete/" ++ id ) }, effects)
+            ({ model | navChange = Just ("/templates/delete/" ++ id ) }, msgs)
 
          _ -> 
            result
@@ -63,41 +63,41 @@ navigate action ((({launch, delete} as model), effects) as result) =
     TemplatesAdd add -> 
       case add of 
         Add.Saved (Result.Ok _) -> 
-          ({ model | navChange = Just "/templates/list" }, effects)
+          ({ model | navChange = Just "/templates/list" }, msgs)
 
         Add.Cancel -> 
-          ({ model | navChange = Just "/templates/list"}, effects)
+          ({ model | navChange = Just "/templates/list"}, msgs)
 
         Add.Done -> 
-          ({ model | navChange = Just "/templates/list"}, effects)
+          ({ model | navChange = Just "/templates/list"}, msgs)
 
         _ -> 
           result
 
-    TemplatesLaunch launchAction -> 
-       case launchAction of
+    TemplatesLaunch launchMsg -> 
+       case launchMsg of
           Launch.Cancel -> 
-            ({ model | navChange = Just "/templates/list" }, effects)
+            ({ model | navChange = Just "/templates/list" }, msgs)
 
           Launch.JobLaunched r -> 
-            ({ model | navChange = Just "/jobs/list"}, effects)
+            ({ model | navChange = Just "/jobs/list"}, msgs)
 
           _ -> 
             result
 
-    TemplatesDelete deleteAction -> 
-       case deleteAction of 
+    TemplatesDelete deleteMsg -> 
+       case deleteMsg of 
           Delete.Deleted _  -> 
            if delete.errorMsg == "" then
-             ({ model | navChange = Just "/templates/list"}, effects)
+             ({ model | navChange = Just "/templates/list"}, msgs)
            else
              result
 
           Delete.Cancel -> 
-            refreshList True ({ model | navChange = Just "/templates/list"}, effects)
+            refreshList True ({ model | navChange = Just "/templates/list"}, msgs)
 
           Delete.Done -> 
-            refreshList True ({ model | navChange = Just "/templates/list"}, effects)
+            refreshList True ({ model | navChange = Just "/templates/list"}, msgs)
          
           _ -> 
             result
@@ -110,9 +110,9 @@ setName model name =
 refreshList = 
   refresh List.init TemplatesList
 
-route : Action ->  Model -> (Model , Effects Action)
-route action ({add, launch, list, delete} as model) =
-  case action of 
+route : Msg ->  Model -> (Model , Effects Msg)
+route msg ({add, launch, list, delete} as model) =
+  case msg of 
     SetupJob (job, name) -> 
       case job of
         "launch" -> 
@@ -124,65 +124,65 @@ route action ({add, launch, list, delete} as model) =
         _ -> 
           none model   
  
-    TemplatesAdd action -> 
-      case action of 
+    TemplatesAdd msg -> 
+      case msg of 
         Add.Saved _ -> 
           let 
-           (newAdd, effects) = (Add.update action add)
+           (newAdd, msgs) = (Add.update msg add)
           in
-           refreshList True ({ model | add = newAdd}, Effects.map TemplatesAdd effects)
+           refreshList True ({ model | add = newAdd}, Cmd.map TemplatesAdd msgs)
 
         _ -> 
          let 
-          (newAdd, effects) = (Add.update action add)
+          (newAdd, msgs) = (Add.update msg add)
          in
-          ({ model | add = newAdd }, Effects.map TemplatesAdd effects)
+          ({ model | add = newAdd }, Cmd.map TemplatesAdd msgs)
 
-    TemplatesList action -> 
+    TemplatesList msg -> 
       let 
-        (newList, effects) = (List.update action list)
+        (newList, msgs) = (List.update msg list)
       in
-       ({ model | list = newList }, Effects.map TemplatesList effects)
+       ({ model | list = newList }, Cmd.map TemplatesList msgs)
 
-    TemplatesLaunch action -> 
+    TemplatesLaunch msg -> 
       let 
-         (newLaunch, effects) = (Launch.update action launch)
+         (newLaunch, msgs) = (Launch.update msg launch)
       in
-        ({ model | launch = newLaunch } , Effects.map TemplatesLaunch effects)
+        ({ model | launch = newLaunch } , Cmd.map TemplatesLaunch msgs)
 
-    TemplatesDelete action -> 
+    TemplatesDelete msg -> 
       let 
-        (newDelete, effects) = (Delete.update action delete)
-        success = (succeeded action Delete.Deleted "Template deleted")
+        (newDelete, msgs) = (Delete.update msg delete)
+        success = (succeeded msg Delete.Deleted "Template deleted")
       in
-        refreshList success ({ model | delete = newDelete } , Effects.map TemplatesDelete effects)
+        refreshList success ({ model | delete = newDelete } , Cmd.map TemplatesDelete msgs)
 
     _ -> 
       none model
 
 
-update : Action ->  Model -> (Model , Effects Action)
-update action ({add, launch, list} as model) =
-   navigate action (route action model)
+update : Msg ->  Model -> (Model , Effects Msg)
+update msg ({add, launch, list} as model) =
+   navigate msg (route msg model)
 
 -- Used in application Nav change
 add hyp system = 
   TemplatesAdd (Add.SetSystem hyp system)
 
-view : Signal.Address Action -> Model -> Route -> List Html
-view address {add, list, launch, delete} route =
+view : Model -> Route -> List (Html Msg)
+view {add, list, launch, delete} route =
   case route of
     Route.Add ->
-      Add.view (Signal.forwardTo address TemplatesAdd) add
+      Add.view (Signal.forwardTo TemplatesAdd) add
 
     Route.List ->
-      List.view (Signal.forwardTo address TemplatesList) list
+      List.view (Signal.forwardTo TemplatesList) list
 
     Route.Launch _ ->
-      Launch.view (Signal.forwardTo address TemplatesLaunch) launch
+      Launch.view (Signal.forwardTo TemplatesLaunch) launch
 
     Route.Delete _ ->
-      Delete.view (Signal.forwardTo address TemplatesDelete) delete
+      Delete.view (Signal.forwardTo TemplatesDelete) delete
 
     Route.View _ -> 
       []

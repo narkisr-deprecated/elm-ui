@@ -1,6 +1,6 @@
-module Common.Wizard where
+module Common.Wizard exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import Maybe exposing (withDefault)
@@ -22,14 +22,14 @@ init zero default steps =
 
 -- Update 
 
-type Action = 
+type Msg = 
   Next 
     | Back
     | NoOp
 
-update : Bool -> Action ->  Model a -> Model a 
-update noErrors action ({next, prev, default, zero, step} as model)  =
-  case action of 
+update : Bool -> Msg ->  Model a -> Model a 
+update noErrors msg ({next, prev, default, zero, step} as model)  =
+  case msg of 
     Next -> 
       let
         nextStep = withDefault default (List.head next)
@@ -57,8 +57,8 @@ update noErrors action ({next, prev, default, zero, step} as model)  =
 
 -- View
 
-view : Signal.Address Action -> Model a -> Html
-view address model =
+view : Model a -> Html Msg
+view model =
   div [] [
   ]
 

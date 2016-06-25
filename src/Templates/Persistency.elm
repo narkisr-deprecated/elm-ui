@@ -1,8 +1,8 @@
-module Templates.Persistency where
+module Templates.Persistency exposing (..)
 
 import Templates.Model.Common exposing (Template, emptyOpenstackDefaults, Defaults, OpenstackDefaults)
 import Systems.Add.Encoders exposing (encoderOf, machineEncoder, optional)
-import Effects exposing (Effects)
+
 import Json.Encode as E exposing (..)
 import Maybe exposing (withDefault)
 import Dict exposing (Dict)
@@ -53,7 +53,7 @@ encode ({type', machine, defaults, name, description} as template) hyp =
  ] 
 
 
-persistModel : (String -> Effects a) -> Value -> Effects a
+persistModel : (String -> Cmd a) -> Value -> Cmd a
 persistModel f value =
     (f (E.encode 0 value))
 

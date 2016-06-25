@@ -1,11 +1,11 @@
-module Jobs.Core where
+module Jobs.Core exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Jobs.Routing as Routing exposing (Route)
 import Common.Utils exposing (none)
 
-import Jobs.List as List exposing (Action(Polling))
+import Jobs.List as List exposing (Msg(Polling))
 import Jobs.Stats as Stats
 
 type alias Model = 
@@ -14,27 +14,27 @@ type alias Model =
    , stats : Stats.Model 
   }
  
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let
     (stats,statsEffects) = Stats.init
     (list, listEffects) = List.init
-    effects = [
-       Effects.map JobsListing listEffects
-     , Effects.map JobsStats statsEffects
+    msgs = [
+       Cmd.map JobsListing listEffects
+     , Cmd.map JobsStats statsEffects
     ]
   in
-    (Model list stats, Effects.batch effects)
+    (Model list stats, Effects.batch msgs)
 
 -- Update 
 
-type Action = 
-  JobsListing List.Action
-    | JobsStats Stats.Action
+type Msg = 
+  JobsListing List.Msg
+    | JobsStats Stats.Msg
     | NoOp
 
-isPolling action = 
-  case action of
+isPolling msg = 
+  case msg of
     JobsListing Polling -> 
       True
 
@@ -45,20 +45,20 @@ isPolling action =
       False
 
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({list, stats} as model)=
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({list, stats} as model)=
+  case msg of 
     JobsListing listing -> 
       let
-        (newListing, effects) = List.update listing list
+        (newListing, msgs) = List.update listing list
       in
-        ({model | list = newListing}, Effects.map JobsListing effects) 
+        ({model | list = newListing}, Cmd.map JobsListing msgs) 
 
     JobsStats sts -> 
       let
-        (newStats, effects) = Stats.update sts stats
+        (newStats, msgs) = Stats.update sts stats
       in
-        ({model | stats = newStats}, Effects.map JobsStats effects) 
+        ({model | stats = newStats}, Cmd.map JobsStats msgs) 
 
      
     NoOp -> 
@@ -66,14 +66,14 @@ update action ({list, stats} as model)=
 
 -- View
 
-view : Signal.Address Action -> Model -> Route -> List Html
-view address {list, stats} route =
+view : Model -> Route -> List (Html Msg)
+view {list, stats} route =
   case route of
     Routing.List -> 
-      List.view (Signal.forwardTo address JobsListing) list
+     App.map JobsListing (List.view list)
 
     Routing.Stats -> 
-      Stats.view (Signal.forwardTo address JobsStats) stats
+     App.map JobsStats (Stats.view stats)
 
 
 

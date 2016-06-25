@@ -1,9 +1,9 @@
-module Nav.Header where
+module Nav.Header exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src, style)
 import Users.Session exposing (getSession, Session, emptySession, logout)
-import Effects exposing (Effects)
+
 import Common.Redirect exposing (redirect)
 import Common.Errors exposing (successHandler)
 import Common.Utils exposing (none)
@@ -19,12 +19,12 @@ type alias Model =
     session : Session
   }
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   none (Model emptySession)
 
 
-type Action = 
+type Msg = 
    SignOut
     | SetSession Session
     | Redirect (Result Http.Error String)
@@ -35,9 +35,9 @@ type Action =
 setSession model session = 
    none {model | session = session }
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of
     SetSession session -> 
        none { model | session = session }
 
@@ -63,21 +63,21 @@ navHeader  =
 dropdown attrs = 
   List.append [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ] attrs
 
-gearsButton : Signal.Address Action  -> Session -> Html
-gearsButton address session =
+gearsButton : Signal.Address Msg  -> Session -> Html
+gearsButton session =
   if isUser session then 
      i [ class "fa fa-gears", style [("color", "gray"), ("pointer-events", "none")]] [ ] 
   else
     div [class "dropdown pull-right"] [
         i (dropdown [ class "fa fa-gears", style [("color", "black")]]) []
       , ul [ class "dropdown-menu" ] [
-          li [] [ a [href "#", onClick address (Goto Users List)] [text "Users" ] ]
-        , li [] [ a [href "#", onClick address LoadSwagger] [text "Swagger"] ]
+          li [] [ a [href "#", onClick (Goto Users List)] [text "Users" ] ]
+        , li [] [ a [href "#", onClick LoadSwagger] [text "Swagger"] ]
         ] 
       ]
 
-topNav : Signal.Address Action  -> Session -> Html
-topNav address ({username, envs} as session) =
+topNav : Signal.Address Msg  -> Session -> Html
+topNav ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
      [li [ class "dropdown user user-menu"] [
@@ -99,7 +99,7 @@ topNav address ({username, envs} as session) =
                    ]
                 ]
                 , div [ class "pull-right" ] [
-                   a [ class "btn btn-default btn-flat", href "#", onClick address SignOut]
+                   a [ class "btn btn-default btn-flat", href "#", onClick SignOut]
                         [ text "Sign out" ]
                    ]
                 ]
@@ -107,14 +107,14 @@ topNav address ({username, envs} as session) =
         ]
     , li [] [
         a [ attribute "data-toggle" "control-sidebar", href "#" ] [
-             (gearsButton address session) 
+             (gearsButton session) 
           ]
         ]
      ]
   ]
 
-view : Signal.Address Action -> Model -> List Html
-view address ({session} as model) =
+view : Model -> List (Html Msg)
+view ({session} as model) =
   [header [class "main-header"] [
       a [href "/index.html", class "logo"] [
          span [class "logo-mini"] [text "CEL"]   
@@ -125,7 +125,7 @@ view address ({session} as model) =
            attribute "data-toggle" "offcanvas",attribute "role" "button"] [
           span [class "sr-only"][text "Toggle navigation"]
         ]
-      , (topNav address session)
+      , (topNav session)
       ]
     ]
   ]

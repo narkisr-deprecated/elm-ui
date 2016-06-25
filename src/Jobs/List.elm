@@ -1,15 +1,17 @@
-module Jobs.List where
+module Jobs.List exposing (..)
 
 -- view
 import Html exposing (..)
+import Html.App as App
 import Html.Attributes as Attr exposing (type', class, id, attribute, href, style)
 import Bootstrap.Html exposing (..)
 import Common.Http exposing (getJson)
+import Basics.Extra exposing (never)
 
 -- remoting
 import Json.Decode as Json exposing (..)
 import Task
-import Effects exposing (Effects, map, batch)
+import Platform.Cmd exposing (map, batch)
 import Http exposing (Error(BadResponse))
 import Debug
 import Date
@@ -19,7 +21,7 @@ import Date.Format exposing (format)
 import Dict exposing (Dict)
 import Common.Errors exposing (successHandler)
 import Common.NewTab exposing (newtab)
-import Table exposing (view,Action(Select))
+import Table exposing (view,Msg(Select))
 import Pager exposing (..)
 import String
 
@@ -52,16 +54,16 @@ type alias Model =
   , pager : Pager.Model
   } 
 
-type Action = 
+type Msg = 
   SetRunning(Result Http.Error (List RunningJob))
   | SetDone(Result Http.Error (Int ,(List DoneJob)))
   | Polling
-  | LoadRunning (Table.Action RunningJob)
-  | LoadDone (Table.Action DoneJob)
+  | LoadRunning (Table.Msg RunningJob)
+  | LoadDone (Table.Msg DoneJob)
   | NoOp
-  | GotoPage Pager.Action
+  | GotoPage Pager.Msg
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let
     running = Table.init "runningJobs" False ["#","Queue", "Status"] runningRow "Running Jobs"
@@ -71,25 +73,25 @@ init =
 
 -- Update
 
-setRunningJobs : Model -> List RunningJob -> (Model , Effects Action)
+setRunningJobs : Model -> List RunningJob -> (Model , Cmd Msg)
 setRunningJobs ({running} as model) res =
   let 
     jobsList = List.map (\({tid} as r) -> (tid, r)) res
   in  
-    ({model | running = (Table.update (Table.UpdateRows jobsList) running)} , Effects.none)
+    ({model | running = (Table.update (Table.UpdateRows jobsList) running)} , Cmd.none)
 
-setDoneJobs : Model -> (Int, List DoneJob) -> (Model , Effects Action)
+setDoneJobs : Model -> (Int, List DoneJob) -> (Model , Cmd Msg)
 setDoneJobs ({done, pager} as model) (total, doneJobs) =
   let 
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) pager)
     jobsList = List.map (\({tid} as r) -> (tid, r)) doneJobs
     newDone = (Table.update (Table.UpdateRows jobsList) done)
   in  
-   ({model | done = newDone, pager = newPager} , Effects.none)
+   ({model | done = newDone, pager = newPager} , Cmd.none)
   
-update : Action ->  Model-> (Model , Effects Action)
-update action ({running, done, pager} as model) =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({running, done, pager} as model) =
+  case msg of 
     Polling ->
       (model , batch [getRunning, getDone pager.page 10])
 
@@ -99,15 +101,15 @@ update action ({running, done, pager} as model) =
     SetDone result ->
       successHandler result model (setDoneJobs model) NoOp
 
-    GotoPage pageAction -> 
-      case pageAction of
+    GotoPage pageMsg -> 
+      case pageMsg of
         Pager.NextPage page -> 
           let
-            newPager = (Pager.update pageAction model.pager)
+            newPager = (Pager.update pageMsg model.pager)
           in
             ({model | pager = newPager}, getDone page 10)
         _  ->
-          (model , Effects.none)
+          (model , Cmd.none)
     LoadDone (Select tid) ->
        let
          emptyRow = DoneJob 0 0 "" "" "" "" "" "" ""
@@ -123,11 +125,11 @@ update action ({running, done, pager} as model) =
          (model, (newtab NoOp job.tid_link))
 
     _ -> 
-      (model , Effects.none)
+      (model , Cmd.none)
 
 -- View
 
-runningRow : String -> RunningJob -> List Html
+runningRow : String -> RunningJob -> List (Html Msg)
 runningRow tableId {type', status,id } = 
  [
    td [] [ text id ]
@@ -142,7 +144,7 @@ runningRow tableId {type', status,id } =
    ]
  ]
 
-doneRow : String -> DoneJob -> List Html
+doneRow : String -> DoneJob -> List (Html Msg)
 doneRow tableid {hostname, start, end, queue, identity, status} = 
   let 
    min = (toString ((round (end - start)) // (1000 * 60)))
@@ -184,19 +186,21 @@ accordionPanel active ident body =
       ]
 
 
-view : Signal.Address Action -> Model -> List Html
-view address ({running, done, pager} as model) =
-  [div [class "panel-group", id "accordion", attribute "role" "tablist"] 
-     [ accordionPanel (not (List.isEmpty running.rows)) "Running" 
-         (panelDefault_ (Table.view (Signal.forwardTo address LoadRunning) running))
+view : Model -> List (Html Msg)
+view ({running, done, pager} as model) =
+  [div [class "panel-group", id "accordion", attribute "role" "tablist"] [
+       accordionPanel (not (List.isEmpty running.rows)) "Running" 
+         (panelDefault_ (App.map LoadRunning (Table.view running)))
      , accordionPanel (not (List.isEmpty done.rows)) "Done" 
          (div [] 
            [ row_ [
                div [class "col-md-12"][
-                 (panelDefault_ (Table.view (Signal.forwardTo address LoadDone) done))
+                 (panelDefault_ (App.map LoadDone (Table.viewdone)))
                ]
              ]
-           , row_ [(Pager.view (Signal.forwardTo address GotoPage) pager)]
+           , row_ [
+              (App.map GotoPage (Pager.view pager))
+             ]
            ]
          ) 
      ]
@@ -244,21 +248,19 @@ doneList =
     ("jobs" := (list doneJob))
 
 
--- Effects
+-- Cmd
 
-getRunning : Effects Action
+getRunning : Cmd Msg
 getRunning = 
   getJson runningList "/jobs/running" 
     |> Task.toResult
-    |> Task.map SetRunning
-    |> Effects.task
+    |> Task.perform never SetRunning
 
-getDone : Int -> Int -> Effects Action
+getDone : Int -> Int -> Cmd Msg
 getDone page offset= 
   getJson doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page))
     |> Task.toResult
-    |> Task.map SetDone
-    |> Effects.task
+    |> Task.perform never SetDone
 
     
    

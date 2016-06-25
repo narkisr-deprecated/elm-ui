@@ -1,7 +1,8 @@
-module Users.Model where
+module Users.Model exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
+import Basics.Extra exposing (never)
 
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
@@ -10,7 +11,7 @@ import Common.Http exposing (getJson)
 import Dict exposing (Dict)
 import String
 
-import Effects exposing (Effects)
+
 import Task
 
 -- Model
@@ -52,20 +53,18 @@ usersList =
 
 -- Effects
 
-getUsers action = 
+getUsers msg = 
   getJson usersList "/users" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 
 rolesList : Decoder (Dict String String)
 rolesList =
   at ["roles"] (dict string)
 
-getRoles action = 
+getRoles msg = 
   getJson rolesList "/users/roles" 
     |> Task.toResult
-    |> Task.map action
-    |> Effects.task
+    |> Task.perform never msg
 
 

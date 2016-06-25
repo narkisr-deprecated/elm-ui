@@ -1,11 +1,12 @@
-module Types.Edit where
+module Types.Edit exposing (..)
 
 import Http exposing (Error(BadResponse))
-import Effects exposing (Effects)
+
 import Common.Components exposing (asList)
 import Common.Utils exposing (none)
 import Html exposing (..)
-import Types.Add as Add exposing (Action(FormAction, Save, LoadEditor), updateType)
+import Html.Add as App
+import Types.Add as Add exposing (Msg(FormMsg, Save, LoadEditor), updateType)
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
 import Common.Errors exposing (successHandler)
@@ -13,7 +14,7 @@ import Maybe exposing (withDefault)
 
 import Form.Error as Error exposing (..)
 import Form.Field as Field exposing (..)
-import Form exposing (Action(..))
+import Form exposing (Msg(..))
 import Task exposing (Task)
 
 
@@ -24,60 +25,60 @@ type alias Model =
   , type' : Type
   }
  
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let 
-    (add, effects) = Add.init
+    (add, msgs) = Add.init
   in 
-    (Model add "" emptyType, Effects.map AddAction effects)
+    (Model add "" emptyType, Cmd.map AddMsg msgs)
 
 -- Update 
 
-type Action = 
+type Msg = 
   NoOp
-   | AddAction Add.Action 
+   | AddMsg Add.Msg 
    | LoadType String
-   | ViewAction View.Action
+   | ViewMsg View.Msg
    | SetType (Result Http.Error Type)
    | SetClasses String
 
-setType : Model -> Type -> (Model , Effects Action)
+setType : Model -> Type -> (Model , Effects Msg)
 setType ({add} as model) type' =
   let
     env = withDefault "" (List.head (add.environments))
   in 
     none {model | type' = type', add = Add.reinit add type' env}
 
-envChange action ({type', add} as model) = 
-  case action of 
-    (FormAction (Input "environment" (Select env))) -> 
+envChange msg ({type', add} as model) = 
+  case msg of 
+    (FormMsg (Input "environment" (Select env))) -> 
       {model | type' = type', add = Add.reinit add type' env}
 
     _ -> 
       model
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({add} as model) =
-  case action of 
-    AddAction addAction -> 
-      case addAction of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({add} as model) =
+  case msg of 
+    AddMsg addMsg -> 
+      case addMsg of 
         Save _ -> 
           let 
-            (newAdd, effects) = Add.update (Save updateType) add
+            (newAdd, msgs) = Add.update (Save updateType) add
           in
-            ({ model | add = newAdd }, Effects.map AddAction effects)
+            ({ model | add = newAdd }, Cmd.map AddMsg msgs)
 
         LoadEditor _ -> 
           let 
-            (newAdd, effects) = Add.update (LoadEditor "typesEdit") add
+            (newAdd, msgs) = Add.update (LoadEditor "typesEdit") add
           in
-            ({ model | add = newAdd }, Effects.map AddAction effects)
+            ({ model | add = newAdd }, Cmd.map AddMsg msgs)
 
         _ -> 
           let 
-            (newAdd, effects) = Add.update addAction add
+            (newAdd, msgs) = Add.update addMsg add
           in 
-            (envChange addAction { model | add = newAdd }, Effects.map AddAction effects)
+            (envChange addMsg { model | add = newAdd }, Cmd.map AddMsg msgs)
 
     LoadType name -> 
        (model, View.getType name SetType)
@@ -90,7 +91,7 @@ update action ({add} as model) =
 
 -- View
 
-view : Signal.Address Action -> Model -> List Html
-view address model =
-  Add.view (Signal.forwardTo address AddAction) model.add
+view : Model -> List (Html Msg)
+view model =
+  App.map AddMsg (Add.view model.add)
 

@@ -1,7 +1,7 @@
-module Systems.Add.Digital where
+module Systems.Add.Digital exposing (..)
 
 import Bootstrap.Html exposing (..)
-import Html.Shorthand exposing (..)
+
 import Html exposing (..)
 import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
@@ -12,7 +12,7 @@ import Environments.List as ENV exposing (Environment, Template, Hypervisor(OSTe
 import Dict as Dict exposing (Dict)
 import Systems.Model.Common exposing (Machine, emptyMachine)
 import Systems.Model.Digital exposing (..)
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Common.Components exposing (fixedPanel, asList)
 import Common.Utils exposing (withDefaultProp, defaultEmpty)
 import String
@@ -39,8 +39,8 @@ init =
   in 
     Model wizard emptyDigital emptyMachine Dict.empty Dict.empty
 
-type Action = 
-  WizardAction Wizard.Action
+type Msg = 
+  WizardMsg Wizard.Msg
   | Update Environment
   | SelectSize String
   | SelectOS String
@@ -75,13 +75,13 @@ stringValidations = Dict.fromList [
 
 validateDigital = validateAll [stringValidations]
 
-update : Action -> Model-> Model
-update action ({wizard, digital, machine} as model) =
-  case action of
-    WizardAction action -> 
+update : Msg -> Model-> Model
+update msg ({wizard, digital, machine} as model) =
+  case msg of
+    WizardMsg msg -> 
       let
         ({errors} as newModel) = (validateDigital wizard.step model)
-        newWizard = Wizard.update (notAny errors) action wizard
+        newWizard = Wizard.update (notAny errors) msg wizard
       in
        { newModel | wizard = newWizard } 
 
@@ -129,10 +129,10 @@ next : Model -> Environment -> Model
 next model environment =
       model 
          |> update (Update environment) 
-         |> update (WizardAction Wizard.Next)
+         |> update (WizardMsg Wizard.Next)
 
 back model =
-  (update (WizardAction Wizard.Back) model)
+  (update (WizardMsg Wizard.Back) model)
 
 getOses : Model -> Dict String Template
 getOses model =
@@ -145,8 +145,8 @@ getOses model =
       _ -> 
         Dict.empty
 
-instance : Signal.Address Action -> Model -> List Html
-instance address ({digital, machine, errors} as model) =
+instance : Model -> List (Html Msg)
+instance ({digital, machine, errors} as model) =
   let
     check = withErrors errors
     region = withDefault "" (List.head regions)
@@ -154,22 +154,22 @@ instance address ({digital, machine, errors} as model) =
     [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
        [ 
          legend [] [text "Properties"]
-       , group' "Size" (selector address SelectSize sizes digital.size)
-       , group' "OS" (selector address SelectOS (Dict.keys (getOses model)) machine.os) , group' "Region" (selector address SelectRegion regions digital.region)
+       , group' "Size" (selector SelectSize sizes digital.size)
+       , group' "OS" (selector SelectOS (Dict.keys (getOses model)) machine.os) , group' "Region" (selector SelectRegion regions digital.region)
        , legend [] [text "Security"]
-       , check "User" (inputText address UserInput "" machine.user) 
+       , check "User" (inputText UserInput "" machine.user) 
        , legend [] [text "Networking"]
-       , check "Hostname" (inputText address HostnameInput "" machine.hostname)
-       , check "Domain"  (inputText address DomainInput "" machine.domain)
-       , group' "Private Networking" (checkbox address PrivateNetworking digital.privateNetworking)
+       , check "Hostname" (inputText HostnameInput "" machine.hostname)
+       , check "Domain"  (inputText DomainInput "" machine.domain)
+       , group' "Private Networking" (checkbox PrivateNetworking digital.privateNetworking)
        ]
     ]
 
-stepView :  Signal.Address Action -> Model -> List Html
-stepView address ({wizard, digital, machine} as model) =
+stepView :  Model -> List (Html Msg)
+stepView ({wizard, digital, machine} as model) =
   case wizard.step of
     Instance -> 
-      instance address model 
+      instance model 
 
     Summary -> 
       summarize (digital, machine)
@@ -178,6 +178,6 @@ stepView address ({wizard, digital, machine} as model) =
       Debug.log (toString wizard.step) [div [] []]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-  fixedPanel (Html.form [] (stepView address model))
+view : Model -> Html Msg
+view model =
+  fixedPanel (Html.form [] (stepView model))

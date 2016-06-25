@@ -1,8 +1,8 @@
-module Types.Add.Puppet where
+module Types.Add.Puppet exposing (..)
 
 import Common.Model exposing (Options(BoolOption))
 import Types.Model exposing (PuppetStd, emptyPuppet)
-import Effects exposing (Effects)
+
 import Html exposing (..)
 import Common.Utils exposing (none, defaultEmpty)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
@@ -61,7 +61,7 @@ reinit env type' =
   Model (Form.initial (editDefaults env type') validate)
 
 
-view check address ({form} as model) =
+view check ({form} as model) =
  let 
     name = (Form.getFieldAsString "name" form)
     source = (Form.getFieldAsString "source" form)
@@ -70,10 +70,10 @@ view check address ({form} as model) =
  in 
    (Html.form [] [
      div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Name" Input.textInput name address
-      , formControl "Source" Input.textInput source address
-      , formGroup "Unsecure" Input.checkboxInput unsecure address []
-      , formControl "Arguments" Input.textInput arguments address
+        formControl "Name" Input.textInput name 
+      , formControl "Source" Input.textInput source
+      , formGroup "Unsecure" Input.checkboxInput unsecure []
+      , formControl "Arguments" Input.textInput arguments 
       , group' "Edit classes" check
       , div [ id "jsoneditor"
           , style [("width", "50%"), ("height", "400px"), ("margin-left", "25%")]] []

@@ -1,7 +1,8 @@
-module Stacks.Core where
+module Stacks.Core exposing (..)
 
-import Effects exposing (Effects)
+
 import Html exposing (..)
+import Html.App as App
 import Stacks.Add as Add
 import Nav.Common exposing (Active(Jobs), Section(Stats, Launch, Add, List, View))
 import Common.Components exposing (asList, notImplemented)
@@ -13,41 +14,41 @@ type alias Model =
   , navChange : Maybe (Active, Section)
   }
  
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
   let
     (add, addEffects) = Add.init
-    effects = [
-      Effects.map StacksAdd addEffects
+    msgs = [
+      Cmd.map StacksAdd addEffects
     ]
   in
-   (Model add Nothing, Effects.batch effects)
+   (Model add Nothing, Effects.batch msgs)
 
 -- Update 
 
-type Action = 
+type Msg = 
   NoOp
-    | StacksAdd Add.Action
+    | StacksAdd Add.Msg
 
-update : Action ->  Model-> (Model , Effects Action)
-update action ({add} as model) =
-  case action of 
-    StacksAdd addAction -> 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg ({add} as model) =
+  case msg of 
+    StacksAdd addMsg -> 
       let
-        (newAdd, effects) = Add.update addAction add
+        (newAdd, msgs) = Add.update addMsg add
       in
-        ({model | add = newAdd}, Effects.map StacksAdd effects)
+        ({model | add = newAdd}, Cmd.map StacksAdd msgs)
     
     _ -> 
-      (model, Effects.none)
+      none model
 
 -- View
 
-view : Signal.Address Action -> Model -> Section -> List Html
-view address model section =
+view : Model -> Section -> List (Html Msg)
+view model section =
   case section of
     Add ->
-      asList (Add.view (Signal.forwardTo address StacksAdd) model.add)
+      asList (App.map StacksAdd (Add.view model.add))
 
     _ -> 
       asList notImplemented
@@ -55,7 +56,7 @@ view address model section =
 
 loadTemplates ({add} as model) =
   let
-   (newAdd, effects) = Add.update Add.LoadTemplates add
+   (newAdd, msgs) = Add.update Add.LoadTemplates add
   in
-   ({model | add = newAdd }, Effects.map StacksAdd effects)
+   ({model | add = newAdd }, Cmd.map StacksAdd msgs)
 

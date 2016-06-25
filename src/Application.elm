@@ -1,7 +1,8 @@
-module Application where
+module Application exposing (..)
 
 import Html exposing (..)
-import Effects exposing (Effects, Never, batch, map)
+import Html.App as App
+import Platform.Cmd exposing (batch, map)
 
 import Html.Attributes exposing (type', class, id, href, attribute, height, width, alt, src)
 import Systems.Core as Systems 
@@ -17,34 +18,34 @@ import Bootstrap.Html exposing (..)
 import Debug
 
 -- Hop
-import Hop.Types exposing (Location, Query,newLocation)
-import Hop.Navigate exposing (navigateTo, setQuery)
+import Hop.Types exposing (Location, Query, newLocation)
+import Navigation exposing (modifyUrl)
 
 -- Routing
 import Routing as BaseRoute exposing (config, Route(..), defaultRoute)
 import Systems.Routing exposing (Route(List))
 
 
-init : (Model, Effects Action)
+init : (Model, Effects Msg)
 init =
   let 
-    (jobs, jobsAction) = Jobs.init
-    (types, typesAction) = Types.init
-    (users, usersAction) = Users.init
-    (templates, templatesAction) = Templates.init
-    (nav, navAction) = Nav.init
-    (systems, systemsAction) = Systems.init
-    (stacks, stacksAction) = Stacks.init
-    effects = [ Effects.map TemplatesAction templatesAction
-              , Effects.map TypesAction typesAction
-              , Effects.map UsersAction usersAction
-              , Effects.map SystemsAction systemsAction
-              , Effects.map StacksAction stacksAction
-              , Effects.map NavAction navAction
-              , Effects.map JobsAction jobsAction
+    (jobs, jobsMsg) = Jobs.init
+    (types, typesMsg) = Types.init
+    (users, usersMsg) = Users.init
+    (templates, templatesMsg) = Templates.init
+    (nav, navMsg) = Nav.init
+    (systems, systemsMsg) = Systems.init
+    (stacks, stacksMsg) = Stacks.init
+    msgs = [ Cmd.map TemplatesMsg templatesMsg
+              , Cmd.map TypesMsg typesMsg
+              , Cmd.map UsersMsg usersMsg
+              , Cmd.map SystemsMsg systemsMsg
+              , Cmd.map StacksMsg stacksMsg
+              , Cmd.map NavMsg navMsg
+              , Cmd.map JobsMsg jobsMsg
               ]
   in
-    (Model systems stacks jobs types templates users nav defaultRoute newLocation, Effects.batch effects) 
+    (Model systems stacks jobs types templates users nav defaultRoute newLocation, Effects.batch msgs) 
 
 type alias Model = 
   { 
@@ -59,124 +60,124 @@ type alias Model =
   , location : Location
   }
 
-type Action = 
+type Msg = 
   ApplyRoute (BaseRoute.Route,Location)
-    | HopAction ()
+    | HopMsg ()
     | NavigateTo String
-    | SystemsAction Systems.Action
-    | NavAction Nav.Action
-    | StacksAction Stacks.Action
-    | JobsAction Jobs.Action
-    | TypesAction Types.Action
-    | TemplatesAction Templates.Action
-    | UsersAction Users.Action
+    | SystemsMsg Systems.Msg
+    | NavMsg Nav.Msg
+    | StacksMsg Stacks.Msg
+    | JobsMsg Jobs.Msg
+    | TypesMsg Types.Msg
+    | TemplatesMsg Templates.Msg
+    | UsersMsg Users.Msg
     | NoOp
 
-route : Action ->  Model -> (Model , Effects Action)
-route action ({route, types, users, jobs, systems, templates, stacks} as model) =
-  case action of 
-    JobsAction action -> 
-      if Jobs.isPolling action &&  BaseRoute.notJobs route then
+route : Msg ->  Model -> (Model , Effects Msg)
+route msg ({route, types, users, jobs, systems, templates, stacks} as model) =
+  case msg of 
+    JobsMsg msg -> 
+      if Jobs.isPolling msg &&  BaseRoute.notJobs route then
         none model 
       else 
         let
-          (newJob, effects) = Jobs.update action jobs
+          (newJob, msgs) = Jobs.update msg jobs
         in
-          ({model | jobs = newJob}, Effects.map JobsAction effects) 
+          ({model | jobs = newJob}, Cmd.map JobsMsg msgs) 
 
-    TypesAction action -> 
+    TypesMsg msg -> 
       let 
-       (newTypes, effects) = navigate (Types.update action types) TypesAction
+       (newTypes, msgs) = navigate (Types.update msg types) TypesMsg
       in
-       ({ model | types = newTypes}, effects) 
+       ({ model | types = newTypes}, msgs) 
 
 
-    UsersAction action -> 
+    UsersMsg msg -> 
       let 
-       (newUsers, effects) = navigate (Users.update action users) UsersAction
+       (newUsers, msgs) = navigate (Users.update msg users) UsersMsg
       in
-       ({ model | users = newUsers}, effects) 
+       ({ model | users = newUsers}, msgs) 
 
 
-    StacksAction action -> 
+    StacksMsg msg -> 
       let 
-       (newStacks, effects) = Stacks.update action stacks
+       (newStacks, msgs) = Stacks.update msg stacks
       in
-       ({ model | stacks = newStacks}, Effects.map StacksAction effects) 
+       ({ model | stacks = newStacks}, Cmd.map StacksMsg msgs) 
 
-    TemplatesAction action -> 
+    TemplatesMsg msg -> 
       let 
-        (newTemplates, effects) = navigate (Templates.update action templates) TemplatesAction
+        (newTemplates, msgs) = navigate (Templates.update msg templates) TemplatesMsg
       in
-        ({ model | templates = newTemplates} , effects)
+        ({ model | templates = newTemplates} , msgs)
 
-    SystemsAction action -> 
+    SystemsMsg msg -> 
       let 
-        (newSystems, effects) = navigate (Systems.update action systems) SystemsAction
+        (newSystems, msgs) = navigate (Systems.update msg systems) SystemsMsg
       in
-        ({ model | systems = newSystems}, effects)
+        ({ model | systems = newSystems}, msgs)
 
     ApplyRoute (route, location) ->
       case route of 
         NotFoundRoute -> 
-            (model,  Effects.map HopAction (navigateTo config "systems/list"))
+            (model,  Cmd.map HopMsg (modifyUrl To config "systems/list"))
 
         _ -> 
             none { model | route = route, location = location }
 
-    HopAction () ->
+    HopMsg () ->
       none model
 
     _ -> 
         none model
 
-navigate ({navChange} as model, effects) action = 
+navigate ({navChange} as model, msgs) msg = 
   case navChange of 
     Just path -> 
       let 
        withNavChange = [
-           Effects.map action effects
-         , Effects.map HopAction (navigateTo config path)
+           Cmd.map msg msgs
+         , Cmd.map HopMsg (modifyUrl config path)
         ]
       in
        ({model | navChange = Nothing }, Effects.batch withNavChange)
 
     Nothing -> 
-      (model, Effects.map action effects)
+      (model, Cmd.map msg msgs)
 
 
-update : Action ->  Model -> (Model , Effects Action)
-update action model = 
-   route action model
+update : Msg ->  Model -> (Model , Effects Msg)
+update msg model = 
+   route msg model
 
-activeView : Signal.Address Action -> Model -> List Html
-activeView address ({jobs, route, systems, types, templates, stacks, users} as model) =
+activeView : Model -> List (Html Msg)
+activeView ({jobs, route, systems, types, templates, stacks, users} as model) =
     case route of
       SystemsRoute nested -> 
-        Systems.view (Signal.forwardTo address SystemsAction) systems nested
+        App.map SystemsMsg (Systems.view systems nested)
       
       TypesRoute nested -> 
-        Types.view (Signal.forwardTo address TypesAction) types nested
+        App.map TypesMsg (Types.view types nested)
 
       TemplatesRoute nested -> 
-        Templates.view (Signal.forwardTo address TemplatesAction) templates nested
+        App.map TemplatesMsg (Templates.view templates nested)
       
       JobsRoute nested -> 
-        Jobs.view (Signal.forwardTo address JobsAction) jobs nested
+        App.map JobsMsg (Jobs.view jobs nested)
 
       UsersRoute nested -> 
-        Users.view (Signal.forwardTo address UsersAction) users nested
+        App.map UsersMsg (Users.view users nested)
       
       _ ->
-         Systems.view (Signal.forwardTo address SystemsAction) systems List
+        App.map SystemsMsg (Systems.view systems List)
 
-view : Signal.Address Action -> Model -> Html
-view address ({nav} as model) = 
+view : Model -> Html Msg
+view ({nav} as model) = 
   div [class "wrapper"] 
     (List.append
        (List.append 
-         (Nav.sideView (Signal.forwardTo address NavAction) nav) 
-         (Nav.headerView (Signal.forwardTo address NavAction) nav))
+         (App.map NavMsg (Nav.sideView nav))
+         (App.map NavMsg (Nav.headerView nav))
        [div [class "content-wrapper"]
-         [section [class "content"] (activeView address model)]])
+         [section [class "content"] (activeView model)]])
 

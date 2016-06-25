@@ -1,6 +1,6 @@
-module Admin.Core where
+module Admin.Core exposing (..)
 
-import Effects exposing (Effects, batch)
+import Platform.Cmd exposing (batch)
 import Html exposing (..)
 import Common.Errors exposing (successHandler)
 import Environments.List exposing (Environments, Environment, getEnvironments)
@@ -25,13 +25,13 @@ partialAdmin : String -> String -> Model
 partialAdmin owner environment =
     Model [] environment Dict.empty [] owner
 
-init : (Model , Effects Action)
+init : (Model , Cmd Msg)
 init =
-  (Model [] "" Dict.empty [] "", Effects.batch [ getEnvironments SetEnvironments, getSession LoadSession])
+  (Model [] "" Dict.empty [] "", batch [ getEnvironments SetEnvironments, getSession LoadSession])
 
 -- Update 
 
-type Action = 
+type Msg = 
   SetEnvironments (Result Http.Error Environments)
     | SetOwners (Result Http.Error (List User))
     | SelectOwner String
@@ -39,7 +39,7 @@ type Action =
     | LoadSession (Result Http.Error Session)
     | NoOp
 
-setOwners : Model -> List User -> (Model, Effects Action)
+setOwners : Model -> List User -> (Model, Cmd Msg)
 setOwners model owners =
   let
     users = List.map .username owners
@@ -47,7 +47,7 @@ setOwners model owners =
   in
     none {model | owners = users, owner = user}
 
-setEnvironments : Model -> Environments -> (Model, Effects Action)
+setEnvironments : Model -> Environments -> (Model, Cmd Msg)
 setEnvironments model es =
   let 
     environment = (Maybe.withDefault "" (List.head (Dict.keys es)))
@@ -60,9 +60,9 @@ setSession model ({username} as session) =
   else 
     (model, getUsers SetOwners)
 
-update : Action ->  Model-> (Model , Effects Action)
-update action model =
-  case action of 
+update : Msg ->  Model -> (Model , Cmd Msg)
+update msg model =
+  case msg of 
    SetEnvironments result ->
      (successHandler result model (setEnvironments model) NoOp)
 
@@ -88,9 +88,9 @@ ownersList {owner, owners} =
   else 
     owners
 
-view : Signal.Address Action -> Model -> List Html
-view address ({environments, environment, owner} as model) =
+view : Model -> List (Html Msg)
+view ({environments, environment, owner} as model) =
   [ 
-    group' "Environment" (selector address SelectEnvironment environments environment)
-  , group' "Owner" (selector address SelectOwner (ownersList model) owner)
+    group' "Environment" (selector SelectEnvironment environments environment)
+  , group' "Owner" (selector SelectOwner (ownersList model) owner)
   ]
