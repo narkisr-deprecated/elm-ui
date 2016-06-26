@@ -18,6 +18,7 @@ import Chartjs.Line as Line exposing (..)
 import Color exposing (..)
 
 -- view
+import Element exposing (toHtml)
 import Html exposing (..)
 import Basics.Extra exposing (never)
 import Html.Attributes exposing (type', class, id, style, attribute, href)
@@ -107,7 +108,7 @@ meanMaxMin polls =
     )
 
 
-setMetrics: Model -> Metrics -> (Model, Effects Msg)
+setMetrics: Model -> Metrics -> (Model, Cmd Msg)
 setMetrics ({polls} as model) metrics =
   let 
     newPolls = pollingTrim model metrics
@@ -143,7 +144,7 @@ update msg ({polls, lastPoll, enabled} as model) =
 
 -- View
 
-item : (String,String) -> Html
+item : (String,String) -> Html Msg
 item ((name,rgba) as pair) =
    li [] [
       div [] 
@@ -152,7 +153,7 @@ item ((name,rgba) as pair) =
         ]
     ]
 
-legend : List (String,String) -> Html
+legend : List (String,String) -> Html Msg
 legend items = 
   ul [class "legend"] (List.map item items)
 
@@ -164,21 +165,23 @@ rgbString color =
   in 
     "rgba(" ++  rgba ++ ")"
 
-chart : Config -> String -> Html
+chart : Config -> String -> Html Msg
 chart ((labels,series) as config) header =
  div [class "col-md-6"] 
    [panelDefault_ 
       [ panelHeading_ [text header]
       , panelBody_ 
-         [fromElement <| Line.chart 500 200 config { defaultOptions | datasetFill = False }
+         [toHtml <| Line.chart 500 200 config { defaultOptions | datasetFill = False }
          , legend (List.map (\(label,{pointColor},_) -> (label, (rgbString pointColor))) series)  ]
       ]
    ]
 
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({charts} as model)=
-  List.map row_ (partition 2 (List.map (\(header,config) -> chart config header) charts))
+  div [] 
+    (List.map row_ 
+      (partition 2 (List.map (\(header,config) -> chart config header) charts)))
 
 -- Decoding
 
@@ -199,7 +202,7 @@ metricsDecoder =
 
 -- Effects
 
-getMetrics : Effects Msg
+getMetrics : Cmd Msg
 getMetrics = 
   getJson metricsDecoder "/metrics" 
     |> Task.toResult

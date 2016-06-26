@@ -46,11 +46,11 @@ update msg ({name} as model) =
 
 -- View
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view model =
   Delete.view model "Template" Cancel Delete Done
 
-deleteTemplate : String -> Effects Msg
+deleteTemplate : String -> Cmd Msg
 deleteTemplate  name = 
   delete deleteResponse ("/templates/" ++ name)
     |> Task.toResult

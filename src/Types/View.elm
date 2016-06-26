@@ -85,7 +85,7 @@ summarySections {type', description, puppetStd} =
      [overviewSection "Type" ["type", "description"] [type', withDefault "" description]]
      (puppetSummary puppetStd)
 
-summarize: Type -> Html
+summarize: Type -> Html Msg
 summarize model =
    div [style [("line-height", "1.8"), ("list-style-type","none")]] 
      (summarySections model |> List.map summaryPanel
@@ -93,9 +93,12 @@ summarize model =
                             |> (List.map List.concat) 
                             |> (List.map row_))
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view model =
-  asList (div [] [h4 [] [(text "Type")], (summarize model.type')])
+  div [] [
+    h4 [] [text "Type"]
+  , (summarize model.type')
+  ]
   
 
 getType id msg = 

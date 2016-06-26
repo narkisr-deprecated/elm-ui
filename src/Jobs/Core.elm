@@ -2,6 +2,7 @@ module Jobs.Core exposing (..)
 
 
 import Html exposing (..)
+import Html.App as App
 import Jobs.Routing as Routing exposing (Route)
 import Common.Utils exposing (none)
 
@@ -24,7 +25,7 @@ init =
      , Cmd.map JobsStats statsEffects
     ]
   in
-    (Model list stats, Effects.batch msgs)
+    (Model list stats, Cmd.batch msgs)
 
 -- Update 
 
@@ -59,14 +60,13 @@ update msg ({list, stats} as model)=
         (newStats, msgs) = Stats.update sts stats
       in
         ({model | stats = newStats}, Cmd.map JobsStats msgs) 
-
      
     NoOp -> 
       none model
 
 -- View
 
-view : Model -> Route -> List (Html Msg)
+view : Model -> Route -> Html Msg
 view {list, stats} route =
   case route of
     Routing.List -> 

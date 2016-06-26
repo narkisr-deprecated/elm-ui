@@ -40,7 +40,7 @@ type Msg =
    | Cancel
    | NoOp
 
-setTemplates: Model -> List Template -> (Model , Effects Msg)
+setTemplates: Model -> List Template -> (Model , Cmd Msg)
 setTemplates model newTemplates = 
   none { model | templates = (List.map (\{name} -> name) newTemplates)}
 
@@ -80,5 +80,4 @@ addView ({template, templates, stack, editDefaults} as model) =
 
 view : Model -> Html Msg
 view model =
-  div [] 
     (infoCallout (info "Add a new Stack" ) (addView model) Cancel Save)

@@ -71,18 +71,21 @@ update msg model =
 
 -- View
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({pager, table} as model) =
-  [
-    div [] [
-      row_ [
-        div [class "col-md-offset-1 col-md-10"] [
-          panelDefault_ (App.map LoadPage (Table.view table))
-        ]
-      ],
-      row_ [ (App.map GotoPage (Pager.view pager))]
-    ]
-  ]
+ div [] [
+   row_ [
+     div [class "col-md-offset-1 col-md-10"] [
+       panelDefault_ [
+         (App.map LoadPage (Table.view table))
+       ]
+     ]
+   ],
+   row_ [
+     (App.map GotoPage (Pager.view pager))
+   ]
+ ]
+ 
 
 findTemplate : Model ->  String -> Template
 findTemplate {templates} name =

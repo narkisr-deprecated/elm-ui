@@ -29,7 +29,7 @@ type alias Model =
   , pager : Pager.Model
   } 
 
-typeRow : String -> Type -> List (Html Msg)
+typeRow : String -> Type -> List (Html msg)
 typeRow id {type', description } = 
     [ td [] [ text type' ]
     , td [] [ text "Puppet standalone"]
@@ -49,7 +49,7 @@ type Msg =
     | SetTypes (Result Http.Error (List Type))
     | NoOp
 
-setTypes: Model -> List Type -> (Model , Effects Msg)
+setTypes: Model -> List Type -> (Model , Cmd Msg)
 setTypes ({pager, table} as model) types = 
   let
     total = List.length types
@@ -69,9 +69,9 @@ update msg model =
     _ -> 
       none model
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({types, pager, table} as model) =
-  [ div [class ""] [
+   div [class ""] [
     row_ [
       div [class "col-md-offset-1 col-md-10"] [
         panelDefault_ [
@@ -82,7 +82,7 @@ view ({types, pager, table} as model) =
     row_ [
      App.map GotoPage (Pager.view pager)
     ]
-  ]]
+  ]
   
 
 -- Decoding
@@ -91,7 +91,8 @@ typesList : Decoder (List Type)
 typesList =
    at ["types"] (list Model.type')
 
--- Effects
+-- Http 
+
 getTypes msg = 
   getJson typesList "/types" 
     |> Task.toResult

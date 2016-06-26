@@ -4,6 +4,7 @@ module Templates.Launch exposing (..)
 import Bootstrap.Html exposing (..)
 
 import Html exposing (..)
+import Html.App as App
 import Templates.Model.Common exposing (emptyTemplate, Template)
 import Common.Utils exposing (none)
 import Debug
@@ -81,7 +82,7 @@ type Msg =
     | Cancel
     | NoOp
 
-stage : Model -> SaveResponse -> (Model, Effects Msg)
+stage : Model -> SaveResponse -> (Model, Cmd Msg)
 stage model {id} =
   case id of
    Just num ->
@@ -140,22 +141,22 @@ infoMessage name =
 
 machineView form =
   let 
-    formAddress = Signal.forwardTo FormMsg
     hostname = (Form.getFieldAsString "machine.hostname" form)
     domain = (Form.getFieldAsString "machine.domain" form)
   in 
-   [ formControl "Hostname" Input.textInput hostname formAddress
-   , formControl "Domain" Input.textInput domain formAddress 
-   ]
+    div [] [
+       formControl "Hostname" Input.textInput hostname
+     , formControl "Domain" Input.textInput domain 
+    ]
 
 launchView {name, form, admin} =
    div [class "panel panel-default"] [
      div [class "panel-body"] [
        (Html.form [] [
-          div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-           (List.append
-              (machineView form) 
-              (Admin.view (Signal.forwardTo AdminMsg) admin))
+          div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
+              (App.map FormMsg (machineView form))
+           ,  (App.map AdminMsg (Admin.view admin))
+           ]
       ])
     ]
   ]
@@ -168,19 +169,19 @@ errorMessage =
   ]
 
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({name, saveErrors} as model) =
   let
-    errorsView = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
+    errorsView = (App.map ErrorsView (Errors.view  saveErrors))
   in
     if Errors.hasErrors saveErrors then
       dangerCallout errorMessage (panel (panelContents errorsView)) Cancel Done
     else 
       infoCallout (infoMessage name) (launchView model) Cancel Launch
 
--- Effects
+-- Http
 
-intoSystem : String -> String -> Effects Msg
+intoSystem : String -> String -> Cmd Msg
 intoSystem name json = 
   postJson (Http.string json) saveResponse ("/systems/template/"  ++ name)
     |> Task.toResult

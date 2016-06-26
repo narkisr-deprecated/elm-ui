@@ -126,7 +126,7 @@ update msg ({error, table} as model) =
 
 -- View
 
-systemRow : String -> System -> List (Html Msg)
+systemRow : String -> System -> List (Html msg)
 systemRow id {env, owner, type', machine} = 
  [
    td [] [ text id ]
@@ -136,7 +136,7 @@ systemRow id {env, owner, type', machine} =
  , td [] [ text owner]
  ]
 
-flash : Model -> Html
+flash : Model -> Html Msg
 flash model =
   let 
     result = div [class "callout callout-danger"]
@@ -152,26 +152,25 @@ flash model =
         callout "danger" (info error)
 
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view model = 
   let 
    (meta,systems) = model.systems
   in
-    [
-     row_ [
-      div [class "col-md-12"] [
-         App.map Searching (Search.view model.search)
-       ]
-     ],
-
-     row_ [
-       flash model
-     , div [class "col-md-offset-1 col-md-10"] [
-         panelDefault_ [
-           App.map LoadPage (Table.view model.table)
-         ]
-       ]
-     ],
+    div [] [
+      row_ [
+       div [class "col-md-12"] [
+          App.map Searching (Search.view model.search)
+        ]
+      ],
+      row_ [
+        flash model
+      , div [class "col-md-offset-1 col-md-10"] [
+          panelDefault_ [
+            App.map LoadPage (Table.view model.table)
+          ]
+        ]
+      ],
       row_ [App.map GotoPage (Pager.view model.pager)]
     ]
        

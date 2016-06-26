@@ -88,9 +88,9 @@ ownersList {owner, owners} =
   else 
     owners
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({environments, environment, owner} as model) =
-  [ 
+  div [] [ 
     group' "Environment" (selector SelectEnvironment environments environment)
   , group' "Owner" (selector SelectOwner (ownersList model) owner)
   ]

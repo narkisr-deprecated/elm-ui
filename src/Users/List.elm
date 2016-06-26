@@ -68,9 +68,9 @@ update msg model =
 
 -- View
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({pager, table} as model) =
-  [ div [class ""] [
+   div [class ""] [
     row_ [
        div [class "col-md-offset-1 col-md-10"] [
          panelDefault_ [
@@ -79,5 +79,5 @@ view ({pager, table} as model) =
        ]
     ]
   , row_ [(map GotoPage (Pager.view pager))]
-  ]]
+  ]
  

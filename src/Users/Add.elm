@@ -179,7 +179,7 @@ currentView ({wizard, roles, environments, operations} as model) =
           
     Nothing -> 
         dialogPanel "info" (info "Save new user") 
-           (panel (fixedPanel (App.map NoOp (summarize (merged model)))))
+           (panel (fixedPanel (App.map (\_ -> NoOp) (summarize (merged model)))))
 
 
 errorsView {saveErrors} = 
@@ -196,26 +196,26 @@ doneButton =
 
 
 rows contents buttons = 
- [ 
-  row_ [
-    contents
-  ]
- ,row_ buttons
+ div [] [ 
+   row_ [
+     contents
+   ]
+  , row_ buttons
  ]
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({wizard, saveErrors} as model) =
   let 
     buttons' = (buttons { model | hasNext = Wizard.notDone model})
   in 
    if Errors.hasErrors saveErrors then
-    rows 
-     (div [] (errorsView model))
-     (buttons' Done Reset (doneButton address))
-    else
      rows 
-      (div [class "col-md-offset-2 col-md-8"] (currentView model))
-      (buttons' Next Back (saveButton address))
+      (div [] (errorsView model))
+      (buttons' Done Reset (doneButton))
+    else
+      rows 
+       (div [class "col-md-offset-2 col-md-8"] (currentView model))
+       (buttons' Next Back (saveButton))
 
 saveUser: String -> Cmd Msg
 saveUser json = 

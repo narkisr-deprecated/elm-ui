@@ -76,9 +76,9 @@ callout type' message =
     div [ class ("callout callout-" ++ type') ] message
   ]
 
-dialogPanel : String -> List (Html msg) -> (Html msg) -> List (Html msg)
 dialogPanel type' message body = 
-  [ row_ [
+  [
+    row_ [
       callout type' message
     ] 
   , row_ [
@@ -94,14 +94,17 @@ withButtons cancel ok panel =
 infoCallout message body cancel ok = 
   dialogPanel "info" message body
     |> withButtons cancel ok
+    |> div []
 
 dangerCallout message body cancel ok = 
   dialogPanel "danger" message body 
     |> withButtons cancel ok
+    |> div []
 
 warningCallout message body cancel ok = 
   dialogPanel "warning" message body
     |> withButtons cancel ok
+    |> div []
 
 
 -- Form groups

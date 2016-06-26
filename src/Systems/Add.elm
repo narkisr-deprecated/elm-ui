@@ -8,6 +8,7 @@ import Basics.Extra exposing (never)
 
 import Common.Errors as Errors exposing (errorsSuccessHandler)
 import Html exposing (..)
+import Html.App as App 
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Task exposing (Task)
@@ -77,7 +78,7 @@ type Msg =
   | Saved Msg (Result Http.Error SaveResponse)
   | JobLaunched (Result Http.Error JobResponse)
 
-init : (Model, Effects Msg)
+init : (Model, Cmd Msg)
 init =
   let 
     (general, msgs) = General.init 
@@ -86,7 +87,7 @@ init =
     (withModels True Errors.init General, Cmd.map GeneralView msgs)
 
 
-setSaved : Msg -> Model -> SaveResponse -> (Model, Effects Msg)
+setSaved : Msg -> Model -> SaveResponse -> (Model, Cmd Msg)
 setSaved next model {id} =
   case id of 
     Just num -> 
@@ -259,34 +260,34 @@ update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physical
     _ -> 
      none model
 
-currentView : Model -> Html
+currentView : Model -> Html Msg
 currentView ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, kvmModel, saveErrors, general} as model)=
   case model.stage of 
     General -> 
-      (General.view (Signal.forwardTo GeneralView) general)
+     App.map GeneralView (General.view general)
 
     AWS -> 
-      (AWS.view (Signal.forwardTo AWSView) awsModel)
+     App.map AWSView (AWS.view awsModel)
 
     GCE -> 
-      (GCE.view (Signal.forwardTo GCEView) gceModel)
+     App.map GCEView (GCE.view gceModel)
 
     Digital -> 
-      (Digital.view (Signal.forwardTo DigitalView) digitalModel)
+     App.map DigitalView (Digital.view digitalModel)
 
     Physical -> 
-      (Physical.view (Signal.forwardTo PhysicalView) physicalModel)
+     App.map PhysicalView (Physical.view physicalModel)
 
     Openstack -> 
-      (Openstack.view (Signal.forwardTo OpenstackView) openstackModel)
+     App.map OpenstackView (Openstack.view openstackModel)
 
     KVM -> 
-      (KVM.view (Signal.forwardTo KVMView) kvmModel)
+     App.map KVMView (KVM.view kvmModel)
 
     _ -> 
       notImplemented
 
-saveMenu : Html 
+saveMenu : Html Msg
 saveMenu =
   ul [class "dropdown-menu"] [
     li [] [a [class "SaveSystem", href "#", onClick SaveSystem ] [text "Save system"]]
@@ -301,19 +302,20 @@ dropdown =
           , attribute "aria-haspopup" "true"
           , attribute "aria-expanded" "false"] 
     [ span [class "caret"] [] , span [class "sr-only"] [] ]
-  , saveMenu address
+  , saveMenu 
   ]
 
 errorsView {saveErrors} = 
    let
-     body = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
+     body = App.map ErrorsView (Errors.view saveErrors)
    in
      dialogPanel "danger" (error "Failed to save system") (panel (panelContents body))
 
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({stage} as model) =
- [ row_ [
+ div [][
+   row_ [
      (if stage /= Error then
         div [class "col-md-offset-2 col-md-8"] [
           (panel (currentView model))
@@ -321,7 +323,7 @@ view ({stage} as model) =
        else
          div [] (errorsView model))
    ]
- , row_ (buttons model Next Back (dropdown address))
+ , row_ (buttons model Next Back dropdown)
  ]
 
 -- Effects

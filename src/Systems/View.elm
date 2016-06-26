@@ -61,20 +61,21 @@ update msg model =
 toHtml ({system} as model) f prop= 
   case prop of
     Just value -> 
-       asList (fixedPanel (div [] (f (value, system.machine))))
+       fixedPanel (div [] (f (value, system.machine)))
     Nothing -> 
-       []
+       div [] []
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({system} as model) =
     let
-      options = [ toHtml  model AWSView.summarize system.aws
-                , toHtml  model GCEView.summarize system.gce
-                , toHtml  model OpenstackView.summarize system.openstack
-                , toHtml  model KVMView.summarize system.kvm
-                , toHtml  model DigitalView.summarize system.digital]
+      options = [ toHtml model AWSView.summarize system.aws
+                , toHtml model GCEView.summarize system.gce
+                , toHtml model OpenstackView.summarize system.openstack
+                , toHtml model KVMView.summarize system.kvm
+                , toHtml model DigitalView.summarize system.digital]
+      empty = (\op -> op /= div [][])
     in 
-      withDefault (asList notImplemented) (List.head (List.filter (not << List.isEmpty) options))
+      withDefault notImplemented (List.head (List.filter empty options))
 
 -- Http 
 

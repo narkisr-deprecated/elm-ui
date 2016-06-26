@@ -49,7 +49,7 @@ update msg ({name} as model) =
 
 -- View
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view model =
   Delete.view model "Type" Cancel Delete Done
 

@@ -1,6 +1,7 @@
 module Stacks.Core exposing (..)
 
 
+import Common.Utils exposing (none)
 import Html exposing (..)
 import Html.App as App
 import Stacks.Add as Add
@@ -22,7 +23,7 @@ init =
       Cmd.map StacksAdd addEffects
     ]
   in
-   (Model add Nothing, Effects.batch msgs)
+   (Model add Nothing, Cmd.batch msgs)
 
 -- Update 
 
@@ -44,14 +45,14 @@ update msg ({add} as model) =
 
 -- View
 
-view : Model -> Section -> List (Html Msg)
+view : Model -> Section -> Html Msg
 view model section =
   case section of
     Add ->
-      asList (App.map StacksAdd (Add.view model.add))
+      (App.map StacksAdd (Add.view model.add))
 
     _ -> 
-      asList notImplemented
+      notImplemented
 
 
 loadTemplates ({add} as model) =

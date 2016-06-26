@@ -115,21 +115,21 @@ update msg ({running, done, pager} as model) =
          emptyRow = DoneJob 0 0 "" "" "" "" "" "" ""
          (_, job) = Maybe.withDefault (tid, emptyRow) (List.head (List.filter (\(_,job) -> job.tid == tid ) done.rows))
        in
-         (model, (newtab NoOp job.tid_link))
+         (model, (newtab job.tid_link))
 
     LoadRunning (Select tid) ->
        let
          emptyRow = RunningJob "" "" "" "" "" "" ""
          (_, job) = Maybe.withDefault (tid, emptyRow) (List.head (List.filter (\(_,job) -> job.tid == tid ) running.rows))
        in
-         (model, (newtab NoOp job.tid_link))
+         (model, (newtab job.tid_link))
 
     _ -> 
       (model , Cmd.none)
 
 -- View
 
-runningRow : String -> RunningJob -> List (Html Msg)
+runningRow : String -> RunningJob -> List (Html msg)
 runningRow tableId {type', status,id } = 
  [
    td [] [ text id ]
@@ -144,7 +144,7 @@ runningRow tableId {type', status,id } =
    ]
  ]
 
-doneRow : String -> DoneJob -> List (Html Msg)
+doneRow : String -> DoneJob -> List (Html msg)
 doneRow tableid {hostname, start, end, queue, identity, status} = 
   let 
    min = (toString ((round (end - start)) // (1000 * 60)))
@@ -161,7 +161,7 @@ doneRow tableid {hostname, start, end, queue, identity, status} =
     ]
 
 
-accordionPanel : Bool -> String -> Html -> Html
+accordionPanel : Bool -> String -> Html Msg -> Html Msg
 accordionPanel active ident body = 
   let
      enabled = if active then " in" else ""
@@ -186,16 +186,20 @@ accordionPanel active ident body =
       ]
 
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({running, done, pager} as model) =
-  [div [class "panel-group", id "accordion", attribute "role" "tablist"] [
+  div [class "panel-group", id "accordion", attribute "role" "tablist"] [
        accordionPanel (not (List.isEmpty running.rows)) "Running" 
-         (panelDefault_ (App.map LoadRunning (Table.view running)))
+         (panelDefault_ [
+           (App.map LoadRunning (Table.view running))
+         ])
      , accordionPanel (not (List.isEmpty done.rows)) "Done" 
-         (div [] 
-           [ row_ [
+         (div [] [
+             row_ [
                div [class "col-md-12"][
-                 (panelDefault_ (App.map LoadDone (Table.viewdone)))
+                 (panelDefault_ [
+                   (App.map LoadDone (Table.view done))
+                  ])
                ]
              ]
            , row_ [
@@ -203,8 +207,8 @@ view ({running, done, pager} as model) =
              ]
            ]
          ) 
-     ]
   ]
+  
 
 -- Decoding
 

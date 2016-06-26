@@ -75,13 +75,12 @@ type Msg =
     | WizardMsg Wizard.Msg
     | FormMsg Form.Msg
     | SetEnvironments (Result Http.Error Environments)
-    | LoadEditor String
     | SetClasses String
     | Reset
     | Done
     | Back
     | Next
-    | Save (String -> Effects Msg)
+    | Save (String -> Cmd Msg)
     | Saved (Result Http.Error SaveResponse)
     | NoOp
 
@@ -112,14 +111,14 @@ merge classes ({value, form} as step) acc =
 merged {wizard, classes} =
   List.foldl (merge classes) emptyType wizard.prev 
 
-update : Msg ->  Model -> (Model , Effects Msg)
+update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({wizard, editClasses, classes} as model) =
   case msg of 
     -- Next -> 
     --   let
     --    (next, msgs) = update (WizardMsg Wizard.Next) model
     --   in
-    --    (next, Effects.batch [msgs , unloadEditor NoOp])
+    --    (next, Cmd.batch [msgs , unloadEditor NoOp])
     --
     -- Back -> 
     --   let
@@ -127,12 +126,12 @@ update msg ({wizard, editClasses, classes} as model) =
     --   in
     --    ({ back | editClasses = False}, unloadEditor NoOp)
     --
-    Reset -> 
-      let
-        (back,_) = (update (WizardMsg Wizard.Back) model)
-      in
-       ({ back | editClasses = False, saveErrors = Errors.init }, unloadEditor NoOp)
-
+    -- Reset -> 
+    --   let
+    --     (back,_) = (update (WizardMsg Wizard.Back) model)
+    --   in
+    --    ({ back | editClasses = False, saveErrors = Errors.init }, unloadEditor NoOp)
+    --
 
     WizardMsg wizardMsg -> 
       let 
@@ -177,15 +176,12 @@ currentView ({wizard, environments, editClasses, classes} as model) =
             (panel (fixedPanel (App.map FormMsg (Main.view environmentList current))))
 
           Puppet -> 
-            let
-             check = (checkbox (LoadEditor "typesAdd") editClasses)
-            in 
              dialogPanel "info" (info "Module properties") 
-               (panel (fixedPanel (App.map FormMsg (Puppet.view check current))))
+               (panel (fixedPanel (App.map FormMsg (Puppet.view current))))
           
       Nothing -> 
         dialogPanel "info" (info "Save new type") 
-           (panel (fixedPanel (App.map NoOp (summarize (merged model)))))
+           (panel (fixedPanel (App.map (\_ -> NoOp) (summarize (merged model)))))
 
 
 errorsView {saveErrors} = 
@@ -202,14 +198,14 @@ doneButton =
 
 
 rows contents buttons = 
- [ 
+ div [] [ 
   row_ [
     contents
   ]
  ,row_ buttons
  ]
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({wizard, saveErrors} as model) =
   let 
     buttons' = (buttons { model | hasNext = Wizard.notDone model})
@@ -217,19 +213,19 @@ view ({wizard, saveErrors} as model) =
    if Errors.hasErrors saveErrors then
     rows 
      (div [] (errorsView model))
-     (buttons' Done Reset (doneButton address))
+     (buttons' Done Reset doneButton)
     else
      rows 
       (div [class "col-md-offset-2 col-md-8"] (currentView model))
-      (buttons' Next Back (saveButton address))
+      (buttons' Next Back saveButton)
 
-saveType: String -> Effects Msg
+saveType: String -> Cmd Msg
 saveType json = 
   postJson (Http.string json) saveResponse "/types"  
     |> Task.toResult
     |> Task.perform never Saved
 
-updateType: String -> Effects Msg
+updateType: String -> Cmd Msg
 updateType json = 
   putJson (Http.string json) saveResponse "/types"  
     |> Task.toResult

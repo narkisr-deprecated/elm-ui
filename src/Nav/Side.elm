@@ -72,15 +72,15 @@ userMenus =
      , drop "jobs" ["list", "stats"] "fa fa-tasks"
    ]
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view {session} =
- [aside [class "main-sidebar"] 
-   [section [class "sidebar"] [
+ aside [class "main-sidebar"] [
+   section [class "sidebar"] [
        ul [class "sidebar-menu"]
         (if isUser session then
           (userMenus)
         else
           (adminMenus))
-     ]
-   ]
- ] 
+  ]
+ ]
+  

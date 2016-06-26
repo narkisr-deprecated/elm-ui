@@ -3,8 +3,10 @@ module Templates.Core exposing (..)
 import String
 import Common.Utils exposing (none)
 import Common.Delete exposing (refresh, succeeded)
+import Common.Components exposing (notImplemented)
 
 import Html exposing (..)
+import Html.App as App 
 import Templates.Add as Add
 import Templates.List as List
 import Templates.Launch as Launch
@@ -21,7 +23,7 @@ type alias Model =
   , navChange : Maybe String
   }
 
-init : (Model, Effects Msg)
+init : (Model, Cmd Msg)
 init =
   let
     (add, addEffects) = Add.init
@@ -35,7 +37,7 @@ init =
     , Cmd.map TemplatesDelete deleteEffects
     ]
   in
-    (Model add list launch delete Nothing, Effects.batch msgs)
+    (Model add list launch delete Nothing, Cmd.batch msgs)
 
 type Msg = 
   TemplatesAdd Add.Msg
@@ -46,7 +48,7 @@ type Msg =
     | NoOp
 
 
-navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
+navigate : Msg -> (Model , Cmd Msg) -> (Model , Cmd Msg)
 navigate msg ((({launch, delete} as model), msgs) as result) =
   case msg of 
     SetupJob (job,id) -> 
@@ -110,7 +112,7 @@ setName model name =
 refreshList = 
   refresh List.init TemplatesList
 
-route : Msg ->  Model -> (Model , Effects Msg)
+route : Msg ->  Model -> (Model , Cmd Msg)
 route msg ({add, launch, list, delete} as model) =
   case msg of 
     SetupJob (job, name) -> 
@@ -161,7 +163,7 @@ route msg ({add, launch, list, delete} as model) =
       none model
 
 
-update : Msg ->  Model -> (Model , Effects Msg)
+update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({add, launch, list} as model) =
    navigate msg (route msg model)
 
@@ -169,21 +171,21 @@ update msg ({add, launch, list} as model) =
 add hyp system = 
   TemplatesAdd (Add.SetSystem hyp system)
 
-view : Model -> Route -> List (Html Msg)
+view : Model -> Route -> Html Msg
 view {add, list, launch, delete} route =
   case route of
     Route.Add ->
-      Add.view (Signal.forwardTo TemplatesAdd) add
+      App.map TemplatesAdd (Add.view add)
 
     Route.List ->
-      List.view (Signal.forwardTo TemplatesList) list
+      App.map TemplatesList (List.view list)
 
     Route.Launch _ ->
-      Launch.view (Signal.forwardTo TemplatesLaunch) launch
+      App.map TemplatesLaunch (Launch.view launch)
 
     Route.Delete _ ->
-      Delete.view (Signal.forwardTo TemplatesDelete) delete
+      App.map TemplatesDelete (Delete.view delete)
 
     Route.View _ -> 
-      []
+      notImplemented
  

@@ -1,5 +1,6 @@
 module Systems.Core exposing (..)
 
+import Html.App as App
 import Systems.List as List exposing (Error(NoSystemSelected, NoError))
 import Systems.Add as Add
 import Systems.View as View
@@ -9,6 +10,7 @@ import Nav.Common exposing (Active(Systems, Jobs, Templates), Section(Stats, Lau
 import Html exposing (..)
 import Platform.Cmd exposing (batch, map)
 import Common.Utils exposing (none)
+import Common.Components exposing (notImplemented)
 import Common.Redirect exposing (redirect)
 import Table as Table
 import Set
@@ -37,7 +39,7 @@ init =
      , Cmd.map SystemsAdd systemsAddMsg 
      ]
   in
-    (Model systemsList systemsAdd systemsView systemsLaunch Nothing, Effects.batch msgs)
+    (Model systemsList systemsAdd systemsView systemsLaunch Nothing, Cmd.batch msgs)
 
 type Msg = 
   SystemsListing List.Msg
@@ -46,7 +48,7 @@ type Msg =
    | SystemsLaunch Launch.Msg
    | NoOp
 
-setupJob : Launch.Msg -> Model -> (Model, Effects Msg)
+setupJob : Launch.Msg -> Model -> (Model, Cmd Msg)
 setupJob msg ({systemsList, systemsLaunch} as model) =
   let
     (_, systems) = systemsList.systems
@@ -135,21 +137,21 @@ update msg ({systemsView, systemsList, systemsAdd} as model) =
       none model
 
 
-view : Model -> Route -> List (Html Msg)
+view : Model -> Route -> Html Msg
 view model route =
   case route of
     Routing.List -> 
-      List.view (Signal.forwardTo SystemsListing) model.systemsList 
+      App.map SystemsListing (List.view model.systemsList)
 
     Routing.Launch ->
-      Launch.view (Signal.forwardTo SystemsLaunch) model.systemsLaunch
+      App.map SystemsLaunch (Launch.view model.systemsLaunch)
 
     Routing.Add ->
-      Add.view (Signal.forwardTo SystemsAdd) model.systemsAdd
+      App.map SystemsAdd (Add.view model.systemsAdd)
 
     Routing.View _ -> 
-      View.view (Signal.forwardTo SystemsView) model.systemsView
+      App.map SystemsView (View.view model.systemsView)
 
     _ -> 
-     [div  [] [text "not implemented"]]
+     notImplemented
  

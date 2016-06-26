@@ -2,6 +2,7 @@ module Users.Core exposing (..)
 
 
 import Html exposing (..)
+import Html.App as App
 import Users.List as List exposing (Msg)
 import Users.Add as Add exposing (Msg)
 import Common.Utils exposing (none)
@@ -27,7 +28,7 @@ init =
      ,  Cmd.map Adding addMsgs
      ]
   in 
-    (Model list add Nothing, Effects.batch msgs)
+    (Model list add Nothing, Cmd.batch msgs)
 
 -- Update 
 
@@ -38,7 +39,7 @@ type Msg =
     | NoOp
 
 
-navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
+navigate : Msg -> (Model , Cmd Msg) -> (Model , Cmd Msg)
 navigate msg ((({list} as model), msgs) as result) =
   case msg of 
     MenuClick (job,name) -> 
@@ -55,7 +56,7 @@ navigate msg ((({list} as model), msgs) as result) =
     _ -> 
      none model
 
-route : Msg ->  Model -> (Model , Effects Msg)
+route : Msg ->  Model -> (Model , Cmd Msg)
 route msg ({list, add} as model) =
   case msg of 
     Listing listing -> 
@@ -81,15 +82,15 @@ update msg model =
 
 -- View
 
-view : Model -> Route -> List (Html Msg)
+view : Model -> Route -> Html Msg
 view ({list, add} as model) section =
    case section of
      Routing.List -> 
-        List.view (Signal.forwardTo Listing) list
+       App.map Listing (List.view list)
 
      Routing.Add -> 
-        Add.view (Signal.forwardTo Adding) add
+       App.map Adding (Add.view add)
       
      _ -> 
-       asList notImplemented
+       notImplemented
 

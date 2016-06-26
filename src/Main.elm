@@ -1,7 +1,7 @@
+module Main exposing (..)
+
 import Html.App as Html -- was StartA
 import Task
-import Common.Redirect as Redirect exposing (redirectMsgs)
-import Common.NewTab as NewTab exposing (newtabMsgs)
 import Application as App exposing (init, view, update) 
 import Users.Core as UsersCore
 import Json.Encode as E exposing (list, string)
@@ -84,56 +84,43 @@ toQuery msg =
 --      |> filter (\s -> s /= Search.NoOp) Search.NoOp
 --      |> map toQuery
 --
-port parsingOk : Signal Search.ParseResult
-
-parsingInput msg p =
-  Signal.map (\r -> App.SystemsMsg (SystemsCore.SystemsListing (Systems.List.Searching (msg r)))) p
-
-port parsingErr : Signal Search.ParseResult
-
-jobsListPolling : Signal App.Msg
-jobsListPolling =
-  Signal.map (\_ -> App.JobsMsg (Jobs.JobsListing Polling)) (Time.every (1 * second))
-
-jobsStatsPolling : Signal App.Msg
-jobsStatsPolling =
-  let
-    (model, _)= Stats.init
-  in
-    Signal.map (\t -> App.JobsMsg (Jobs.JobsStats (PollMetrics t))) (Time.every (model.interval * second))
-
-port menuPort : Signal (String, String, String)
-
-intoMsgs (dest, job, target) = 
-  case dest of
-    "Systems" ->
-       App.SystemsMsg (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
-
-    "Templates" ->
-       App.TemplatesMsg (TemplatesCore.SetupJob (job, target))
-
-    "Types" ->
-       App.TypesMsg (TypesCore.MenuClick (job, target))
-
-    "Users" ->
-       App.UsersMsg (UsersCore.MenuClick (job, target))
-
-    _ -> 
-       App.NoOp
-
-menuClick p =
- Signal.map intoMsgs p
-
-
-router : Router Route
-router =
-  Hop.new Routing.config
-
-
-routerSignal : App.Msg
-routerSignal =
-  Signal.map App.ApplyRoute router.signal
-
-port routeRunTask : Task () ()
-port routeRunTask =
-  router.run
+-- port parsingOk : Signal Search.ParseResult
+--
+-- parsingInput msg p =
+--   Signal.map (\r -> App.SystemsMsg (SystemsCore.SystemsListing (Systems.List.Searching (msg r)))) p
+--
+-- port parsingErr : Signal Search.ParseResult
+--
+-- jobsListPolling : Signal App.Msg
+-- jobsListPolling =
+--   Signal.map (\_ -> App.JobsMsg (Jobs.JobsListing Polling)) (Time.every (1 * second))
+--
+-- jobsStatsPolling : Signal App.Msg
+-- jobsStatsPolling =
+--   let
+--     (model, _)= Stats.init
+--   in
+--     Signal.map (\t -> App.JobsMsg (Jobs.JobsStats (PollMetrics t))) (Time.every (model.interval * second))
+--
+-- port menuPort : Signal (String, String, String)
+--
+-- intoMsgs (dest, job, target) = 
+--   case dest of
+--     "Systems" ->
+--        App.SystemsMsg (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
+--
+--     "Templates" ->
+--        App.TemplatesMsg (TemplatesCore.SetupJob (job, target))
+--
+--     "Types" ->
+--        App.TypesMsg (TypesCore.MenuClick (job, target))
+--
+--     "Users" ->
+--        App.UsersMsg (UsersCore.MenuClick (job, target))
+--
+--     _ -> 
+--        App.NoOp
+--
+-- menuClick p =
+--  Signal.map intoMsgs p
+--

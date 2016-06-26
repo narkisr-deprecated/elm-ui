@@ -24,7 +24,7 @@ init =
   let
     (header, _) = Header.init
   in 
-    (Model Side.init header Systems List , Effects.batch [getSession LoadSession])
+    (Model Side.init header Systems List , Cmd.batch [getSession LoadSession])
 
 -- Update 
 

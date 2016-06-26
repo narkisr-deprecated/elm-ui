@@ -18,7 +18,7 @@ deleteMessage item name =
 deleteView {name} type' cancel delete  =
    dangerCallout (deleteMessage name type' ) (div [] []) cancel delete
 
-view ({errorMsg} as model) type' cancel delete done=
+view ({errorMsg} as model) type' cancel delete done =
   if errorMsg /= "" then
     dangerCallout (error errorMsg) (div [] []) cancel done
   else

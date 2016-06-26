@@ -1,6 +1,6 @@
 module Systems.Launch exposing (..)
 
-import Html.App as Html exposing (map)
+import Html.App as App
 import Http exposing (Error(BadResponse))
 import Json.Decode as Json exposing (..)
 import Common.Errors exposing (successHandler)
@@ -34,7 +34,7 @@ type Msg =
   | NoOp
   | Cancel
 
-systemRow : String -> System -> List (Html Msg)
+systemRow : String -> System -> List (Html msg)
 systemRow id {env, owner, type', machine} = 
  [
    td [] [ text id ]
@@ -100,10 +100,10 @@ message job =
      ]
  ]
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view {table, job} =
  let 
-   systemsTable = (panelDefault_ (Html.map LoadPage (Table.view table)))
+   systemsTable = panelDefault_ [(App.map LoadPage (Table.view table))]
  in
    dangerCallout (message job) systemsTable  Cancel Run
 

@@ -45,16 +45,16 @@ update msg model =
      (model, logout Redirect)
 
     Redirect _ -> 
-     (model, redirect NoOp "login")
+     (model, redirect "login")
 
     LoadSwagger -> 
-      (model, (newtab NoOp "swagger/index.html"))
+      (model, (newtab "swagger/index.html"))
 
     _ -> 
       none model
 
 
-navHeader : Html
+navHeader : Html Msg
 navHeader  =
  div [class  "navbar-header"] [
    img [src "assets/img/cropped.png", alt "Celestial", width 110 , height 50] []
@@ -63,7 +63,7 @@ navHeader  =
 dropdown attrs = 
   List.append [attribute "aria-expanded" "false", class "dropdown-toggle", attribute "data-toggle" "dropdown", href "#" ] attrs
 
-gearsButton : Signal.Address Msg  -> Session -> Html
+gearsButton : Session -> Html Msg
 gearsButton session =
   if isUser session then 
      i [ class "fa fa-gears", style [("color", "gray"), ("pointer-events", "none")]] [ ] 
@@ -76,7 +76,7 @@ gearsButton session =
         ] 
       ]
 
-topNav : Signal.Address Msg  -> Session -> Html
+topNav : Session -> Html Msg
 topNav ({username, envs} as session) =
  div [class "navbar-custom-menu"] [
    ul [class "nav navbar-nav"]
@@ -113,9 +113,9 @@ topNav ({username, envs} as session) =
      ]
   ]
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({session} as model) =
-  [header [class "main-header"] [
+  header [class "main-header"] [
       a [href "/index.html", class "logo"] [
          span [class "logo-mini"] [text "CEL"]   
        , span [class "logo-lg"] [navHeader]   
@@ -126,8 +126,8 @@ view ({session} as model) =
           span [class "sr-only"][text "Toggle navigation"]
         ]
       , (topNav session)
-      ]
-    ]
+     ]
   ]
+  
 
 

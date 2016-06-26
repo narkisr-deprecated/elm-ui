@@ -5,8 +5,8 @@ import Http exposing (Error(BadResponse))
 import Common.Components exposing (asList)
 import Common.Utils exposing (none)
 import Html exposing (..)
-import Html.Add as App
-import Types.Add as Add exposing (Msg(FormMsg, Save, LoadEditor), updateType)
+import Html.App as App
+import Types.Add as Add exposing (Msg(FormMsg, Save), updateType)
 import Types.View as View
 import Types.Model as Model exposing (Type, PuppetStd, emptyType)
 import Common.Errors exposing (successHandler)
@@ -42,7 +42,7 @@ type Msg =
    | SetType (Result Http.Error Type)
    | SetClasses String
 
-setType : Model -> Type -> (Model , Effects Msg)
+setType : Model -> Type -> (Model , Cmd Msg)
 setType ({add} as model) type' =
   let
     env = withDefault "" (List.head (add.environments))
@@ -68,12 +68,12 @@ update msg ({add} as model) =
           in
             ({ model | add = newAdd }, Cmd.map AddMsg msgs)
 
-        LoadEditor _ -> 
-          let 
-            (newAdd, msgs) = Add.update (LoadEditor "typesEdit") add
-          in
-            ({ model | add = newAdd }, Cmd.map AddMsg msgs)
-
+        -- LoadEditor _ -> 
+        --   let 
+        --     (newAdd, msgs) = Add.update (LoadEditor "typesEdit") add
+        --   in
+        --     ({ model | add = newAdd }, Cmd.map AddMsg msgs)
+        --
         _ -> 
           let 
             (newAdd, msgs) = Add.update addMsg add
@@ -91,7 +91,7 @@ update msg ({add} as model) =
 
 -- View
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view model =
   App.map AddMsg (Add.view model.add)
 

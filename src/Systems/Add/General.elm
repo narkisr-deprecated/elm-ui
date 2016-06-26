@@ -46,7 +46,7 @@ init : (Model , Cmd Msg)
 init =
   let
     (admin, adminEffects) = Admin.init
-    msgs = Effects.batch [
+    msgs = Cmd.batch [
              getTypes SetTypes
            , getEnvironments SetEnvironments
            , (Cmd.map AdminMsg adminEffects)
@@ -56,7 +56,7 @@ init =
 
 -- Update
 
-setEnvironments : Model -> Environments -> (Model, Effects Msg)
+setEnvironments : Model -> Environments -> (Model, Cmd Msg)
 setEnvironments model es =
   let 
      environment = Maybe.withDefault "" (List.head (Dict.keys es))
@@ -66,7 +66,7 @@ setEnvironments model es =
   in 
     none {model | hypervisors = hypervisors, hypervisor = hypervisor}
 
-setTypes : Model -> List Type -> (Model, Effects Msg)
+setTypes : Model -> List Type -> (Model, Cmd Msg)
 setTypes model types =
   let
     typesList = List.map .type' types
@@ -74,7 +74,7 @@ setTypes model types =
   in
     none {model | types = typesList , type' = firstType}
 
-update : Msg ->  Model-> (Model, Effects Msg)
+update : Msg ->  Model-> (Model, Cmd Msg)
 update msg ({admin} as model) =
   case msg of
     SetEnvironments result ->
@@ -101,13 +101,11 @@ update msg ({admin} as model) =
 -- View
 
 general {admin, type', types, hypervisors, hypervisor} =
-  div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-    (List.append
-       (Admin.view (Signal.forwardTo AdminMsg) admin)
-          [ group' "Type" (selector SelectType types type')
-          , group' "Hypervisor" (selector SelectHypervisor hypervisors hypervisor)
-          ]
-        )
+  div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
+     (App.map AdminMsg (Admin.view admin))
+   , group' "Type" (selector SelectType types type')
+   , group' "Hypervisor" (selector SelectHypervisor hypervisors hypervisor)
+  ]
 
 view : Model -> Html Msg
 view model =

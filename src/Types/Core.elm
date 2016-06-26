@@ -43,7 +43,7 @@ init =
       , Cmd.map Editing editMsg
      ]
    in
-     (Model list add view delete edit Nothing, Effects.batch msgs) 
+     (Model list add view delete edit Nothing, Cmd.batch msgs) 
 
 type Msg = 
   Listing TypesList.Msg
@@ -53,7 +53,7 @@ type Msg =
     | Deleting TypesDelete.Msg
     | Editing TypesEdit.Msg
 
-navigate : Msg -> (Model , Effects Msg) -> (Model , Effects Msg)
+navigate : Msg -> (Model , Cmd Msg) -> (Model , Cmd Msg)
 navigate msg ((({list, add, view, delete, edit} as model), msgs) as result) =
     case msg of 
       Listing listing -> 
@@ -128,7 +128,7 @@ setName model name =
   { model | name = name } 
 
 
-route : Msg ->  Model -> (Model , Effects Msg)
+route : Msg ->  Model -> (Model , Cmd Msg)
 route msg ({list, add, view, delete, edit} as model) =
   case msg of
     Listing msg -> 
@@ -180,7 +180,7 @@ update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
   navigate msg (route msg model)
 
-view : Model -> Route -> List (Html Msg)
+view : Model -> Route -> Html Msg
 view ({list, add, view, delete, edit} as model) section =
    case section of
      Routing.List -> 

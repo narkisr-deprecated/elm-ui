@@ -6,6 +6,7 @@ import Basics.Extra exposing (never)
 import Common.Http exposing (postJson)
 import Common.Errors exposing (errorsHandler, successHandler)
 import Html exposing (..)
+import Html.App as App
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Http exposing (Error(BadResponse))
@@ -122,10 +123,10 @@ editing {template, editDefaults} =
           ])
         )
 
-view : Model -> List (Html Msg)
+view : Model -> Html Msg
 view ({saveErrors} as model) =
   let
-    errorsView = (Errors.view (Signal.forwardTo ErrorsView) saveErrors)
+    errorsView = (App.map ErrorsView (Errors.view saveErrors))
   in
     if Errors.hasErrors saveErrors then
       dangerCallout (error "Failed to save template") (panel (panelContents errorsView)) Cancel Done
@@ -145,7 +146,7 @@ saveResponse =
   object1 SaveResponse
     ("message" := string) 
 
-saveTemplate: String -> Effects Msg
+saveTemplate: String -> Cmd Msg
 saveTemplate json = 
   postJson (Http.string json) saveResponse "/templates"  
     |> Task.toResult
