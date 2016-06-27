@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.App as App
 import Jobs.Routing as Routing exposing (Route)
 import Common.Utils exposing (none)
+import Common.Components exposing (notImplemented)
 
 import Jobs.List as List exposing (Msg(Polling))
 import Jobs.Stats as Stats
@@ -55,13 +56,13 @@ update msg ({list, stats} as model)=
       in
         ({model | list = newListing}, Cmd.map JobsListing msgs) 
 
-    JobsStats sts -> 
-      let
-        (newStats, msgs) = Stats.update sts stats
-      in
-        ({model | stats = newStats}, Cmd.map JobsStats msgs) 
-     
-    NoOp -> 
+    -- JobsStats sts -> 
+    --   let
+    --     (newStats, msgs) = Stats.update sts stats
+    --   in
+    --     ({model | stats = newStats}, Cmd.map JobsStats msgs) 
+    --  
+    _ -> 
       none model
 
 -- View
@@ -72,8 +73,10 @@ view {list, stats} route =
     Routing.List -> 
      App.map JobsListing (List.view list)
 
-    Routing.Stats -> 
-     App.map JobsStats (Stats.view stats)
+    _ -> 
+      notImplemented
+    -- Routing.Stats -> 
+     -- App.map JobsStats (Stats.view stats)
 
 
 

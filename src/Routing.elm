@@ -1,5 +1,6 @@
 module Routing exposing (..)
 
+import Hop exposing (matchUrl)
 import Hop.Types exposing (Config, Location, Query, Router, PathMatcher, newLocation)
 import Hop.Matchers exposing (..)
 import Systems.Routing as Systems
@@ -7,6 +8,9 @@ import Types.Routing as Types
 import Jobs.Routing as Jobs
 import Templates.Routing as Templates
 import Users.Routing as Users
+
+-- Navigation
+import Navigation
 
 type Route =
  SystemsRoute Systems.Route   
@@ -65,3 +69,9 @@ config =
   , matchers = matchers
   , notFound = NotFoundRoute
   }
+
+-- Navigation
+
+urlParser : Navigation.Parser ( Route, Hop.Types.Location )
+urlParser =
+   Navigation.makeParser (.href >> matchUrl config)

@@ -1,6 +1,9 @@
 module Now exposing (..)
 
-import Native.Now
 
-loadTime : Float
-loadTime = Native.Now.loadTime
+type Foo = 
+  None
+-- import Native.Now
+--
+-- loadTime : Float
+-- loadTime = Native.Now.loadTime

@@ -1,8 +1,8 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Html.App as Html -- was StartA
 import Task
-import Application as App exposing (init, view, update) 
+import Application as App exposing (init, view, update ,Msg(EditMsg), Model, urlUpdate) 
 import Users.Core as UsersCore
 import Json.Encode as E exposing (list, string)
 
@@ -32,95 +32,36 @@ import Stacks.Core as StacksCore
 
 -- Jobs 
 import Time exposing (every, second)
-import Jobs.List exposing (Msg(Polling))
-import Jobs.Stats as Stats exposing (Msg(PollMetrics))
 import Jobs.Core as Jobs
 
-main =  
-  Html.program
-    { init = init
-    , update = update
-    , view = view
-    , subscriptions = \_ -> Sub.none
-    }
+-- Common 
+import Common.Editor exposing (editorOutPort, editorInPort, Msg(Load))
 
--- app =
---   StartApp.start
+-- Navigation
+import Navigation
+
+-- main =  
+--   Html.program
 --     { init = init
 --     , update = update
 --     , view = view
---     , inputs = [
---         parsingInput (Search.Result True) parsingOk , 
---         parsingInput (Search.Result False) parsingErr,
---         menuClick menuPort,
---         editorValue editorInPort,
---         jobsListPolling,
---         jobsStatsPolling,
---         routerSignal
---       ]
+--     , subscriptions = subscriptions
 --     }
 
+main : Program Never
+main =
+    Navigation.program urlParser
+        { init = init
+        , view = view
+        , update = update
+        , urlUpdate = urlUpdate
+        , subscriptions = subscriptions
+        }
 
-toResource msg = 
-  case msg of 
-    Redirect.To s -> 
-      s
-
-    _ -> 
-      ""
+subscriptions : Model -> Sub App.Msg
+subscriptions model =
+    editorInPort (EditMsg << Load)
 
 
-toQuery : (Search.Msg -> String)
-toQuery msg =
-   case msg of
-     Search.Parse query -> 
-       query
+port parser : String -> Cmd msg
 
-     _ -> ""
-
--- port parserPort : Signal String
--- port parserPort =
---    searchMsgs.signal
---      |> filter (\s -> s /= Search.NoOp) Search.NoOp
---      |> map toQuery
---
--- port parsingOk : Signal Search.ParseResult
---
--- parsingInput msg p =
---   Signal.map (\r -> App.SystemsMsg (SystemsCore.SystemsListing (Systems.List.Searching (msg r)))) p
---
--- port parsingErr : Signal Search.ParseResult
---
--- jobsListPolling : Signal App.Msg
--- jobsListPolling =
---   Signal.map (\_ -> App.JobsMsg (Jobs.JobsListing Polling)) (Time.every (1 * second))
---
--- jobsStatsPolling : Signal App.Msg
--- jobsStatsPolling =
---   let
---     (model, _)= Stats.init
---   in
---     Signal.map (\t -> App.JobsMsg (Jobs.JobsStats (PollMetrics t))) (Time.every (model.interval * second))
---
--- port menuPort : Signal (String, String, String)
---
--- intoMsgs (dest, job, target) = 
---   case dest of
---     "Systems" ->
---        App.SystemsMsg (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
---
---     "Templates" ->
---        App.TemplatesMsg (TemplatesCore.SetupJob (job, target))
---
---     "Types" ->
---        App.TypesMsg (TypesCore.MenuClick (job, target))
---
---     "Users" ->
---        App.UsersMsg (UsersCore.MenuClick (job, target))
---
---     _ -> 
---        App.NoOp
---
--- menuClick p =
---  Signal.map intoMsgs p
---

@@ -10,11 +10,11 @@ import Date.Format exposing (format)
 import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
 import Date
-import Now
+-- import Now
 import String
 
 -- charting
-import Chartjs.Line as Line exposing (..)
+-- import Chartjs.Line as Line exposing (..)
 import Color exposing (..)
 
 -- view
@@ -52,8 +52,9 @@ type alias Metrics =
 type alias Model = 
   {
     polls : List (Time, Metrics)
-  , charts : List (String,Config) 
-  , lastPoll : Time
+  -- , charts : List (String,Config) 
+  , charts : List (String) 
+  -- , lastPoll : Time
   , interval : Float
   , enabled : Bool
   }
@@ -70,142 +71,147 @@ emptyTimer =
 
 init : (Model , Cmd Msg)
 init =
-   (Model [] [] Now.loadTime 15 False, getSession LoadSession)
+   (Model [] [] 15 False, getSession LoadSession)
 
+
+-- init : (Model , Cmd Msg)
+-- init =
+--    (Model [] [] Now.loadTime 15 False, getSession LoadSession)
+--
 -- Update
 
-timerConfig : List String -> List (List Float) -> List String -> List (Float -> Color)-> Config
-timerConfig xs ysList titles styles =
- (xs , List.map3 (\ys title style -> (title , defStyle style, ys)) ysList titles styles)
+-- timerConfig : List String -> List (List Float) -> List String -> List (Float -> Color)-> Config
+-- timerConfig xs ysList titles styles =
+--  (xs , List.map3 (\ys title style -> (title , defStyle style, ys)) ysList titles styles)
 
-timerChart : List (Time, Timer) -> List (Timer -> Float) -> List String -> List (Float -> Color) -> Config
-timerChart timers selectors titles styles=
-  let
-    xs = List.map (\(t,_) -> (format "%H:%M:%S" (Date.fromTime t))) timers
-    ysList = List.map (\selector -> (List.map (\(_,v) -> (selector v / second))  timers)) selectors
-  in
-    timerConfig xs ysList titles styles
-
-pollingTrim : Model -> Metrics -> List (Time, Metrics)
-pollingTrim ({lastPoll,polls, interval} as model) metrics =
-  if List.length polls < 10 then
-      List.append polls [(lastPoll, metrics)]
-  else
-    (List.append (withDefault [] (List.tail polls)) [(lastPoll, metrics)])
-
-meanMaxMin polls = 
-  let 
-    startTimes = List.map (\(t, {startTimer}) -> (t, startTimer)) polls
-    stopTimes = List.map (\(t, {stopTimer}) -> (t, stopTimer)) polls
-    provisionTimes = List.map (\(t, {provisionTimer}) -> (t, provisionTimer)) polls
-    reloadTimes = List.map (\(t, {reloadTimer}) -> (t, reloadTimer)) polls
-  in
-    ( [(\{mean} -> mean), (\{min} -> min), (\{max} -> max)]
-    , ["mean", "min", "max"]
-    , [(rgba 204 204 255), (rgba 153 204 255), (rgba 51 153 255)]
-    , [startTimes, stopTimes, provisionTimes, reloadTimes] 
-    , ["Start", "Stop", "Provision", "Reload"] 
-    )
-
-
-setMetrics: Model -> Metrics -> (Model, Cmd Msg)
-setMetrics ({polls} as model) metrics =
-  let 
-    newPolls = pollingTrim model metrics
-    (selectors, titles, styles, samples, headers) = meanMaxMin polls
-    newCharts = List.map2 (\ sample header -> (header,(timerChart sample selectors titles styles))) samples headers
-   in 
-    none {model | polls = newPolls, charts = newCharts}
-
-setEnabled model ({roles, username} as session) = 
-  if List.member "celestial.roles/user" roles then
-     none {model | enabled = False } 
-  else 
-     none {model | enabled = True } 
-
-
-update : Msg ->  Model -> (Model , Cmd Msg)
-update msg ({polls, lastPoll, enabled} as model) =
-  case msg of
-    PollMetrics time ->
-      if enabled then 
-        ({model | lastPoll = time}, getMetrics)
-      else
-        none model
-
-    Load result ->
-       (successHandler result model (setMetrics model) NoOp)
-
-    LoadSession result -> 
-      (successHandler result model (setEnabled model) NoOp)
-
-    _ -> 
-      none model
-
--- View
-
-item : (String,String) -> Html Msg
-item ((name,rgba) as pair) =
-   li [] [
-      div [] 
-        [ span [style [("background-color", rgba)]] []
-        , (text name)
-        ]
-    ]
-
-legend : List (String,String) -> Html Msg
-legend items = 
-  ul [class "legend"] (List.map item items)
-
-rgbString : Color -> String
-rgbString color =
-  let
-    {red, green, blue, alpha} = toRgb color
-    rgba = (String.join "," (List.append (List.map toString [red, green, blue]) [toString alpha]))
-  in 
-    "rgba(" ++  rgba ++ ")"
-
-chart : Config -> String -> Html Msg
-chart ((labels,series) as config) header =
- div [class "col-md-6"] 
-   [panelDefault_ 
-      [ panelHeading_ [text header]
-      , panelBody_ 
-         [toHtml <| Line.chart 500 200 config { defaultOptions | datasetFill = False }
-         , legend (List.map (\(label,{pointColor},_) -> (label, (rgbString pointColor))) series)  ]
-      ]
-   ]
-
-
-view : Model -> Html Msg
-view ({charts} as model)=
-  div [] 
-    (List.map row_ 
-      (partition 2 (List.map (\(header,config) -> chart config header) charts)))
-
--- Decoding
-
-timer : Decoder (Timer)
-timer =
-  object3 Timer
-    ("max" := float)
-    ("min" := float)
-    ("mean" := float)
-
-metricsDecoder : Decoder (Metrics)
-metricsDecoder =
-  object4 Metrics
-    (at ["default.default.start-time"] timer )
-    (at ["default.default.stop-time"] timer )
-    (at ["default.default.provision-time"] timer )
-    (at ["default.default.reload-time"] timer )
-
+-- timerChart : List (Time, Timer) -> List (Timer -> Float) -> List String -> List (Float -> Color) -> Config
+-- timerChart timers selectors titles styles=
+--   let
+--     xs = List.map (\(t,_) -> (format "%H:%M:%S" (Date.fromTime t))) timers
+--     ysList = List.map (\selector -> (List.map (\(_,v) -> (selector v / second))  timers)) selectors
+--   in
+--     timerConfig xs ysList titles styles
+--
+-- pollingTrim : Model -> Metrics -> List (Time, Metrics)
+-- pollingTrim ({lastPoll,polls, interval} as model) metrics =
+--   if List.length polls < 10 then
+--       List.append polls [(lastPoll, metrics)]
+--   else
+--     (List.append (withDefault [] (List.tail polls)) [(lastPoll, metrics)])
+--
+-- meanMaxMin polls = 
+--   let 
+--     startTimes = List.map (\(t, {startTimer}) -> (t, startTimer)) polls
+--     stopTimes = List.map (\(t, {stopTimer}) -> (t, stopTimer)) polls
+--     provisionTimes = List.map (\(t, {provisionTimer}) -> (t, provisionTimer)) polls
+--     reloadTimes = List.map (\(t, {reloadTimer}) -> (t, reloadTimer)) polls
+--   in
+--     ( [(\{mean} -> mean), (\{min} -> min), (\{max} -> max)]
+--     , ["mean", "min", "max"]
+--     , [(rgba 204 204 255), (rgba 153 204 255), (rgba 51 153 255)]
+--     , [startTimes, stopTimes, provisionTimes, reloadTimes] 
+--     , ["Start", "Stop", "Provision", "Reload"] 
+--     )
+--
+--
+-- setMetrics: Model -> Metrics -> (Model, Cmd Msg)
+-- setMetrics ({polls} as model) metrics =
+--   let 
+--     newPolls = pollingTrim model metrics
+--     (selectors, titles, styles, samples, headers) = meanMaxMin polls
+--     newCharts = List.map2 (\ sample header -> (header,(timerChart sample selectors titles styles))) samples headers
+--    in 
+--     none {model | polls = newPolls, charts = newCharts}
+--
+-- setEnabled model ({roles, username} as session) = 
+--   if List.member "celestial.roles/user" roles then
+--      none {model | enabled = False } 
+--   else 
+--      none {model | enabled = True } 
+--
+--
+-- update : Msg ->  Model -> (Model , Cmd Msg)
+-- update msg ({polls, lastPoll, enabled} as model) =
+--   case msg of
+--     PollMetrics time ->
+--       if enabled then 
+--         ({model | lastPoll = time}, getMetrics)
+--       else
+--         none model
+--
+--     Load result ->
+--        (successHandler result model (setMetrics model) NoOp)
+--
+--     LoadSession result -> 
+--       (successHandler result model (setEnabled model) NoOp)
+--
+--     _ -> 
+--       none model
+--
+-- -- View
+--
+-- item : (String,String) -> Html Msg
+-- item ((name,rgba) as pair) =
+--    li [] [
+--       div [] 
+--         [ span [style [("background-color", rgba)]] []
+--         , (text name)
+--         ]
+--     ]
+--
+-- legend : List (String,String) -> Html Msg
+-- legend items = 
+--   ul [class "legend"] (List.map item items)
+--
+-- rgbString : Color -> String
+-- rgbString color =
+--   let
+--     {red, green, blue, alpha} = toRgb color
+--     rgba = (String.join "," (List.append (List.map toString [red, green, blue]) [toString alpha]))
+--   in 
+--     "rgba(" ++  rgba ++ ")"
+--
+-- -- chart : Config -> String -> Html Msg
+-- -- chart ((labels,series) as config) header =
+-- --  div [class "col-md-6"] 
+-- --    [panelDefault_ 
+-- --       [ panelHeading_ [text header]
+-- --       , panelBody_ []
+-- --          -- [toHtml <| Line.chart 500 200 config { defaultOptions | datasetFill = False }
+-- --          -- , legend (List.map (\(label,{pointColor},_) -> (label, (rgbString pointColor))) series)  ]
+-- --       ]
+-- --    ]
+-- --
+-- --
+-- view : Model -> Html Msg
+-- view ({charts} as model)=
+--   div [] []
+--     -- (List.map row_ 
+--     --   (partition 2 (List.map (\(header,config) -> chart config header) charts)))
+--     --
+-- -- Decoding
+--
+-- timer : Decoder (Timer)
+-- timer =
+--   object3 Timer
+--     ("max" := float)
+--     ("min" := float)
+--     ("mean" := float)
+--
+-- metricsDecoder : Decoder (Metrics)
+-- metricsDecoder =
+--   object4 Metrics
+--     (at ["default.default.start-time"] timer )
+--     (at ["default.default.stop-time"] timer )
+--     (at ["default.default.provision-time"] timer )
+--     (at ["default.default.reload-time"] timer )
+--
 -- Effects
 
-getMetrics : Cmd Msg
-getMetrics = 
-  getJson metricsDecoder "/metrics" 
-    |> Task.toResult
-    |> Task.perform never Load
-
-
+-- getMetrics : Cmd Msg
+-- getMetrics = 
+--   getJson metricsDecoder "/metrics" 
+--     |> Task.toResult
+--     |> Task.perform never Load
+--
+--

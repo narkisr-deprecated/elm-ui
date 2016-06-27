@@ -15,6 +15,7 @@ import Types.Core as Types
 import Users.Core as Users
 import Templates.Core as Templates
 import Nav.Core as Nav
+import Common.Editor as Editor
 
 import Bootstrap.Html exposing (..)
 import Debug
@@ -28,8 +29,8 @@ import Routing as BaseRoute exposing (config, Route(..), defaultRoute)
 import Systems.Routing exposing (Route(List))
 
 
-init : (Model, Cmd Msg)
-init =
+init : ( BaseRoute.Route, Location ) -> (Model, Cmd Msg)
+init (route, location) =
   let 
     (jobs, jobsMsg) = Jobs.init
     (types, typesMsg) = Types.init
@@ -47,7 +48,7 @@ init =
               , Cmd.map JobsMsg jobsMsg
               ]
   in
-    (Model systems stacks jobs types templates users nav defaultRoute newLocation, Cmd.batch msgs) 
+    (Model systems stacks jobs types templates users nav route location, Cmd.batch msgs) 
 
 type alias Model = 
   { 
@@ -65,6 +66,7 @@ type alias Model =
 type Msg = 
   ApplyRoute (BaseRoute.Route,Location)
     | HopMsg ()
+    | EditMsg Editor.Msg
     | NavigateTo String
     | SystemsMsg Systems.Msg
     | NavMsg Nav.Msg
@@ -148,6 +150,11 @@ navigate ({navChange} as model, msgs) msg =
       (model, Cmd.map msg msgs)
 
 
+urlUpdate : (BaseRoute.Route, Location ) -> Model -> ( Model, Cmd Msg )
+urlUpdate (route, location) model =
+  none { model | route = route, location = location }
+
+
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model = 
    route msg model
@@ -177,9 +184,9 @@ view : Model -> Html Msg
 view ({nav} as model) = 
   div [class "wrapper"] [
      div [class "content-wrapper"] [
-       section [class "content"] (asList (activeView model))
+       App.map NavMsg (Nav.headerView nav)
+     , section [class "content"] (asList (activeView model))
      , App.map NavMsg (Nav.sideView nav)
-     , App.map NavMsg (Nav.headerView nav)
      ]
   ]
 

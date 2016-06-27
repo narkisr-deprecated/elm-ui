@@ -51,140 +51,141 @@
     menuPort: ['','',''],
     editorInPort: ['', '']
   }
-  var main = Elm.embed(Elm.Main, elmDiv, outPorts);
+  var main = Elm.Main.embed(elmDiv);
 
-  main.ports.redirectPort.subscribe(function(event) {
-    var url = window.location.href;
-    var arr = url.split("/");
-    window.location =  arr[0] + "//" + arr[2] + "/"+event;
-  });
-
-
-  main.ports.newtabPort.subscribe(function(event) {
-    var redirectWindow = window.open(event, '_blank');
-    redirectWindow.location;
-  });
-
-  var editor = undefined;
-
-  var input = function(editor) {
-    if( editor !== undefined ){
-	try {
-	  return JSON.stringify(editor.get())
-	} catch (e) {
-	  return "{}"
-	}
-    } else {
-	return "{}"
-    }
-  }
-
-  main.ports.editorOutPort.subscribe(function(event) {
-  	var action = event[0], target = event[1]
+   main.ports.redirect.subscribe(function(event) {
+     console.log(event);
+     var url = window.location.href;
+     var arr = url.split("/");
+     window.location =  arr[0] + "//" + arr[2] + "/"+event;
+   });
+  
+ 
+   main.ports.newtab.subscribe(function(event) {
+     var redirectWindow = window.open(event, '_blank');
+     redirectWindow.location;
+   });
+  
+   var editor = undefined;
+  
+   var input = function(editor) {
+     if( editor !== undefined ){
+	 try {
+	   return JSON.stringify(editor.get())
+	 } catch (e) {
+	   return "{}"
+	 }
+     } else {
+	 return "{}"
+     }
+   }
+  
+   main.ports.editorOutPort.subscribe(function(event) {
+   	var action = event[0], target = event[1]
 	if(action === "get") {
-	  main.ports.editorInPort.send([target, input(editor)]);
-        editor = undefined
+	   main.ports.editorInPort.send([target, input(editor)]);
+         editor = undefined
 	} else if (action === "unload"){
-	  editor = undefined
+	   editor = undefined
 	} else {
-        var container = document.getElementById('jsoneditor');
-	  var options = {
-	      mode : 'code'
-	    , onChange : function(){
-	         console.log(target) 
-	         main.ports.editorInPort.send([target, input(editor)]) 
-		 }
-	  }
-	  if(editor === undefined) {
-	    editor = new JSONEditor(container, options, JSON.parse(event[0]));
-	  }
-	}
-  });
-
- 
-  main.ports.parserPort.subscribe(function(event) {
-   try { 
-     var result = parseQuery(event);
-      main.ports.parsingOk.send({
-	   "result" : btoa(JSON.stringify(result)),
-	   "source" : event,
-	   "message":""
-     });
-    } catch (e) {
+         var container = document.getElementById('jsoneditor');
+	   var options = {
+	       mode : 'code'
+	     , onChange : function(){
+	          console.log(target) 
+	          main.ports.editorInPort.send([target, input(editor)]) 
+	 	 }
+	   }
+	   if(editor === undefined) {
+	     editor = new JSONEditor(container, options, JSON.parse(event[0]));
+	   }
+	 }
+   });
+  
+  
+   main.ports.parser.subscribe(function(event) {
+    try { 
+      var result = parseQuery(event);
+       main.ports.parsingOk.send({
+	    "result" : btoa(JSON.stringify(result)),
+	    "source" : event,
+	    "message":""
+      });
+   } catch (e) {
      main.ports.parsingErr.send({
-	 "message" : e.message,
-	 "source": event,
-	 "result": "" 
-     });
-    }
+	  "message" : e.message,
+	  "source": event,
+	  "result": "" 
+      });
+   }
   });
- 
-  systemAction = function (e) {
-    return function(key, opt){
-      main.ports.menuPort.send(["Systems",e, ""]); 
-    }
-  }
-
-  $.contextMenu({
-    selector: "#systemsListing tr",
-    items: {
-        start: { name: "Start", callback: systemAction("start") },
-        stop:  { name: "Stop", callback: systemAction("stop")},
-        provision: {name: "Provision", callback: systemAction("provision")},
-	  reload: { name: "Reload", callback: systemAction("reload")},
-        destroy: { name: "Destroy", callback: systemAction("destroy")}
-    }
-  }); 
-
-  templateAction = function (e) {
-    return function(key, opt){
-      templateName = $(this).context.cells[0].innerHTML;
-	if (templateName !== undefined) {
-	  main.ports.menuPort.send(["Templates",e, templateName]); 
-	}
-    }
-  }
-
-  $.contextMenu({
-    selector: "#templateListing tr",
-    items: {
-        launch: { name: "Launch", callback: templateAction("launch")},
-        clear: { name: "Clear", callback: templateAction("clear") }
-    }
-  }); 
-
-  typesAction = function (e) {
-    return function(key, opt){
-      typeName = $(this).context.cells[0].innerHTML;
-	if (typeName !== undefined) {
-	  main.ports.menuPort.send(["Types",e, typeName]); 
-	}
-    }
-  }
-
-  $.contextMenu({
-    selector: "#typesListing tr",
-    items: {
-        launch: { name: "Edit", callback: typesAction("edit")},
-        clear: { name: "Clear", callback: typesAction("clear") }
-    }
-  });
-
-  usersAction = function (e) {
-    return function(key, opt){
-      typeName = $(this).context.cells[0].innerHTML;
-	if (typeName !== undefined) {
-	  main.ports.menuPort.send(["Users",e, typeName]); 
-	}
-    }
-  }
-  $.contextMenu({
-    selector: "#usersListing tr",
-    items: {
-        edit: { name: "Edit", callback: usersAction("edit")},
-        clear: { name: "Clear", callback: usersAction("clear") }
-    }
-  });
+  
+  // systemAction = function (e) {
+  //   return function(key, opt){
+  //     main.ports.menuPort.send(["Systems",e, ""]); 
+  //   }
+  // }
+  //
+  // $.contextMenu({
+  //   selector: "#systemsListing tr",
+  //   items: {
+  //       start: { name: "Start", callback: systemAction("start") },
+  //       stop:  { name: "Stop", callback: systemAction("stop")},
+  //       provision: {name: "Provision", callback: systemAction("provision")},
+	//   reload: { name: "Reload", callback: systemAction("reload")},
+  //       destroy: { name: "Destroy", callback: systemAction("destroy")}
+  //   }
+  // }); 
+  //
+  // templateAction = function (e) {
+  //   return function(key, opt){
+  //     templateName = $(this).context.cells[0].innerHTML;
+	// if (templateName !== undefined) {
+	//   main.ports.menuPort.send(["Templates",e, templateName]); 
+	// }
+  //   }
+  // }
+  //
+  // $.contextMenu({
+  //   selector: "#templateListing tr",
+  //   items: {
+  //       launch: { name: "Launch", callback: templateAction("launch")},
+  //       clear: { name: "Clear", callback: templateAction("clear") }
+  //   }
+  // }); 
+  //
+  // typesAction = function (e) {
+  //   return function(key, opt){
+  //     typeName = $(this).context.cells[0].innerHTML;
+	// if (typeName !== undefined) {
+	//   main.ports.menuPort.send(["Types",e, typeName]); 
+	// }
+  //   }
+  // }
+  //
+  // $.contextMenu({
+  //   selector: "#typesListing tr",
+  //   items: {
+  //       launch: { name: "Edit", callback: typesAction("edit")},
+  //       clear: { name: "Clear", callback: typesAction("clear") }
+  //   }
+  // });
+  //
+  // usersAction = function (e) {
+  //   return function(key, opt){
+  //     typeName = $(this).context.cells[0].innerHTML;
+	// if (typeName !== undefined) {
+	//   main.ports.menuPort.send(["Users",e, typeName]); 
+	// }
+  //   }
+  // }
+  // $.contextMenu({
+  //   selector: "#usersListing tr",
+  //   items: {
+  //       edit: { name: "Edit", callback: usersAction("edit")},
+  //       clear: { name: "Clear", callback: usersAction("clear") }
+  //   }
+  // });
 </script>
 
 </html>

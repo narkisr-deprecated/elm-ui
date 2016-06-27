@@ -158,12 +158,12 @@ handler result model success fail noop =
 
    Result.Err e -> 
      case e of 
-       BadResponse 401 m _ ->
+       BadResponse 401 m ->
          Debug.log (toString e) (model , (redirect "login"))
        
-       BadResponse 400 m resp ->
-          (fail (decodeError resp))
-       
+       -- BadResponse 400 m resp ->
+       --    (fail (decodeError resp))
+       --
        _ -> Debug.log (toString e) (model , Cmd.none)
 
 successHandler result model success noop = 
