@@ -7,6 +7,3 @@
 [submodule "modules/elm-simple-form-infix"]
 	path = modules/elm-simple-form-infix
 	url = git://github.com/narkisr/elm-simple-form-infix.git
-[submodule "fork"]
-	path = modules/elm-simple-form-infix
-	url = git://github.com/narkisr/elm-simple-form-infix.git
