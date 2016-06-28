@@ -1,6 +1,3 @@
-[submodule "modules/elm-http"]
-	path = modules/elm-http
-	url = git://github.com/narkisr/elm-http.git
 [submodule "modules/elm-simple-form"]
 	path = modules/elm-simple-form
 	url = git://github.com/narkisr/elm-simple-form.git
