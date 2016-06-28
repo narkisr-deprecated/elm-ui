@@ -21,6 +21,7 @@ import Bootstrap.Html exposing (..)
 import Debug
 
 -- Hop
+import Hop
 import Hop.Types exposing (Location, Query, newLocation)
 import Navigation exposing (modifyUrl)
 
@@ -40,13 +41,13 @@ init (route, location) =
     (systems, systemsMsg) = Systems.init
     (stacks, stacksMsg) = Stacks.init
     msgs = [ Cmd.map TemplatesMsg templatesMsg
-              , Cmd.map TypesMsg typesMsg
-              , Cmd.map UsersMsg usersMsg
-              , Cmd.map SystemsMsg systemsMsg
-              , Cmd.map StacksMsg stacksMsg
-              , Cmd.map NavMsg navMsg
-              , Cmd.map JobsMsg jobsMsg
-              ]
+           , Cmd.map TypesMsg typesMsg
+           , Cmd.map UsersMsg usersMsg
+           , Cmd.map SystemsMsg systemsMsg
+           , Cmd.map StacksMsg stacksMsg
+           , Cmd.map NavMsg navMsg
+           , Cmd.map JobsMsg jobsMsg
+           ]
   in
     (Model systems stacks jobs types templates users nav route location, Cmd.batch msgs) 
 
@@ -66,6 +67,7 @@ type alias Model =
 type Msg = 
   ApplyRoute (BaseRoute.Route,Location)
     | HopMsg ()
+    | MenuMsg (String, String, String)
     | EditMsg Editor.Msg
     | NavigateTo String
     | SystemsMsg Systems.Msg
@@ -141,7 +143,7 @@ navigate ({navChange} as model, msgs) msg =
       let 
        withNavChange = [
            Cmd.map msg msgs
-         , Cmd.map HopMsg (modifyUrl path)
+         , Hop.makeUrl config path |> Navigation.newUrl
         ]
       in
        ({model | navChange = Nothing }, Cmd.batch withNavChange)
@@ -161,7 +163,7 @@ update msg model =
 
 activeView : Model -> Html Msg
 activeView ({jobs, route, systems, types, templates, stacks, users} as model) =
-    case route of
+    case (Debug.log "" route) of
       SystemsRoute nested -> 
         App.map SystemsMsg (Systems.view systems nested)
       

@@ -33812,6 +33812,34 @@ var _narkisr$elm_ui$Application$urlUpdate = F2(
 				model,
 				{route: _p1._0, location: _p1._1}));
 	});
+var _narkisr$elm_ui$Application$navigate = F2(
+	function (_p2, msg) {
+		var _p3 = _p2;
+		var _p6 = _p3._1;
+		var _p5 = _p3._0;
+		var _p4 = _p3._0.navChange;
+		if (_p4.ctor === 'Just') {
+			var withNavChange = _elm_lang$core$Native_List.fromArray(
+				[
+					A2(_elm_lang$core$Platform_Cmd$map, msg, _p6),
+					_elm_lang$navigation$Navigation$newUrl(
+					A2(_sporto$hop$Hop$makeUrl, _narkisr$elm_ui$Routing$config, _p4._0))
+				]);
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p5,
+					{navChange: _elm_lang$core$Maybe$Nothing}),
+				_1: _elm_lang$core$Platform_Cmd$batch(withNavChange)
+			};
+		} else {
+			return {
+				ctor: '_Tuple2',
+				_0: _p5,
+				_1: A2(_elm_lang$core$Platform_Cmd$map, msg, _p6)
+			};
+		}
+	});
 var _narkisr$elm_ui$Application$Model = F9(
 	function (a, b, c, d, e, f, g, h, i) {
 		return {systems: a, stacks: b, jobs: c, types: d, templates: e, users: f, nav: g, route: h, location: i};
@@ -33838,29 +33866,29 @@ var _narkisr$elm_ui$Application$NavMsg = function (a) {
 var _narkisr$elm_ui$Application$SystemsMsg = function (a) {
 	return {ctor: 'SystemsMsg', _0: a};
 };
-var _narkisr$elm_ui$Application$init = function (_p2) {
-	var _p3 = _p2;
-	var _p4 = _narkisr$elm_ui$Stacks_Core$init;
-	var stacks = _p4._0;
-	var stacksMsg = _p4._1;
-	var _p5 = _narkisr$elm_ui$Systems_Core$init;
-	var systems = _p5._0;
-	var systemsMsg = _p5._1;
-	var _p6 = _narkisr$elm_ui$Nav_Core$init;
-	var nav = _p6._0;
-	var navMsg = _p6._1;
-	var _p7 = _narkisr$elm_ui$Templates_Core$init;
-	var templates = _p7._0;
-	var templatesMsg = _p7._1;
-	var _p8 = _narkisr$elm_ui$Users_Core$init;
-	var users = _p8._0;
-	var usersMsg = _p8._1;
-	var _p9 = _narkisr$elm_ui$Types_Core$init;
-	var types = _p9._0;
-	var typesMsg = _p9._1;
-	var _p10 = _narkisr$elm_ui$Jobs_Core$init;
-	var jobs = _p10._0;
-	var jobsMsg = _p10._1;
+var _narkisr$elm_ui$Application$init = function (_p7) {
+	var _p8 = _p7;
+	var _p9 = _narkisr$elm_ui$Stacks_Core$init;
+	var stacks = _p9._0;
+	var stacksMsg = _p9._1;
+	var _p10 = _narkisr$elm_ui$Systems_Core$init;
+	var systems = _p10._0;
+	var systemsMsg = _p10._1;
+	var _p11 = _narkisr$elm_ui$Nav_Core$init;
+	var nav = _p11._0;
+	var navMsg = _p11._1;
+	var _p12 = _narkisr$elm_ui$Templates_Core$init;
+	var templates = _p12._0;
+	var templatesMsg = _p12._1;
+	var _p13 = _narkisr$elm_ui$Users_Core$init;
+	var users = _p13._0;
+	var usersMsg = _p13._1;
+	var _p14 = _narkisr$elm_ui$Types_Core$init;
+	var types = _p14._0;
+	var typesMsg = _p14._1;
+	var _p15 = _narkisr$elm_ui$Jobs_Core$init;
+	var jobs = _p15._0;
+	var jobsMsg = _p15._1;
 	var msgs = _elm_lang$core$Native_List.fromArray(
 		[
 			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$TemplatesMsg, templatesMsg),
@@ -33873,50 +33901,50 @@ var _narkisr$elm_ui$Application$init = function (_p2) {
 		]);
 	return {
 		ctor: '_Tuple2',
-		_0: A9(_narkisr$elm_ui$Application$Model, systems, stacks, jobs, types, templates, users, nav, _p3._0, _p3._1),
+		_0: A9(_narkisr$elm_ui$Application$Model, systems, stacks, jobs, types, templates, users, nav, _p8._0, _p8._1),
 		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
 	};
 };
-var _narkisr$elm_ui$Application$activeView = function (_p11) {
-	var _p12 = _p11;
-	var _p14 = _p12.systems;
-	var _p13 = _p12.route;
-	switch (_p13.ctor) {
+var _narkisr$elm_ui$Application$activeView = function (_p16) {
+	var _p17 = _p16;
+	var _p19 = _p17.systems;
+	var _p18 = A2(_elm_lang$core$Debug$log, '', _p17.route);
+	switch (_p18.ctor) {
 		case 'SystemsRoute':
 			return A2(
 				_elm_lang$html$Html_App$map,
 				_narkisr$elm_ui$Application$SystemsMsg,
-				A2(_narkisr$elm_ui$Systems_Core$view, _p14, _p13._0));
+				A2(_narkisr$elm_ui$Systems_Core$view, _p19, _p18._0));
 		case 'TypesRoute':
 			return A2(
 				_elm_lang$html$Html_App$map,
 				_narkisr$elm_ui$Application$TypesMsg,
-				A2(_narkisr$elm_ui$Types_Core$view, _p12.types, _p13._0));
+				A2(_narkisr$elm_ui$Types_Core$view, _p17.types, _p18._0));
 		case 'TemplatesRoute':
 			return A2(
 				_elm_lang$html$Html_App$map,
 				_narkisr$elm_ui$Application$TemplatesMsg,
-				A2(_narkisr$elm_ui$Templates_Core$view, _p12.templates, _p13._0));
+				A2(_narkisr$elm_ui$Templates_Core$view, _p17.templates, _p18._0));
 		case 'JobsRoute':
 			return A2(
 				_elm_lang$html$Html_App$map,
 				_narkisr$elm_ui$Application$JobsMsg,
-				A2(_narkisr$elm_ui$Jobs_Core$view, _p12.jobs, _p13._0));
+				A2(_narkisr$elm_ui$Jobs_Core$view, _p17.jobs, _p18._0));
 		case 'UsersRoute':
 			return A2(
 				_elm_lang$html$Html_App$map,
 				_narkisr$elm_ui$Application$UsersMsg,
-				A2(_narkisr$elm_ui$Users_Core$view, _p12.users, _p13._0));
+				A2(_narkisr$elm_ui$Users_Core$view, _p17.users, _p18._0));
 		default:
 			return A2(
 				_elm_lang$html$Html_App$map,
 				_narkisr$elm_ui$Application$SystemsMsg,
-				A2(_narkisr$elm_ui$Systems_Core$view, _p14, _narkisr$elm_ui$Systems_Routing$List));
+				A2(_narkisr$elm_ui$Systems_Core$view, _p19, _narkisr$elm_ui$Systems_Routing$List));
 	}
 };
-var _narkisr$elm_ui$Application$view = function (_p15) {
-	var _p16 = _p15;
-	var _p17 = _p16.nav;
+var _narkisr$elm_ui$Application$view = function (_p20) {
+	var _p21 = _p20;
+	var _p22 = _p21.nav;
 	return A2(
 		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
@@ -33936,7 +33964,7 @@ var _narkisr$elm_ui$Application$view = function (_p15) {
 						A2(
 						_elm_lang$html$Html_App$map,
 						_narkisr$elm_ui$Application$NavMsg,
-						_narkisr$elm_ui$Nav_Core$headerView(_p17)),
+						_narkisr$elm_ui$Nav_Core$headerView(_p22)),
 						A2(
 						_elm_lang$html$Html$section,
 						_elm_lang$core$Native_List.fromArray(
@@ -33944,11 +33972,11 @@ var _narkisr$elm_ui$Application$view = function (_p15) {
 								_elm_lang$html$Html_Attributes$class('content')
 							]),
 						_narkisr$elm_ui$Common_Components$asList(
-							_narkisr$elm_ui$Application$activeView(_p16))),
+							_narkisr$elm_ui$Application$activeView(_p21))),
 						A2(
 						_elm_lang$html$Html_App$map,
 						_narkisr$elm_ui$Application$NavMsg,
-						_narkisr$elm_ui$Nav_Core$sideView(_p17))
+						_narkisr$elm_ui$Nav_Core$sideView(_p22))
 					]))
 			]));
 };
@@ -33958,39 +33986,12 @@ var _narkisr$elm_ui$Application$NavigateTo = function (a) {
 var _narkisr$elm_ui$Application$EditMsg = function (a) {
 	return {ctor: 'EditMsg', _0: a};
 };
+var _narkisr$elm_ui$Application$MenuMsg = function (a) {
+	return {ctor: 'MenuMsg', _0: a};
+};
 var _narkisr$elm_ui$Application$HopMsg = function (a) {
 	return {ctor: 'HopMsg', _0: a};
 };
-var _narkisr$elm_ui$Application$navigate = F2(
-	function (_p18, msg) {
-		var _p19 = _p18;
-		var _p22 = _p19._1;
-		var _p21 = _p19._0;
-		var _p20 = _p19._0.navChange;
-		if (_p20.ctor === 'Just') {
-			var withNavChange = _elm_lang$core$Native_List.fromArray(
-				[
-					A2(_elm_lang$core$Platform_Cmd$map, msg, _p22),
-					A2(
-					_elm_lang$core$Platform_Cmd$map,
-					_narkisr$elm_ui$Application$HopMsg,
-					_elm_lang$navigation$Navigation$modifyUrl(_p20._0))
-				]);
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					_p21,
-					{navChange: _elm_lang$core$Maybe$Nothing}),
-				_1: _elm_lang$core$Platform_Cmd$batch(withNavChange)
-			};
-		} else {
-			return {
-				ctor: '_Tuple2',
-				_0: _p21,
-				_1: A2(_elm_lang$core$Platform_Cmd$map, msg, _p22)
-			};
-		}
-	});
 var _narkisr$elm_ui$Application$route = F2(
 	function (msg, _p23) {
 		var _p24 = _p23;
@@ -34124,12 +34125,64 @@ var _narkisr$elm_ui$Application$ApplyRoute = function (a) {
 	return {ctor: 'ApplyRoute', _0: a};
 };
 
+var _narkisr$elm_ui$Common_Menu$intoMsg = function (msg) {
+	var _p0 = msg;
+	if ((_p0.ctor === 'MenuMsg') && (_p0._0.ctor === '_Tuple3')) {
+		var _p3 = _p0._0._2;
+		var _p2 = _p0._0._1;
+		var _p1 = _p0._0._0;
+		switch (_p1) {
+			case 'Systems':
+				return _narkisr$elm_ui$Application$SystemsMsg(
+					_narkisr$elm_ui$Systems_Core$SystemsLaunch(
+						_narkisr$elm_ui$Systems_Launch$SetupJob(_p2)));
+			case 'Templates':
+				return _narkisr$elm_ui$Application$TemplatesMsg(
+					_narkisr$elm_ui$Templates_Core$SetupJob(
+						{ctor: '_Tuple2', _0: _p2, _1: _p3}));
+			case 'Types':
+				return _narkisr$elm_ui$Application$TypesMsg(
+					_narkisr$elm_ui$Types_Core$MenuClick(
+						{ctor: '_Tuple2', _0: _p2, _1: _p3}));
+			case 'Users':
+				return _narkisr$elm_ui$Application$UsersMsg(
+					_narkisr$elm_ui$Users_Core$MenuClick(
+						{ctor: '_Tuple2', _0: _p2, _1: _p3}));
+			default:
+				return _narkisr$elm_ui$Application$NoOp;
+		}
+	} else {
+		return msg;
+	}
+};
+var _narkisr$elm_ui$Common_Menu$menuPort = _elm_lang$core$Native_Platform.incomingPort(
+	'menuPort',
+	A4(
+		_elm_lang$core$Json_Decode$tuple3,
+		F3(
+			function (x1, x2, x3) {
+				return {ctor: '_Tuple3', _0: x1, _1: x2, _2: x3};
+			}),
+		_elm_lang$core$Json_Decode$string,
+		_elm_lang$core$Json_Decode$string,
+		_elm_lang$core$Json_Decode$string));
+
 var _narkisr$elm_ui$Main$subscriptions = function (model) {
-	return _narkisr$elm_ui$Common_Editor$editorInPort(
-		function (_p0) {
-			return _narkisr$elm_ui$Application$EditMsg(
-				_narkisr$elm_ui$Common_Editor$Load(_p0));
-		});
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_narkisr$elm_ui$Common_Editor$editorInPort(
+				function (_p0) {
+					return _narkisr$elm_ui$Application$EditMsg(
+						_narkisr$elm_ui$Common_Editor$Load(_p0));
+				}),
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				function (v) {
+					return _narkisr$elm_ui$Common_Menu$intoMsg(v);
+				},
+				_narkisr$elm_ui$Common_Menu$menuPort(_narkisr$elm_ui$Application$MenuMsg))
+			]));
 };
 var _narkisr$elm_ui$Main$main = {
 	main: A2(
@@ -34172,6 +34225,9 @@ _elm_lang$core$Native_Platform.addPublicModule(Elm['Common']['FormWizard'], 'Com
 Elm['Common'] = Elm['Common'] || {};
 Elm['Common']['Http'] = Elm['Common']['Http'] || {};
 _elm_lang$core$Native_Platform.addPublicModule(Elm['Common']['Http'], 'Common.Http', typeof _narkisr$elm_ui$Common_Http$main === 'undefined' ? null : _narkisr$elm_ui$Common_Http$main);
+Elm['Common'] = Elm['Common'] || {};
+Elm['Common']['Menu'] = Elm['Common']['Menu'] || {};
+_elm_lang$core$Native_Platform.addPublicModule(Elm['Common']['Menu'], 'Common.Menu', typeof _narkisr$elm_ui$Common_Menu$main === 'undefined' ? null : _narkisr$elm_ui$Common_Menu$main);
 Elm['Common'] = Elm['Common'] || {};
 Elm['Common']['Model'] = Elm['Common']['Model'] || {};
 _elm_lang$core$Native_Platform.addPublicModule(Elm['Common']['Model'], 'Common.Model', typeof _narkisr$elm_ui$Common_Model$main === 'undefined' ? null : _narkisr$elm_ui$Common_Model$main);
