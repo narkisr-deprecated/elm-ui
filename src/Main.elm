@@ -12,8 +12,11 @@ import Hop.Types exposing (Router)
 import Routing exposing (..)
 import Task exposing (Task)
 
--- Jobs 
-import Time exposing (every, second)
+-- Polling
+import Time exposing (Time, second)
+import Jobs.List exposing (Msg(Polling))
+import Jobs.Core as Jobs
+
 
 -- Common 
 import Common.Menu exposing (menuPort, intoMsg)
@@ -37,9 +40,10 @@ main =
 subscriptions : Model -> Sub App.Msg
 subscriptions model =
     Sub.batch [
-       editorInPort (EditMsg << Load)
-    ,  Sub.map (\v -> (intoMsg v)) (menuPort MenuMsg)
-    ]
+        editorInPort (EditMsg << Load)
+     ,  Sub.map (\v -> (intoMsg v)) (menuPort MenuMsg)
+     , Time.every second (\_ -> (App.JobsMsg (Jobs.JobsListing Polling)))
+     ]
 
 
 
