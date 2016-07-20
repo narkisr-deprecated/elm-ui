@@ -8,20 +8,20 @@ import Systems.Model.Physical exposing (Physical)
 import Systems.Model.KVM exposing (KVM)
 import Dict exposing (Dict)
 
-type alias Machine = 
+type alias Machine =
   { user : String
   , hostname : String
-  , domain : String 
+  , domain : String
   , ip : Maybe String
   , os : String
   , ram : Maybe Int
   , cpu : Maybe Int
   }
 
-type alias System = 
-  { owner : String 
+type alias System =
+  { owner : String
   , env : String
-  , type' : String 
+  , type' : String
   , machine: Machine
   , aws : Maybe AWS
   , gce : Maybe GCE
@@ -44,5 +44,5 @@ emptySystem : System
 emptySystem =
   let
    base = System "" "" ""
-  in 
+  in
    base emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing

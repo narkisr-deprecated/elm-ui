@@ -20,10 +20,10 @@ import Common.Wizard as Wizard
 import Dict as Dict exposing (Dict)
 import Common.Components exposing (..)
 
--- Model 
+-- Model
 
-type alias Model = 
-  { 
+type alias Model =
+  {
     wizard : (Wizard.Model Step)
   , aws : AWS
   , machine : Machine
@@ -35,12 +35,12 @@ type alias Model =
 
 init : Model
 init =
-  let 
+  let
     wizard = Wizard.init Zero Instance [ Instance, Networking, EBS, Store, Summary ]
-  in 
+  in
     Model wizard emptyAws emptyMachine Dict.empty Dict.empty emptyVolume emptyBlock
 
-type Msg = 
+type Msg =
   WizardMsg Wizard.Msg
    | Update Environment
    | SelectInstanceType String
@@ -70,7 +70,7 @@ type Msg =
    | BlockRemove String
 
 
-type Step = 
+type Step =
   Zero
   | Instance
   | Networking
@@ -92,14 +92,14 @@ setVolume f ({volume} as model) =
   let
     newVolume = f volume
   in
-    { model | volume = newVolume }  
+    { model | volume = newVolume }
 
 setBlock : (Block -> Block)-> Model -> Model
 setBlock f ({block} as model) =
   let
     newBlock = f block
   in
-    { model | block = newBlock }  
+    { model | block = newBlock }
 
 stringValidations = Dict.fromList [
     vpair Networking [
@@ -115,7 +115,7 @@ stringValidations = Dict.fromList [
     ]
  ]
 
-  
+
 listValidations = Dict.fromList [
     vpair Instance [
       ("Security groups", validationOf "Security groups" [hasItems] (\({aws} as model) -> (defaultEmpty aws.securityGroups)))
@@ -137,92 +137,92 @@ validateAWS = validateAll [listValidations, stringValidations]
 
 ignoreDevices: Model-> Model
 ignoreDevices ({errors} as model) =
-  let 
-    ignored  = errors |> Dict.remove "EBS Device" 
+  let
+    ignored  = errors |> Dict.remove "EBS Device"
                       |> Dict.remove "Instance Device"
                       |> Dict.remove "Volume"
-  in 
+  in
     { model | errors =  ignored }
 
 
 update : Msg -> Model-> Model
 update msg ({wizard, aws, machine, volume, block} as model) =
   case msg of
-    WizardMsg msg -> 
+    WizardMsg msg ->
       let
         ({errors} as newModel) = ignoreDevices (validateAWS wizard.step model)
         newWizard = Wizard.update (notAny errors) msg wizard
       in
-       { newModel | wizard = newWizard } 
+       { newModel | wizard = newWizard }
 
-    Update environment -> 
+    Update environment ->
        (setDefaultOS "aws" { model | environment = environment })
 
-    SelectInstanceType type' -> 
+    SelectInstanceType type' ->
       setAWS (\aws -> {aws | instanceType = type' }) model
 
-    SelectOS os -> 
+    SelectOS os ->
       setMachine (\machine -> {machine | os = os }) model
-    
-    SelectEndpoint point -> 
+
+    SelectEndpoint point ->
       let
         (_,url,_) = withDefault ("","",[]) (List.head (List.filter (\(name,url,zones) -> name == point) (Dict.values endpoints)))
-      in 
-        setAWS (\aws -> {aws | endpoint = url }) model 
+      in
+        setAWS (\aws -> {aws | endpoint = url }) model
 
-    SelectZone zone -> 
-      setAWS (\aws -> {aws | availabilityZone = (Just zone) }) model 
+    SelectZone zone ->
+      setAWS (\aws -> {aws | availabilityZone = (Just zone) }) model
 
-    KeyPairInput key -> 
-      model 
-        |> setAWS (\aws -> {aws | keyName = key }) 
+    KeyPairInput key ->
+      model
+        |> setAWS (\aws -> {aws | keyName = key })
         |> validate wizard.step "Keypair" stringValidations
 
-    SecurityGroupsInput groups -> 
+    SecurityGroupsInput groups ->
       let
-        splited = String.split " " groups 
+        splited = String.split " " groups
       in
-        model  
+        model
           |>  setAWS (\aws -> {aws | securityGroups = Just (if splited == [""] then [] else splited)})
           |>  validate wizard.step "Security groups" listValidations
 
-    UserInput user -> 
-       model 
+    UserInput user ->
+       model
         |> setMachine (\machine -> {machine | user = user })
         |> validate wizard.step "User" stringValidations
 
-    HostnameInput host -> 
-      model 
+    HostnameInput host ->
+      model
         |> setMachine (\machine -> {machine | hostname = host })
         |> validate wizard.step "Hostname" stringValidations
 
-    DomainInput domain -> 
-      model 
+    DomainInput domain ->
+      model
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate wizard.step "Domain" stringValidations
 
-    IPInput ip -> 
-      model 
+    IPInput ip ->
+      model
         |> setMachine (\machine -> {machine | ip = Just ip })
         |> validate wizard.step "IP" stringValidations
 
-    VPCIdInput vpcId -> 
+    VPCIdInput vpcId ->
       let
         newVpc = withDefault emptyVpc aws.vpc
       in
-        model 
+        model
           |> setAWS (\aws -> {aws | vpc = Just { newVpc | vpcId = vpcId }})
           |> validate wizard.step "VPC Id" stringValidations
 
-    SubnetIdInput subnetId -> 
+    SubnetIdInput subnetId ->
       let
         newVpc = withDefault emptyVpc aws.vpc
       in
-        model 
+        model
           |> setAWS (\aws -> {aws | vpc = Just { newVpc | subnetId = subnetId }})
           |> validate wizard.step "Subnet Id" stringValidations
 
-    AssignIp -> 
+    AssignIp ->
       let
         newVpc = withDefault emptyVpc aws.vpc
       in
@@ -231,83 +231,83 @@ update msg ({wizard, aws, machine, volume, block} as model) =
     SelectEBSType type' ->
        setVolume (\volume -> {volume | type' = type'}) model
 
-    EBSSizeInput size -> 
+    EBSSizeInput size ->
       case (String.toInt size) of
-        Ok num -> 
+        Ok num ->
           setVolume (\volume -> { volume | size = num}) model
 
-        Err _ -> 
+        Err _ ->
           model
 
-    EBSIOPSInput iops -> 
+    EBSIOPSInput iops ->
       case (String.toInt iops) of
-        Ok num -> 
+        Ok num ->
           setVolume (\volume -> { volume | iops = (Just num)}) model
 
-        Err _ -> 
+        Err _ ->
           model
 
-    EBSDeviceInput device -> 
-      model 
+    EBSDeviceInput device ->
+      model
         |> setVolume (\volume -> { volume | device = device})
         |> validate wizard.step "EBS Device" tupleValidations
 
-    EBSOptimized -> 
+    EBSOptimized ->
       setAWS (\aws -> {aws | ebsOptimized = Just (not (withDefault False aws.ebsOptimized))}) model
 
-    EBSClear -> 
+    EBSClear ->
       setVolume (\volume -> { volume | clear = not volume.clear}) model
 
-    VolumeAdd -> 
-      let 
+    VolumeAdd ->
+      let
         ({errors} as newModel) = validate wizard.step "EBS Device" tupleValidations model
-        newAws = {aws | volumes = Just (List.append [volume] (defaultEmpty aws.volumes)) } 
-      in 
+        newAws = {aws | volumes = Just (List.append [volume] (defaultEmpty aws.volumes)) }
+      in
         if notAny errors then
           { newModel | volume = emptyVolume, aws = newAws }
-        else 
+        else
           { newModel | aws = aws }
-        
-    InstanceDeviceInput device -> 
-      model 
+
+    InstanceDeviceInput device ->
+      model
         |> setBlock (\block -> { block | device = device})
         |> validate wizard.step "Instance Device" tupleValidations
 
-    InstanceVolumeInput volume -> 
-      model 
+    InstanceVolumeInput volume ->
+      model
         |> setBlock (\block -> { block | volume = volume})
         |> validate wizard.step "Volume" tupleValidations
 
-    BlockAdd -> 
-      let 
-        ({errors} as newModel) = model 
-                                  |> validate wizard.step "Instance Device" tupleValidations 
-                                  |> validate wizard.step "Volume" tupleValidations 
-        newAws = { aws | blockDevices = Just (List.append [block] (defaultEmpty aws.blockDevices)) } 
-      in 
+    BlockAdd ->
+      let
+        ({errors} as newModel) = model
+                                  |> validate wizard.step "Instance Device" tupleValidations
+                                  |> validate wizard.step "Volume" tupleValidations
+        newAws = { aws | blockDevices = Just (List.append [block] (defaultEmpty aws.blockDevices)) }
+      in
         if notAny errors then
           { newModel | block = emptyBlock, aws = newAws }
-        else 
+        else
           { newModel | aws = aws }
-        
-    VolumeRemove device -> 
-      let 
-        newVolumes = (List.filter (\volume -> volume.device /= device) (defaultEmpty aws.volumes))
-        newAws = { aws | volumes = Just newVolumes} 
-      in 
-        { model | aws = newAws } 
 
-    BlockRemove device -> 
-      let 
+    VolumeRemove device ->
+      let
+        newVolumes = (List.filter (\volume -> volume.device /= device) (defaultEmpty aws.volumes))
+        newAws = { aws | volumes = Just newVolumes}
+      in
+        { model | aws = newAws }
+
+    BlockRemove device ->
+      let
         newBlocks = (List.filter (\block -> block.device /= device) (defaultEmpty aws.blockDevices))
-        newAws = { aws | blockDevices = Just newBlocks} 
-      in 
-        { model | aws = newAws } 
+        newAws = { aws | blockDevices = Just newBlocks}
+      in
+        { model | aws = newAws }
 
 next : Model -> Environment -> Model
 next model environment =
-      model 
-         |> update (Update environment) 
+      model
+         |> update (Update environment)
          |> update (WizardMsg Wizard.Next)
 
 back model =
@@ -323,25 +323,25 @@ instance ({aws, machine, errors} as model) =
     (name,_,zones) = withDefault ("","",[]) (Dict.get zone endpoints)
     zoneOptions = (List.append [""] (List.map (\k -> zone ++ k) zones))
   in
-    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       [ 
+    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+       [
          legend [] [text "Properties"]
        , group' "Instance type" (selector SelectInstanceType instanceTypes aws.instanceType)
        , group' "OS" (selector SelectOS (Dict.keys (getOses "aws" model)) machine.os)
        , group' "Endpoint" (selector SelectEndpoint points name)
        , group' "Availability Zone" (selector SelectZone zoneOptions (withDefault "" aws.availabilityZone))
        , legend [] [text "Security"]
-       , check "User" (inputText UserInput "" model.machine.user) 
+       , check "User" (inputText UserInput "" model.machine.user)
        , check "Keypair" (inputText KeyPairInput "" aws.keyName)
        , check "Security groups" (inputText SecurityGroupsInput " " groups)]
    ]
 
 networking: Model -> List (Html Msg)
 networking ({errors, aws, machine} as model) =
-  let 
+  let
     check = withErrors errors
   in
-  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
      [
        legend [] [text "DNS"]
      , check "Hostname" (inputText HostnameInput "" machine.hostname)
@@ -361,7 +361,7 @@ ebsTypes = Dict.fromList [
   ]
 
 volumeRow : Volume -> Html Msg
-volumeRow ({device} as v) = 
+volumeRow ({device} as v) =
   let
     remove = span [ class "glyphicon glyphicon-remove"
                   , attribute "aria-hidden" "true"
@@ -373,19 +373,19 @@ volumeRow ({device} as v) =
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
 volumes : List Volume -> Html Msg
-volumes vs = 
+volumes vs =
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "ebsVolumes"]
      [thead []
         [tr [] (List.map (\k ->  (th [] [text k])) ["device", "size", "type", "clear", ""])]
-         , tbody [] 
+         , tbody []
             (List.map (\volume -> volumeRow volume) vs)
- 
+
      ]
   ]
 
 blockRow : Block -> Html Msg
-blockRow ({device} as v) = 
+blockRow ({device} as v) =
   let
     remove = span [ class "glyphicon glyphicon-remove"
                   , attribute "aria-hidden" "true"
@@ -398,32 +398,32 @@ blockRow ({device} as v) =
 
 
 blocks: List Block -> Html Msg
-blocks bs = 
+blocks bs =
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "instanceVolumes"]
      [thead []
         [tr [] (List.map (\k ->  (th [] [text k])) ["device", "volume", ""])]
-         , tbody [] 
+         , tbody []
             (List.map (\block-> blockRow block) bs)
      ]
-  ]   
+  ]
 
 ebs: Model -> List (Html Msg)
 ebs ({errors, volume, aws} as model) =
   let
     check = withErrors errors
   in
-  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-    [ 
+  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+    [
       legend [] [text "Global"]
     , group' "EBS Optimized" (checkbox EBSOptimized (withDefault False aws.ebsOptimized))
     , legend [] [text "Devices"]
     , check "EBS Device" (inputText EBSDeviceInput "sdh" volume.device)
     , group' "Size" (inputNumber EBSSizeInput "" (toString volume.size))
     , group' "Type" (selector SelectEBSType (Dict.keys ebsTypes) volume.type')
-    , if volume.type' == "Provisioned IOPS (SSD)" then 
+    , if volume.type' == "Provisioned IOPS (SSD)" then
         group' "IOPS" (inputNumber EBSIOPSInput "50" (toString (withDefault 50 volume.iops)))
-      else 
+      else
         div  [] []
     , group' "Clear" (checkbox EBSClear volume.clear)
     , group' ""  (button [class "btn btn-sm col-md-2", onClick VolumeAdd] [text "Add"])
@@ -437,8 +437,8 @@ store ({errors, block, aws} as model) =
   let
     check = withErrors errors
   in
-  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-    [ 
+  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+    [
       legend [] [text "Instance Store"]
     , check "Instance Device" (inputText InstanceDeviceInput "sdb" block.device)
     , check "Volume" (inputText InstanceVolumeInput "ephemeral0" block.volume)
@@ -451,22 +451,22 @@ store ({errors, block, aws} as model) =
 stepView :  Model -> List (Html Msg)
 stepView ({wizard, aws, machine} as model) =
   case wizard.step of
-    Instance -> 
-      instance model 
+    Instance ->
+      instance model
 
-    Networking -> 
+    Networking ->
       networking model
 
-    EBS -> 
+    EBS ->
       ebs model
 
-    Store -> 
+    Store ->
       store model
 
-    Summary -> 
+    Summary ->
       summarize (aws, machine)
 
-    _ -> 
+    _ ->
       Debug.log (toString wizard.step) [div [] []]
 
 

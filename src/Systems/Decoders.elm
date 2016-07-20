@@ -11,30 +11,30 @@ import Json.Decode as Json exposing (..)
 import Common.Http exposing (apply)
 
 vpcDecoder : Decoder VPC
-vpcDecoder = 
+vpcDecoder =
   object3 VPC
-   ("subnetId" := string) 
-   ("vpcId" := string) 
-   ("assignIp" := bool) 
+   ("subnetId" := string)
+   ("vpcId" := string)
+   ("assignIp" := bool)
 
 
 blockDecoder : Decoder Block
-blockDecoder = 
+blockDecoder =
   object2 Block
-   ("volume" := string) 
-   ("device" := string) 
+   ("volume" := string)
+   ("device" := string)
 
 awsVolumeDecoder : Decoder AWS.Volume
-awsVolumeDecoder = 
-  object5 AWS.Volume 
-   ("volume-type" := string) 
-   ("size" := int) 
+awsVolumeDecoder =
+  object5 AWS.Volume
+   ("volume-type" := string)
+   ("size" := int)
    (maybe ("iops" := int))
-   ("device" := string) 
-   ("clear" := bool) 
+   ("device" := string)
+   ("clear" := bool)
 
 awsDecoder: Decoder AWS
-awsDecoder = 
+awsDecoder =
   map AWS
     ("instance-type" := string)
    `apply` (maybe ("instance-id" := string))
@@ -49,7 +49,7 @@ awsDecoder =
 
 
 gceDecoder: Decoder GCE
-gceDecoder = 
+gceDecoder =
   object5 GCE
     ("machine-type" := string)
     ("zone" := string)
@@ -58,33 +58,33 @@ gceDecoder =
     (maybe ("static-ip" := string))
 
 digitalDecoder: Decoder Digital
-digitalDecoder = 
+digitalDecoder =
   object3 Digital
     ("size" := string)
     ("region" := string)
     ("private-networking" := bool)
 
 physicalDecoder: Decoder Physical
-physicalDecoder = 
+physicalDecoder =
   object2 Physical
     (maybe ("mac" := string))
     (maybe ("broadcast" := string))
 
 kvmDecoder: Decoder KVM
-kvmDecoder = 
+kvmDecoder =
   object1 KVM
     ("node" := string)
 
 openstackVolumeDecoder : Decoder Openstack.Volume
-openstackVolumeDecoder = 
-  object3 Openstack.Volume 
-   ("device" := string) 
-   ("size" := int) 
-   ("clear" := bool) 
+openstackVolumeDecoder =
+  object3 Openstack.Volume
+   ("device" := string)
+   ("size" := int)
+   ("clear" := bool)
 
 
 openstackDecoder: Decoder Openstack
-openstackDecoder = 
+openstackDecoder =
   map Openstack
    ("flavor" := string)
    `apply` ("tenant" := string)
@@ -96,8 +96,8 @@ openstackDecoder =
    `apply` (maybe ("volumes" := list openstackVolumeDecoder))
 
 machineDecoder: Decoder Machine
-machineDecoder = 
-  object7 Machine 
+machineDecoder =
+  object7 Machine
     ("user" := string)
     ("hostname" := string)
     ("domain" := string)
@@ -105,11 +105,11 @@ machineDecoder =
     ("os" := string)
     (maybe ("ram" := int))
     (maybe ("cpu" := int))
-    
-    
+
+
 systemDecoder : Decoder System
-systemDecoder = 
-   map System 
+systemDecoder =
+   map System
     ("owner" := string )
     `apply` ("env" := string )
     `apply` ("type" := string )
@@ -120,7 +120,7 @@ systemDecoder =
     `apply` (maybe ("openstack" := openstackDecoder))
     `apply` (maybe ("physical" := physicalDecoder))
     `apply` (maybe ("kvm" := kvmDecoder))
- 
+
 
 
 

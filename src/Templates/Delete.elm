@@ -12,19 +12,19 @@ import Basics.Extra exposing (never)
 import Maybe exposing (withDefault)
 import Common.Delete as Delete exposing (deleteResponse, DeleteResponse)
 
-type alias Model = 
+type alias Model =
   {
     name : String
   , errorMsg : String
   }
- 
+
 init : (Model , Cmd Msg)
 init =
   none (Model "" "")
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   NoOp
   | Cancel
   | Delete
@@ -34,14 +34,14 @@ type Msg =
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({name} as model) =
-  case msg of 
-    Deleted result -> 
+  case msg of
+    Deleted result ->
       failHandler result model (\{message} -> none { model | errorMsg = withDefault "Failed to delete template" message }) NoOp
-       
-    Delete -> 
+
+    Delete ->
       (model, deleteTemplate name)
 
-    _ -> 
+    _ ->
       none model
 
 -- View
@@ -51,12 +51,12 @@ view model =
   Delete.view model "Template" Cancel Delete Done
 
 deleteTemplate : String -> Cmd Msg
-deleteTemplate  name = 
+deleteTemplate  name =
   delete deleteResponse ("/templates/" ++ name)
     |> Task.toResult
     |> Task.perform never Deleted
 
-succeeded msg {errorMsg} = 
+succeeded msg {errorMsg} =
   if msg == (Deleted (Result.Ok { message = "Template deleted"} )) then
     True
   else

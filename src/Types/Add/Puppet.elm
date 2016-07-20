@@ -18,11 +18,11 @@ import Form.Infix exposing (..)
 import Dict exposing (Dict)
 import String
 
-type alias Model = 
+type alias Model =
   {
     form : Form () Type
   }
- 
+
 validate : Validation () Type
 validate =
   form4 puppetBase
@@ -30,17 +30,17 @@ validate =
      ("source" := string)
      ("unsecure" := bool)
      ("arguments" := string)
- 
+
 init : Model
 init =
   Model (Form.initial [] validate)
 
-defaultBool option = 
-  case (withDefault (BoolOption False) option) of 
-    BoolOption bool -> 
+defaultBool option =
+  case (withDefault (BoolOption False) option) of
+    BoolOption bool ->
       bool
 
-    _ -> 
+    _ ->
       False
 
 editDefaults: String -> Type -> List (String, Field)
@@ -48,7 +48,7 @@ editDefaults env ({puppetStd} as type') =
   let
     ({module'} as std) = withDefault emptyPuppet (Dict.get env puppetStd)
     unsecure = defaultBool (Dict.get "unsecure" (withDefault Dict.empty module'.options))
-  in 
+  in
     [
       ("name", Field.Text module'.name)
     , ("source", Field.Text module'.src)
@@ -62,19 +62,19 @@ reinit env type' =
 
 
 view ({form} as model) =
- let 
+ let
     name = (Form.getFieldAsString "name" form)
     editor = (Form.getFieldAsBool "editor" form)
     source = (Form.getFieldAsString "source" form)
     arguments = (Form.getFieldAsString "arguments" form)
     unsecure = (Form.getFieldAsBool "unsecure" form)
- in 
+ in
    (Html.form [] [
      div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Name" Input.textInput name 
+        formControl "Name" Input.textInput name
       , formControl "Source" Input.textInput source
       , formGroup "Unsecure" Input.checkboxInput unsecure []
-      , formControl "Arguments" Input.textInput arguments 
+      , formControl "Arguments" Input.textInput arguments
       , formControl "Edit classes" Input.checkboxInput editor
       , div [ id "jsoneditor"
           , style [("width", "50%"), ("height", "400px"), ("margin-left", "25%")]] []

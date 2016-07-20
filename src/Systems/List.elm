@@ -1,11 +1,11 @@
 module Systems.List exposing (..)
 
-import Platform.Cmd as Cmd 
+import Platform.Cmd as Cmd
 import Basics.Extra exposing (never)
 
 import Bootstrap.Html exposing (..)
 import Html exposing (..)
-import Html.App as App 
+import Html.App as App
 import Html.Attributes exposing (type', class, id, style, attribute)
 
 import Http exposing (Error(BadResponse))
@@ -27,20 +27,20 @@ import Set exposing (Set)
 -- Components
 import Common.Components exposing (info, callout)
 import Pager exposing (..)
-import Table 
+import Table
 import Search
 
 -- Model
 
-type alias Systems = 
+type alias Systems =
   ((Dict String Int), List (String, System))
 
-type Error = 
+type Error =
     NoSystemSelected
   | SearchParseFailed String
   | NoError
 
-type alias Model = 
+type alias Model =
   { error : Error
   , systems : Systems
   , pager : Pager.Model
@@ -49,7 +49,7 @@ type alias Model =
 
 init : (Model, Cmd Msg)
 init =
- let 
+ let
    systems = (Dict.empty, [("", emptySystem)])
    table = Table.init "systemsListing" True ["#","Hostname", "Type", "Env","Owner"] systemRow "Systems"
    search = Search.init
@@ -58,14 +58,14 @@ init =
 
 -- Update
 
-type Msg = 
+type Msg =
       SetSystems(Result Http.Error Systems)
     | GotoPage Pager.Msg
     | LoadPage (Table.Msg System)
     | Searching Search.Msg
     | NoOp
 
-setSystems model ((meta, items) as systemsResult) = 
+setSystems model ((meta, items) as systemsResult) =
   let
     total = Maybe.withDefault 0 (Dict.get "total" meta)
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
@@ -79,27 +79,27 @@ update msg ({error, table} as model) =
 
     SetSystems result ->
       successHandler result model (setSystems model) NoOp
-      
-    GotoPage pageMsg -> 
+
+    GotoPage pageMsg ->
       case pageMsg of
 
-        Pager.NextPage page -> 
+        Pager.NextPage page ->
           let
             newPager = (Pager.update pageMsg model.pager)
           in
            if isEmpty model.search.input then
             ({model | pager = newPager}, getSystems page 10)
-           else 
+           else
             ({model | pager = newPager}, getSystemsQuery page 10 model.search.parsed)
 
         _ ->
           none model
 
-    Searching searchMsg -> 
-      let 
+    Searching searchMsg ->
+      let
         newSearch = (Search.update searchMsg model.search)
       in
-      case searchMsg of 
+      case searchMsg of
         Search.Result True res ->
            ({ model | search = newSearch , error = NoError}, getSystemsQuery model.pager.page 10 newSearch.parsed)
 
@@ -109,16 +109,16 @@ update msg ({error, table} as model) =
           else
             none { model | search = newSearch, error = SearchParseFailed newSearch.error }
 
-        _ -> 
+        _ ->
           none model
 
-    LoadPage tableMsg -> 
+    LoadPage tableMsg ->
       let
         newTable = Table.update tableMsg model.table
       in
         if error == NoSystemSelected && newTable.selected /= Set.empty then
           none {model | table = newTable , error = NoError }
-        else 
+        else
           none {model | table = newTable }
 
     NoOp ->
@@ -127,7 +127,7 @@ update msg ({error, table} as model) =
 -- View
 
 systemRow : String -> System -> List (Html msg)
-systemRow id {env, owner, type', machine} = 
+systemRow id {env, owner, type', machine} =
  [
    td [] [ text id ]
  , td [] [ text (.hostname machine) ]
@@ -138,7 +138,7 @@ systemRow id {env, owner, type', machine} =
 
 flash : Model -> Html Msg
 flash model =
-  let 
+  let
     result = div [class "callout callout-danger"]
   in
     case model.error of
@@ -153,8 +153,8 @@ flash model =
 
 
 view : Model -> Html Msg
-view model = 
-  let 
+view model =
+  let
    (meta,systems) = model.systems
   in
     div [] [
@@ -173,31 +173,31 @@ view model =
       ],
       row_ [App.map GotoPage (Pager.view model.pager)]
     ]
-       
+
 
 -- Decoding
 systemPair : Decoder (String, System)
-systemPair = 
+systemPair =
   tuple2 (,)
     string systemDecoder
 
 systemPage : Decoder ((Dict String Int) , (List (String, System)))
-systemPage = 
-  object2 (,)  
-    ("meta" := dict int) 
+systemPage =
+  object2 (,)
+    ("meta" := dict int)
     ("systems" := list systemPair)
 
 
 -- Http
 
 getSystems : Int -> Int -> Cmd Msg
-getSystems page offset = 
-  getJson systemPage ("/systems?page=" ++ (toString page) ++  "&offset=" ++ (toString offset)) 
+getSystems page offset =
+  getJson systemPage ("/systems?page=" ++ (toString page) ++  "&offset=" ++ (toString offset))
     |> Task.toResult
     |> Task.perform never SetSystems
 
 getSystemsQuery : Int -> Int  -> String -> Cmd Msg
-getSystemsQuery page offset query= 
+getSystemsQuery page offset query=
   getJson systemPage ("/systems/query?page=" ++ (toString page) ++  "&offset=" ++ (toString offset) ++ "&query=" ++ query)
     |> Task.toResult
     |> Task.perform never SetSystems

@@ -2,9 +2,9 @@ port module Common.Editor exposing (..)
 
 import Task
 
--- SIGNALS 
-type Msg = 
-  NoOp 
+-- SIGNALS
+type Msg =
+  NoOp
   | Load (String, String)
 
 

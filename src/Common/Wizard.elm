@@ -7,7 +7,7 @@ import Maybe exposing (withDefault)
 import Debug
 
 
-type alias Model a = 
+type alias Model a =
   {
     zero :  a
   , step : a
@@ -15,22 +15,22 @@ type alias Model a =
   , prev : List a
   , next : List a
   }
- 
-init : a -> a -> List a -> Model a 
+
+init : a -> a -> List a -> Model a
 init zero default steps =
    Model zero zero default [] steps
 
--- Update 
+-- Update
 
-type Msg = 
-  Next 
+type Msg =
+  Next
     | Back
     | NoOp
 
-update : Bool -> Msg ->  Model a -> Model a 
+update : Bool -> Msg ->  Model a -> Model a
 update noErrors msg ({next, prev, default, zero, step} as model)  =
-  case msg of 
-    Next -> 
+  case msg of
+    Next ->
       let
         nextStep = withDefault default (List.head next)
         nextSteps = defaultEmpty (List.tail next)
@@ -38,10 +38,10 @@ update noErrors msg ({next, prev, default, zero, step} as model)  =
       in
         if noErrors then
            {model | step = nextStep, next = nextSteps, prev = prevSteps}
-        else 
+        else
            model
 
-    Back -> 
+    Back ->
       let
         prevStep = withDefault zero (List.head (List.reverse prev))
         prevSteps = List.take ((List.length prev) - 1) prev
@@ -49,10 +49,10 @@ update noErrors msg ({next, prev, default, zero, step} as model)  =
       in
         if noErrors then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}
-        else 
+        else
           model
 
-    NoOp -> 
+    NoOp ->
       model
 
 -- View

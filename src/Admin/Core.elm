@@ -12,7 +12,7 @@ import Users.Session exposing (isUser, getSession, Session)
 import Dict
 
 
-type alias Model = 
+type alias Model =
   {
     environments : List String
   , environment : String
@@ -20,7 +20,7 @@ type alias Model =
   , owners : List String
   , owner : String
   }
- 
+
 partialAdmin : String -> String -> Model
 partialAdmin owner environment =
     Model [] environment Dict.empty [] owner
@@ -29,9 +29,9 @@ init : (Model , Cmd Msg)
 init =
   (Model [] "" Dict.empty [] "", batch [ getEnvironments SetEnvironments, getSession LoadSession])
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   SetEnvironments (Result Http.Error Environments)
     | SetOwners (Result Http.Error (List User))
     | SelectOwner String
@@ -49,48 +49,48 @@ setOwners model owners =
 
 setEnvironments : Model -> Environments -> (Model, Cmd Msg)
 setEnvironments model es =
-  let 
+  let
     environment = (Maybe.withDefault "" (List.head (Dict.keys es)))
-  in 
+  in
     none {model | environments = Dict.keys es, environment = environment, rawEnvironments = es}
 
-setSession model ({username} as session) = 
+setSession model ({username} as session) =
   if isUser session then
-     none {model | owner = username } 
-  else 
+     none {model | owner = username }
+  else
     (model, getUsers SetOwners)
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
-  case msg of 
+  case msg of
    SetEnvironments result ->
      (successHandler result model (setEnvironments model) NoOp)
 
-   SelectEnvironment environment -> 
+   SelectEnvironment environment ->
       none {model | environment = environment}
 
    SetOwners result ->
      (successHandler result model (setOwners model) NoOp)
 
-   SelectOwner owner -> 
+   SelectOwner owner ->
      none {model | owner = owner}
 
-   LoadSession result -> 
+   LoadSession result ->
       (successHandler result model (setSession model) NoOp)
 
-   NoOp -> 
+   NoOp ->
       none model
 
 
-ownersList {owner, owners} = 
-  if List.isEmpty owners then 
+ownersList {owner, owners} =
+  if List.isEmpty owners then
     [owner]
-  else 
+  else
     owners
 
 view : Model -> Html Msg
 view ({environments, environment, owner} as model) =
-  div [] [ 
+  div [] [
     group' "Environment" (selector SelectEnvironment environments environment)
   , group' "Owner" (selector SelectOwner (ownersList model) owner)
   ]

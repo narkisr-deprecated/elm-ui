@@ -1,18 +1,18 @@
 module Stacks.Model exposing (..)
 
-type alias System = 
+type alias System =
   {
     count : Int
-  , template : String 
+  , template : String
   }
 
-type alias Stack = 
+type alias Stack =
   {
-    name : String 
+    name : String
   , description : String
-  , systems : List System  
+  , systems : List System
   }
- 
+
 
 emptyStack : Stack
 emptyStack  =

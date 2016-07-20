@@ -3,7 +3,7 @@ module Systems.Routing exposing (..)
 import Hop.Types exposing (Config, Location, Query, Router, PathMatcher, newLocation)
 import Hop.Matchers exposing (..)
 
-type Route = 
+type Route =
   Add
     | Launch
     | List

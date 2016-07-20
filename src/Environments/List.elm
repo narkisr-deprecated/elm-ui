@@ -12,26 +12,26 @@ import Http exposing (Error(BadResponse))
 import Task
 
 
--- Model 
+-- Model
 
-type alias Template = 
+type alias Template =
   (Dict String String)
 
-type alias Environment = 
+type alias Environment =
   (Dict String Hypervisor)
 
-type alias Environments = 
+type alias Environments =
   Dict String Environment
 
-type Hypervisor = 
+type Hypervisor =
   OSTemplates (Dict String Template)
     | Proxmox (Dict String (Dict String String))  (Dict String Template)
     | Openstack (Dict String String)  (Dict String Template)
     | KVM (Dict String Template) (Dict String (Dict String Options))
     | AWS
     | GCE
-    | Physical 
-    | Empty 
+    | Physical
+    | Empty
 
 -- Decoder
 
@@ -40,7 +40,7 @@ template =
   dict string
 
 hypervisor : Decoder Hypervisor
-hypervisor = 
+hypervisor =
   oneOf [
       object2 Openstack ("flavors" := dict string) ("ostemplates" := dict template)
     , object2 KVM ("ostemplates" := dict template) ("nodes" := dict (dict (option ())))
@@ -57,8 +57,8 @@ environmentsList =
    at ["environments"] (dict environment)
 
 -- Effects
-getEnvironments msg = 
-  getJson environmentsList "/environments" 
+getEnvironments msg =
+  getJson environmentsList "/environments"
     |> Task.toResult
     |> Task.perform never msg
 
@@ -67,8 +67,8 @@ environmentsKeys=
   at ["environments"] (list string)
 
 
-getEnvironmentKeys msg = 
-  getJson environmentsKeys "/environments/keys" 
+getEnvironmentKeys msg =
+  getJson environmentsKeys "/environments/keys"
     |> Task.toResult
     |> Task.perform never msg
 

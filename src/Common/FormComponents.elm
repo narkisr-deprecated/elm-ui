@@ -26,11 +26,11 @@ withError field class =
     Nothing ->
      class
 
-formControl title widget field  = 
+formControl title widget field  =
   formGroup title widget field [class "form-control"]
 
-formGroup title widget field attrs = 
-  div [class (withError field "form-group"), id title] 
+formGroup title widget field attrs =
+  div [class (withError field "form-group"), id title]
     [ label [for title, class "col-sm-3 control-label"] [
        (text title)
       ]

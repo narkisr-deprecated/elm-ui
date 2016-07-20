@@ -9,12 +9,12 @@ import Nav.Common exposing (Active(Jobs), Section(Stats, Launch, Add, List, View
 import Common.Components exposing (asList, notImplemented)
 import Debug
 
-type alias Model = 
+type alias Model =
   {
-    add : Add.Model 
+    add : Add.Model
   , navChange : Maybe (Active, Section)
   }
- 
+
 init : (Model , Cmd Msg)
 init =
   let
@@ -25,22 +25,22 @@ init =
   in
    (Model add Nothing, Cmd.batch msgs)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   NoOp
     | StacksAdd Add.Msg
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({add} as model) =
-  case msg of 
-    StacksAdd addMsg -> 
+  case msg of
+    StacksAdd addMsg ->
       let
         (newAdd, msgs) = Add.update addMsg add
       in
         ({model | add = newAdd}, Cmd.map StacksAdd msgs)
-    
-    _ -> 
+
+    _ ->
       none model
 
 -- View
@@ -51,7 +51,7 @@ view model section =
     Add ->
       (App.map StacksAdd (Add.view model.add))
 
-    _ -> 
+    _ ->
       notImplemented
 
 

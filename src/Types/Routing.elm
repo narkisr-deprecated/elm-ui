@@ -3,7 +3,7 @@ module Types.Routing exposing (..)
 import Hop.Types exposing (PathMatcher, newLocation)
 import Hop.Matchers exposing (..)
 
-type Route = 
+type Route =
   Add
     | List
     | View String

@@ -2,9 +2,9 @@ module Types.Add.Common exposing (..)
 
 import Dict
 
-type Type = 
+type Type =
   Main String String String
-   | Puppet String String Bool String 
+   | Puppet String String Bool String
 
 
 

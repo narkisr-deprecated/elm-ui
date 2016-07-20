@@ -12,7 +12,7 @@ import Html.Events exposing (onClick)
 import Common.FormComponents exposing (..)
 import Common.Components exposing (infoCallout, dangerCallout, panelContents, panel)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
-import Admin.Core as Admin 
+import Admin.Core as Admin
 import Environments.List exposing (Environments, Environment, getEnvironments)
 
 import Common.Http exposing (postJson, SaveResponse, saveResponse)
@@ -32,47 +32,47 @@ import Form.Input as Input
 import Form.Infix exposing (..)
 
 
-type alias PartialMachine = 
-  { 
+type alias PartialMachine =
+  {
       hostname : String
     , domain : String
-  } 
+  }
 
 
-type alias Provided = 
+type alias Provided =
   {
     machine : PartialMachine
   }
 
-type alias Model = 
+type alias Model =
   {
     name : String
   , form : Form () Provided
   , admin : Admin.Model
   , saveErrors : Errors.Model
   }
- 
+
 validate : Validation () Provided
 validate =
   form1 Provided
     ("machine" := form2 PartialMachine
         ("hostname" := string)
         ("domain" := string))
-    
+
 init : (Model , Cmd Msg)
 init =
-  let 
+  let
     (admin, msgs) = Admin.init
     errors = Errors.init
-  in 
+  in
     (Model "" (Form.initial [] validate) admin errors, Cmd.map AdminMsg msgs)
 
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   SetupJob (String, String)
-    | AdminMsg Admin.Msg 
+    | AdminMsg Admin.Msg
     | ErrorsView Errors.Msg
     | Launched (Result Http.Error SaveResponse)
     | FormMsg Form.Msg
@@ -88,25 +88,25 @@ stage model {id} =
    Just num ->
      (model, runJob (toString num) "stage" JobLaunched)
 
-   Nothing -> 
+   Nothing ->
      none model
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({saveErrors, form, admin, name} as model) =
-  case msg of 
+  case msg of
     FormMsg formMsg ->
-       let 
+       let
          newForm = Form.update formMsg form
        in
          none { model | form = Form.update Form.Validate newForm}
 
-    Launch -> 
+    Launch ->
       let
         (newModel, _) = update (FormMsg Form.Validate) model
       in
         if List.isEmpty (Form.getErrors newModel.form) then
           case (Form.getOutput newModel.form) of
-            Just {machine} -> 
+            Just {machine} ->
               (newModel, persistProvided (intoSystem name) machine admin)
 
             Nothing ->
@@ -114,16 +114,16 @@ update msg ({saveErrors, form, admin, name} as model) =
         else
           none newModel
 
-    AdminMsg msg -> 
+    AdminMsg msg ->
       let
         (newAdmin, msgs) = Admin.update msg admin
-      in  
+      in
         ({ model | admin = newAdmin}, Cmd.map AdminMsg msgs)
-    
-    Launched result -> 
+
+    Launched result ->
        errorsSuccessHandler result model (stage model) NoOp
 
-    _ -> 
+    _ ->
       none model
 
 -- View
@@ -132,21 +132,21 @@ infoMessage name =
   [
      h4 [] [ text "Info" ]
   ,  span [] [
-          text "Launch a new system from " 
-        , strong [] [text name] 
+          text "Launch a new system from "
+        , strong [] [text name]
         , text " template "
      ]
  ]
 
 
 machineView form =
-  let 
+  let
     hostname = (Form.getFieldAsString "machine.hostname" form)
     domain = (Form.getFieldAsString "machine.domain" form)
-  in 
+  in
     div [] [
        formControl "Hostname" Input.textInput hostname
-     , formControl "Domain" Input.textInput domain 
+     , formControl "Domain" Input.textInput domain
     ]
 
 launchView {name, form, admin} =
@@ -176,13 +176,13 @@ view ({name, saveErrors} as model) =
   in
     if Errors.hasErrors saveErrors then
       dangerCallout errorMessage (panel (panelContents errorsView)) Cancel Done
-    else 
+    else
       infoCallout (infoMessage name) (launchView model) Cancel Launch
 
 -- Http
 
 intoSystem : String -> String -> Cmd Msg
-intoSystem name json = 
+intoSystem name json =
   postJson (Http.string json) saveResponse ("/systems/template/"  ++ name)
     |> Task.toResult
     |> Task.perform never Launched

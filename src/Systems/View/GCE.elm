@@ -14,8 +14,8 @@ import Common.Summary exposing (..)
 import String
 import Common.Utils exposing (none)
 
--- Model 
-type alias Model = 
+-- Model
+type alias Model =
   {
    id : Int
   }
@@ -23,11 +23,11 @@ type alias Model =
 init : (Model , Cmd msg)
 init =
   none (Model 0)
-  
+
 -- View
 summarySections : (GCE, Machine) -> List (List (Html msg))
 summarySections ((gce, machine) as model)=
-   List.filter (not << List.isEmpty) [ 
+   List.filter (not << List.isEmpty) [
      overviewSection "Instance"
        ["type", "os", "zone", "project id"]
        [gce.machineType, machine.os, gce.zone, gce.projectId]
@@ -42,11 +42,11 @@ summarySections ((gce, machine) as model)=
 
 summarize: (GCE, Machine) -> List (Html msg)
 summarize model =
-  [div [] [ h4 [] [(text "System overview")] 
-          , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
+  [div [] [ h4 [] [(text "System overview")]
+          , div [style [("line-height", "1.8"),("list-style-type", "none") ]]
              (summarySections model |> List.map summaryPanel
-                                    |> partition 2 
-                                    |> (List.map List.concat) 
+                                    |> partition 2
+                                    |> (List.map List.concat)
                                     |> (List.map row_))
           ]
   ]

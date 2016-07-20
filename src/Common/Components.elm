@@ -11,12 +11,12 @@ import Maybe exposing (withDefault)
 import Common.Utils exposing (defaultEmpty)
 import Dict exposing (Dict)
 
-notImplemented = 
+notImplemented =
   div [] [
     text "not implemented"
   ]
 
-fixedSize height = 
+fixedSize height =
   style [
     ("height","auto !important")
   , ("overflow", "auto")
@@ -24,25 +24,25 @@ fixedSize height =
   , ("height", height)
   ]
 
--- panels 
+-- panels
 
 panelContents body =
   div [class "panel-body"] [
     body
-  ] 
-   
-panel body = 
+  ]
+
+panel body =
    div [class "panel panel-default"] [
       body
    ]
 
-asList body = 
+asList body =
   [body]
 
-fixedPanel body = 
+fixedPanel body =
   div [class "panel-body" , (fixedSize "550px")] [
     body
-  ] 
+  ]
 
 -- Dialogs
 
@@ -54,7 +54,7 @@ message title content =
 info msg =
     message "Info" [text msg]
 
-error msg = 
+error msg =
    message "Error!" [text msg]
 
 dialogButtons cancel ok =
@@ -65,7 +65,7 @@ dialogButtons cancel ok =
             text (toString cancel)
           ]
        ,  button [class "btn btn-primary btn-sm col-md-1", onClick ok][
-           text (toString ok) 
+           text (toString ok)
          ]
       ]
     ]
@@ -76,11 +76,11 @@ callout type' message =
     div [ class ("callout callout-" ++ type') ] message
   ]
 
-dialogPanel type' message body = 
+dialogPanel type' message body =
   [
     row_ [
       callout type' message
-    ] 
+    ]
   , row_ [
       div [class "col-md-offset-1 col-md-10"] [
         body
@@ -88,20 +88,20 @@ dialogPanel type' message body =
     ]
   ]
 
-withButtons cancel ok panel = 
+withButtons cancel ok panel =
   List.append panel (asList (dialogButtons cancel ok))
 
-infoCallout message body cancel ok = 
+infoCallout message body cancel ok =
   dialogPanel "info" message body
     |> withButtons cancel ok
     |> div []
 
-dangerCallout message body cancel ok = 
-  dialogPanel "danger" message body 
+dangerCallout message body cancel ok =
+  dialogPanel "danger" message body
     |> withButtons cancel ok
     |> div []
 
-warningCallout message body cancel ok = 
+warningCallout message body cancel ok =
   dialogPanel "warning" message body
     |> withButtons cancel ok
     |> div []
@@ -111,66 +111,66 @@ warningCallout message body cancel ok =
 
 withError : List Error -> String -> String
 withError errors class =
-  if List.isEmpty errors then 
-    class 
-  else 
+  if List.isEmpty errors then
+    class
+  else
     class ++ " has-error"
-        
+
 toHtml : Error -> (Html msg)
 toHtml error =
   case error of
-    Invalid message -> 
+    Invalid message ->
       span [class "help-block"] [(text message)]
     None ->
       span [class "help-block"] []
 
 withMessage : List Error -> (Html msg)
-withMessage errors = 
-  if List.isEmpty errors then 
-    div [] [] 
-  else  
-    let 
+withMessage errors =
+  if List.isEmpty errors then
+    div [] []
+  else
+    let
       messages = List.map toHtml errors
     in
       withDefault (div [] []) (List.head messages)
- 
+
 group : String -> (Html msg) -> List Error -> (Html msg)
-group title widget errors = 
-  div [class (withError errors "form-group"), id title] 
+group title widget errors =
+  div [class (withError errors "form-group"), id title]
     [ label [for title, class "col-sm-3 control-label"] [(text title)]
     , div [class "col-sm-6"] [widget]
     , withMessage errors
     ]
 
 group' : String -> (Html msg) -> (Html msg)
-group' title widget = 
+group' title widget =
   group title widget []
 
 selected : String -> String -> List (Attribute msg)
 selected value default =
   if value == default then
     [attribute "selected" "true"]
-  else 
+  else
     []
 
 onSelect : (String -> msg) -> Attribute msg
-onSelect msg = 
+onSelect msg =
   Html.Events.on "change" (Json.map msg (at ["target", "value"] string))
 
 onMultiSelect : (String -> msg) -> Attribute msg
-onMultiSelect msg = 
+onMultiSelect msg =
   Html.Events.on "change" (Json.map msg (at ["target"] string))
 
 
 selector : (String -> msg) -> List String -> String -> (Html msg)
 selector msg options default =
-  select [class "form-control", onSelect msg ] 
+  select [class "form-control", onSelect msg ]
     (List.map (\opt -> option (selected opt default) [text opt]) options)
 
 
 typedInput : (String -> msg) -> String -> String -> String -> (Html msg)
 typedInput msg place currentValue typed =
-  input 
+  input
     [ class "form-control"
     , type' typed
     , placeholder place
@@ -187,7 +187,7 @@ inputText msg place currentValue =
   typedInput msg place currentValue "text"
 
 checkbox : msg -> Bool -> (Html msg)
-checkbox msg currentValue= 
+checkbox msg currentValue=
    input [type' "checkbox", onClick msg, checked currentValue] []
 
 withErrors : Dict String (List Error) -> String ->  (Html msg) -> (Html msg)
@@ -197,8 +197,8 @@ withErrors errors key widget =
 buttons ({hasNext} as model) next back last =
   let
     margin = style [("margin-left", "30%")]
-  in 
-    [ 
+  in
+    [
       button [id "Back", class "btn btn-primary", margin, onClick back] [text "<< Back"]
     , if hasNext then
        div [class "btn-group", margin]
@@ -206,4 +206,4 @@ buttons ({hasNext} as model) next back last =
       else
         div [class "btn-group", margin] last
     ]
- 
+

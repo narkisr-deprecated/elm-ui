@@ -14,21 +14,21 @@ import Debug
 import Templates.Model.Common exposing (Template)
 import Templates.List exposing (getTemplates)
 
-type alias Model = 
+type alias Model =
   {
     stack : Stack
   , template : String
   , templates : List String
   , editDefaults : Bool
   }
- 
+
 init : (Model , Cmd Msg)
 init =
   (Model emptyStack "" [] False, getTemplates SetTemplates)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   LoadTemplates
    | NameInput String
    | SelectTemplate String
@@ -41,30 +41,30 @@ type Msg =
    | NoOp
 
 setTemplates: Model -> List Template -> (Model , Cmd Msg)
-setTemplates model newTemplates = 
+setTemplates model newTemplates =
   none { model | templates = (List.map (\{name} -> name) newTemplates)}
 
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
-  case msg of 
-   LoadTemplates -> 
+  case msg of
+   LoadTemplates ->
      (model, getTemplates SetTemplates)
 
-   Select templates -> 
-     none model  
+   Select templates ->
+     none model
 
    SetTemplates result ->
      successHandler result model (setTemplates model) NoOp
-   
-   _ -> 
+
+   _ ->
      none model
 
 -- View
 
 addView ({template, templates, stack, editDefaults} as model) =
     panel
-      (panelContents 
+      (panelContents
           (Html.form [] [
             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
               group' "Name" (inputText NameInput " "  stack.name)

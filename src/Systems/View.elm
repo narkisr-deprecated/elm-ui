@@ -24,8 +24,8 @@ import Systems.View.Digital as DigitalView
 import Common.Utils exposing (none)
 import Maybe exposing (withDefault)
 
--- Model 
-type alias Model = 
+-- Model
+type alias Model =
   {
     system : System
    }
@@ -35,7 +35,7 @@ init =
   none (Model emptySystem)
 
 -- Update
-type Msg = 
+type Msg =
   ViewSystem String
     | SetSystem (Result Http.Error System)
     | NoOp
@@ -47,22 +47,22 @@ setSystem model system =
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
   case msg of
-    ViewSystem id -> 
+    ViewSystem id ->
       (model, getSystem id)
 
-    SetSystem result -> 
+    SetSystem result ->
       successHandler result model (setSystem model) NoOp
-      
-    NoOp -> 
+
+    NoOp ->
       none model
-      
+
 -- View
 
-toHtml ({system} as model) f prop= 
+toHtml ({system} as model) f prop=
   case prop of
-    Just value -> 
+    Just value ->
        fixedPanel (div [] (f (value, system.machine)))
-    Nothing -> 
+    Nothing ->
        div [] []
 
 view : Model -> Html Msg
@@ -74,13 +74,13 @@ view ({system} as model) =
                 , toHtml model KVMView.summarize system.kvm
                 , toHtml model DigitalView.summarize system.digital]
       empty = (\op -> op /= div [][])
-    in 
+    in
       withDefault notImplemented (List.head (List.filter empty options))
 
--- Http 
+-- Http
 
 getSystem : String -> Cmd Msg
-getSystem id = 
+getSystem id =
   getJson systemDecoder ("/systems/" ++ id)
     |> Task.toResult
     |> Task.perform never SetSystem

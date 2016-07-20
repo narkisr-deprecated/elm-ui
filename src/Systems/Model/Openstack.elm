@@ -2,13 +2,13 @@ module Systems.Model.Openstack exposing (..)
 import Dict
 import Maybe exposing (withDefault)
 
-type alias Volume = 
+type alias Volume =
   { device : String
   , size : Int
   , clear : Bool
-  } 
+  }
 
-type alias Openstack = 
+type alias Openstack =
   { flavor : String
   , tenant : String
   , keyName : String
@@ -24,7 +24,7 @@ emptyVolume : Volume
 emptyVolume =
   Volume "" 0 False
 
-emptyOpenstack : Openstack 
-emptyOpenstack = 
+emptyOpenstack : Openstack
+emptyOpenstack =
   Openstack "" "" "" Nothing Nothing Nothing [] Nothing
 

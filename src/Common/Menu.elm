@@ -17,11 +17,11 @@ import Templates.Core as TemplatesCore
 -- Users
 import Users.Core as UsersCore
 
-import Application as App  
+import Application as App
 
-intoMsg msg  = 
-    case msg of 
-      App.MenuMsg (dest, job, target) -> 
+intoMsg msg  =
+    case msg of
+      App.MenuMsg (dest, job, target) ->
         case dest  of
           "Systems" ->
             App.SystemsMsg (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
@@ -34,10 +34,10 @@ intoMsg msg  =
           "Users" ->
             App.UsersMsg (UsersCore.MenuClick (job, target))
 
-          _ -> 
+          _ ->
             App.NoOp
 
-      _ -> 
+      _ ->
           msg
 
 

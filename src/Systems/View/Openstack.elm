@@ -13,8 +13,8 @@ import Platform.Cmd exposing (map)
 import String
 import Common.Utils exposing (none)
 
--- Model 
-type alias Model = 
+-- Model
+type alias Model =
   {
    id : Int
   }
@@ -22,11 +22,11 @@ type alias Model =
 init : (Model , Cmd msg)
 init =
   none (Model 0)
-  
+
 -- View
 summarySections : (Openstack, Machine) -> List (List (Html msg))
 summarySections ((openstack, machine) as model)=
-   List.filter (not << List.isEmpty) [ 
+   List.filter (not << List.isEmpty) [
      overviewSection "Instance"
        ["flavor", "os", "tenant"]
        [openstack.flavor, machine.os, openstack.tenant]
@@ -37,18 +37,18 @@ summarySections ((openstack, machine) as model)=
        ["hostname", "domain", "ip", "ip pool", "networks" ]
        [ machine.hostname, machine.domain, withDefault "" openstack.floatingIp
        , withDefault "" openstack.floatingIpPool, (String.join " " openstack.networks)]
-   , tablizedSection "Volumes" 
+   , tablizedSection "Volumes"
        ["device", "size", "clear"] (withDefault [] openstack.volumes)
        [.device, (toString << .size), (toString << .clear)]
    ]
 
 summarize: (Openstack, Machine) -> List (Html msg)
 summarize model =
-  [div [] [ h4 [] [(text "System overview")] 
-          , div [style [("line-height", "1.8"),("list-style-type", "none") ]] 
+  [div [] [ h4 [] [(text "System overview")]
+          , div [style [("line-height", "1.8"),("list-style-type", "none") ]]
              (summarySections model |> List.map summaryPanel
-                                    |> partition 2 
-                                    |> (List.map List.concat) 
+                                    |> partition 2
+                                    |> (List.map List.concat)
                                     |> (List.map row_))
           ]
   ]

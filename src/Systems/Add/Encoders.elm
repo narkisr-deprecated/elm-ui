@@ -26,7 +26,7 @@ awsVolumeEncoder volume =
      , ("clear", bool volume.clear)
     ]
   in
-    enc |> (combine int volume.iops "iops") 
+    enc |> (combine int volume.iops "iops")
         |> object
 
 
@@ -39,7 +39,7 @@ blockEncoder block =
 
 vpcEncoder ({vpcId} as vpc) curr =
   if String.isEmpty vpcId then
-    curr 
+    curr
   else
     (List.append curr [
      ("vpc", object [
@@ -50,7 +50,7 @@ vpcEncoder ({vpcId} as vpc) curr =
 
 awsEncoder : AWS -> Value
 awsEncoder aws =
-  let 
+  let
      root = [
         ("key-name", string aws.keyName)
       , ("endpoint", string aws.endpoint)
@@ -61,8 +61,8 @@ awsEncoder aws =
       , ("volumes", list (List.map awsVolumeEncoder (defaultEmpty aws.volumes)))
      ]
    in
-     root |> (vpcEncoder (withDefault emptyVpc aws.vpc)) 
-          |> (combine string aws.availabilityZone "availability-zone") 
+     root |> (vpcEncoder (withDefault emptyVpc aws.vpc))
+          |> (combine string aws.availabilityZone "availability-zone")
           |> object
 
 gceEncoder : GCE -> Value
@@ -92,10 +92,10 @@ kvmEncoder kvm =
 optional : (a -> Value) -> Maybe a -> Value
 optional enc value =
   case value of
-    Just v -> 
+    Just v ->
       enc v
 
-    Nothing -> 
+    Nothing ->
        null
 
 physicalEncoder : Physical -> Value
@@ -115,12 +115,12 @@ openstackVolumeEncoder volume =
   ]
 
 
-maybeString optional = 
-  case optional of 
-    Just value -> 
+maybeString optional =
+  case optional of
+    Just value ->
       (string value)
 
-    Nothing -> 
+    Nothing ->
       null
 
 openstackEncoder : Openstack -> Value
@@ -137,12 +137,12 @@ openstackEncoder openstack =
   ]
 
 combine enc value key curr =
-  case value of 
-    Just exists -> 
+  case value of
+    Just exists ->
       List.append curr [(key, enc exists)]
 
-    Nothing -> 
-      curr 
+    Nothing ->
+      curr
 
 machineEncoder : Machine -> Value
 machineEncoder machine =
@@ -154,35 +154,35 @@ machineEncoder machine =
       , ("user", string machine.user)
      ]
   in
-   encoded |> (combine int machine.cpu "cpu") 
-           |> (combine int machine.ram "ram") 
-           |> (combine string machine.ip "ip") 
+   encoded |> (combine int machine.cpu "cpu")
+           |> (combine int machine.ram "ram")
+           |> (combine string machine.ip "ip")
            |> object
-    
+
 
 
 encoderOf {openstack, physical, aws, digital, gce, kvm} stage =
-  case stage of 
-    "AWS" -> 
+  case stage of
+    "AWS" ->
        ("aws", awsEncoder (withDefault emptyAws aws))
 
-    "GCE" -> 
+    "GCE" ->
        ("gce" , gceEncoder (withDefault emptyGce gce))
 
-    "Digital" -> 
+    "Digital" ->
        ("digital-ocean" , digitalEncoder (withDefault emptyDigital digital))
-   
-    "Physical" -> 
+
+    "Physical" ->
        ("physical" , physicalEncoder (withDefault emptyPhysical physical))
 
-    "Openstack" -> 
+    "Openstack" ->
       ("openstack" , openstackEncoder (withDefault emptyOpenstack openstack))
 
-    "KVM" -> 
+    "KVM" ->
       ("kvm" , kvmEncoder (withDefault emptyKVM kvm))
 
 
-    _ -> 
+    _ ->
 
      ("",null)
 
@@ -194,6 +194,6 @@ encode ({owner, env, type', machine} as system) stage =
   , ("env" , string env)
   , (encoderOf system stage)
   , ("machine" , machineEncoder machine)
- ] 
+ ]
 
 

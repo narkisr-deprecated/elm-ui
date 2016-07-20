@@ -1,7 +1,7 @@
 module Now exposing (..)
 
 
-type Foo = 
+type Foo =
   None
 -- import Native.Now
 --

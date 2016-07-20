@@ -1,7 +1,7 @@
 module Templates.List exposing (..)
 
 import Common.Utils exposing (none)
-import Html.App as App 
+import Html.App as App
 import Html exposing (..)
 import Maybe exposing (withDefault)
 import Task
@@ -18,15 +18,15 @@ import Html.Attributes exposing (type', class, id, style, attribute)
 import Bootstrap.Html exposing (..)
 import Templates.Model.Common exposing (decodeDefaults, defaultsByEnv, emptyTemplate, Template)
 
-type alias Model = 
+type alias Model =
   {
-    templates : List Template 
+    templates : List Template
   , table : Table.Model Template
   , pager : Pager.Model
   }
- 
+
 templateRow : String -> Template -> List (Html msg)
-templateRow id {name, type', description } = 
+templateRow id {name, type', description } =
     [ td [] [ text name ]
     , td [] [ text type' ]
     , td [] [ text description]
@@ -35,38 +35,38 @@ templateRow id {name, type', description } =
 
 init : (Model , Cmd Msg)
 init =
-  let 
+  let
     table = Table.init "templateListing" True ["Name", "Type", "Description"] templateRow "Templates"
-  in 
+  in
     (Model [] table Pager.init , getTemplates SetTemplates)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   LoadPage (Table.Msg Template)
     | GotoPage Pager.Msg
     | SetTemplates (Result Http.Error (List Template))
     | NoOp
 
 setTemplates: Model -> List Template -> (Model , Cmd Msg)
-setTemplates model templates = 
+setTemplates model templates =
   let
     total = List.length templates
     templatePairs = List.map (\ ({type'} as item) -> (type', item)) templates
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) model.pager)
     newTable = (Table.update (Table.UpdateRows templatePairs) model.table)
   in
-    none { model | templates = templates, pager = newPager, table = newTable } 
+    none { model | templates = templates, pager = newPager, table = newTable }
 
 
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
-  case msg of 
+  case msg of
    SetTemplates result ->
      successHandler result model (setTemplates model) NoOp
-   
-   _ -> 
+
+   _ ->
      none model
 
 -- View
@@ -85,7 +85,7 @@ view ({pager, table} as model) =
      (App.map GotoPage (Pager.view pager))
    ]
  ]
- 
+
 
 findTemplate : Model ->  String -> Template
 findTemplate {templates} name =
@@ -95,10 +95,10 @@ templateList : Decoder (List Template)
 templateList =
    at ["templates"] (list templateDecoder)
 
--- Http 
+-- Http
 
-getTemplates msg = 
-  getJson templateList "/templates" 
+getTemplates msg =
+  getJson templateList "/templates"
     |> Task.toResult
     |> Task.perform never msg
 

@@ -6,7 +6,7 @@ import Common.Delete exposing (refresh, succeeded)
 import Common.Components exposing (notImplemented)
 
 import Html exposing (..)
-import Html.App as App 
+import Html.App as App
 import Templates.Add as Add
 import Templates.List as List
 import Templates.Launch as Launch
@@ -14,8 +14,8 @@ import Templates.Delete as Delete
 import Templates.Routing as Route exposing (Route)
 import Systems.Model.Common exposing (System)
 
-type alias Model = 
-  { 
+type alias Model =
+  {
     add : Add.Model
   , list: List.Model
   , launch: Launch.Model
@@ -39,7 +39,7 @@ init =
   in
     (Model add list launch delete Nothing, Cmd.batch msgs)
 
-type Msg = 
+type Msg =
   TemplatesAdd Add.Msg
     | TemplatesList List.Msg
     | TemplatesLaunch Launch.Msg
@@ -50,116 +50,116 @@ type Msg =
 
 navigate : Msg -> (Model , Cmd Msg) -> (Model , Cmd Msg)
 navigate msg ((({launch, delete} as model), msgs) as result) =
-  case msg of 
-    SetupJob (job,id) -> 
-       case job of 
-         "launch" -> 
+  case msg of
+    SetupJob (job,id) ->
+       case job of
+         "launch" ->
             ({ model | navChange = Just ("/templates/launch/" ++ id) }, msgs)
-          
-         "clear" -> 
+
+         "clear" ->
             ({ model | navChange = Just ("/templates/delete/" ++ id ) }, msgs)
 
-         _ -> 
+         _ ->
            result
-          
-    TemplatesAdd add -> 
-      case add of 
-        Add.Saved (Result.Ok _) -> 
+
+    TemplatesAdd add ->
+      case add of
+        Add.Saved (Result.Ok _) ->
           ({ model | navChange = Just "/templates/list" }, msgs)
 
-        Add.Cancel -> 
+        Add.Cancel ->
           ({ model | navChange = Just "/templates/list"}, msgs)
 
-        Add.Done -> 
+        Add.Done ->
           ({ model | navChange = Just "/templates/list"}, msgs)
 
-        _ -> 
+        _ ->
           result
 
-    TemplatesLaunch launchMsg -> 
+    TemplatesLaunch launchMsg ->
        case launchMsg of
-          Launch.Cancel -> 
+          Launch.Cancel ->
             ({ model | navChange = Just "/templates/list" }, msgs)
 
-          Launch.JobLaunched r -> 
+          Launch.JobLaunched r ->
             ({ model | navChange = Just "/jobs/list"}, msgs)
 
-          _ -> 
+          _ ->
             result
 
-    TemplatesDelete deleteMsg -> 
-       case deleteMsg of 
-          Delete.Deleted _  -> 
+    TemplatesDelete deleteMsg ->
+       case deleteMsg of
+          Delete.Deleted _  ->
            if delete.errorMsg == "" then
              ({ model | navChange = Just "/templates/list"}, msgs)
            else
              result
 
-          Delete.Cancel -> 
+          Delete.Cancel ->
             refreshList True ({ model | navChange = Just "/templates/list"}, msgs)
 
-          Delete.Done -> 
+          Delete.Done ->
             refreshList True ({ model | navChange = Just "/templates/list"}, msgs)
-         
-          _ -> 
+
+          _ ->
             result
-    _ -> 
+    _ ->
       result
 
-setName model name = 
-  { model | name = name } 
+setName model name =
+  { model | name = name }
 
-refreshList = 
+refreshList =
   refresh List.init TemplatesList
 
 route : Msg ->  Model -> (Model , Cmd Msg)
 route msg ({add, launch, list, delete} as model) =
-  case msg of 
-    SetupJob (job, name) -> 
+  case msg of
+    SetupJob (job, name) ->
       case job of
-        "launch" -> 
+        "launch" ->
             none { model | launch = setName launch name }
-          
-        "clear" -> 
+
+        "clear" ->
             none { model | delete = setName delete name }
 
-        _ -> 
-          none model   
- 
-    TemplatesAdd msg -> 
-      case msg of 
-        Add.Saved _ -> 
-          let 
+        _ ->
+          none model
+
+    TemplatesAdd msg ->
+      case msg of
+        Add.Saved _ ->
+          let
            (newAdd, msgs) = (Add.update msg add)
           in
            refreshList True ({ model | add = newAdd}, Cmd.map TemplatesAdd msgs)
 
-        _ -> 
-         let 
+        _ ->
+         let
           (newAdd, msgs) = (Add.update msg add)
          in
           ({ model | add = newAdd }, Cmd.map TemplatesAdd msgs)
 
-    TemplatesList msg -> 
-      let 
+    TemplatesList msg ->
+      let
         (newList, msgs) = (List.update msg list)
       in
        ({ model | list = newList }, Cmd.map TemplatesList msgs)
 
-    TemplatesLaunch msg -> 
-      let 
+    TemplatesLaunch msg ->
+      let
          (newLaunch, msgs) = (Launch.update msg launch)
       in
         ({ model | launch = newLaunch } , Cmd.map TemplatesLaunch msgs)
 
-    TemplatesDelete msg -> 
-      let 
+    TemplatesDelete msg ->
+      let
         (newDelete, msgs) = (Delete.update msg delete)
         success = (succeeded msg Delete.Deleted "Template deleted")
       in
         refreshList success ({ model | delete = newDelete } , Cmd.map TemplatesDelete msgs)
 
-    _ -> 
+    _ ->
       none model
 
 
@@ -168,7 +168,7 @@ update msg ({add, launch, list} as model) =
    navigate msg (route msg model)
 
 -- Used in application Nav change
-add hyp system = 
+add hyp system =
   TemplatesAdd (Add.SetSystem hyp system)
 
 view : Model -> Route -> Html Msg
@@ -186,6 +186,6 @@ view {add, list, launch, delete} route =
     Route.Delete _ ->
       App.map TemplatesDelete (Delete.view delete)
 
-    Route.View _ -> 
+    Route.View _ ->
       notImplemented
- 
+

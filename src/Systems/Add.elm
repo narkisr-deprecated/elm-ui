@@ -8,7 +8,7 @@ import Basics.Extra exposing (never)
 
 import Common.Errors as Errors exposing (errorsSuccessHandler)
 import Html exposing (..)
-import Html.App as App 
+import Html.App as App
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type', style)
 import Html.Events exposing (onClick)
 import Task exposing (Task)
@@ -34,8 +34,8 @@ import Systems.Model.Common exposing (System, Machine, emptyMachine)
 import Common.Wizard as Wizard
 import Common.Components exposing (asList, panelContents, panel, dialogPanel, error, notImplemented, buttons)
 
-type Stage = 
-  General 
+type Stage =
+  General
     | Error
     | Proxmox
     | AWS
@@ -45,8 +45,8 @@ type Stage =
     | Digital
     | Physical
 
-type alias Model = 
-  { 
+type alias Model =
+  {
     awsModel : AWS.Model
   , gceModel : GCE.Model
   , physicalModel : Physical.Model
@@ -59,7 +59,7 @@ type alias Model =
   , stage : Stage
   }
 
-type Msg = 
+type Msg =
   Next
   | SaveSystem
   | SaveTemplate
@@ -80,20 +80,20 @@ type Msg =
 
 init : (Model, Cmd Msg)
 init =
-  let 
-    (general, msgs) = General.init 
-    withModels = Model AWS.init GCE.init Physical.init Digital.init Openstack.init general KVM.init 
-  in 
+  let
+    (general, msgs) = General.init
+    withModels = Model AWS.init GCE.init Physical.init Digital.init Openstack.init general KVM.init
+  in
     (withModels True Errors.init General, Cmd.map GeneralView msgs)
 
 
 setSaved : Msg -> Model -> SaveResponse -> (Model, Cmd Msg)
 setSaved next model {id} =
-  case id of 
-    Just num -> 
+  case id of
+    Just num ->
       (model, runJob (toString num) (toLower (toString next)) JobLaunched)
 
-    Nothing -> 
+    Nothing ->
       none model
 
 
@@ -102,11 +102,11 @@ back hasPrev model =
      newModel = { model |  hasNext = True}
    in
      if hasPrev then
-       newModel 
-     else 
+       newModel
+     else
        {newModel | stage = General}
 
-getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel} as model) hyp = 
+getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel} as model) hyp =
   let
    backs = Dict.fromList [
       ("aws", (back (Wizard.hasPrev awsModel) {model | stage = AWS , awsModel = (AWS.back awsModel)}))
@@ -121,7 +121,7 @@ getBack ({awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmMo
 
 machineFrom : String -> Model -> Machine
 machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel} =
-  let 
+  let
     machines =  Dict.fromList [
             ("aws", awsModel.machine)
           , ("gce", gceModel.machine)
@@ -133,122 +133,122 @@ machineFrom stage {awsModel, gceModel, digitalModel, openstackModel, physicalMod
   in
     withDefault emptyMachine (Dict.get (String.toLower stage) machines)
 
-  
+
 intoSystem : Model -> System
-intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, kvmModel, physicalModel, stage} as model) = 
+intoSystem ({general, awsModel, gceModel, digitalModel, openstackModel, kvmModel, physicalModel, stage} as model) =
   let
     {admin, type'} =  general
     baseSystem = System admin.owner admin.environment type' (machineFrom (toString stage) model)
-  in 
+  in
     baseSystem (Just awsModel.aws) (Just gceModel.gce) (Just digitalModel.digital) (Just openstackModel.openstack) (Just physicalModel.physical) (Just kvmModel.kvm)
-  
+
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physicalModel, kvmModel, stage} as model) =
   case msg of
-    Next -> 
-      let 
+    Next ->
+      let
         {admin} = general
         current = withDefault Dict.empty (Dict.get admin.environment admin.rawEnvironments)
       in
         case general.hypervisor of
-          "aws" -> 
+          "aws" ->
             let
-              newAws = AWS.next awsModel current 
+              newAws = AWS.next awsModel current
             in
               none { model | stage = AWS, awsModel = newAws , hasNext = Wizard.hasNext newAws}
 
-          "gce" -> 
+          "gce" ->
              let
-               newGce = GCE.next gceModel current 
+               newGce = GCE.next gceModel current
              in
                none { model | stage = GCE, gceModel = newGce , hasNext = Wizard.hasNext newGce}
 
-          "digital-ocean" -> 
+          "digital-ocean" ->
             let
-               newDigital = Digital.next digitalModel current 
+               newDigital = Digital.next digitalModel current
             in
               none { model | stage = Digital , digitalModel = newDigital , hasNext = Wizard.hasNext newDigital}
 
-          "physical" -> 
+          "physical" ->
             let
-              newPhysical = Physical.next physicalModel current 
+              newPhysical = Physical.next physicalModel current
             in
               none { model | stage = Physical , physicalModel = newPhysical , hasNext = Wizard.hasNext newPhysical}
 
-          "openstack" -> 
+          "openstack" ->
             let
-              newOpenstack = Openstack.next openstackModel current 
+              newOpenstack = Openstack.next openstackModel current
             in
               none { model | stage = Openstack , openstackModel = newOpenstack , hasNext = Wizard.hasNext newOpenstack}
 
-          "kvm" -> 
+          "kvm" ->
             let
-              newKvm = KVM.next kvmModel current 
+              newKvm = KVM.next kvmModel current
             in
               none { model | stage = KVM , kvmModel = newKvm , hasNext = Wizard.hasNext newKvm}
 
 
-          _ -> 
+          _ ->
             none model
 
-    Back -> 
+    Back ->
       none (getBack model general.hypervisor)
 
-    AWSView msg -> 
+    AWSView msg ->
       let
-        newAws = AWS.update msg awsModel 
+        newAws = AWS.update msg awsModel
       in
         none { model | awsModel = newAws }
 
-    GCEView msg -> 
+    GCEView msg ->
       let
         newGce= GCE.update msg gceModel
       in
         none { model | gceModel = newGce }
 
-    DigitalView msg -> 
+    DigitalView msg ->
       let
         newDigital= Digital.update msg digitalModel
       in
         none { model | digitalModel = newDigital }
 
-    PhysicalView msg -> 
+    PhysicalView msg ->
       let
         newPhysical= Physical.update msg physicalModel
       in
         none { model | physicalModel = newPhysical }
 
-    OpenstackView msg -> 
+    OpenstackView msg ->
       let
         newOpenstack = Openstack.update msg openstackModel
       in
         none { model | openstackModel = newOpenstack }
 
-    KVMView msg -> 
+    KVMView msg ->
       let
         newKvm = KVM.update msg kvmModel
       in
         none { model | kvmModel = newKvm }
 
-    GeneralView msg -> 
+    GeneralView msg ->
       let
         (newGeneral, msgs) = General.update msg general
       in
         ({ model | general = newGeneral }, Cmd.map GeneralView msgs)
 
-    Stage -> 
+    Stage ->
        (model, persistModel (saveSystem Stage) (intoSystem model) (toString stage))
 
-    SaveSystem -> 
+    SaveSystem ->
        (model, persistModel (saveSystem NoOp) (intoSystem model) (toString stage))
 
-    Create -> 
+    Create ->
       (model, persistModel (saveSystem Create) (intoSystem model) (toString stage))
 
-    SaveTemplate -> 
+    SaveTemplate ->
       none model
 
-    Saved next result -> 
+    Saved next result ->
       let
         ({saveErrors} as newModel, msgs) = errorsSuccessHandler result model (setSaved next model) NoOp
       in
@@ -257,34 +257,34 @@ update msg ({general, awsModel, gceModel, digitalModel, openstackModel, physical
        else
           (model, msgs)
 
-    _ -> 
+    _ ->
      none model
 
 currentView : Model -> Html Msg
 currentView ({awsModel, gceModel, digitalModel, physicalModel, openstackModel, kvmModel, saveErrors, general} as model)=
-  case model.stage of 
-    General -> 
+  case model.stage of
+    General ->
      App.map GeneralView (General.view general)
 
-    AWS -> 
+    AWS ->
      App.map AWSView (AWS.view awsModel)
 
-    GCE -> 
+    GCE ->
      App.map GCEView (GCE.view gceModel)
 
-    Digital -> 
+    Digital ->
      App.map DigitalView (Digital.view digitalModel)
 
-    Physical -> 
+    Physical ->
      App.map PhysicalView (Physical.view physicalModel)
 
-    Openstack -> 
+    Openstack ->
      App.map OpenstackView (Openstack.view openstackModel)
 
-    KVM -> 
+    KVM ->
      App.map KVMView (KVM.view kvmModel)
 
-    _ -> 
+    _ ->
       notImplemented
 
 saveMenu : Html Msg
@@ -294,18 +294,18 @@ saveMenu =
   , li [] [a [class "SaveTemplate", href "#", onClick SaveTemplate ] [text "Save as template"]]
   , li [] [a [class "Create", href "#", onClick Create ] [text "Create System"]]
   ]
-    
-dropdown = 
+
+dropdown =
   [  button [type' "button", class "btn btn-primary", onClick Stage] [text "Stage"]
   ,  button [class "btn btn-primary dropdown-toggle"
           , attribute "data-toggle" "dropdown"
           , attribute "aria-haspopup" "true"
-          , attribute "aria-expanded" "false"] 
+          , attribute "aria-expanded" "false"]
     [ span [class "caret"] [] , span [class "sr-only"] [] ]
-  , saveMenu 
+  , saveMenu
   ]
 
-errorsView {saveErrors} = 
+errorsView {saveErrors} =
    let
      body = App.map ErrorsView (Errors.view saveErrors)
    in
@@ -329,8 +329,8 @@ view ({stage} as model) =
 -- Effects
 
 saveSystem : Msg -> String -> Cmd Msg
-saveSystem next json  = 
-  postJson (Http.string json) saveResponse "/systems"  
+saveSystem next json  =
+  postJson (Http.string json) saveResponse "/systems"
     |> Task.toResult
     |> Task.perform never (Saved next)
 

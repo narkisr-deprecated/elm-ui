@@ -7,13 +7,13 @@ import Http exposing (Error(BadResponse))
 import Basics.Extra exposing (never)
 import Task
 
-type alias JobResponse = 
-  { message : String , id : String , job : String } 
+type alias JobResponse =
+  { message : String , id : String , job : String }
 
 jobResponse : Decoder JobResponse
-jobResponse = 
+jobResponse =
   object3 JobResponse
-    ("message" := Json.string) 
+    ("message" := Json.string)
     ("id" := Json.string)
     ("job" := Json.string)
 

@@ -20,18 +20,18 @@ import Dict exposing (Dict)
 import String
 
 
-type alias Model = 
+type alias Model =
   {
-   type' : Type 
+   type' : Type
   }
- 
+
 init : (Model , Cmd Msg)
 init =
   none (Model emptyType)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   ViewType String
     | SetType (Result Http.Error Type)
     | NoOp
@@ -43,40 +43,40 @@ setType model type' =
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
-  case msg of 
-   ViewType id -> 
+  case msg of
+   ViewType id ->
      (model, getType id SetType)
 
-   SetType result -> 
+   SetType result ->
       successHandler result model (setType model) NoOp
- 
-   NoOp -> 
+
+   NoOp ->
      none model
 
 -- View
 
-optionsList options = 
-  case options of 
-    Just vs -> 
+optionsList options =
+  case options of
+    Just vs ->
       String.join "," (Dict.values (Dict.map (\k o -> k ++ ": " ++ (valueOf o) ++ ", ") vs))
 
-    Nothing -> 
+    Nothing ->
       ""
 
 
-moduleSection env {args, module', classes} = 
+moduleSection env {args, module', classes} =
   let
     cs = String.join "" (Dict.keys classes)
     os = optionsList module'.options
     args' = String.join ", " args
-  in 
+  in
   [overviewSection (capitalize env)
      ["name", "source", "arguments", "options", "classes"]
      [module'.name, module'.src, args', os, cs]]
 
 puppetSummary :  Dict String PuppetStd -> List (List (Html Msg))
-puppetSummary puppetStd = 
-  Dict.foldl 
+puppetSummary puppetStd =
+  Dict.foldl
     (\env std res -> List.append (moduleSection env std) res) [] puppetStd
 
 summarySections : Type  -> List (List (Html Msg))
@@ -87,10 +87,10 @@ summarySections {type', description, puppetStd} =
 
 summarize: Type -> Html Msg
 summarize model =
-   div [style [("line-height", "1.8"), ("list-style-type","none")]] 
+   div [style [("line-height", "1.8"), ("list-style-type","none")]]
      (summarySections model |> List.map summaryPanel
-                            |> partition 2 
-                            |> (List.map List.concat) 
+                            |> partition 2
+                            |> (List.map List.concat)
                             |> (List.map row_))
 
 view : Model -> Html Msg
@@ -99,9 +99,9 @@ view model =
     h4 [] [text "Type"]
   , (summarize model.type')
   ]
-  
 
-getType id msg = 
+
+getType id msg =
   getJson Model.type' ("/types/" ++ id)
     |> Task.toResult
     |> Task.perform never msg

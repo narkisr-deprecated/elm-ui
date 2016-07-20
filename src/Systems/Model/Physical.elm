@@ -1,14 +1,14 @@
 module Systems.Model.Physical exposing (..)
 
-import Maybe 
+import Maybe
 
-type alias Physical = 
-  { 
+type alias Physical =
+  {
     mac : Maybe String,
     broadcast : Maybe String
   }
 
 emptyPhysical: Physical
-emptyPhysical = 
+emptyPhysical =
    Physical Nothing Nothing
 

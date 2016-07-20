@@ -15,7 +15,7 @@ import Common.Redirect exposing (redirect)
 import Table as Table
 import Set
 
-type alias Model = 
+type alias Model =
   { systemsList : List.Model
   , systemsAdd : Add.Model
   , systemsView : View.Model
@@ -23,25 +23,25 @@ type alias Model =
   , navChange : Maybe String
   }
 
-  
-addedSystem model = 
+
+addedSystem model =
   ((toString model.systemsAdd.stage), Add.intoSystem model.systemsAdd)
 
 init : (Model , Cmd Msg)
 init =
   let
-     (systemsList, systemsListMsg) = List.init 
-     (systemsView, _) = View.init 
-     (systemsAdd, systemsAddMsg ) = Add.init 
-     (systemsLaunch, _) = Launch.init 
-     msgs = [ 
-       Cmd.map SystemsListing systemsListMsg 
-     , Cmd.map SystemsAdd systemsAddMsg 
+     (systemsList, systemsListMsg) = List.init
+     (systemsView, _) = View.init
+     (systemsAdd, systemsAddMsg ) = Add.init
+     (systemsLaunch, _) = Launch.init
+     msgs = [
+       Cmd.map SystemsListing systemsListMsg
+     , Cmd.map SystemsAdd systemsAddMsg
      ]
   in
     (Model systemsList systemsAdd systemsView systemsLaunch Nothing, Cmd.batch msgs)
 
-type Msg = 
+type Msg =
   SystemsListing List.Msg
    | SystemsAdd Add.Msg
    | SystemsView View.Msg
@@ -67,36 +67,36 @@ setupJob msg ({systemsList, systemsLaunch} as model) =
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({systemsView, systemsList, systemsAdd} as model) =
- case msg of 
-    SystemsView msg -> 
+ case msg of
+    SystemsView msg ->
       let
         (newSystems, msgs) = View.update msg systemsView
       in
         ({model | systemsView = newSystems}, Cmd.map SystemsView msgs)
 
-    SystemsListing systemsMsg -> 
-      case systemsMsg of 
+    SystemsListing systemsMsg ->
+      case systemsMsg of
         List.LoadPage (Table.View id) ->
-          let 
+          let
             (newSystems, msgs) = View.update (View.ViewSystem id) systemsView
           in
-           ({model | systemsView = newSystems, navChange = Just("systems/view/" ++ id)}, Cmd.map SystemsView msgs)        
+           ({model | systemsView = newSystems, navChange = Just("systems/view/" ++ id)}, Cmd.map SystemsView msgs)
         _ ->
 
-          let 
+          let
             (newSystems, effect ) = List.update systemsMsg systemsList
           in
             ({ model | systemsList = newSystems }, Cmd.map SystemsListing effect)
 
-    SystemsAdd systemsMsg -> 
+    SystemsAdd systemsMsg ->
       case systemsMsg of
-        Add.JobLaunched _ -> 
+        Add.JobLaunched _ ->
           none {model | navChange = Just "jobs/list"}
 
-        Add.SaveTemplate -> 
+        Add.SaveTemplate ->
           none {model | navChange = Just "templates/add"}
 
-        Add.Saved next result -> 
+        Add.Saved next result ->
           let
             (newSystems, newEffects) = Add.update systemsMsg systemsAdd
             (initial, initEffects) = Add.init
@@ -104,43 +104,43 @@ update msg ({systemsView, systemsList, systemsAdd} as model) =
             -- If not the default case
             if newEffects /= Cmd.none && next == Add.NoOp then
               ({model | navChange = Just "systems/list", systemsAdd = initial}, Cmd.map SystemsAdd initEffects)
-            else  
+            else
               ({model | systemsAdd = newSystems }, Cmd.map SystemsAdd newEffects)
 
-        _ -> 
-          let 
+        _ ->
+          let
             (newSystems, effect) = Add.update systemsMsg systemsAdd
           in
             ({model | systemsAdd = newSystems }, Cmd.map SystemsAdd effect)
 
-    SystemsLaunch launchMsg -> 
-      case Debug.log "" launchMsg of 
-        Launch.Cancel -> 
+    SystemsLaunch launchMsg ->
+      case Debug.log "" launchMsg of
+        Launch.Cancel ->
           none { model | navChange = Just "systems/list"}
 
-        Launch.JobLaunched _ -> 
+        Launch.JobLaunched _ ->
           none {model | navChange = Just "jobs/list"}
 
-        SetupJob job -> 
+        SetupJob job ->
           setupJob launchMsg model
 
-        Run -> 
-          let 
+        Run ->
+          let
              (newLaunch, effect) = Launch.update launchMsg model.systemsLaunch
-          in 
+          in
            ({ model | systemsLaunch = newLaunch}, Cmd.map SystemsLaunch effect)
 
-        _ -> 
+        _ ->
           none model
 
-    NoOp -> 
+    NoOp ->
       none model
 
 
 view : Model -> Route -> Html Msg
 view model route =
   case route of
-    Routing.List -> 
+    Routing.List ->
       App.map SystemsListing (List.view model.systemsList)
 
     Routing.Launch ->
@@ -149,9 +149,9 @@ view model route =
     Routing.Add ->
       App.map SystemsAdd (Add.view model.systemsAdd)
 
-    Routing.View _ -> 
+    Routing.View _ ->
       App.map SystemsView (View.view model.systemsView)
 
-    _ -> 
+    _ ->
      notImplemented
- 
+

@@ -12,11 +12,11 @@ import Users.Model exposing (User, permBase)
 import Form.Field as Field exposing (Field)
 import Form.Infix exposing (..)
 
-type alias Model = 
+type alias Model =
   {
     form : Form () User
   }
- 
+
 validate : Validation () User
 validate =
   form2 permBase
@@ -29,14 +29,14 @@ init =
 -- View
 
 view envs operations ({form} as model) =
- let 
+ let
     environment = (Form.getFieldAsStringList "envs" form)
     operation = (Form.getFieldAsStringList "operations" form)
  in
    (Html.form [] [
       div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Environment" (Input.multiSelectInput envs) environment 
-      , formControl "Operation"  (Input.multiSelectInput operations) operation 
+        formControl "Environment" (Input.multiSelectInput envs) environment
+      , formControl "Operation"  (Input.multiSelectInput operations) operation
       ]
     ])
 

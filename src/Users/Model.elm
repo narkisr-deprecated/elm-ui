@@ -16,18 +16,18 @@ import Task
 
 -- Model
 
-type alias User = 
+type alias User =
   {
     username : String
   , password : Maybe String
   , operations : List String
   , roles : List String
-  , envs : List String 
+  , envs : List String
   }
 
 emptyUser : User
 emptyUser  =
-  User "" Nothing [] [] [] 
+  User "" Nothing [] [] []
 
 userBase name password role =
   User name (Just password) [] [role] []
@@ -39,7 +39,7 @@ permBase envs operations =
 -- Decoding
 
 user : Decoder User
-user = 
+user =
   object5 User
     ("username" := string)
     (maybe ("password" := string))
@@ -53,8 +53,8 @@ usersList =
 
 -- Effects
 
-getUsers msg = 
-  getJson usersList "/users" 
+getUsers msg =
+  getJson usersList "/users"
     |> Task.toResult
     |> Task.perform never msg
 
@@ -62,8 +62,8 @@ rolesList : Decoder (Dict String String)
 rolesList =
   at ["roles"] (dict string)
 
-getRoles msg = 
-  getJson rolesList "/users/roles" 
+getRoles msg =
+  getJson rolesList "/users/roles"
     |> Task.toResult
     |> Task.perform never msg
 

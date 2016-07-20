@@ -14,26 +14,26 @@ import Systems.Model.Common exposing (System)
 
 
 addDevice : Maybe (List {r | device : String}) -> Maybe (List {r | device : String})
-addDevice vs = 
+addDevice vs =
   Just (List.map (\({device} as volume) -> {volume | device = "/dev/"++device}) (withDefault [] vs))
 
 transform ({aws, openstack} as system) stage =
   case stage of
-    "AWS" -> 
+    "AWS" ->
       let
         justAws = withDefault emptyAws aws
         newAws = {justAws | blockDevices = addDevice justAws.blockDevices, volumes = addDevice justAws.volumes}
       in
        {system | aws = Just newAws}
 
-    "Openstack" -> 
+    "Openstack" ->
       let
         justStack = withDefault emptyOpenstack openstack
         newStack = {justStack | volumes = addDevice justStack.volumes}
       in
        {system | openstack = Just newStack}
 
-    _ -> 
+    _ ->
        system
 
 persistModel : (String -> Cmd a) -> System -> String -> Cmd a

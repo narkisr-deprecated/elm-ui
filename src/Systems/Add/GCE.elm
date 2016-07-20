@@ -21,10 +21,10 @@ import Debug
 import Common.Wizard as Wizard
 import Common.Components exposing (..)
 
--- Model 
+-- Model
 
-type alias Model = 
-  { 
+type alias Model =
+  {
     wizard : (Wizard.Model Step)
   , gce : GCE
   , machine : Machine
@@ -34,12 +34,12 @@ type alias Model =
 
 init : Model
 init =
-  let 
+  let
     wizard = Wizard.init Zero Instance [ Instance, Networking, Summary ]
-  in 
+  in
     Model wizard emptyGce emptyMachine Dict.empty Dict.empty
 
-type Msg = 
+type Msg =
   WizardMsg Wizard.Msg
    | Update Environment
    | SelectMachineType String
@@ -52,7 +52,7 @@ type Msg =
    | DomainInput String
    | IPInput String
 
-type Step = 
+type Step =
   Zero
   | Instance
   | Networking
@@ -90,72 +90,72 @@ validateGce = validateAll [listValidations, stringValidations]
 update : Msg -> Model-> Model
 update msg ({wizard, gce, machine} as model) =
   case msg of
-    WizardMsg msg -> 
+    WizardMsg msg ->
       let
         ({errors} as newModel) = (validateGce wizard.step model)
         newWizard = Wizard.update (notAny errors) msg wizard
       in
-       { newModel | wizard = newWizard } 
+       { newModel | wizard = newWizard }
 
-    Update environment -> 
+    Update environment ->
         let
            newModel = { model | environment = environment }
-        in 
+        in
           case List.head (Dict.keys (getOses newModel)) of
-             Just os -> 
+             Just os ->
                if (String.isEmpty machine.os) then
                  { newModel | machine = {machine | os = os }}
-               else 
+               else
                  newModel
-             Nothing -> 
+             Nothing ->
                newModel
 
-    SelectMachineType type' -> 
+    SelectMachineType type' ->
       setGCE (\gce -> {gce | machineType = type' }) model
 
-    SelectOS newOS -> 
+    SelectOS newOS ->
       setMachine (\machine -> {machine | os = newOS }) model
 
-    SelectZone zone -> 
-      setGCE (\gce -> {gce | zone = zone }) model 
+    SelectZone zone ->
+      setGCE (\gce -> {gce | zone = zone }) model
 
-    UserInput user -> 
-       model 
+    UserInput user ->
+       model
         |> setMachine (\machine -> {machine | user = user })
         |> validate wizard.step "User" stringValidations
 
-    HostnameInput host -> 
-      model 
+    HostnameInput host ->
+      model
         |> setMachine (\machine -> {machine | hostname = host })
         |> validate wizard.step "Hostname" stringValidations
-         
-    ProjectIdInput id -> 
-      model 
+
+    ProjectIdInput id ->
+      model
         |> setGCE (\gce-> {gce | projectId = id })
         |> validate wizard.step "Project id" stringValidations
 
-    TagsInput tags -> 
+    TagsInput tags ->
       let
         splited = String.split " " tags
       in
-        model  
+        model
           |>  setGCE (\gce -> {gce | tags = Just (if splited == [""] then [] else splited)})
           |>  validate wizard.step "Tags" listValidations
 
-    DomainInput domain -> 
-      model 
+    DomainInput domain ->
+      model
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate wizard.step "Domain" stringValidations
 
-    IPInput ip -> 
-      model 
+    IPInput ip ->
+      model
         |> setGCE (\gce -> {gce | staticIp = Just ip})
         |> validate wizard.step "IP" stringValidations
 
 next : Model -> Environment -> Model
 next model environment =
-      model 
-         |> update (Update environment) 
+      model
+         |> update (Update environment)
          |> update (WizardMsg Wizard.Next)
 
 back model =
@@ -164,21 +164,21 @@ back model =
 
 getOses : Model -> Dict String Template
 getOses model =
-  let 
+  let
     hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "gce" model.environment)
-  in 
+  in
     case hypervisor of
-      OSTemplates oses -> 
+      OSTemplates oses ->
         oses
-      _ -> 
+      _ ->
         Dict.empty
 
 networking: Model -> List (Html Msg)
 networking ({errors, gce, machine} as model) =
-  let 
+  let
     check = withErrors errors
   in
-  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
      [
        legend [] [text "DNS"]
      , check "Hostname" (inputText HostnameInput "" machine.hostname)
@@ -195,31 +195,31 @@ instance ({gce, machine, errors} as model) =
     tags = (String.join " " (defaultEmpty gce.tags))
     zone = withDefault "" (List.head zones)
   in
-    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       [ 
+    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+       [
          legend [] [text "Properties"]
        , group' "Machine type" (selector SelectMachineType machineTypes gce.machineType)
        , group' "OS" (selector SelectOS (Dict.keys (getOses model)) machine.os)
        , group' "Zone" (selector SelectZone zones gce.zone)
        , check "Project id" (inputText ProjectIdInput "" gce.projectId)
        , legend [] [text "Security"]
-       , check "User" (inputText UserInput "" model.machine.user) 
+       , check "User" (inputText UserInput "" model.machine.user)
        , check "Tags" (inputText TagsInput " " tags)]
    ]
 
 stepView:  Model -> List (Html Msg)
 stepView ({wizard, gce, machine} as model) =
   case wizard.step of
-    Instance -> 
-      instance model 
+    Instance ->
+      instance model
 
-    Networking -> 
+    Networking ->
       networking model
 
-    Summary -> 
+    Summary ->
       summarize (gce, machine)
 
-    _ -> 
+    _ ->
       Debug.log (toString wizard.step) [div [] []]
 
 

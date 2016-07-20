@@ -18,25 +18,25 @@ import Form exposing (Msg(..))
 import Task exposing (Task)
 
 
-type alias Model = 
+type alias Model =
   {
     add : Add.Model
   , name : String
   , type' : Type
   }
- 
+
 init : (Model , Cmd Msg)
 init =
-  let 
+  let
     (add, msgs) = Add.init
-  in 
+  in
     (Model add "" emptyType, Cmd.map AddMsg msgs)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   NoOp
-   | AddMsg Add.Msg 
+   | AddMsg Add.Msg
    | LoadType String
    | ViewMsg View.Msg
    | SetType (Result Http.Error Type)
@@ -46,47 +46,47 @@ setType : Model -> Type -> (Model , Cmd Msg)
 setType ({add} as model) type' =
   let
     env = withDefault "" (List.head (add.environments))
-  in 
+  in
     none {model | type' = type', add = Add.reinit add type' env}
 
-envChange msg ({type', add} as model) = 
-  case msg of 
-    (FormMsg (Input "environment" (Select env))) -> 
+envChange msg ({type', add} as model) =
+  case msg of
+    (FormMsg (Input "environment" (Select env))) ->
       {model | type' = type', add = Add.reinit add type' env}
 
-    _ -> 
+    _ ->
       model
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({add} as model) =
-  case msg of 
-    AddMsg addMsg -> 
-      case addMsg of 
-        Save _ -> 
-          let 
+  case msg of
+    AddMsg addMsg ->
+      case addMsg of
+        Save _ ->
+          let
             (newAdd, msgs) = Add.update (Save updateType) add
           in
             ({ model | add = newAdd }, Cmd.map AddMsg msgs)
 
-        -- LoadEditor _ -> 
-        --   let 
+        -- LoadEditor _ ->
+        --   let
         --     (newAdd, msgs) = Add.update (LoadEditor "typesEdit") add
         --   in
         --     ({ model | add = newAdd }, Cmd.map AddMsg msgs)
         --
-        _ -> 
-          let 
+        _ ->
+          let
             (newAdd, msgs) = Add.update addMsg add
-          in 
+          in
             (envChange addMsg { model | add = newAdd }, Cmd.map AddMsg msgs)
 
-    LoadType name -> 
+    LoadType name ->
        (model, View.getType name SetType)
 
-    SetType result -> 
+    SetType result ->
       successHandler result model (setType model) NoOp
- 
-    _ -> 
+
+    _ ->
       none model
 
 -- View

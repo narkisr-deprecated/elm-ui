@@ -2,7 +2,7 @@ port module Main exposing (..)
 
 import Html.App as Html -- was StartA
 import Task
-import Application as App exposing (init, view, update ,Msg(EditMsg, MenuMsg), Model, urlUpdate) 
+import Application as App exposing (init, view, update ,Msg(EditMsg, MenuMsg), Model, urlUpdate)
 
 import Json.Encode as E exposing (list, string)
 
@@ -18,7 +18,7 @@ import Jobs.List exposing (Msg(Polling))
 import Jobs.Core as Jobs
 
 
--- Common 
+-- Common
 import Common.Menu exposing (menuPort, intoMsg)
 import Common.Editor exposing (editorOutPort, editorInPort, Msg(Load))
 

@@ -5,23 +5,23 @@ import Dict exposing (Dict)
 import String
 import Common.Model exposing (..)
 
-type alias Module = 
+type alias Module =
   {
-    name : String 
-  , src : String 
+    name : String
+  , src : String
   , options : Maybe (Dict String Options)
   }
 
-type alias PuppetStd = 
+type alias PuppetStd =
   {
     module' : Module
   , args : List String
   , classes : Dict String Options
   }
 
-type alias Type = 
+type alias Type =
   {
-    type' : String 
+    type' : String
   , description : Maybe String
   , puppetStd : Dict String PuppetStd
   }
@@ -29,20 +29,20 @@ type alias Type =
 -- Decoders
 
 classesDecoder: Decoder (Dict String Options)
-classesDecoder = 
+classesDecoder =
    (dict (option ()))
 
 decodeClasses : String -> (Dict String Options)
 decodeClasses json =
-  case Json.decodeString classesDecoder json of 
-    Ok value -> 
+  case Json.decodeString classesDecoder json of
+    Ok value ->
        value
 
-    Err error -> 
+    Err error ->
       Debug.log error Dict.empty
 
 module' : Decoder Module
-module' = 
+module' =
   object3 Module
    ("name" := string)
    ("src" := string)
@@ -56,28 +56,28 @@ puppetStd =
      ("classes" := (dict (option ())))
 
 type': Decoder Type
-type' = 
+type' =
   object3 Type
     ("type" := string)
     (maybe ("description" := string))
     ("puppet-std" := dict puppetStd)
 
 
--- Builders 
+-- Builders
 
-emptyType = 
+emptyType =
   Type "" Nothing Dict.empty
 
-emptyModule = 
+emptyModule =
   Module "" "" Nothing
 
 emptyPuppet =
   PuppetStd emptyModule [] Dict.empty
 
-typeBase type' description environment = 
+typeBase type' description environment =
   Type type' (Just description) (Dict.fromList [(environment, emptyPuppet)])
 
-puppetBase name src unsecure args = 
+puppetBase name src unsecure args =
   let
     module' = Module name src (Just (Dict.fromList [("unsecure", BoolOption unsecure)]))
     puppet = PuppetStd module' (String.split " " args) Dict.empty

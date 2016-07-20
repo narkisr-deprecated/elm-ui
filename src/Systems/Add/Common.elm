@@ -10,32 +10,32 @@ import Dict exposing (Dict)
 import String
 
 getOses hyp model =
-  let 
+  let
     hypervisor = withDefault ENV.Empty (Dict.get hyp model.environment)
-  in 
+  in
     case hypervisor of
-      OSTemplates oses -> 
+      OSTemplates oses ->
         oses
 
-      ENV.Openstack flavors oses -> 
+      ENV.Openstack flavors oses ->
         oses
 
-      ENV.KVM oses _ -> 
+      ENV.KVM oses _ ->
         oses
 
-      _ -> 
+      _ ->
         Dict.empty
 
 
-setDefaultOS hyp ({machine} as model) = 
+setDefaultOS hyp ({machine} as model) =
    case List.head (Dict.keys (getOses hyp model)) of
-     Just os -> 
+     Just os ->
        if (String.isEmpty machine.os) then
          { model | machine = {machine | os = os }}
-       else 
+       else
          model
 
-     Nothing -> 
+     Nothing ->
        model
 
 setMachine f ({machine} as model) =

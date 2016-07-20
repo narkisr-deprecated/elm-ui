@@ -11,28 +11,28 @@ import Common.Components exposing (notImplemented, asList)
 -- Routing
 import Users.Routing as Routing exposing (Route)
 
-type alias Model = 
+type alias Model =
   {
-   list : List.Model 
-  , add : Add.Model 
+   list : List.Model
+  , add : Add.Model
   , navChange : Maybe String
   }
- 
+
 init : (Model , Cmd Msg)
 init =
-  let 
+  let
     (list, listMsgs) = List.init
     (add, addMsgs) = Add.init
     msgs = [
         Cmd.map Listing listMsgs
      ,  Cmd.map Adding addMsgs
      ]
-  in 
+  in
     (Model list add Nothing, Cmd.batch msgs)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   Listing List.Msg
     | Adding Add.Msg
     | MenuClick (String, String)
@@ -41,38 +41,38 @@ type Msg =
 
 navigate : Msg -> (Model , Cmd Msg) -> (Model , Cmd Msg)
 navigate msg ((({list} as model), msgs) as result) =
-  case msg of 
-    MenuClick (job,name) -> 
-      case job of 
-        "edit" -> 
+  case msg of
+    MenuClick (job,name) ->
+      case job of
+        "edit" ->
           ({ model | navChange = Just ("/users/edit/" ++ name) }, msgs)
-           
-        "clear" -> 
+
+        "clear" ->
           ({ model | navChange = Just ("/users/delete/" ++ name) }, msgs)
 
-        _ -> 
+        _ ->
             none model
 
-    _ -> 
+    _ ->
      none model
 
 route : Msg ->  Model -> (Model , Cmd Msg)
 route msg ({list, add} as model) =
-  case msg of 
-    Listing listing -> 
+  case msg of
+    Listing listing ->
       let
-        (newList, msgs) =  List.update listing list 
+        (newList, msgs) =  List.update listing list
       in
         ({model | list = newList }, Cmd.map Listing msgs)
 
-    Adding adding -> 
+    Adding adding ->
       let
         (newAdd, msgs) =  Add.update adding add
       in
         ({model | add = newAdd }, Cmd.map Adding msgs)
 
 
-    _ -> 
+    _ ->
       none model
 
 update : Msg ->  Model -> (Model , Cmd Msg)
@@ -85,12 +85,12 @@ update msg model =
 view : Model -> Route -> Html Msg
 view ({list, add} as model) section =
    case section of
-     Routing.List -> 
+     Routing.List ->
        App.map Listing (List.view list)
 
-     Routing.Add -> 
+     Routing.Add ->
        App.map Adding (Add.view add)
-      
-     _ -> 
+
+     _ ->
        notImplemented
 

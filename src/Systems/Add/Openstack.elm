@@ -22,9 +22,9 @@ import Common.Wizard as Wizard
 import Common.Components exposing (..)
 import Common.Utils exposing (none)
 
--- Model 
+-- Model
 
-type alias Model = 
+type alias Model =
   {
     wizard : (Wizard.Model Step)
   , openstack : Openstack
@@ -36,12 +36,12 @@ type alias Model =
 
 init : Model
 init =
-  let 
+  let
     wizard = Wizard.init Zero Instance [ Instance, Networking, Cinder, Summary ]
-  in 
+  in
     Model wizard emptyOpenstack emptyMachine Dict.empty Dict.empty emptyVolume
 
-type Msg = 
+type Msg =
   WizardMsg Wizard.Msg
    | Update Environment
    | SelectFlavor String
@@ -62,7 +62,7 @@ type Msg =
    | VolumeRemove String
 
 
-type Step = 
+type Step =
   Zero
   | Instance
   | Networking
@@ -83,7 +83,7 @@ setVolume f ({volume} as model) =
   let
     newVolume = f volume
   in
-    { model | volume = newVolume }  
+    { model | volume = newVolume }
 
 stringValidations = Dict.fromList [
     vpair Networking [
@@ -115,33 +115,33 @@ tupleValidations = Dict.fromList [
 
 ignoreDevices: Model-> Model
 ignoreDevices ({errors} as model) =
-  let 
-    ignored  = errors |> Dict.remove "Cinder Device" 
+  let
+    ignored  = errors |> Dict.remove "Cinder Device"
                       |> Dict.remove "Instance Device"
                       |> Dict.remove "Volume"
-  in 
+  in
     { model | errors =  ignored }
 
 getFlavors model =
-  let 
+  let
     hypervisor = withDefault ENV.Empty (Dict.get "openstack" model.environment)
-  in 
+  in
     case hypervisor of
-      ENV.Openstack flavors _ -> 
+      ENV.Openstack flavors _ ->
         flavors
-      _ -> 
+      _ ->
         Dict.empty
 
 
-setDefaultFlavor hyp ({openstack} as model) = 
+setDefaultFlavor hyp ({openstack} as model) =
    case List.head (Dict.keys (getFlavors model)) of
-     Just flavor -> 
+     Just flavor ->
        if (String.isEmpty openstack.flavor) then
          { model | openstack = {openstack | flavor = flavor }}
-       else 
+       else
          model
 
-     Nothing -> 
+     Nothing ->
        model
 
 validateOpenstack = validateAll [stringValidations, listValidations]
@@ -149,112 +149,112 @@ validateOpenstack = validateAll [stringValidations, listValidations]
 update : Msg -> Model-> Model
 update msg ({wizard, openstack, machine, volume} as model) =
   case msg of
-    WizardMsg msg -> 
+    WizardMsg msg ->
       let
         ({errors} as newModel) = ignoreDevices (validateOpenstack wizard.step model)
         newWizard = Wizard.update (notAny errors) msg wizard
       in
-       { newModel | wizard = newWizard } 
+       { newModel | wizard = newWizard }
 
-    Update environment -> 
-      setDefaultOS "openstack" { model | environment = environment} 
+    Update environment ->
+      setDefaultOS "openstack" { model | environment = environment}
         |> setDefaultFlavor model
 
-    SelectFlavor flavor -> 
+    SelectFlavor flavor ->
       setOpenstack (\openstack -> {openstack | flavor = flavor }) model
 
-    SelectOS os -> 
+    SelectOS os ->
       setMachine (\machine -> {machine | os = os }) model
 
-    TenantInput tenant -> 
-      model 
-        |> setOpenstack (\openstack -> {openstack | tenant = tenant }) 
+    TenantInput tenant ->
+      model
+        |> setOpenstack (\openstack -> {openstack | tenant = tenant })
         |> validate wizard.step "Tenant" stringValidations
 
-   
-    KeyPairInput key -> 
-      model 
-        |> setOpenstack (\openstack -> {openstack | keyName = key }) 
+
+    KeyPairInput key ->
+      model
+        |> setOpenstack (\openstack -> {openstack | keyName = key })
         |> validate wizard.step "Keypair" stringValidations
 
-    SecurityGroupsInput groups -> 
+    SecurityGroupsInput groups ->
       let
-        splited = String.split " " groups 
+        splited = String.split " " groups
       in
-        model  
+        model
           |>  setOpenstack (\openstack -> {openstack | securityGroups = Just (if splited == [""] then [] else splited)})
           |>  validate wizard.step "Security groups" listValidations
 
 
-    NetworksInput networks -> 
+    NetworksInput networks ->
       let
         splited = String.split " " networks
       in
-        model  
+        model
           |>  setOpenstack (\openstack -> {openstack | networks = splited})
           |>  validate wizard.step "Networks" listValidations
 
 
-    UserInput user -> 
-       model 
+    UserInput user ->
+       model
         |> setMachine (\machine -> {machine | user = user })
         |> validate wizard.step "User" stringValidations
 
-    HostnameInput host -> 
-      model 
+    HostnameInput host ->
+      model
         |> setMachine (\machine -> {machine | hostname = host })
         |> validate wizard.step "Hostname" stringValidations
 
-    DomainInput domain -> 
-      model 
+    DomainInput domain ->
+      model
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate wizard.step "Domain" stringValidations
 
-    IPInput ip -> 
-      model 
+    IPInput ip ->
+      model
         |> setOpenstack (\openstack -> {openstack | floatingIp = Just ip })
         |> validate wizard.step "IP" stringValidations
 
-    IPPoolInput pool -> 
-      model 
+    IPPoolInput pool ->
+      model
         |> setOpenstack (\openstack -> {openstack | floatingIpPool = Just pool })
 
-    CinderSizeInput size -> 
+    CinderSizeInput size ->
       case (String.toInt size) of
-        Ok num -> 
+        Ok num ->
           setVolume (\volume -> { volume | size = num}) model
-        Err _ -> 
+        Err _ ->
           model
 
-    CinderDeviceInput device -> 
-      model 
+    CinderDeviceInput device ->
+      model
         |> setVolume (\volume -> { volume | device = device})
         |> validate wizard.step "Cinder Device" tupleValidations
 
-    CinderClear -> 
+    CinderClear ->
       setVolume (\volume -> { volume | clear = not volume.clear}) model
 
-    VolumeAdd -> 
-      let 
+    VolumeAdd ->
+      let
         ({errors} as newModel) = validate wizard.step "Cinder Device" tupleValidations model
-        newOpenstack = {openstack | volumes = Just (List.append [volume] (defaultEmpty openstack.volumes)) } 
-      in 
+        newOpenstack = {openstack | volumes = Just (List.append [volume] (defaultEmpty openstack.volumes)) }
+      in
         if notAny errors then
           { newModel | volume = emptyVolume, openstack = newOpenstack }
-        else 
+        else
           { newModel | openstack = openstack }
-        
-    VolumeRemove device -> 
-      let 
+
+    VolumeRemove device ->
+      let
         newVolumes = (List.filter (\volume -> volume.device /= device) (defaultEmpty openstack.volumes))
-        newOpenstack = { openstack | volumes = Just newVolumes} 
-      in 
-        { model | openstack = newOpenstack } 
+        newOpenstack = { openstack | volumes = Just newVolumes}
+      in
+        { model | openstack = newOpenstack }
 
 next : Model -> Environment -> Model
 next model environment =
-      model 
-         |> update (Update environment) 
+      model
+         |> update (Update environment)
          |> update (WizardMsg Wizard.Next)
 
 back model =
@@ -268,25 +268,25 @@ instance ({openstack, machine, errors} as model) =
     flavors = (Dict.keys (getFlavors model))
     oses = (Dict.keys (getOses "openstack" model))
   in
-    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       [ 
+    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+       [
          legend [] [text "Properties"]
        , group' "Flavor" (selector SelectFlavor flavors openstack.flavor)
        , group' "OS" (selector SelectOS oses machine.os)
-       , check "Tenant" (inputText TenantInput "" openstack.tenant) 
+       , check "Tenant" (inputText TenantInput "" openstack.tenant)
        , legend [] [text "Security"]
-       , check "User" (inputText UserInput "" machine.user) 
+       , check "User" (inputText UserInput "" machine.user)
        , check "Keypair" (inputText KeyPairInput "" openstack.keyName)
        , check "Security groups" (inputText SecurityGroupsInput " " groups)]
    ]
 
 networking: Model -> List (Html Msg)
 networking ({errors, openstack, machine} as model) =
-  let 
+  let
     check = withErrors errors
     networks = (String.join " " openstack.networks)
   in
-  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
+  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
      [
        legend [] [text "Networking"]
      , check "Hostname" (inputText HostnameInput "" machine.hostname)
@@ -298,7 +298,7 @@ networking ({errors, openstack, machine} as model) =
   ]
 
 volumeRow : Volume -> Html Msg
-volumeRow ({device} as v) = 
+volumeRow ({device} as v) =
   let
     remove = span [ class "glyphicon glyphicon-remove"
                   , attribute "aria-hidden" "true"
@@ -310,14 +310,14 @@ volumeRow ({device} as v) =
     tr [] (List.append (List.map (\prop -> td [] [text (prop v)]) props) [remove])
 
 volumes : List Volume -> Html Msg
-volumes vs = 
+volumes vs =
   div [class "col-md-8 col-md-offset-2 "] [
     table [class "table", id "ebsVolumes"]
      [thead []
         [tr [] (List.map (\k ->  (th [] [text k])) ["device", "size", "clear", ""])]
-         , tbody [] 
+         , tbody []
             (List.map (\volume -> volumeRow volume) vs)
- 
+
      ]
   ]
 
@@ -327,8 +327,8 @@ cinder ({errors, volume, openstack} as model) =
   let
     check = withErrors errors
   in
-  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-    [ 
+  [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+    [
       legend [] [text "Devices"]
     , check "Cinder Device" (inputText CinderDeviceInput "sdh" volume.device)
     , group' "Size" (inputNumber CinderSizeInput "" (toString volume.size))
@@ -342,19 +342,19 @@ cinder ({errors, volume, openstack} as model) =
 stepView :  Model -> List (Html Msg)
 stepView ({wizard, openstack, machine} as model) =
   case wizard.step of
-    Instance -> 
-      instance model 
+    Instance ->
+      instance model
 
-    Networking -> 
+    Networking ->
       networking model
 
-    Cinder -> 
+    Cinder ->
       cinder model
 
-    Summary -> 
+    Summary ->
       summarize (openstack, machine)
 
-    _ -> 
+    _ ->
       Debug.log (toString wizard.step) [div [] []]
 
 

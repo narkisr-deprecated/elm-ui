@@ -12,59 +12,59 @@ import Form.Validate as Validate exposing (..)
 import Form.Input as Input
 
 
-type alias Step s f = 
+type alias Step s f =
   {
     form : Form () f
   , value : s
   }
 
-type alias Model s f = 
+type alias Model s f =
   {
     step : Maybe (Step s f)
   , prev : List (Step s f)
   , next : List (Step s f)
   }
- 
+
 init first steps =
-   Model (Just first) [] steps 
+   Model (Just first) [] steps
 
--- Update 
+-- Update
 
-type Msg = 
-  Next 
+type Msg =
+  Next
     | FormMsg Form.Msg
     | Back
     | NoOp
 
-noErrors ({step} as model) = 
-  case step of 
+noErrors ({step} as model) =
+  case step of
     Just {form} ->
       (List.isEmpty (Form.getErrors form))
 
-    Nothing -> 
+    Nothing ->
       True
 
-append step target = 
-  case step of 
-    Just s -> 
+append step target =
+  case step of
+    Just s ->
       List.append target [s]
 
-    Nothing -> 
+    Nothing ->
       target
 
 prepend step target =
-  case step of 
-    Just s -> 
-      List.append [s] target 
+  case step of
+    Just s ->
+      List.append [s] target
 
-    Nothing -> 
+    Nothing ->
       target
 
 
 update : Msg -> Model s f -> Model s f
 update msg ({next, prev, step} as model)  =
-  case msg of 
-    Next -> 
+  case msg of
+    Next ->
       let
         nextStep = (List.head next)
         nextSteps = defaultEmpty (List.tail next)
@@ -73,10 +73,10 @@ update msg ({next, prev, step} as model)  =
       in
         if noErrors model then
            { model | step = nextStep, next = nextSteps, prev = prevSteps}
-        else 
+        else
            model
 
-    Back -> 
+    Back ->
       let
         prevStep = List.head (List.reverse prev)
         prevSteps = List.take ((List.length prev) - 1) prev
@@ -85,23 +85,23 @@ update msg ({next, prev, step} as model)  =
       in
         if (noErrors model && prevStep /= Nothing) then
           {model | step = prevStep, next = nextSteps, prev = prevSteps}
-        else 
+        else
           model
 
     FormMsg formMsg ->
-      case step of 
-        Just ({form} as currStep) -> 
-         let 
+      case step of
+        Just ({form} as currStep) ->
+         let
            newForm = Form.update formMsg form
            newStep = { currStep | form = newForm }
          in
            { model | step = Just newStep }
 
-        Nothing -> 
+        Nothing ->
           model
 
 
-    _  -> 
+    _  ->
       model
 
 hasNext {wizard} =
@@ -110,5 +110,5 @@ hasNext {wizard} =
 hasPrev {wizard}  =
   not (List.isEmpty wizard.prev)
 
-notDone {wizard} = 
-  wizard.step /= Nothing 
+notDone {wizard} =
+  wizard.step /= Nothing

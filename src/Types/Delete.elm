@@ -13,19 +13,19 @@ import Maybe exposing (withDefault)
 import Common.Errors exposing (failHandler)
 
 
-type alias Model = 
+type alias Model =
   {
     name : String
   , errorMsg : String
   }
- 
+
 init : (Model , Cmd Msg)
 init =
   none (Model "" "")
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   NoOp
   | Cancel
   | Delete
@@ -36,15 +36,15 @@ type Msg =
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({name} as model) =
-  case msg of 
-    Deleted result -> 
+  case msg of
+    Deleted result ->
       failHandler result model (\{message} -> none { model | errorMsg = withDefault "Failed to delete template" message }) NoOp
-       
-    Delete -> 
+
+    Delete ->
       (model, deleteType name)
 
 
-    _ -> 
+    _ ->
      none model
 
 -- View
@@ -54,12 +54,12 @@ view model =
   Delete.view model "Type" Cancel Delete Done
 
 deleteType : String -> Cmd Msg
-deleteType name = 
+deleteType name =
   delete deleteResponse ("/types/" ++ name)
     |> Task.toResult
     |> Task.perform never Deleted
 
-succeeded msg {error} = 
+succeeded msg {error} =
   if msg == (Deleted (Result.Ok { message = "Type deleted"} )) then
     True
   else

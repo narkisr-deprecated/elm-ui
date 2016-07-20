@@ -20,9 +20,9 @@ import Debug
 import Common.Wizard as Wizard
 import Common.Components exposing (..)
 
--- Model 
+-- Model
 
-type alias Model = 
+type alias Model =
   {
     wizard : (Wizard.Model Step)
   , physical : Physical
@@ -33,12 +33,12 @@ type alias Model =
 
 init : Model
 init =
-  let 
+  let
     wizard = Wizard.init Zero Instance [ Instance, Summary ]
-  in 
+  in
     Model wizard (emptyPhysical) (emptyMachine) Dict.empty Dict.empty
 
-type Msg = 
+type Msg =
   WizardMsg Wizard.Msg
    | Update Environment
    | SelectOS String
@@ -49,7 +49,7 @@ type Msg =
    | BroadcastInput String
    | IPInput String
 
-type Step = 
+type Step =
   Zero
   | Instance
   | Summary
@@ -77,60 +77,60 @@ validatePhysical = validateAll [stringValidations]
 update : Msg -> Model-> Model
 update msg ({wizard, physical, machine} as model) =
   case msg of
-    WizardMsg msg -> 
+    WizardMsg msg ->
       let
         ({errors} as newModel) = validatePhysical wizard.step model
         newWizard = Wizard.update (notAny errors) msg wizard
       in
-       { newModel | wizard = newWizard } 
+       { newModel | wizard = newWizard }
 
-    Update environment -> 
+    Update environment ->
         let
            newModel = { model | environment = environment }
-        in 
+        in
           case List.head (Dict.keys (getOses newModel)) of
-             Just os -> 
+             Just os ->
                if (String.isEmpty machine.os) then
                  { newModel | machine = {machine | os = os }}
-               else 
+               else
                  newModel
-             Nothing -> 
+             Nothing ->
                newModel
 
-    SelectOS newOS -> 
+    SelectOS newOS ->
       setMachine (\machine -> {machine | os = newOS }) model
 
-    UserInput user -> 
-       model 
+    UserInput user ->
+       model
         |> setMachine (\machine -> {machine | user = user })
         |> validate wizard.step "User" stringValidations
-        
 
-    HostnameInput host -> 
-      model 
+
+    HostnameInput host ->
+      model
         |> setMachine (\machine -> {machine | hostname = host })
         |> validate wizard.step "Hostname" stringValidations
-         
-    DomainInput domain -> 
-      model 
+
+    DomainInput domain ->
+      model
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate wizard.step "Domain" stringValidations
 
-    MacInput mac -> 
-      setPhysical (\physical -> {physical| mac = Just mac}) model 
+    MacInput mac ->
+      setPhysical (\physical -> {physical| mac = Just mac}) model
 
-    BroadcastInput ip -> 
-      setPhysical (\physical -> {physical| broadcast = Just ip}) model 
+    BroadcastInput ip ->
+      setPhysical (\physical -> {physical| broadcast = Just ip}) model
 
-    IPInput ip -> 
-      model 
+    IPInput ip ->
+      model
         |> setMachine (\machine -> {machine | ip = Just ip })
         |> validate wizard.step "IP" stringValidations
 
 next : Model -> Environment -> Model
 next model environment =
-      model 
-         |> update (Update environment) 
+      model
+         |> update (Update environment)
          |> update (WizardMsg Wizard.Next)
 
 back model =
@@ -139,13 +139,13 @@ back model =
 
 getOses : Model -> Dict String Template
 getOses model =
-  let 
+  let
     hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "physical" model.environment)
-  in 
+  in
     case hypervisor of
-      OSTemplates oses -> 
+      OSTemplates oses ->
         oses
-      _ -> 
+      _ ->
         Dict.empty
 
 instance : Model -> List (Html Msg)
@@ -153,10 +153,10 @@ instance ({physical, machine, errors} as model) =
   let
     check = withErrors errors
   in
-    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       [ 
+    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+       [
          legend [] [text "Security"]
-       , check "User" (inputText UserInput "" machine.user) 
+       , check "User" (inputText UserInput "" machine.user)
        , legend [] [text "Networking"]
        , check "IP"  (inputText IPInput "" (withDefault "" machine.ip))
        , check "Hostname" (inputText HostnameInput "" machine.hostname)
@@ -170,13 +170,13 @@ instance ({physical, machine, errors} as model) =
 stepView : Model -> List (Html Msg)
 stepView ({wizard, physical, machine} as model) =
   case wizard.step of
-    Instance -> 
-      instance model 
+    Instance ->
+      instance model
 
-    Summary -> 
+    Summary ->
       summarize (physical, machine)
 
-    _ -> 
+    _ ->
       Debug.log (toString wizard.step) [div [] []]
 
 

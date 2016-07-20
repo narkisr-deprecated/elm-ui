@@ -13,22 +13,22 @@ import Users.Routing as Users
 import Navigation
 
 type Route =
- SystemsRoute Systems.Route   
-  | TypesRoute Types.Route   
-  | JobsRoute Jobs.Route   
-  | TemplatesRoute Templates.Route  
-  | UsersRoute Users.Route  
+ SystemsRoute Systems.Route
+  | TypesRoute Types.Route
+  | JobsRoute Jobs.Route
+  | TemplatesRoute Templates.Route
+  | UsersRoute Users.Route
   | NotFoundRoute
 
 
-notJobs route = 
-  case route of 
+notJobs route =
+  case route of
     JobsRoute _ ->
       False
-    _ -> 
+    _ ->
       True
 
-defaultRoute = 
+defaultRoute =
   SystemsRoute Systems.List
 
 matcherSystems: PathMatcher Route

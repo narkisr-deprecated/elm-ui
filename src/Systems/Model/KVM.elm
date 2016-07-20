@@ -1,13 +1,13 @@
 module Systems.Model.KVM exposing (..)
 
 
-type alias KVM = 
-  { 
+type alias KVM =
+  {
     node : String
   }
 
 
-emptyKVM : KVM 
-emptyKVM = 
+emptyKVM : KVM
+emptyKVM =
   KVM ""
 

@@ -8,7 +8,7 @@ import Html.Events exposing (onClick, onDoubleClick)
 import Set exposing (Set)
 
 -- Model
-type alias Model a = 
+type alias Model a =
   { id : String
   , caption : Bool
   , rows : List (String, a)
@@ -17,7 +17,7 @@ type alias Model a =
   , title : String
   , rowFn : (String -> a -> List (Html (Msg a)))}
 
-type Msg a = 
+type Msg a =
   Select String
   | View String
   | SelectAll
@@ -31,18 +31,18 @@ init id caption hs f title =
 -- Update
 
 update : Msg a ->  Model a -> Model a
-update msg ({selected, rows} as model) = 
+update msg ({selected, rows} as model) =
   case msg of
     UpdateRows rs ->
       { model | rows = rs, selected = Set.empty}
 
-    SelectAll -> 
-      let 
+    SelectAll ->
+      let
         all = Set.fromList (List.map (\(id, _) -> id) rows)
       in
         if (selected == all) then
          { model | selected = Set.empty }
-        else 
+        else
          { model | selected = all }
 
     Select id ->
@@ -56,17 +56,17 @@ update msg ({selected, rows} as model) =
 -- View
 
 headersMap : (List String) -> List (Html (Msg a))
-headersMap keys = 
+headersMap keys =
   (List.map (\k ->  (th [] [text k])) keys)
 
 applySelect : Model a -> String -> List (Html (Msg a)) -> (Html (Msg a))
 applySelect model id cols =
-  let 
+  let
       background = if (Set.member id model.selected) then "#e7e7e7" else ""
   in
-    tr [style [("background",background)], onClick (Select id), onDoubleClick (View id)] 
+    tr [style [("background",background)], onClick (Select id), onDoubleClick (View id)]
         cols
-    
+
 withCaption : Bool -> String -> List (Html (Msg a)) -> List (Html (Msg a))
 withCaption enabled title body =
   if enabled then
@@ -77,11 +77,11 @@ withCaption enabled title body =
 view : Model a -> Html (Msg a)
 view model =
   table [class "table table-bordered", id model.id]
-     (withCaption model.caption model.title 
+     (withCaption model.caption model.title
         [ thead []
             [tr [onClick SelectAll] (headersMap model.headers)]
         , tbody []
             (List.map (\(id, item) -> applySelect model id (model.rowFn id item) ) model.rows)
         ])
-  
-  
+
+

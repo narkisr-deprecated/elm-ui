@@ -10,12 +10,12 @@ import Common.Components exposing (notImplemented)
 import Jobs.List as List exposing (Msg(Polling))
 import Jobs.Stats as Stats
 
-type alias Model = 
+type alias Model =
   {
      list : List.Model
-   , stats : Stats.Model 
+   , stats : Stats.Model
   }
- 
+
 init : (Model , Cmd Msg)
 init =
   let
@@ -28,41 +28,41 @@ init =
   in
     (Model list stats, Cmd.batch msgs)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   JobsListing List.Msg
     | JobsStats Stats.Msg
     | NoOp
 
-isPolling msg = 
+isPolling msg =
   case msg of
-    JobsListing Polling -> 
+    JobsListing Polling ->
       True
 
-    JobsStats (Stats.PollMetrics _) -> 
+    JobsStats (Stats.PollMetrics _) ->
       True
 
-    _ -> 
+    _ ->
       False
 
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({list, stats} as model)=
-  case msg of 
-    JobsListing listing -> 
+  case msg of
+    JobsListing listing ->
       let
         (newListing, msgs) = List.update listing list
       in
-        ({model | list = newListing}, Cmd.map JobsListing msgs) 
+        ({model | list = newListing}, Cmd.map JobsListing msgs)
 
-    -- JobsStats sts -> 
+    -- JobsStats sts ->
     --   let
     --     (newStats, msgs) = Stats.update sts stats
     --   in
-    --     ({model | stats = newStats}, Cmd.map JobsStats msgs) 
-    --  
-    _ -> 
+    --     ({model | stats = newStats}, Cmd.map JobsStats msgs)
+    --
+    _ ->
       none model
 
 -- View
@@ -70,12 +70,12 @@ update msg ({list, stats} as model)=
 view : Model -> Route -> Html Msg
 view {list, stats} route =
   case route of
-    Routing.List -> 
+    Routing.List ->
      App.map JobsListing (List.view list)
 
-    _ -> 
+    _ ->
       notImplemented
-    -- Routing.Stats -> 
+    -- Routing.Stats ->
      -- App.map JobsStats (Stats.view stats)
 
 

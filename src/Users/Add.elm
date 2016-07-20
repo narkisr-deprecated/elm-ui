@@ -2,7 +2,7 @@ module Users.Add exposing (..)
 
 
 import Html exposing (..)
-import Html.App as App 
+import Html.App as App
 import Bootstrap.Html exposing (..)
 import Dict exposing (Dict)
 
@@ -29,7 +29,7 @@ import Users.Add.Main as Main
 import Users.View exposing (summarize)
 import Form exposing (Form)
 
-type alias Model = 
+type alias Model =
   {
     wizard : (Wizard.Model Step User)
   , saveErrors : Errors.Model
@@ -39,11 +39,11 @@ type alias Model =
   , operations : List (String,String)
   }
 
-type Step = 
+type Step =
   Main
     | Perm
 
-step model value = 
+step model value =
   {
     form = model.form
   , value = value
@@ -65,7 +65,7 @@ init =
   in
     (Model wizard errors False [] [] [], Cmd.batch msgs)
 
-type Msg = 
+type Msg =
    ErrorsView Errors.Msg
     | WizardMsg Wizard.Msg
     | FormMsg Form.Msg
@@ -80,19 +80,19 @@ type Msg =
     | Saved (Result Http.Error SaveResponse)
     | NoOp
 
-merge ({value, form} as step) acc = 
-  let 
+merge ({value, form} as step) acc =
+  let
     user = withDefault acc (Form.getOutput form)
-  in 
+  in
    case value of
-     Main ->  
+     Main ->
        user
- 
-     Perm -> 
+
+     Perm ->
        user
 
 merged {wizard} =
-  List.foldl merge emptyUser wizard.prev 
+  List.foldl merge emptyUser wizard.prev
 
 setRoles ({wizard} as model) roles =
   let
@@ -106,41 +106,41 @@ setEnvironment model keys =
   let
     env = (Maybe.withDefault "" (List.head keys))
     pairs = List.map (\key -> (key,key) ) keys
-  in 
+  in
    none { model | environments = pairs }
 
 setOperation model keys =
   let
     op = (Maybe.withDefault "" (List.head keys))
     pairs = List.map (\key -> (key,key) ) keys
-  in 
+  in
     none { model | operations = pairs }
 
 
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({wizard} as model) =
-  case msg of 
-    Next -> 
+  case msg of
+    Next ->
       update (WizardMsg Wizard.Next) model
 
-    Back -> 
+    Back ->
        update (WizardMsg Wizard.Back) model
 
-    Reset -> 
+    Reset ->
       let
         (back,_) = (update (WizardMsg Wizard.Back) model)
       in
         none { back | saveErrors = Errors.init }
 
-    WizardMsg wizardMsg -> 
-      let 
+    WizardMsg wizardMsg ->
+      let
         newWizard = Wizard.update wizardMsg wizard
       in
         none { model | wizard = newWizard }
 
-    FormMsg formMsg -> 
-      let 
+    FormMsg formMsg ->
+      let
         newWizard = Wizard.update (Wizard.FormMsg formMsg) wizard
       in
         none { model | wizard = newWizard }
@@ -154,35 +154,35 @@ update msg ({wizard} as model) =
     SetOperations result ->
        (successHandler result model (setOperation model) NoOp)
 
-    Save f -> 
+    Save f ->
       none model
       -- (model, persistType f (merged model))
 
-    Saved result -> 
+    Saved result ->
        errorsHandler result model NoOp
 
-    _ -> 
+    _ ->
       (none model)
 
 currentView : Model -> List (Html Msg)
 currentView ({wizard, roles, environments, operations} as model) =
-  case wizard.step of 
+  case wizard.step of
     Just ({value} as current) ->
-      case value of 
-        Main -> 
-          dialogPanel "info" (info "Add a new User") 
+      case value of
+        Main ->
+          dialogPanel "info" (info "Add a new User")
              (panel (fixedPanel (App.map FormMsg (Main.view roles current)) ))
 
-        Perm -> 
-           dialogPanel "info" (info "User permissions") 
+        Perm ->
+           dialogPanel "info" (info "User permissions")
              (panel (fixedPanel (App.map FormMsg (Perm.view environments operations current))))
-          
-    Nothing -> 
-        dialogPanel "info" (info "Save new user") 
+
+    Nothing ->
+        dialogPanel "info" (info "Save new user")
            (panel (fixedPanel (App.map (\_ -> NoOp) (summarize (merged model)))))
 
 
-errorsView {saveErrors} = 
+errorsView {saveErrors} =
    let
      body = (App.map ErrorsView (Errors.view saveErrors))
    in
@@ -195,8 +195,8 @@ doneButton =
     [button [id "Done", class "btn btn-primary", onClick (Save saveUser) ] [text "Done "]]
 
 
-rows contents buttons = 
- div [] [ 
+rows contents buttons =
+ div [] [
    row_ [
      contents
    ]
@@ -205,27 +205,27 @@ rows contents buttons =
 
 view : Model -> Html Msg
 view ({wizard, saveErrors} as model) =
-  let 
+  let
     buttons' = (buttons { model | hasNext = Wizard.notDone model})
-  in 
+  in
    if Errors.hasErrors saveErrors then
-     rows 
+     rows
       (div [] (errorsView model))
       (buttons' Done Reset (doneButton))
     else
-      rows 
+      rows
        (div [class "col-md-offset-2 col-md-8"] (currentView model))
        (buttons' Next Back (saveButton))
 
 saveUser: String -> Cmd Msg
-saveUser json = 
-  postJson (Http.string json) saveResponse "/users"  
+saveUser json =
+  postJson (Http.string json) saveResponse "/users"
     |> Task.toResult
     |> Task.perform never Saved
 
 updateUser: String -> Cmd Msg
-updateUser json = 
-  putJson (Http.string json) saveResponse "/users"  
+updateUser json =
+  putJson (Http.string json) saveResponse "/users"
     |> Task.toResult
     |> Task.perform never Saved
 
@@ -235,8 +235,8 @@ environmentsKeys=
   at ["operations"] (list string)
 
 
-getOperations msg = 
-  getJson environmentsKeys "/users/operations" 
+getOperations msg =
+  getJson environmentsKeys "/users/operations"
     |> Task.toResult
     |> Task.perform never msg
 

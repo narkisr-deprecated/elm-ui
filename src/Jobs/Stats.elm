@@ -34,14 +34,14 @@ import Debug
 import Common.Redirect exposing (redirect)
 import Common.Utils exposing (partition)
 
-type alias Timer = 
+type alias Timer =
   {
     max : Float
   , min : Float
-  , mean : Float 
+  , mean : Float
   }
 
-type alias Metrics = 
+type alias Metrics =
   {
     startTimer : Timer
   , stopTimer : Timer
@@ -49,17 +49,17 @@ type alias Metrics =
   , reloadTimer : Timer
   }
 
-type alias Model = 
+type alias Model =
   {
     polls : List (Time, Metrics)
-  -- , charts : List (String,Config) 
-  , charts : List (String) 
+  -- , charts : List (String,Config)
+  , charts : List (String)
   -- , lastPoll : Time
   , interval : Float
   , enabled : Bool
   }
 
-type Msg = 
+type Msg =
   PollMetrics Time
     | Load (Result Http.Error Metrics)
     | LoadSession (Result Http.Error Session)
@@ -99,8 +99,8 @@ init =
 --   else
 --     (List.append (withDefault [] (List.tail polls)) [(lastPoll, metrics)])
 --
--- meanMaxMin polls = 
---   let 
+-- meanMaxMin polls =
+--   let
 --     startTimes = List.map (\(t, {startTimer}) -> (t, startTimer)) polls
 --     stopTimes = List.map (\(t, {stopTimer}) -> (t, stopTimer)) polls
 --     provisionTimes = List.map (\(t, {provisionTimer}) -> (t, provisionTimer)) polls
@@ -109,32 +109,32 @@ init =
 --     ( [(\{mean} -> mean), (\{min} -> min), (\{max} -> max)]
 --     , ["mean", "min", "max"]
 --     , [(rgba 204 204 255), (rgba 153 204 255), (rgba 51 153 255)]
---     , [startTimes, stopTimes, provisionTimes, reloadTimes] 
---     , ["Start", "Stop", "Provision", "Reload"] 
+--     , [startTimes, stopTimes, provisionTimes, reloadTimes]
+--     , ["Start", "Stop", "Provision", "Reload"]
 --     )
 --
 --
 -- setMetrics: Model -> Metrics -> (Model, Cmd Msg)
 -- setMetrics ({polls} as model) metrics =
---   let 
+--   let
 --     newPolls = pollingTrim model metrics
 --     (selectors, titles, styles, samples, headers) = meanMaxMin polls
 --     newCharts = List.map2 (\ sample header -> (header,(timerChart sample selectors titles styles))) samples headers
---    in 
+--    in
 --     none {model | polls = newPolls, charts = newCharts}
 --
--- setEnabled model ({roles, username} as session) = 
+-- setEnabled model ({roles, username} as session) =
 --   if List.member "celestial.roles/user" roles then
---      none {model | enabled = False } 
---   else 
---      none {model | enabled = True } 
+--      none {model | enabled = False }
+--   else
+--      none {model | enabled = True }
 --
 --
 -- update : Msg ->  Model -> (Model , Cmd Msg)
 -- update msg ({polls, lastPoll, enabled} as model) =
 --   case msg of
 --     PollMetrics time ->
---       if enabled then 
+--       if enabled then
 --         ({model | lastPoll = time}, getMetrics)
 --       else
 --         none model
@@ -142,10 +142,10 @@ init =
 --     Load result ->
 --        (successHandler result model (setMetrics model) NoOp)
 --
---     LoadSession result -> 
+--     LoadSession result ->
 --       (successHandler result model (setEnabled model) NoOp)
 --
---     _ -> 
+--     _ ->
 --       none model
 --
 -- -- View
@@ -153,14 +153,14 @@ init =
 -- item : (String,String) -> Html Msg
 -- item ((name,rgba) as pair) =
 --    li [] [
---       div [] 
+--       div []
 --         [ span [style [("background-color", rgba)]] []
 --         , (text name)
 --         ]
 --     ]
 --
 -- legend : List (String,String) -> Html Msg
--- legend items = 
+-- legend items =
 --   ul [class "legend"] (List.map item items)
 --
 -- rgbString : Color -> String
@@ -168,13 +168,13 @@ init =
 --   let
 --     {red, green, blue, alpha} = toRgb color
 --     rgba = (String.join "," (List.append (List.map toString [red, green, blue]) [toString alpha]))
---   in 
+--   in
 --     "rgba(" ++  rgba ++ ")"
 --
 -- -- chart : Config -> String -> Html Msg
 -- -- chart ((labels,series) as config) header =
--- --  div [class "col-md-6"] 
--- --    [panelDefault_ 
+-- --  div [class "col-md-6"]
+-- --    [panelDefault_
 -- --       [ panelHeading_ [text header]
 -- --       , panelBody_ []
 -- --          -- [toHtml <| Line.chart 500 200 config { defaultOptions | datasetFill = False }
@@ -186,7 +186,7 @@ init =
 -- view : Model -> Html Msg
 -- view ({charts} as model)=
 --   div [] []
---     -- (List.map row_ 
+--     -- (List.map row_
 --     --   (partition 2 (List.map (\(header,config) -> chart config header) charts)))
 --     --
 -- -- Decoding
@@ -209,8 +209,8 @@ init =
 -- Effects
 
 -- getMetrics : Cmd Msg
--- getMetrics = 
---   getJson metricsDecoder "/metrics" 
+-- getMetrics =
+--   getJson metricsDecoder "/metrics"
 --     |> Task.toResult
 --     |> Task.perform never Load
 --

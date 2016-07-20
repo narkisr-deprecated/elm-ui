@@ -7,7 +7,7 @@ import Json.Decode as Json exposing (..)
 httpJson : String -> Http.Body -> Decoder value -> String -> Task Http.Error value
 httpJson verb body decoder url  =
   let request =
-        { verb = verb 
+        { verb = verb
         , headers = [
              ("Content-Type", "application/json;charset=UTF-8")
            , ("Accept", "application/json, text/plain, */*")
@@ -31,16 +31,16 @@ apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
 apply func value =
     Json.object2 (<|) func value
 
-type alias SaveResponse = 
+type alias SaveResponse =
   {
-    message : String 
-  , id : Maybe Int 
-  } 
+    message : String
+  , id : Maybe Int
+  }
 
 saveResponse : Decoder SaveResponse
-saveResponse = 
+saveResponse =
   object2 SaveResponse
-    ("message" := string) 
+    ("message" := string)
     (maybe ("id" := int))
 
 

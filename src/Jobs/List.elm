@@ -17,7 +17,7 @@ import Debug
 import Date
 import Date.Format exposing (format)
 
--- model 
+-- model
 import Dict exposing (Dict)
 import Common.Errors exposing (successHandler)
 import Common.NewTab exposing (newtab)
@@ -26,17 +26,17 @@ import Pager exposing (..)
 import String
 
 -- Model
-type alias RunningJob = 
+type alias RunningJob =
   { env : String
   , id : String
   , jid : String
   , status : String
   , tid : String
   , tid_link : String
-  , type' : String} 
+  , type' : String}
 
-type alias DoneJob = 
-  { start : Float 
+type alias DoneJob =
+  { start : Float
   , end : Float
   , env : String
   , hostname : String
@@ -48,13 +48,13 @@ type alias DoneJob =
   }
 
 
-type alias Model = 
+type alias Model =
   { running : Table.Model RunningJob
   , done : Table.Model DoneJob
   , pager : Pager.Model
-  } 
+  }
 
-type Msg = 
+type Msg =
   SetRunning(Result Http.Error (List RunningJob))
   | SetDone(Result Http.Error (Int ,(List DoneJob)))
   | Polling
@@ -75,35 +75,35 @@ init =
 
 setRunningJobs : Model -> List RunningJob -> (Model , Cmd Msg)
 setRunningJobs ({running} as model) res =
-  let 
+  let
     jobsList = List.map (\({tid} as r) -> (tid, r)) res
-  in  
+  in
     ({model | running = (Table.update (Table.UpdateRows jobsList) running)} , Cmd.none)
 
 setDoneJobs : Model -> (Int, List DoneJob) -> (Model , Cmd Msg)
 setDoneJobs ({done, pager} as model) (total, doneJobs) =
-  let 
+  let
     newPager = (Pager.update (Pager.UpdateTotal (Basics.toFloat total)) pager)
     jobsList = List.map (\({tid} as r) -> (tid, r)) doneJobs
     newDone = (Table.update (Table.UpdateRows jobsList) done)
-  in  
+  in
    ({model | done = newDone, pager = newPager} , Cmd.none)
-  
+
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({running, done, pager} as model) =
-  case msg of 
+  case msg of
     Polling ->
       (model , batch [getRunning, getDone pager.page 10])
 
-    SetRunning result -> 
+    SetRunning result ->
       successHandler result model (setRunningJobs model) NoOp
 
     SetDone result ->
       successHandler result model (setDoneJobs model) NoOp
 
-    GotoPage pageMsg -> 
+    GotoPage pageMsg ->
       case pageMsg of
-        Pager.NextPage page -> 
+        Pager.NextPage page ->
           let
             newPager = (Pager.update pageMsg model.pager)
           in
@@ -124,29 +124,29 @@ update msg ({running, done, pager} as model) =
        in
          (model, (newtab job.tid_link))
 
-    _ -> 
+    _ ->
       (model , Cmd.none)
 
 -- View
 
 runningRow : String -> RunningJob -> List (Html msg)
-runningRow tableId {type', status,id } = 
+runningRow tableId {type', status,id } =
  [
    td [] [ text id ]
  , td [] [ text type']
  , td []  [
       div  [class "progress progress-xs progress-striped active"] [
          div  [class "progress-bar progress-bar-primary", Attr.id status , style [("width", "0%")]] [
-           
+
          ]
       ]
-   
+
    ]
  ]
 
 doneRow : String -> DoneJob -> List (Html msg)
-doneRow tableid {hostname, start, end, queue, identity, status} = 
-  let 
+doneRow tableid {hostname, start, end, queue, identity, status} =
+  let
    min = (toString ((round (end - start)) // (1000 * 60)))
    sec = (toString (((round ((end - start) / 1000))) % 60))
    pad = (\str ->  if String.length str == 1 then ("0" ++ str) else str)
@@ -162,12 +162,12 @@ doneRow tableid {hostname, start, end, queue, identity, status} =
 
 
 accordionPanel : Bool -> String -> Html Msg -> Html Msg
-accordionPanel active ident body = 
+accordionPanel active ident body =
   let
      enabled = if active then " in" else ""
   in
-    div [class "panel panel-default"] [ 
-      div [class "panel panel-heading", id ("heading" ++ ident), attribute "role" "tab"] [ 
+    div [class "panel panel-default"] [
+      div [class "panel panel-heading", id ("heading" ++ ident), attribute "role" "tab"] [
         h4 [class "panel-title"] [
           a [ attribute "role" "button"
             , attribute "data-toggle" "collapse"
@@ -177,11 +177,11 @@ accordionPanel active ident body =
             , attribute "aria-controls" ("collapse" ++ ident)
             ] [text ident]
           ]
-         ]  
+         ]
          , div [ id ("collapse" ++ ident )
                , class ("panel-collapse collapse" ++ enabled)
                , attribute "role" "tabpanel"
-               , attribute "aria-labelledby" ("heading" ++ ident)] 
+               , attribute "aria-labelledby" ("heading" ++ ident)]
                [div [class "panel-body"] [ body ]]
       ]
 
@@ -189,11 +189,11 @@ accordionPanel active ident body =
 view : Model -> Html Msg
 view ({running, done, pager} as model) =
   div [class "panel-group", id "accordion", attribute "role" "tablist"] [
-       accordionPanel (not (List.isEmpty running.rows)) "Running" 
+       accordionPanel (not (List.isEmpty running.rows)) "Running"
          (panelDefault_ [
            (App.map LoadRunning (Table.view running))
          ])
-     , accordionPanel (not (List.isEmpty done.rows)) "Done" 
+     , accordionPanel (not (List.isEmpty done.rows)) "Done"
          (div [] [
              row_ [
                div [class "col-md-12"][
@@ -206,26 +206,26 @@ view ({running, done, pager} as model) =
               (App.map GotoPage (Pager.view pager))
              ]
            ]
-         ) 
+         )
   ]
-  
+
 
 -- Decoding
 
 runningJob : Decoder RunningJob
 runningJob =
   object7 RunningJob
-    ("env" := string) 
-    ("id" := string) 
-    ("jid" := string) 
-    ("status" := oneOf [string, null ""]) 
-    ("tid" := string) 
+    ("env" := string)
+    ("id" := string)
+    ("jid" := string)
+    ("status" := oneOf [string, null ""])
+    ("tid" := string)
     ("tid-link" := oneOf [string, null ""])
     ("type" := string)
 
 
 runningList : Decoder (List RunningJob)
-runningList = 
+runningList =
   at ["jobs"] (list runningJob)
 
 apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
@@ -235,18 +235,18 @@ apply func value =
 doneJob : Decoder DoneJob
 doneJob =
   Json.map DoneJob
-    ("start" := float) 
-   `apply`  ("end" := float) 
-   `apply`  ("env" := string) 
-   `apply`  ("hostname" := string) 
-   `apply`  ("identity" := string) 
+    ("start" := float)
+   `apply`  ("end" := float)
+   `apply`  ("env" := string)
+   `apply`  ("hostname" := string)
+   `apply`  ("identity" := string)
    `apply`  ("queue" := string)
    `apply`  ("status" := string)
-   `apply`  ("tid" := string) 
+   `apply`  ("tid" := string)
    `apply`  ("tid-link" := oneOf [string, null ""])
 
 doneList : Decoder (Int, (List DoneJob))
-doneList = 
+doneList =
   Json.object2 (,)
     ("total" := int)
     ("jobs" := (list doneJob))
@@ -255,17 +255,17 @@ doneList =
 -- Cmd
 
 getRunning : Cmd Msg
-getRunning = 
-  getJson runningList "/jobs/running" 
+getRunning =
+  getJson runningList "/jobs/running"
     |> Task.toResult
     |> Task.perform never SetRunning
 
 getDone : Int -> Int -> Cmd Msg
-getDone page offset= 
+getDone page offset=
   getJson doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page))
     |> Task.toResult
     |> Task.perform never SetDone
 
-    
-   
+
+
 

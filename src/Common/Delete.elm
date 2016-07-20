@@ -11,7 +11,7 @@ deleteMessage : String -> String -> List (Html msg)
 deleteMessage item name =
   message "Notice!" [
     text (item ++ " ")
-  , strong [] [text name] 
+  , strong [] [text name]
   , text " will be deleted! "
   ]
 
@@ -25,25 +25,25 @@ view ({errorMsg} as model) type' cancel delete done =
     deleteView model type' cancel delete
 
 
-type alias DeleteResponse = 
-  { message : String } 
+type alias DeleteResponse =
+  { message : String }
 
 deleteResponse : Decoder DeleteResponse
-deleteResponse = 
+deleteResponse =
   object1 DeleteResponse
-    ("message" := string) 
+    ("message" := string)
 
 refresh init msg succeeded ((model, effect) as original)  =
   if succeeded then
-    let 
+    let
       (_ , listMsgs) = init
       msgs= [effect , Cmd.map msg listMsgs]
     in
       (model ,Cmd.batch msgs)
-  else 
+  else
     original
 
-succeeded msg deleted expected = 
+succeeded msg deleted expected =
   if msg == (deleted (Result.Ok { message = expected } )) then
     True
   else

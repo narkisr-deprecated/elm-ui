@@ -13,18 +13,18 @@ import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Common.Http exposing (apply)
 
-type alias OpenstackDefaults = 
+type alias OpenstackDefaults =
   {
    networks : Maybe (List String)
   }
 
-emptyOpenstackDefaults = 
+emptyOpenstackDefaults =
     OpenstackDefaults (Just [])
 
-type alias Template = 
-  { 
+type alias Template =
+  {
     name : String
-  , type' : String 
+  , type' : String
   , description : String
   , machine: Machine
   , aws : Maybe AWS
@@ -40,52 +40,52 @@ emptyTemplate : Template
 emptyTemplate  =
   Template "" "" "" emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
-type alias Defaults = 
+type alias Defaults =
   {
     openstack : Maybe OpenstackDefaults
   }
 
 
-emptyDefaults = 
+emptyDefaults =
   Dict.empty
 
 defaultsByEnv : List String -> Dict String Defaults
-defaultsByEnv envs =  
+defaultsByEnv envs =
   Dict.fromList (List.map (\ env -> (env, {openstack = Just emptyOpenstackDefaults})) envs)
 
-openstackDefaults = 
+openstackDefaults =
   object1 OpenstackDefaults
     (maybe ("networks" :=  list string))
 
 defaultsDecoder : Decoder Defaults
-defaultsDecoder = 
+defaultsDecoder =
   object1 Defaults
    (maybe ("openstack" := openstackDefaults))
 
 defaultsDictDecoder : Decoder (Dict String Defaults)
-defaultsDictDecoder = 
+defaultsDictDecoder =
    (dict defaultsDecoder)
 
 decodeDefaults : String -> Dict String Defaults
 decodeDefaults json =
-  case Json.decodeString defaultsDictDecoder json of 
-    Ok value -> 
+  case Json.decodeString defaultsDictDecoder json of
+    Ok value ->
        value
 
-    Err error -> 
+    Err error ->
       Debug.log error emptyDefaults
 
-partialMachine user os = 
+partialMachine user os =
   Machine user "" "" Nothing os Nothing Nothing
 
 partialMachineDecoder: Decoder Machine
-partialMachineDecoder = 
+partialMachineDecoder =
   object2 partialMachine
     ("user" := string)
     ("os" := string)
- 
+
 templateDecoder : Decoder Template
-templateDecoder = 
+templateDecoder =
   map Template
     ("name" := string )
     `apply` ("type" := string )
@@ -98,7 +98,7 @@ templateDecoder =
     `apply` (maybe ("kvm" := kvmDecoder))
     `apply` (maybe ("physical" := physicalDecoder))
     `apply` (maybe ("defaults" := defaultsDictDecoder))
- 
+
 
 
 

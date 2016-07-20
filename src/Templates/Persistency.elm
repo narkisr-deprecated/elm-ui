@@ -15,19 +15,19 @@ openstackDefaultsEncoder openstack =
   ]
 
 defaultsEncoder : Defaults -> String -> Value
-defaultsEncoder {openstack} hyp = 
+defaultsEncoder {openstack} hyp =
   if hyp == "Openstack" then
     object [
       ("openstack" , openstackDefaultsEncoder (withDefault emptyOpenstackDefaults openstack))
     ]
-  else 
+  else
     null
 
 
-defaultsDictEncoder defaults hyp = 
-   Dict.toList defaults 
-     |> List.map (\(k,v) -> (k, defaultsEncoder v hyp)) 
-     |> object 
+defaultsDictEncoder defaults hyp =
+   Dict.toList defaults
+     |> List.map (\(k,v) -> (k, defaultsEncoder v hyp))
+     |> object
 
 encodeDefaults : Dict String Defaults -> String -> String
 encodeDefaults defaults hyp =
@@ -50,28 +50,28 @@ encode ({type', machine, defaults, name, description} as template) hyp =
   , (encoderOf template hyp)
   , ("machine" , partialEncoder machine)
   , ("defaults", (defaultsDictEncoder (withDefault Dict.empty defaults) hyp))
- ] 
+ ]
 
 
 persistModel : (String -> Cmd a) -> Value -> Cmd a
 persistModel f value =
     (f (E.encode 0 value))
 
-persistTemplate f template hyp = 
+persistTemplate f template hyp =
   persistModel f (encode template hyp)
 
-encodeMachine {hostname, domain} = 
+encodeMachine {hostname, domain} =
   object [
      ("hostname", string  hostname)
    , ("domain", string domain)
   ]
 
-encodeProvided machine admin = 
+encodeProvided machine admin =
  object [
     ("owner" , string admin.owner)
   , ("env" , string admin.environment)
   , ("machine" , encodeMachine machine)
  ]
 
-persistProvided f machine admin = 
+persistProvided f machine admin =
   persistModel f (encodeProvided machine admin)

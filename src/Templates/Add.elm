@@ -26,7 +26,7 @@ import Common.Components exposing (..)
 import Debug
 
 
-type alias Model = 
+type alias Model =
   {
     template : Template
   , hyp : String
@@ -35,7 +35,7 @@ type alias Model =
   , environments : List String
   }
 
-type Msg = 
+type Msg =
   Save
   | Done
   | NoOp
@@ -54,64 +54,64 @@ init =
   let
     errors = Errors.init
   in
-    (Model emptyTemplate "" False errors [], getEnvironments SetEnvironments)   
+    (Model emptyTemplate "" False errors [], getEnvironments SetEnvironments)
 
-intoTemplate ({template} as model) {type', machine, openstack, physical, aws, digital, gce} hyp = 
-    let 
-      withHyp = {template | openstack = openstack, physical = physical, aws = aws, digital = digital, gce = gce} 
+intoTemplate ({template} as model) {type', machine, openstack, physical, aws, digital, gce} hyp =
+    let
+      withHyp = {template | openstack = openstack, physical = physical, aws = aws, digital = digital, gce = gce}
       newTemplate = {withHyp | name = machine.hostname, type' = type', machine = machine}
-    in 
+    in
       {model | template = newTemplate, hyp = hyp}
 
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({template, hyp, editDefaults, environments} as model) =
   case msg of
-    Save -> 
+    Save ->
       (model, persistTemplate saveTemplate template hyp)
 
-    SetSystem hyp system -> 
+    SetSystem hyp system ->
       none (intoTemplate model system hyp)
 
-    -- LoadEditor -> 
+    -- LoadEditor ->
     --   let
     --     encoded = (encodeDefaults (defaultsByEnv environments) hyp)
-    --   in 
+    --   in
     --   ({ model | editDefaults = not editDefaults}, loadEditor "templates" NoOp encoded)
     --
-    NameInput name -> 
-      let 
+    NameInput name ->
+      let
         newTemplate = { template | name = name }
-      in 
-        none { model | template = newTemplate} 
+      in
+        none { model | template = newTemplate}
 
-    DescriptionInput description -> 
-      let 
+    DescriptionInput description ->
+      let
         newTemplate = { template | description = description }
-      in 
-        none { model | template = newTemplate} 
+      in
+        none { model | template = newTemplate}
 
 
-    SetDefaults json -> 
-       let 
+    SetDefaults json ->
+       let
          newTemplate = { template | defaults = Just (decodeDefaults json) }
-       in 
+       in
          none { model | template = newTemplate}
-    
-    Saved result -> 
+
+    Saved result ->
        errorsHandler result model NoOp
 
     SetEnvironments result ->
        (successHandler result model (setEnvironments model) NoOp)
 
-    _ -> 
+    _ ->
       none model
 
 -- View
 
 editing {template, editDefaults} =
     panel
-      (panelContents 
+      (panelContents
           (Html.form [] [
             div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
               group' "Name" (inputText NameInput " "  template.name)
@@ -130,25 +130,25 @@ view ({saveErrors} as model) =
   in
     if Errors.hasErrors saveErrors then
       dangerCallout (error "Failed to save template") (panel (panelContents errorsView)) Cancel Done
-    else 
+    else
       infoCallout (info "Save template") (editing model) Cancel Save
 
 
 -- Effects
 
-type alias SaveResponse = 
+type alias SaveResponse =
   {
     message : String
-  } 
+  }
 
 saveResponse : Decoder SaveResponse
-saveResponse = 
+saveResponse =
   object1 SaveResponse
-    ("message" := string) 
+    ("message" := string)
 
 saveTemplate: String -> Cmd Msg
-saveTemplate json = 
-  postJson (Http.string json) saveResponse "/templates"  
+saveTemplate json =
+  postJson (Http.string json) saveResponse "/templates"
     |> Task.toResult
     |> Task.perform never Saved
 

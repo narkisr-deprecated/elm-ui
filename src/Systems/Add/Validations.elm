@@ -1,11 +1,11 @@
 module Systems.Add.Validations exposing (..)
 
-import String 
+import String
 import Regex exposing (regex, HowMany(All), find)
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 
-type Error = 
+type Error =
   None
   | Invalid String
 
@@ -13,32 +13,32 @@ notEmpty : String -> Error
 notEmpty value =
   if String.isEmpty value then
     Invalid "cannot be empty"
-  else 
+  else
     None
 
 hasItems : List a -> Error
 hasItems value =
   if List.isEmpty value then
     Invalid "cannot be empty"
-  else 
+  else
     None
 
 notContained : (String, List String) -> Error
 notContained (value, list) =
-  case (notEmpty value) of 
-    Invalid msg -> 
+  case (notEmpty value) of
+    Invalid msg ->
        Invalid msg
     None ->
       if List.member value list then
         Invalid "cannot add twice"
-      else 
+      else
         None
 
 validIp : String -> Error
-validIp value = 
+validIp value =
   if not (String.isEmpty value) && List.length (find All (regex "\\d+\\.\\d+\\.\\d+\\.\\d+$") value) /= 1 then
     Invalid "non legal ip address"
-  else 
+  else
     None
 
 validId : Int -> String -> Bool -> String -> Error
@@ -46,13 +46,13 @@ validId length prefix allowEmpty value =
   if (String.isEmpty value) && allowEmpty then
     None
   else if not (String.contains prefix value) then
-    Invalid ("Id should start with " ++ prefix) 
+    Invalid ("Id should start with " ++ prefix)
    else if String.length value /= length  then
      Invalid ("Id should have " ++ (toString length) ++ " characthers")
   else
     None
 
-vpair step validations = 
+vpair step validations =
   (toString step, Dict.fromList validations)
 
 notAny:  Dict String (List Error) -> Bool
@@ -79,4 +79,4 @@ validationOf key validations value ({errors} as model) =
      newErrors = Dict.update key (\_ -> Just res) errors
    in
      {model | errors = newErrors}
- 
+

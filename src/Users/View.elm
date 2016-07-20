@@ -20,18 +20,18 @@ import String
 import Common.Utils exposing (none)
 import Basics.Extra exposing (never)
 
-type alias Model = 
+type alias Model =
   {
    user : User
   }
- 
+
 init : (Model , Cmd Msg)
 init =
   none (Model emptyUser)
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   ViewUser String
     | SetUser (Result Http.Error User)
     | NoOp
@@ -43,14 +43,14 @@ setUser model user =
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
-  case msg of 
-   ViewUser id -> 
+  case msg of
+   ViewUser id ->
      (model, getUser id SetUser)
 
-   SetUser result -> 
+   SetUser result ->
       successHandler result model (setUser model) NoOp
- 
-   NoOp -> 
+
+   NoOp ->
      none model
 
 -- View
@@ -62,8 +62,8 @@ summarize model =
 view : Model -> List (Html Msg)
 view {user} =
   asList (div [] [h4 [] [(text "User")], (summarize user)])
-  
-getUser name msg = 
+
+getUser name msg =
   getJson Model.user ("/users/" ++ name)
     |> Task.toResult
     |> Task.perform never msg

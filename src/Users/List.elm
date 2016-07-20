@@ -17,37 +17,37 @@ import Bootstrap.Html exposing (..)
 import Debug
 
 
-type alias Model = 
+type alias Model =
   { users : List User
   , table : Table.Model User
   , pager : Pager.Model
-  } 
+  }
 
 userRow : String -> User -> List (Html msg)
-userRow name {roles, envs} = 
+userRow name {roles, envs} =
     [ td [] [ text name ]
     , td [] [ text (String.join ", " (List.map (\r -> String.dropLeft 16 r) roles))]
     , td [] [ text (String.join ", " envs)]
     ]
- 
+
 init : (Model, Cmd Msg)
 init =
-  let 
+  let
     table = Table.init "usersListing" True ["Name", "Roles", "Environments"] userRow "Users"
-  in 
+  in
     (Model [] table Pager.init , getUsers SetUsers)
 
 
--- Update 
+-- Update
 
-type Msg = 
+type Msg =
   SetUsers (Result Http.Error (List User))
     | GotoPage Pager.Msg
     | LoadPage (Table.Msg User)
     | NoOp
 
 setUsers : Model -> List User -> (Model , Cmd Msg)
-setUsers ({pager, table} as model) users = 
+setUsers ({pager, table} as model) users =
   let
     total = List.length users
     typePairs = List.map (\ ({username} as user) -> (username, user)) users
@@ -59,11 +59,11 @@ setUsers ({pager, table} as model) users =
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
-  case msg of 
+  case msg of
    SetUsers result ->
       successHandler result model (setUsers model) NoOp
 
-   _ -> 
+   _ ->
      none model
 
 -- View
@@ -80,4 +80,4 @@ view ({pager, table} as model) =
     ]
   , row_ [(map GotoPage (Pager.view pager))]
   ]
- 
+

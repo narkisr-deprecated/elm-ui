@@ -22,7 +22,7 @@ import Common.Wizard as Wizard
 import Common.Components exposing (..)
 import Common.Utils exposing (none)
 
-type alias Model = 
+type alias Model =
   {
     wizard : (Wizard.Model Step)
   , kvm : KVM
@@ -31,15 +31,15 @@ type alias Model =
   , errors : Dict String (List Error)
 
   }
- 
+
 init : Model
 init =
-  let 
+  let
     wizard = Wizard.init Zero Instance [ Instance, Summary ]
-  in 
+  in
     Model wizard emptyKVM (resourcedMachine 1 512) Dict.empty Dict.empty
 
-type Msg = 
+type Msg =
   WizardMsg Wizard.Msg
    | Update Environment
    | SelectOS String
@@ -52,13 +52,13 @@ type Msg =
    | NoOp
 
 
-type Step = 
+type Step =
   Zero
   | Instance
   | Summary
 
 
--- Update 
+-- Update
 
 stringValidations = Dict.fromList [
     vpair Instance [
@@ -69,26 +69,26 @@ stringValidations = Dict.fromList [
  ]
 
 getNodes model =
-  let 
+  let
     hypervisor = withDefault ENV.Empty (Dict.get "kvm" model.environment)
-  in 
+  in
     case hypervisor of
-      ENV.KVM _ nodes -> 
+      ENV.KVM _ nodes ->
         nodes
 
-      _ -> 
+      _ ->
         Dict.empty
 
 
-setDefaultNode hyp ({kvm} as model) = 
+setDefaultNode hyp ({kvm} as model) =
    case List.head (Dict.keys (getNodes model)) of
-     Just node -> 
+     Just node ->
        if (String.isEmpty kvm.node) then
          { model | kvm = {kvm | node = node}}
-       else 
+       else
          model
 
-     Nothing -> 
+     Nothing ->
        model
 
 
@@ -96,8 +96,8 @@ validateKvm = validateAll [stringValidations]
 
 next : Model -> Environment -> Model
 next model environment =
-      model 
-         |> update (Update environment) 
+      model
+         |> update (Update environment)
          |> update (WizardMsg Wizard.Next)
 
 back model =
@@ -112,59 +112,59 @@ setKVM f ({kvm, errors} as model) =
 
 update : Msg ->  Model -> Model
 update msg ({wizard} as model) =
-  case msg of 
-    WizardMsg msg -> 
+  case msg of
+    WizardMsg msg ->
       let
         ({errors} as newModel) = (validateKvm wizard.step model)
         newWizard = Wizard.update (notAny errors) msg wizard
       in
-       { newModel | wizard = newWizard } 
+       { newModel | wizard = newWizard }
 
-    Update environment -> 
-      setDefaultOS "kvm" { model | environment = environment} 
+    Update environment ->
+      setDefaultOS "kvm" { model | environment = environment}
         |> setDefaultNode model
 
-    SelectOS os -> 
+    SelectOS os ->
       setMachine (\machine -> {machine | os = os }) model
 
-    SelectNode node -> 
+    SelectNode node ->
       setKVM (\kvm -> {kvm | node = node }) model
 
-    UserInput user -> 
-       model 
+    UserInput user ->
+       model
         |> setMachine (\machine -> {machine | user = user })
         |> validate wizard.step "User" stringValidations
 
-    HostnameInput host -> 
-      model 
+    HostnameInput host ->
+      model
         |> setMachine (\machine -> {machine | hostname = host })
         |> validate wizard.step "Hostname" stringValidations
 
-    DomainInput domain -> 
-      model 
+    DomainInput domain ->
+      model
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate wizard.step "Domain" stringValidations
 
-    CpuInput count -> 
+    CpuInput count ->
       case Debug.log "" (String.toInt count) of
-        Ok num -> 
-          model 
+        Ok num ->
+          model
             |> setMachine (\machine -> {machine | cpu = Just num })
 
-        Err _ -> 
+        Err _ ->
           model
 
-    RamInput count -> 
+    RamInput count ->
       case (String.toInt count) of
-        Ok num -> 
-          model 
+        Ok num ->
+          model
             |> setMachine (\machine -> {machine | ram = Just num})
 
-        Err _ -> 
+        Err _ ->
           model
 
 
-    _ -> 
+    _ ->
       model
 
 -- View
@@ -176,8 +176,8 @@ instance ({kvm, machine, errors} as model) =
     oses = (Dict.keys (getOses "kvm" model))
     nodes = (Dict.keys (getNodes model))
   in
-    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       [ 
+    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+       [
          legend [] [text "Domain"]
        , group' "OS" (selector SelectOS oses machine.os)
        , group' "Node" (selector SelectNode nodes kvm.node)
@@ -185,7 +185,7 @@ instance ({kvm, machine, errors} as model) =
        , check  "Cpu" (inputText CpuInput "" (toString (withDefault 0 machine.cpu)))
        , check  "Ram (mb)" (inputText RamInput "" (toString (withDefault 0 machine.ram)))
        , legend [] [text "Network"]
-       , check "User" (inputText UserInput "" machine.user) 
+       , check "User" (inputText UserInput "" machine.user)
        , check "Hostname" (inputText HostnameInput "" machine.hostname)
        , check "Domain"  (inputText DomainInput "" machine.domain)
        ]
@@ -194,13 +194,13 @@ instance ({kvm, machine, errors} as model) =
 stepView :  Model -> List (Html Msg)
 stepView ({wizard, kvm, machine} as model) =
   case wizard.step of
-    Instance -> 
-      instance model 
- 
-    Summary -> 
+    Instance ->
+      instance model
+
+    Summary ->
       summarize (kvm, machine)
- 
-    _ -> 
+
+    _ ->
       [div [] []]
 
 

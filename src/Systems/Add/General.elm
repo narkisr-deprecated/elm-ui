@@ -4,7 +4,7 @@ import Dict exposing (Dict)
 import Common.Errors exposing (successHandler)
 import Platform.Cmd exposing (batch)
 import Http exposing (Error(BadResponse))
-import Admin.Core as Admin 
+import Admin.Core as Admin
 import Common.Components exposing (..)
 import Common.Utils exposing (none)
 
@@ -24,8 +24,8 @@ import Debug
 
 -- Model
 
-type alias Model = 
-  { 
+type alias Model =
+  {
     type' : String
   , types : List String
   , hypervisor : String
@@ -33,10 +33,10 @@ type alias Model =
   , admin : Admin.Model
   }
 
-type Msg = 
+type Msg =
   NoOp
   | SetEnvironments (Result Http.Error Environments)
-  | AdminMsg Admin.Msg 
+  | AdminMsg Admin.Msg
   | SetTypes (Result Http.Error (List Type))
   | SelectType String
   | SelectHypervisor String
@@ -58,12 +58,12 @@ init =
 
 setEnvironments : Model -> Environments -> (Model, Cmd Msg)
 setEnvironments model es =
-  let 
+  let
      environment = Maybe.withDefault "" (List.head (Dict.keys es))
      environments = Dict.keys es
      hypervisors = (Dict.keys (Maybe.withDefault Dict.empty (Dict.get environment es)))
      hypervisor = Maybe.withDefault "" (List.head hypervisors)
-  in 
+  in
     none {model | hypervisors = hypervisors, hypervisor = hypervisor}
 
 setTypes : Model -> List Type -> (Model, Cmd Msg)
@@ -80,22 +80,22 @@ update msg ({admin} as model) =
     SetEnvironments result ->
      (successHandler result model (setEnvironments model) NoOp)
 
-    AdminMsg adminMsg -> 
+    AdminMsg adminMsg ->
       let
         (newAdmin, msgs) = Admin.update adminMsg admin
-      in  
+      in
         ({ model | admin = newAdmin}, Cmd.map AdminMsg msgs)
 
-    SelectHypervisor hypervisor -> 
+    SelectHypervisor hypervisor ->
       none {model | hypervisor = hypervisor}
 
     SetTypes result ->
       (successHandler result model (setTypes model) NoOp)
 
-    SelectType type' -> 
+    SelectType type' ->
       none {model | type' = type' }
 
-    _ -> 
+    _ ->
       none model
 
 -- View

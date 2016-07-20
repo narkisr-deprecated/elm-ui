@@ -10,21 +10,21 @@ import Char
 partition n list =
   let
     catch = (List.take n list)
-  in 
+  in
     if n == (List.length catch) then
       [catch] ++ (partition n (List.drop n list))
     else
       [catch]
 
 withDefaultProp :  Maybe a -> b -> (a -> b) -> b
-withDefaultProp parent default prop = 
+withDefaultProp parent default prop =
  case parent of
-   Just v -> 
+   Just v ->
      (prop v)
 
    Nothing ->
      default
- 
+
 
 defaultEmpty : Maybe (List a) -> List a
 defaultEmpty list =
@@ -32,7 +32,7 @@ defaultEmpty list =
     Just result  ->
       result
 
-    Nothing -> 
+    Nothing ->
       []
 
 none : a -> (a, Cmd b)
@@ -45,11 +45,11 @@ setEnvironments model es =
 setEnvironment ({environments} as model) es =
    none {model |  environment = (Maybe.withDefault "" (List.head (Dict.keys es)))}
 
-capitalize : String -> String 
-capitalize s = 
-  case String.uncons s of 
+capitalize : String -> String
+capitalize s =
+  case String.uncons s of
     Just (c,ss) ->
-      String.cons (Char.toUpper c) ss 
+      String.cons (Char.toUpper c) ss
 
     Nothing ->
-      s 
+      s

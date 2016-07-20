@@ -21,10 +21,10 @@ import Debug
 import Common.Wizard as Wizard
 import Common.Components exposing (..)
 
--- Model 
+-- Model
 
-type alias Model = 
-  { 
+type alias Model =
+  {
     wizard : (Wizard.Model Step)
   , digital : Digital
   , machine : Machine
@@ -34,12 +34,12 @@ type alias Model =
 
 init : Model
 init =
-  let 
+  let
     wizard = Wizard.init Zero Instance [ Instance, Summary ]
-  in 
+  in
     Model wizard emptyDigital emptyMachine Dict.empty Dict.empty
 
-type Msg = 
+type Msg =
   WizardMsg Wizard.Msg
   | Update Environment
   | SelectSize String
@@ -50,7 +50,7 @@ type Msg =
   | HostnameInput String
   | DomainInput String
 
-type Step = 
+type Step =
   Zero
   | Instance
   | Summary
@@ -78,57 +78,57 @@ validateDigital = validateAll [stringValidations]
 update : Msg -> Model-> Model
 update msg ({wizard, digital, machine} as model) =
   case msg of
-    WizardMsg msg -> 
+    WizardMsg msg ->
       let
         ({errors} as newModel) = (validateDigital wizard.step model)
         newWizard = Wizard.update (notAny errors) msg wizard
       in
-       { newModel | wizard = newWizard } 
+       { newModel | wizard = newWizard }
 
-    Update environment -> 
+    Update environment ->
         let
            newModel = { model | environment = environment }
-        in 
+        in
           case List.head (Dict.keys (getOses newModel)) of
-             Just os -> 
+             Just os ->
                if (String.isEmpty machine.os) then
                  { newModel | machine = {machine | os = os }}
-               else 
+               else
                  newModel
-             Nothing -> 
+             Nothing ->
                newModel
 
-    SelectSize size -> 
+    SelectSize size ->
       setDigital (\digital-> {digital | size = size }) model
 
-    SelectOS newOS -> 
+    SelectOS newOS ->
       setMachine (\machine -> {machine | os = newOS }) model
 
-    SelectRegion region -> 
-      setDigital (\digital-> {digital | region = region }) model 
+    SelectRegion region ->
+      setDigital (\digital-> {digital | region = region }) model
 
-    UserInput user -> 
-       model 
+    UserInput user ->
+       model
         |> setMachine (\machine -> {machine | user = user })
         |> validate wizard.step "User" stringValidations
-        
-    HostnameInput host -> 
-      model 
+
+    HostnameInput host ->
+      model
         |> setMachine (\machine -> {machine | hostname = host })
         |> validate wizard.step "Hostname" stringValidations
-         
-    DomainInput domain -> 
-      model 
+
+    DomainInput domain ->
+      model
         |> setMachine (\machine -> {machine | domain = domain})
         |> validate wizard.step "Domain" stringValidations
 
-    PrivateNetworking -> 
+    PrivateNetworking ->
        setDigital (\digital -> {digital | privateNetworking = (not (digital.privateNetworking))}) model
 
 next : Model -> Environment -> Model
 next model environment =
-      model 
-         |> update (Update environment) 
+      model
+         |> update (Update environment)
          |> update (WizardMsg Wizard.Next)
 
 back model =
@@ -136,13 +136,13 @@ back model =
 
 getOses : Model -> Dict String Template
 getOses model =
-  let 
+  let
     hypervisor = withDefault (OSTemplates Dict.empty) (Dict.get "digital-ocean" model.environment)
-  in 
+  in
     case hypervisor of
-      OSTemplates oses -> 
+      OSTemplates oses ->
         oses
-      _ -> 
+      _ ->
         Dict.empty
 
 instance : Model -> List (Html Msg)
@@ -151,13 +151,13 @@ instance ({digital, machine, errors} as model) =
     check = withErrors errors
     region = withDefault "" (List.head regions)
   in
-    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] 
-       [ 
+    [div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+       [
          legend [] [text "Properties"]
        , group' "Size" (selector SelectSize sizes digital.size)
        , group' "OS" (selector SelectOS (Dict.keys (getOses model)) machine.os) , group' "Region" (selector SelectRegion regions digital.region)
        , legend [] [text "Security"]
-       , check "User" (inputText UserInput "" machine.user) 
+       , check "User" (inputText UserInput "" machine.user)
        , legend [] [text "Networking"]
        , check "Hostname" (inputText HostnameInput "" machine.hostname)
        , check "Domain"  (inputText DomainInput "" machine.domain)
@@ -168,13 +168,13 @@ instance ({digital, machine, errors} as model) =
 stepView :  Model -> List (Html Msg)
 stepView ({wizard, digital, machine} as model) =
   case wizard.step of
-    Instance -> 
-      instance model 
+    Instance ->
+      instance model
 
-    Summary -> 
+    Summary ->
       summarize (digital, machine)
 
-    _ -> 
+    _ ->
       Debug.log (toString wizard.step) [div [] []]
 
 

@@ -1,8 +1,8 @@
 module Systems.Model.GCE exposing (..)
 import Maybe exposing (withDefault)
 
-type alias GCE = 
-  { 
+type alias GCE =
+  {
     machineType : String,
     zone : String,
     tags : Maybe (List String),
@@ -10,8 +10,8 @@ type alias GCE =
     staticIp : Maybe String
   }
 
-emptyGce : GCE 
-emptyGce = 
+emptyGce : GCE
+emptyGce =
   let
     type' = (withDefault "" (List.head machineTypes))
     zone = (withDefault "" (List.head zones))
@@ -19,7 +19,7 @@ emptyGce =
     GCE type' zone (Just []) "" (Just "")
 
 machineTypes = [
-    "n1-standard-1", "n1-standard-2", "n1-standard-4", 
+    "n1-standard-1", "n1-standard-2", "n1-standard-4",
     "n1-standard-8", "n1-standard-16", "n1-standard-32"
   ]
 

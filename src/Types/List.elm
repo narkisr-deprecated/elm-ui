@@ -1,6 +1,6 @@
 module Types.List exposing (..)
 
-import Html.App as App 
+import Html.App as App
 import Html exposing (..)
 
 import Dict exposing (Dict)
@@ -23,14 +23,14 @@ import Types.Model as Model exposing (Type)
 import Common.Utils exposing (none)
 import Debug
 
-type alias Model = 
+type alias Model =
   { types : List Type
   , table : Table.Model Type
   , pager : Pager.Model
-  } 
+  }
 
 typeRow : String -> Type -> List (Html msg)
-typeRow id {type', description } = 
+typeRow id {type', description } =
     [ td [] [ text type' ]
     , td [] [ text "Puppet standalone"]
     , td [] [ text (withDefault "" description)]
@@ -38,19 +38,19 @@ typeRow id {type', description } =
 
 init : (Model , Cmd Msg)
 init =
-  let 
+  let
     table = Table.init "typesListing" True ["Name", "Provisioner", "Description"] typeRow "Types"
-  in 
+  in
     (Model [] table Pager.init , getTypes SetTypes)
 
-type Msg = 
+type Msg =
   LoadPage (Table.Msg Type)
     | GotoPage Pager.Msg
     | SetTypes (Result Http.Error (List Type))
     | NoOp
 
 setTypes: Model -> List Type -> (Model , Cmd Msg)
-setTypes ({pager, table} as model) types = 
+setTypes ({pager, table} as model) types =
   let
     total = List.length types
     typePairs = List.map (\ ({type'} as item) -> (type', item)) types
@@ -65,8 +65,8 @@ update msg model =
   case msg of
     SetTypes result ->
       successHandler result model (setTypes model) NoOp
-     
-    _ -> 
+
+    _ ->
       none model
 
 view : Model -> Html Msg
@@ -83,7 +83,7 @@ view ({types, pager, table} as model) =
      App.map GotoPage (Pager.view pager)
     ]
   ]
-  
+
 
 -- Decoding
 
@@ -91,10 +91,10 @@ typesList : Decoder (List Type)
 typesList =
    at ["types"] (list Model.type')
 
--- Http 
+-- Http
 
-getTypes msg = 
-  getJson typesList "/types" 
+getTypes msg =
+  getJson typesList "/types"
     |> Task.toResult
     |> Task.perform never msg
 
