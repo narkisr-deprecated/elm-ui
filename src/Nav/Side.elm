@@ -11,34 +11,34 @@ import Html.Events exposing (onClick)
 import Common.Utils exposing (none)
 import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))
 
-type alias Model = 
-  { 
+type alias Model =
+  {
     session : Session
   }
 
-init : Model 
+init : Model
 init =
    Model emptySession
 
 -- Update
 
-type Msg = 
+type Msg =
   NavigateTo String | SetSession Session
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg model =
    case msg of
-     SetSession session -> 
+     SetSession session ->
        none { model | session = session }
 
-     _ -> 
+     _ ->
        none model
 
 -- View
 
 sectionItem : String -> String -> (Html Msg)
 sectionItem resource nested =
-  li [] [a [class (resource ++ nested), href ("#/" ++ resource ++ "/" ++ nested)] 
+  li [] [a [class (resource ++ nested), href ("#/" ++ resource ++ "/" ++ nested)]
         [ i [class "fa fa-circle-o"][]
         , text nested ]
       ]
@@ -50,9 +50,9 @@ drop resource msgs icon =
       i [class icon] []
     , span [] [text resource]
     , i [class "fa fa-angle-left pull-right"] []
-    ] 
-      
-  , ul [ class "treeview-menu" ] 
+    ]
+
+  , ul [ class "treeview-menu" ]
       (List.map (\nested -> sectionItem resource nested) msgs)
   ]
 
@@ -83,4 +83,4 @@ view {session} =
           (adminMenus))
   ]
  ]
-  
+
