@@ -24,7 +24,7 @@ init =
   let
     (header, _) = Header.init
   in
-    (Model Side.init header Systems List , Cmd.batch [getSession LoadSession])
+    (Model Side.init header Systems List , getSession LoadSession)
 
 -- Update
 
@@ -34,19 +34,12 @@ type Msg =
    | LoadSession (Result Http.Error Session)
    | NoOp
 
---
--- goto active section ({nav} as model) msgs =
---   let
---     (newNav, _) = update (SideMsg (Side.Goto active section)) nav
---   in
---    ({model | nav = newNav }, msgs)
-
 setSession ({side, header} as model) session =
   let
     (newSide, _) = Side.update (Side.SetSession session) side
     (newHeader, _) = Header.update (Header.SetSession session) header
   in
-    none { model | side = newSide, header = newHeader }
+    none  (Debug.log "" { model | side = newSide, header = newHeader })
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({side, header} as model) =

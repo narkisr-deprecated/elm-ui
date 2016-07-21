@@ -2590,6 +2590,120 @@ var _elm_lang$core$Platform_Sub$none = _elm_lang$core$Platform_Sub$batch(
 var _elm_lang$core$Platform_Sub$map = _elm_lang$core$Native_Platform.map;
 var _elm_lang$core$Platform_Sub$Sub = {ctor: 'Sub'};
 
+var _elm_lang$lazy$Native_Lazy = function() {
+
+function memoize(thunk)
+{
+    var value;
+    var isForced = false;
+    return function(tuple0) {
+        if (!isForced) {
+            value = thunk(tuple0);
+            isForced = true;
+        }
+        return value;
+    };
+}
+
+return {
+    memoize: memoize
+};
+
+}();
+
+var _elm_lang$lazy$Lazy$force = function (_p0) {
+	var _p1 = _p0;
+	return _p1._0(
+		{ctor: '_Tuple0'});
+};
+var _elm_lang$lazy$Lazy$Lazy = function (a) {
+	return {ctor: 'Lazy', _0: a};
+};
+var _elm_lang$lazy$Lazy$lazy = function (thunk) {
+	return _elm_lang$lazy$Lazy$Lazy(
+		_elm_lang$lazy$Native_Lazy.memoize(thunk));
+};
+var _elm_lang$lazy$Lazy$map = F2(
+	function (f, a) {
+		return _elm_lang$lazy$Lazy$lazy(
+			function (_p2) {
+				var _p3 = _p2;
+				return f(
+					_elm_lang$lazy$Lazy$force(a));
+			});
+	});
+var _elm_lang$lazy$Lazy$map2 = F3(
+	function (f, a, b) {
+		return _elm_lang$lazy$Lazy$lazy(
+			function (_p4) {
+				var _p5 = _p4;
+				return A2(
+					f,
+					_elm_lang$lazy$Lazy$force(a),
+					_elm_lang$lazy$Lazy$force(b));
+			});
+	});
+var _elm_lang$lazy$Lazy$map3 = F4(
+	function (f, a, b, c) {
+		return _elm_lang$lazy$Lazy$lazy(
+			function (_p6) {
+				var _p7 = _p6;
+				return A3(
+					f,
+					_elm_lang$lazy$Lazy$force(a),
+					_elm_lang$lazy$Lazy$force(b),
+					_elm_lang$lazy$Lazy$force(c));
+			});
+	});
+var _elm_lang$lazy$Lazy$map4 = F5(
+	function (f, a, b, c, d) {
+		return _elm_lang$lazy$Lazy$lazy(
+			function (_p8) {
+				var _p9 = _p8;
+				return A4(
+					f,
+					_elm_lang$lazy$Lazy$force(a),
+					_elm_lang$lazy$Lazy$force(b),
+					_elm_lang$lazy$Lazy$force(c),
+					_elm_lang$lazy$Lazy$force(d));
+			});
+	});
+var _elm_lang$lazy$Lazy$map5 = F6(
+	function (f, a, b, c, d, e) {
+		return _elm_lang$lazy$Lazy$lazy(
+			function (_p10) {
+				var _p11 = _p10;
+				return A5(
+					f,
+					_elm_lang$lazy$Lazy$force(a),
+					_elm_lang$lazy$Lazy$force(b),
+					_elm_lang$lazy$Lazy$force(c),
+					_elm_lang$lazy$Lazy$force(d),
+					_elm_lang$lazy$Lazy$force(e));
+			});
+	});
+var _elm_lang$lazy$Lazy$apply = F2(
+	function (f, x) {
+		return _elm_lang$lazy$Lazy$lazy(
+			function (_p12) {
+				var _p13 = _p12;
+				return A2(
+					_elm_lang$lazy$Lazy$force,
+					f,
+					_elm_lang$lazy$Lazy$force(x));
+			});
+	});
+var _elm_lang$lazy$Lazy$andThen = F2(
+	function (a, callback) {
+		return _elm_lang$lazy$Lazy$lazy(
+			function (_p14) {
+				var _p15 = _p14;
+				return _elm_lang$lazy$Lazy$force(
+					callback(
+						_elm_lang$lazy$Lazy$force(a)));
+			});
+	});
+
 //import Maybe, Native.List, Native.Utils, Result //
 
 var _elm_lang$core$Native_String = function() {
@@ -3152,6 +3266,862 @@ var _elm_lang$core$Regex$AtMost = function (a) {
 	return {ctor: 'AtMost', _0: a};
 };
 var _elm_lang$core$Regex$All = {ctor: 'All'};
+
+var _Bogdanp$elm_combine$Combine$app = function (p) {
+	var _p0 = p;
+	if (_p0.ctor === 'Parser') {
+		return _p0._0;
+	} else {
+		return _elm_lang$lazy$Lazy$force(_p0._0);
+	}
+};
+var _Bogdanp$elm_combine$Combine$parse = F2(
+	function (p, input) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$app,
+			p,
+			{input: input, position: 0});
+	});
+var _Bogdanp$elm_combine$Combine$Context = F2(
+	function (a, b) {
+		return {input: a, position: b};
+	});
+var _Bogdanp$elm_combine$Combine$RecursiveParser = function (a) {
+	return {ctor: 'RecursiveParser', _0: a};
+};
+var _Bogdanp$elm_combine$Combine$rec = function (t) {
+	return _Bogdanp$elm_combine$Combine$RecursiveParser(
+		_elm_lang$lazy$Lazy$lazy(
+			function (_p1) {
+				var _p2 = _p1;
+				return _Bogdanp$elm_combine$Combine$app(
+					t(
+						{ctor: '_Tuple0'}));
+			}));
+};
+var _Bogdanp$elm_combine$Combine$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _Bogdanp$elm_combine$Combine$primitive = _Bogdanp$elm_combine$Combine$Parser;
+var _Bogdanp$elm_combine$Combine$bimap = F3(
+	function (fok, ferr, p) {
+		return _Bogdanp$elm_combine$Combine$Parser(
+			function (cx) {
+				var _p3 = A2(_Bogdanp$elm_combine$Combine$app, p, cx);
+				if (_p3._0.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Result$Ok(
+							fok(_p3._0._0)),
+						_1: _p3._1
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Result$Err(
+							ferr(_p3._0._0)),
+						_1: _p3._1
+					};
+				}
+			});
+	});
+var _Bogdanp$elm_combine$Combine$map = F2(
+	function (f, p) {
+		return A3(_Bogdanp$elm_combine$Combine$bimap, f, _elm_lang$core$Basics$identity, p);
+	});
+var _Bogdanp$elm_combine$Combine$mapError = _Bogdanp$elm_combine$Combine$bimap(_elm_lang$core$Basics$identity);
+var _Bogdanp$elm_combine$Combine$andThen = F2(
+	function (p, f) {
+		return _Bogdanp$elm_combine$Combine$Parser(
+			function (cx) {
+				var _p4 = A2(_Bogdanp$elm_combine$Combine$app, p, cx);
+				if (_p4._0.ctor === 'Ok') {
+					return A2(
+						_Bogdanp$elm_combine$Combine$app,
+						f(_p4._0._0),
+						_p4._1);
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Result$Err(_p4._0._0),
+						_1: _p4._1
+					};
+				}
+			});
+	});
+var _Bogdanp$elm_combine$Combine$sequence = function (ps) {
+	var accumulate = F3(
+		function (acc, ps, cx) {
+			accumulate:
+			while (true) {
+				var _p5 = ps;
+				if (_p5.ctor === '[]') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Result$Ok(
+							_elm_lang$core$List$reverse(acc)),
+						_1: cx
+					};
+				} else {
+					var _p6 = A2(_Bogdanp$elm_combine$Combine$app, _p5._0, cx);
+					if (_p6._0.ctor === 'Ok') {
+						var _v6 = A2(_elm_lang$core$List_ops['::'], _p6._0._0, acc),
+							_v7 = _p5._1,
+							_v8 = _p6._1;
+						acc = _v6;
+						ps = _v7;
+						cx = _v8;
+						continue accumulate;
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Result$Err(_p6._0._0),
+							_1: _p6._1
+						};
+					}
+				}
+			}
+		});
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			return A3(
+				accumulate,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				ps,
+				cx);
+		});
+};
+var _Bogdanp$elm_combine$Combine$fail = function (ms) {
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Result$Err(ms),
+				_1: cx
+			};
+		});
+};
+var _Bogdanp$elm_combine$Combine$succeed = function (r) {
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Result$Ok(r),
+				_1: cx
+			};
+		});
+};
+var _Bogdanp$elm_combine$Combine$andMap = F2(
+	function (lp, rp) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$andThen,
+			lp,
+			function (f) {
+				return A2(
+					_Bogdanp$elm_combine$Combine$andThen,
+					rp,
+					function (x) {
+						return _Bogdanp$elm_combine$Combine$succeed(
+							f(x));
+					});
+			});
+	});
+var _Bogdanp$elm_combine$Combine$between = F3(
+	function (lp, rp, p) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$andMap,
+			A2(
+				_Bogdanp$elm_combine$Combine$andMap,
+				A2(
+					_Bogdanp$elm_combine$Combine$map,
+					_elm_lang$core$Basics$flip(
+						function (_p7) {
+							return _elm_lang$core$Basics$always(
+								_elm_lang$core$Basics$always(_p7));
+						}),
+					lp),
+				p),
+			rp);
+	});
+var _Bogdanp$elm_combine$Combine$skip = function (p) {
+	return A2(
+		_Bogdanp$elm_combine$Combine$andThen,
+		p,
+		_elm_lang$core$Basics$always(
+			_Bogdanp$elm_combine$Combine$succeed(
+				{ctor: '_Tuple0'})));
+};
+var _Bogdanp$elm_combine$Combine$count = F2(
+	function (n, p) {
+		var accumulate = F2(
+			function (x, acc) {
+				return (_elm_lang$core$Native_Utils.cmp(x, 0) < 1) ? _Bogdanp$elm_combine$Combine$succeed(
+					_elm_lang$core$List$reverse(acc)) : A2(
+					_Bogdanp$elm_combine$Combine$andThen,
+					p,
+					function (res) {
+						return A2(
+							accumulate,
+							x - 1,
+							A2(_elm_lang$core$List_ops['::'], res, acc));
+					});
+			});
+		return A2(
+			accumulate,
+			n,
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+var _Bogdanp$elm_combine$Combine$string = function (s) {
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			if (A2(_elm_lang$core$String$startsWith, s, cx.input)) {
+				var len = _elm_lang$core$String$length(s);
+				var rem = A2(_elm_lang$core$String$dropLeft, len, cx.input);
+				var pos = cx.position + len;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Ok(s),
+					_1: _elm_lang$core$Native_Utils.update(
+						cx,
+						{input: rem, position: pos})
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Err(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$core$Basics_ops['++'],
+								'expected ',
+								_elm_lang$core$Basics$toString(s))
+							])),
+					_1: cx
+				};
+			}
+		});
+};
+var _Bogdanp$elm_combine$Combine$parens = A2(
+	_Bogdanp$elm_combine$Combine$between,
+	_Bogdanp$elm_combine$Combine$string('('),
+	_Bogdanp$elm_combine$Combine$string(')'));
+var _Bogdanp$elm_combine$Combine$braces = A2(
+	_Bogdanp$elm_combine$Combine$between,
+	_Bogdanp$elm_combine$Combine$string('{'),
+	_Bogdanp$elm_combine$Combine$string('}'));
+var _Bogdanp$elm_combine$Combine$brackets = A2(
+	_Bogdanp$elm_combine$Combine$between,
+	_Bogdanp$elm_combine$Combine$string('['),
+	_Bogdanp$elm_combine$Combine$string(']'));
+var _Bogdanp$elm_combine$Combine$regex = function (pattern) {
+	var pattern$ = A2(_elm_lang$core$String$startsWith, '^', pattern) ? pattern : A2(_elm_lang$core$Basics_ops['++'], '^', pattern);
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			var _p8 = A3(
+				_elm_lang$core$Regex$find,
+				_elm_lang$core$Regex$AtMost(1),
+				_elm_lang$core$Regex$regex(pattern$),
+				cx.input);
+			if ((_p8.ctor === '::') && (_p8._1.ctor === '[]')) {
+				var _p9 = _p8._0;
+				var len = _elm_lang$core$String$length(_p9.match);
+				var rem = A2(_elm_lang$core$String$dropLeft, len, cx.input);
+				var pos = cx.position + len;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Ok(_p9.match),
+					_1: _elm_lang$core$Native_Utils.update(
+						cx,
+						{input: rem, position: pos})
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Err(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$core$Basics_ops['++'],
+								'expected input matching Regexp /',
+								A2(_elm_lang$core$Basics_ops['++'], pattern$, '/'))
+							])),
+					_1: cx
+				};
+			}
+		});
+};
+var _Bogdanp$elm_combine$Combine$while = function (pred) {
+	var accumulate = F2(
+		function (acc, cx) {
+			accumulate:
+			while (true) {
+				var _p10 = _elm_lang$core$String$uncons(cx.input);
+				if (_p10.ctor === 'Just') {
+					var _p11 = _p10._0._0;
+					if (pred(_p11)) {
+						var pos = cx.position + 1;
+						var c = A2(_elm_lang$core$String$cons, _p11, '');
+						var _v11 = A2(_elm_lang$core$Basics_ops['++'], acc, c),
+							_v12 = _elm_lang$core$Native_Utils.update(
+							cx,
+							{input: _p10._0._1, position: pos});
+						acc = _v11;
+						cx = _v12;
+						continue accumulate;
+					} else {
+						return {ctor: '_Tuple2', _0: acc, _1: cx};
+					}
+				} else {
+					return {ctor: '_Tuple2', _0: acc, _1: cx};
+				}
+			}
+		});
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			var _p12 = A2(accumulate, '', cx);
+			var res = _p12._0;
+			var cx$ = _p12._1;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Result$Ok(res),
+				_1: cx$
+			};
+		});
+};
+var _Bogdanp$elm_combine$Combine$end = _Bogdanp$elm_combine$Combine$Parser(
+	function (cx) {
+		return _elm_lang$core$Native_Utils.eq(cx.input, '') ? {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Result$Ok(
+				{ctor: '_Tuple0'}),
+			_1: cx
+		} : {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Result$Err(
+				_elm_lang$core$Native_List.fromArray(
+					['expected end of input'])),
+			_1: cx
+		};
+	});
+var _Bogdanp$elm_combine$Combine$or = F2(
+	function (lp, rp) {
+		return _Bogdanp$elm_combine$Combine$Parser(
+			function (cx) {
+				var res = A2(_Bogdanp$elm_combine$Combine$app, lp, cx);
+				var _p13 = res;
+				if (_p13._0.ctor === 'Ok') {
+					return res;
+				} else {
+					var res$ = A2(_Bogdanp$elm_combine$Combine$app, rp, cx);
+					var _p14 = res$;
+					if (_p14._0.ctor === 'Ok') {
+						return res$;
+					} else {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Result$Err(
+								A2(_elm_lang$core$Basics_ops['++'], _p13._0._0, _p14._0._0)),
+							_1: cx
+						};
+					}
+				}
+			});
+	});
+var _Bogdanp$elm_combine$Combine$choice = function (xs) {
+	return A3(
+		_elm_lang$core$List$foldr,
+		_Bogdanp$elm_combine$Combine$or,
+		_Bogdanp$elm_combine$Combine$fail(
+			_elm_lang$core$Native_List.fromArray(
+				[])),
+		xs);
+};
+var _Bogdanp$elm_combine$Combine$optional = F2(
+	function (res, p) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$or,
+			p,
+			_Bogdanp$elm_combine$Combine$succeed(res));
+	});
+var _Bogdanp$elm_combine$Combine$chainl = F2(
+	function (p, op) {
+		var accumulate = function (x) {
+			return A2(
+				_Bogdanp$elm_combine$Combine$or,
+				A2(
+					_Bogdanp$elm_combine$Combine$andThen,
+					op,
+					function (f) {
+						return A2(
+							_Bogdanp$elm_combine$Combine$andThen,
+							p,
+							function (y) {
+								return accumulate(
+									A2(f, x, y));
+							});
+					}),
+				_Bogdanp$elm_combine$Combine$succeed(x));
+		};
+		return A2(_Bogdanp$elm_combine$Combine$andThen, p, accumulate);
+	});
+var _Bogdanp$elm_combine$Combine$chainr = F2(
+	function (p, op) {
+		var accumulate = function (x) {
+			return A2(
+				_Bogdanp$elm_combine$Combine$or,
+				A2(
+					_Bogdanp$elm_combine$Combine$andThen,
+					op,
+					function (f) {
+						return A2(
+							_Bogdanp$elm_combine$Combine$andThen,
+							A2(_Bogdanp$elm_combine$Combine$andThen, p, accumulate),
+							function (y) {
+								return _Bogdanp$elm_combine$Combine$succeed(
+									A2(f, x, y));
+							});
+					}),
+				_Bogdanp$elm_combine$Combine$succeed(x));
+		};
+		return A2(_Bogdanp$elm_combine$Combine$andThen, p, accumulate);
+	});
+var _Bogdanp$elm_combine$Combine$maybe = function (p) {
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			var _p15 = A2(_Bogdanp$elm_combine$Combine$app, p, cx);
+			if ((_p15.ctor === '_Tuple2') && (_p15._0.ctor === 'Ok')) {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Ok(
+						_elm_lang$core$Maybe$Just(_p15._0._0)),
+					_1: _p15._1
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Ok(_elm_lang$core$Maybe$Nothing),
+					_1: cx
+				};
+			}
+		});
+};
+var _Bogdanp$elm_combine$Combine$many = function (p) {
+	var accumulate = F2(
+		function (acc, cx) {
+			accumulate:
+			while (true) {
+				var _p16 = A2(_Bogdanp$elm_combine$Combine$app, p, cx);
+				if ((_p16.ctor === '_Tuple2') && (_p16._0.ctor === 'Ok')) {
+					var _p17 = _p16._1;
+					if (_elm_lang$core$Native_Utils.eq(cx, _p17)) {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$List$reverse(acc),
+							_1: cx
+						};
+					} else {
+						var _v17 = A2(_elm_lang$core$List_ops['::'], _p16._0._0, acc),
+							_v18 = _p17;
+						acc = _v17;
+						cx = _v18;
+						continue accumulate;
+					}
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$List$reverse(acc),
+						_1: cx
+					};
+				}
+			}
+		});
+	return _Bogdanp$elm_combine$Combine$Parser(
+		function (cx) {
+			var _p18 = A2(
+				accumulate,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				cx);
+			var res = _p18._0;
+			var cx$ = _p18._1;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Result$Ok(res),
+				_1: cx$
+			};
+		});
+};
+var _Bogdanp$elm_combine$Combine$many1 = function (p) {
+	return A2(
+		_Bogdanp$elm_combine$Combine$andMap,
+		A2(
+			_Bogdanp$elm_combine$Combine$map,
+			F2(
+				function (x, y) {
+					return A2(_elm_lang$core$List_ops['::'], x, y);
+				}),
+			p),
+		_Bogdanp$elm_combine$Combine$many(p));
+};
+var _Bogdanp$elm_combine$Combine$skipMany1 = function (p) {
+	return A2(
+		_Bogdanp$elm_combine$Combine$andThen,
+		_Bogdanp$elm_combine$Combine$many1(
+			_Bogdanp$elm_combine$Combine$skip(p)),
+		_elm_lang$core$Basics$always(
+			_Bogdanp$elm_combine$Combine$succeed(
+				{ctor: '_Tuple0'})));
+};
+var _Bogdanp$elm_combine$Combine$sepBy1 = F2(
+	function (sep, p) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$andMap,
+			A2(
+				_Bogdanp$elm_combine$Combine$map,
+				F2(
+					function (x, y) {
+						return A2(_elm_lang$core$List_ops['::'], x, y);
+					}),
+				p),
+			_Bogdanp$elm_combine$Combine$many(
+				A2(
+					_Bogdanp$elm_combine$Combine$andMap,
+					A2(
+						_Bogdanp$elm_combine$Combine$map,
+						_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always),
+						sep),
+					p)));
+	});
+var _Bogdanp$elm_combine$Combine$sepBy = F2(
+	function (sep, p) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$or,
+			A2(_Bogdanp$elm_combine$Combine$sepBy1, sep, p),
+			_Bogdanp$elm_combine$Combine$succeed(
+				_elm_lang$core$Native_List.fromArray(
+					[])));
+	});
+var _Bogdanp$elm_combine$Combine$sepEndBy1 = F2(
+	function (sep, p) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$andMap,
+			A2(
+				_Bogdanp$elm_combine$Combine$map,
+				_elm_lang$core$Basics$always,
+				A2(_Bogdanp$elm_combine$Combine$sepBy1, sep, p)),
+			_Bogdanp$elm_combine$Combine$maybe(sep));
+	});
+var _Bogdanp$elm_combine$Combine$sepEndBy = F2(
+	function (sep, p) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$or,
+			A2(_Bogdanp$elm_combine$Combine$sepEndBy1, sep, p),
+			_Bogdanp$elm_combine$Combine$succeed(
+				_elm_lang$core$Native_List.fromArray(
+					[])));
+	});
+var _Bogdanp$elm_combine$Combine$skipMany = function (p) {
+	return A2(
+		_Bogdanp$elm_combine$Combine$andThen,
+		_Bogdanp$elm_combine$Combine$many(
+			_Bogdanp$elm_combine$Combine$skip(p)),
+		_elm_lang$core$Basics$always(
+			_Bogdanp$elm_combine$Combine$succeed(
+				{ctor: '_Tuple0'})));
+};
+var _Bogdanp$elm_combine$Combine$manyTill = F2(
+	function (p, end) {
+		var accumulate = F2(
+			function (acc, cx) {
+				accumulate:
+				while (true) {
+					var _p19 = A2(_Bogdanp$elm_combine$Combine$app, end, cx);
+					if (_p19._0.ctor === 'Ok') {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Result$Ok(
+								_elm_lang$core$List$reverse(acc)),
+							_1: _p19._1
+						};
+					} else {
+						var _p20 = A2(_Bogdanp$elm_combine$Combine$app, p, cx);
+						if ((_p20.ctor === '_Tuple2') && (_p20._0.ctor === 'Ok')) {
+							var _v21 = A2(_elm_lang$core$List_ops['::'], _p20._0._0, acc),
+								_v22 = _p20._1;
+							acc = _v21;
+							cx = _v22;
+							continue accumulate;
+						} else {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Result$Err(_p19._0._0),
+								_1: _p19._1
+							};
+						}
+					}
+				}
+			});
+		return _Bogdanp$elm_combine$Combine$Parser(
+			accumulate(
+				_elm_lang$core$Native_List.fromArray(
+					[])));
+	});
+
+var _Bogdanp$elm_combine$Combine_Infix_ops = _Bogdanp$elm_combine$Combine_Infix_ops || {};
+_Bogdanp$elm_combine$Combine_Infix_ops['<|>'] = _Bogdanp$elm_combine$Combine$or;
+var _Bogdanp$elm_combine$Combine_Infix_ops = _Bogdanp$elm_combine$Combine_Infix_ops || {};
+_Bogdanp$elm_combine$Combine_Infix_ops['*>'] = F2(
+	function (lp, rp) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$andMap,
+			A2(
+				_Bogdanp$elm_combine$Combine$map,
+				_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always),
+				lp),
+			rp);
+	});
+var _Bogdanp$elm_combine$Combine_Infix_ops = _Bogdanp$elm_combine$Combine_Infix_ops || {};
+_Bogdanp$elm_combine$Combine_Infix_ops['<*'] = F2(
+	function (lp, rp) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$andMap,
+			A2(_Bogdanp$elm_combine$Combine$map, _elm_lang$core$Basics$always, lp),
+			rp);
+	});
+var _Bogdanp$elm_combine$Combine_Infix_ops = _Bogdanp$elm_combine$Combine_Infix_ops || {};
+_Bogdanp$elm_combine$Combine_Infix_ops['<?>'] = F2(
+	function (p, m) {
+		return A2(
+			_Bogdanp$elm_combine$Combine$mapError,
+			function (_p0) {
+				return _elm_lang$core$Native_List.fromArray(
+					[m]);
+			},
+			p);
+	});
+var _Bogdanp$elm_combine$Combine_Infix_ops = _Bogdanp$elm_combine$Combine_Infix_ops || {};
+_Bogdanp$elm_combine$Combine_Infix_ops['<$'] = function (res) {
+	return _Bogdanp$elm_combine$Combine$map(
+		function (_p1) {
+			return res;
+		});
+};
+var _Bogdanp$elm_combine$Combine_Infix_ops = _Bogdanp$elm_combine$Combine_Infix_ops || {};
+_Bogdanp$elm_combine$Combine_Infix_ops['<*>'] = _Bogdanp$elm_combine$Combine$andMap;
+var _Bogdanp$elm_combine$Combine_Infix_ops = _Bogdanp$elm_combine$Combine_Infix_ops || {};
+_Bogdanp$elm_combine$Combine_Infix_ops['<$>'] = _Bogdanp$elm_combine$Combine$map;
+
+var _Bogdanp$elm_combine$Combine_Char$crlf = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	A2(
+		_Bogdanp$elm_combine$Combine_Infix_ops['<$'],
+		_elm_lang$core$Native_Utils.chr('\n'),
+		_Bogdanp$elm_combine$Combine$regex('\r\n')),
+	'expected crlf');
+var _Bogdanp$elm_combine$Combine_Char$satisfy = function (pred) {
+	return _Bogdanp$elm_combine$Combine$primitive(
+		function (cx) {
+			var message = 'could not satisfy predicate';
+			var _p0 = _elm_lang$core$String$uncons(cx.input);
+			if (_p0.ctor === 'Just') {
+				var _p1 = _p0._0._0;
+				return pred(_p1) ? {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Ok(_p1),
+					_1: _elm_lang$core$Native_Utils.update(
+						cx,
+						{input: _p0._0._1, position: cx.position + 1})
+				} : {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Err(
+						_elm_lang$core$Native_List.fromArray(
+							[message])),
+					_1: cx
+				};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Result$Err(
+						_elm_lang$core$Native_List.fromArray(
+							[message])),
+					_1: cx
+				};
+			}
+		});
+};
+var _Bogdanp$elm_combine$Combine_Char$char = function (c) {
+	return A2(
+		_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+		_Bogdanp$elm_combine$Combine_Char$satisfy(
+			F2(
+				function (x, y) {
+					return _elm_lang$core$Native_Utils.eq(x, y);
+				})(c)),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'expected ',
+			_elm_lang$core$Basics$toString(c)));
+};
+var _Bogdanp$elm_combine$Combine_Char$anyChar = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(
+		_elm_lang$core$Basics$always(true)),
+	'expected any character');
+var _Bogdanp$elm_combine$Combine_Char$oneOf = function (cs) {
+	return A2(
+		_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+		_Bogdanp$elm_combine$Combine_Char$satisfy(
+			A2(_elm_lang$core$Basics$flip, _elm_lang$core$List$member, cs)),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'expected one of ',
+			_elm_lang$core$Basics$toString(cs)));
+};
+var _Bogdanp$elm_combine$Combine_Char$noneOf = function (cs) {
+	return A2(
+		_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+		_Bogdanp$elm_combine$Combine_Char$satisfy(
+			function (_p2) {
+				return _elm_lang$core$Basics$not(
+					A3(_elm_lang$core$Basics$flip, _elm_lang$core$List$member, cs, _p2));
+			}),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'expected none of ',
+			_elm_lang$core$Basics$toString(cs)));
+};
+var _Bogdanp$elm_combine$Combine_Char$space = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(
+			_elm_lang$core$Native_Utils.chr(' '))),
+	'expected space');
+var _Bogdanp$elm_combine$Combine_Char$tab = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(
+			_elm_lang$core$Native_Utils.chr('\t'))),
+	'expected tab');
+var _Bogdanp$elm_combine$Combine_Char$newline = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(
+		F2(
+			function (x, y) {
+				return _elm_lang$core$Native_Utils.eq(x, y);
+			})(
+			_elm_lang$core$Native_Utils.chr('\n'))),
+	'expected newline');
+var _Bogdanp$elm_combine$Combine_Char$eol = A2(_Bogdanp$elm_combine$Combine_Infix_ops['<|>'], _Bogdanp$elm_combine$Combine_Char$newline, _Bogdanp$elm_combine$Combine_Char$crlf);
+var _Bogdanp$elm_combine$Combine_Char$lower = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(_elm_lang$core$Char$isLower),
+	'expected a lowercase character');
+var _Bogdanp$elm_combine$Combine_Char$upper = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(_elm_lang$core$Char$isUpper),
+	'expected an uppercase character');
+var _Bogdanp$elm_combine$Combine_Char$digit = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(_elm_lang$core$Char$isDigit),
+	'expected a digit');
+var _Bogdanp$elm_combine$Combine_Char$octDigit = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(_elm_lang$core$Char$isOctDigit),
+	'expected an octal digit');
+var _Bogdanp$elm_combine$Combine_Char$hexDigit = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	_Bogdanp$elm_combine$Combine_Char$satisfy(_elm_lang$core$Char$isHexDigit),
+	'expected a hexadecimal digit');
+
+var _Bogdanp$elm_combine$Combine_Num$digit = function () {
+	var toDigit = function (c) {
+		return _elm_lang$core$Char$toCode(c) - _elm_lang$core$Char$toCode(
+			_elm_lang$core$Native_Utils.chr('0'));
+	};
+	return A2(
+		_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+		A2(_Bogdanp$elm_combine$Combine_Infix_ops['<$>'], toDigit, _Bogdanp$elm_combine$Combine_Char$digit),
+		'expected a digit');
+}();
+var _Bogdanp$elm_combine$Combine_Num$sign = A2(
+	_Bogdanp$elm_combine$Combine$optional,
+	1,
+	_Bogdanp$elm_combine$Combine$choice(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_Bogdanp$elm_combine$Combine_Infix_ops['<$'],
+				1,
+				_Bogdanp$elm_combine$Combine$string('+')),
+				A2(
+				_Bogdanp$elm_combine$Combine_Infix_ops['<$'],
+				-1,
+				_Bogdanp$elm_combine$Combine$string('-'))
+			])));
+var _Bogdanp$elm_combine$Combine_Num$unwrap = F2(
+	function (f, s) {
+		var _p0 = f(s);
+		if (_p0.ctor === 'Ok') {
+			return _p0._0;
+		} else {
+			return _elm_lang$core$Native_Utils.crashCase(
+				'Combine.Num',
+				{
+					start: {line: 19, column: 3},
+					end: {line: 24, column: 73}
+				},
+				_p0)(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'impossible state in Combine.Num.unwrap: ',
+					_elm_lang$core$Basics$toString(_p0._0)));
+		}
+	});
+var _Bogdanp$elm_combine$Combine_Num$toInt = _Bogdanp$elm_combine$Combine_Num$unwrap(_elm_lang$core$String$toInt);
+var _Bogdanp$elm_combine$Combine_Num$int = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	A2(
+		_Bogdanp$elm_combine$Combine$andMap,
+		A2(
+			_Bogdanp$elm_combine$Combine$map,
+			F2(
+				function (x, y) {
+					return x * y;
+				}),
+			_Bogdanp$elm_combine$Combine_Num$sign),
+		A2(
+			_Bogdanp$elm_combine$Combine_Infix_ops['<$>'],
+			_Bogdanp$elm_combine$Combine_Num$toInt,
+			_Bogdanp$elm_combine$Combine$regex('(0|[1-9][0-9]*)'))),
+	'expected an integer');
+var _Bogdanp$elm_combine$Combine_Num$toFloat = _Bogdanp$elm_combine$Combine_Num$unwrap(_elm_lang$core$String$toFloat);
+var _Bogdanp$elm_combine$Combine_Num$float = A2(
+	_Bogdanp$elm_combine$Combine_Infix_ops['<?>'],
+	A2(
+		_Bogdanp$elm_combine$Combine$andMap,
+		A2(
+			_Bogdanp$elm_combine$Combine$map,
+			function (_p2) {
+				return F2(
+					function (x, y) {
+						return x * y;
+					})(
+					_elm_lang$core$Basics$toFloat(_p2));
+			},
+			_Bogdanp$elm_combine$Combine_Num$sign),
+		A2(
+			_Bogdanp$elm_combine$Combine_Infix_ops['<$>'],
+			_Bogdanp$elm_combine$Combine_Num$toFloat,
+			_Bogdanp$elm_combine$Combine$regex('(0|[1-9][0-9]*)(\\.[0-9]+)'))),
+	'expected a float');
 
 //import Native.List //
 
@@ -12822,6 +13792,243 @@ var _elm_community$basics_extra$Basics_Extra$never = function (n) {
 	}
 };
 
+var _elm_lang$html$Html_App$programWithFlags = _elm_lang$virtual_dom$VirtualDom$programWithFlags;
+var _elm_lang$html$Html_App$program = function (app) {
+	return _elm_lang$html$Html_App$programWithFlags(
+		_elm_lang$core$Native_Utils.update(
+			app,
+			{
+				init: function (_p0) {
+					return app.init;
+				}
+			}));
+};
+var _elm_lang$html$Html_App$beginnerProgram = function (_p1) {
+	var _p2 = _p1;
+	return _elm_lang$html$Html_App$programWithFlags(
+		{
+			init: function (_p3) {
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_p2.model,
+					_elm_lang$core$Native_List.fromArray(
+						[]));
+			},
+			update: F2(
+				function (msg, model) {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A2(_p2.update, msg, model),
+						_elm_lang$core$Native_List.fromArray(
+							[]));
+				}),
+			view: _p2.view,
+			subscriptions: function (_p4) {
+				return _elm_lang$core$Platform_Sub$none;
+			}
+		});
+};
+var _elm_lang$html$Html_App$map = _elm_lang$virtual_dom$VirtualDom$map;
+
+var _elm_lang$core$Color$fmod = F2(
+	function (f, n) {
+		var integer = _elm_lang$core$Basics$floor(f);
+		return (_elm_lang$core$Basics$toFloat(
+			A2(_elm_lang$core$Basics_ops['%'], integer, n)) + f) - _elm_lang$core$Basics$toFloat(integer);
+	});
+var _elm_lang$core$Color$rgbToHsl = F3(
+	function (red, green, blue) {
+		var b = _elm_lang$core$Basics$toFloat(blue) / 255;
+		var g = _elm_lang$core$Basics$toFloat(green) / 255;
+		var r = _elm_lang$core$Basics$toFloat(red) / 255;
+		var cMax = A2(
+			_elm_lang$core$Basics$max,
+			A2(_elm_lang$core$Basics$max, r, g),
+			b);
+		var cMin = A2(
+			_elm_lang$core$Basics$min,
+			A2(_elm_lang$core$Basics$min, r, g),
+			b);
+		var c = cMax - cMin;
+		var lightness = (cMax + cMin) / 2;
+		var saturation = _elm_lang$core$Native_Utils.eq(lightness, 0) ? 0 : (c / (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)));
+		var hue = _elm_lang$core$Basics$degrees(60) * (_elm_lang$core$Native_Utils.eq(cMax, r) ? A2(_elm_lang$core$Color$fmod, (g - b) / c, 6) : (_elm_lang$core$Native_Utils.eq(cMax, g) ? (((b - r) / c) + 2) : (((r - g) / c) + 4)));
+		return {ctor: '_Tuple3', _0: hue, _1: saturation, _2: lightness};
+	});
+var _elm_lang$core$Color$hslToRgb = F3(
+	function (hue, saturation, lightness) {
+		var hue$ = hue / _elm_lang$core$Basics$degrees(60);
+		var chroma = (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)) * saturation;
+		var x = chroma * (1 - _elm_lang$core$Basics$abs(
+			A2(_elm_lang$core$Color$fmod, hue$, 2) - 1));
+		var _p0 = (_elm_lang$core$Native_Utils.cmp(hue$, 0) < 0) ? {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(hue$, 1) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: x, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(hue$, 2) < 0) ? {ctor: '_Tuple3', _0: x, _1: chroma, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(hue$, 3) < 0) ? {ctor: '_Tuple3', _0: 0, _1: chroma, _2: x} : ((_elm_lang$core$Native_Utils.cmp(hue$, 4) < 0) ? {ctor: '_Tuple3', _0: 0, _1: x, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(hue$, 5) < 0) ? {ctor: '_Tuple3', _0: x, _1: 0, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(hue$, 6) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: 0, _2: x} : {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0}))))));
+		var r = _p0._0;
+		var g = _p0._1;
+		var b = _p0._2;
+		var m = lightness - (chroma / 2);
+		return {ctor: '_Tuple3', _0: r + m, _1: g + m, _2: b + m};
+	});
+var _elm_lang$core$Color$toRgb = function (color) {
+	var _p1 = color;
+	if (_p1.ctor === 'RGBA') {
+		return {red: _p1._0, green: _p1._1, blue: _p1._2, alpha: _p1._3};
+	} else {
+		var _p2 = A3(_elm_lang$core$Color$hslToRgb, _p1._0, _p1._1, _p1._2);
+		var r = _p2._0;
+		var g = _p2._1;
+		var b = _p2._2;
+		return {
+			red: _elm_lang$core$Basics$round(255 * r),
+			green: _elm_lang$core$Basics$round(255 * g),
+			blue: _elm_lang$core$Basics$round(255 * b),
+			alpha: _p1._3
+		};
+	}
+};
+var _elm_lang$core$Color$toHsl = function (color) {
+	var _p3 = color;
+	if (_p3.ctor === 'HSLA') {
+		return {hue: _p3._0, saturation: _p3._1, lightness: _p3._2, alpha: _p3._3};
+	} else {
+		var _p4 = A3(_elm_lang$core$Color$rgbToHsl, _p3._0, _p3._1, _p3._2);
+		var h = _p4._0;
+		var s = _p4._1;
+		var l = _p4._2;
+		return {hue: h, saturation: s, lightness: l, alpha: _p3._3};
+	}
+};
+var _elm_lang$core$Color$HSLA = F4(
+	function (a, b, c, d) {
+		return {ctor: 'HSLA', _0: a, _1: b, _2: c, _3: d};
+	});
+var _elm_lang$core$Color$hsla = F4(
+	function (hue, saturation, lightness, alpha) {
+		return A4(
+			_elm_lang$core$Color$HSLA,
+			hue - _elm_lang$core$Basics$turns(
+				_elm_lang$core$Basics$toFloat(
+					_elm_lang$core$Basics$floor(hue / (2 * _elm_lang$core$Basics$pi)))),
+			saturation,
+			lightness,
+			alpha);
+	});
+var _elm_lang$core$Color$hsl = F3(
+	function (hue, saturation, lightness) {
+		return A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, 1);
+	});
+var _elm_lang$core$Color$complement = function (color) {
+	var _p5 = color;
+	if (_p5.ctor === 'HSLA') {
+		return A4(
+			_elm_lang$core$Color$hsla,
+			_p5._0 + _elm_lang$core$Basics$degrees(180),
+			_p5._1,
+			_p5._2,
+			_p5._3);
+	} else {
+		var _p6 = A3(_elm_lang$core$Color$rgbToHsl, _p5._0, _p5._1, _p5._2);
+		var h = _p6._0;
+		var s = _p6._1;
+		var l = _p6._2;
+		return A4(
+			_elm_lang$core$Color$hsla,
+			h + _elm_lang$core$Basics$degrees(180),
+			s,
+			l,
+			_p5._3);
+	}
+};
+var _elm_lang$core$Color$grayscale = function (p) {
+	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
+};
+var _elm_lang$core$Color$greyscale = function (p) {
+	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
+};
+var _elm_lang$core$Color$RGBA = F4(
+	function (a, b, c, d) {
+		return {ctor: 'RGBA', _0: a, _1: b, _2: c, _3: d};
+	});
+var _elm_lang$core$Color$rgba = _elm_lang$core$Color$RGBA;
+var _elm_lang$core$Color$rgb = F3(
+	function (r, g, b) {
+		return A4(_elm_lang$core$Color$RGBA, r, g, b, 1);
+	});
+var _elm_lang$core$Color$lightRed = A4(_elm_lang$core$Color$RGBA, 239, 41, 41, 1);
+var _elm_lang$core$Color$red = A4(_elm_lang$core$Color$RGBA, 204, 0, 0, 1);
+var _elm_lang$core$Color$darkRed = A4(_elm_lang$core$Color$RGBA, 164, 0, 0, 1);
+var _elm_lang$core$Color$lightOrange = A4(_elm_lang$core$Color$RGBA, 252, 175, 62, 1);
+var _elm_lang$core$Color$orange = A4(_elm_lang$core$Color$RGBA, 245, 121, 0, 1);
+var _elm_lang$core$Color$darkOrange = A4(_elm_lang$core$Color$RGBA, 206, 92, 0, 1);
+var _elm_lang$core$Color$lightYellow = A4(_elm_lang$core$Color$RGBA, 255, 233, 79, 1);
+var _elm_lang$core$Color$yellow = A4(_elm_lang$core$Color$RGBA, 237, 212, 0, 1);
+var _elm_lang$core$Color$darkYellow = A4(_elm_lang$core$Color$RGBA, 196, 160, 0, 1);
+var _elm_lang$core$Color$lightGreen = A4(_elm_lang$core$Color$RGBA, 138, 226, 52, 1);
+var _elm_lang$core$Color$green = A4(_elm_lang$core$Color$RGBA, 115, 210, 22, 1);
+var _elm_lang$core$Color$darkGreen = A4(_elm_lang$core$Color$RGBA, 78, 154, 6, 1);
+var _elm_lang$core$Color$lightBlue = A4(_elm_lang$core$Color$RGBA, 114, 159, 207, 1);
+var _elm_lang$core$Color$blue = A4(_elm_lang$core$Color$RGBA, 52, 101, 164, 1);
+var _elm_lang$core$Color$darkBlue = A4(_elm_lang$core$Color$RGBA, 32, 74, 135, 1);
+var _elm_lang$core$Color$lightPurple = A4(_elm_lang$core$Color$RGBA, 173, 127, 168, 1);
+var _elm_lang$core$Color$purple = A4(_elm_lang$core$Color$RGBA, 117, 80, 123, 1);
+var _elm_lang$core$Color$darkPurple = A4(_elm_lang$core$Color$RGBA, 92, 53, 102, 1);
+var _elm_lang$core$Color$lightBrown = A4(_elm_lang$core$Color$RGBA, 233, 185, 110, 1);
+var _elm_lang$core$Color$brown = A4(_elm_lang$core$Color$RGBA, 193, 125, 17, 1);
+var _elm_lang$core$Color$darkBrown = A4(_elm_lang$core$Color$RGBA, 143, 89, 2, 1);
+var _elm_lang$core$Color$black = A4(_elm_lang$core$Color$RGBA, 0, 0, 0, 1);
+var _elm_lang$core$Color$white = A4(_elm_lang$core$Color$RGBA, 255, 255, 255, 1);
+var _elm_lang$core$Color$lightGrey = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
+var _elm_lang$core$Color$grey = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
+var _elm_lang$core$Color$darkGrey = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
+var _elm_lang$core$Color$lightGray = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
+var _elm_lang$core$Color$gray = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
+var _elm_lang$core$Color$darkGray = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
+var _elm_lang$core$Color$lightCharcoal = A4(_elm_lang$core$Color$RGBA, 136, 138, 133, 1);
+var _elm_lang$core$Color$charcoal = A4(_elm_lang$core$Color$RGBA, 85, 87, 83, 1);
+var _elm_lang$core$Color$darkCharcoal = A4(_elm_lang$core$Color$RGBA, 46, 52, 54, 1);
+var _elm_lang$core$Color$Radial = F5(
+	function (a, b, c, d, e) {
+		return {ctor: 'Radial', _0: a, _1: b, _2: c, _3: d, _4: e};
+	});
+var _elm_lang$core$Color$radial = _elm_lang$core$Color$Radial;
+var _elm_lang$core$Color$Linear = F3(
+	function (a, b, c) {
+		return {ctor: 'Linear', _0: a, _1: b, _2: c};
+	});
+var _elm_lang$core$Color$linear = _elm_lang$core$Color$Linear;
+
+//import Result //
+
+var _elm_lang$core$Native_Date = function() {
+
+function fromString(str)
+{
+	var date = new Date(str);
+	return isNaN(date.getTime())
+		? _elm_lang$core$Result$Err('Unable to parse \'' + str + '\' as a date. Dates must be in the ISO 8601 format.')
+		: _elm_lang$core$Result$Ok(date);
+}
+
+var dayTable = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var monthTable =
+	['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+	 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+
+return {
+	fromString: fromString,
+	year: function(d) { return d.getFullYear(); },
+	month: function(d) { return { ctor: monthTable[d.getMonth()] }; },
+	day: function(d) { return d.getDate(); },
+	hour: function(d) { return d.getHours(); },
+	minute: function(d) { return d.getMinutes(); },
+	second: function(d) { return d.getSeconds(); },
+	millisecond: function(d) { return d.getMilliseconds(); },
+	toTime: function(d) { return d.getTime(); },
+	fromTime: function(t) { return new Date(t); },
+	dayOfWeek: function(d) { return { ctor: dayTable[d.getDay()] }; }
+};
+
+}();
 var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
 var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
 var _elm_lang$core$Task$spawnCmd = F2(
@@ -13271,6 +14478,1906 @@ var _elm_lang$core$Time$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
 
+var _elm_lang$core$Date$millisecond = _elm_lang$core$Native_Date.millisecond;
+var _elm_lang$core$Date$second = _elm_lang$core$Native_Date.second;
+var _elm_lang$core$Date$minute = _elm_lang$core$Native_Date.minute;
+var _elm_lang$core$Date$hour = _elm_lang$core$Native_Date.hour;
+var _elm_lang$core$Date$dayOfWeek = _elm_lang$core$Native_Date.dayOfWeek;
+var _elm_lang$core$Date$day = _elm_lang$core$Native_Date.day;
+var _elm_lang$core$Date$month = _elm_lang$core$Native_Date.month;
+var _elm_lang$core$Date$year = _elm_lang$core$Native_Date.year;
+var _elm_lang$core$Date$fromTime = _elm_lang$core$Native_Date.fromTime;
+var _elm_lang$core$Date$toTime = _elm_lang$core$Native_Date.toTime;
+var _elm_lang$core$Date$fromString = _elm_lang$core$Native_Date.fromString;
+var _elm_lang$core$Date$now = A2(_elm_lang$core$Task$map, _elm_lang$core$Date$fromTime, _elm_lang$core$Time$now);
+var _elm_lang$core$Date$Date = {ctor: 'Date'};
+var _elm_lang$core$Date$Sun = {ctor: 'Sun'};
+var _elm_lang$core$Date$Sat = {ctor: 'Sat'};
+var _elm_lang$core$Date$Fri = {ctor: 'Fri'};
+var _elm_lang$core$Date$Thu = {ctor: 'Thu'};
+var _elm_lang$core$Date$Wed = {ctor: 'Wed'};
+var _elm_lang$core$Date$Tue = {ctor: 'Tue'};
+var _elm_lang$core$Date$Mon = {ctor: 'Mon'};
+var _elm_lang$core$Date$Dec = {ctor: 'Dec'};
+var _elm_lang$core$Date$Nov = {ctor: 'Nov'};
+var _elm_lang$core$Date$Oct = {ctor: 'Oct'};
+var _elm_lang$core$Date$Sep = {ctor: 'Sep'};
+var _elm_lang$core$Date$Aug = {ctor: 'Aug'};
+var _elm_lang$core$Date$Jul = {ctor: 'Jul'};
+var _elm_lang$core$Date$Jun = {ctor: 'Jun'};
+var _elm_lang$core$Date$May = {ctor: 'May'};
+var _elm_lang$core$Date$Apr = {ctor: 'Apr'};
+var _elm_lang$core$Date$Mar = {ctor: 'Mar'};
+var _elm_lang$core$Date$Feb = {ctor: 'Feb'};
+var _elm_lang$core$Date$Jan = {ctor: 'Jan'};
+
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
+var _elm_lang$core$Set$foldr = F3(
+	function (f, b, _p0) {
+		var _p1 = _p0;
+		return A3(
+			_elm_lang$core$Dict$foldr,
+			F3(
+				function (k, _p2, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p1._0);
+	});
+var _elm_lang$core$Set$foldl = F3(
+	function (f, b, _p3) {
+		var _p4 = _p3;
+		return A3(
+			_elm_lang$core$Dict$foldl,
+			F3(
+				function (k, _p5, b) {
+					return A2(f, k, b);
+				}),
+			b,
+			_p4._0);
+	});
+var _elm_lang$core$Set$toList = function (_p6) {
+	var _p7 = _p6;
+	return _elm_lang$core$Dict$keys(_p7._0);
+};
+var _elm_lang$core$Set$size = function (_p8) {
+	var _p9 = _p8;
+	return _elm_lang$core$Dict$size(_p9._0);
+};
+var _elm_lang$core$Set$member = F2(
+	function (k, _p10) {
+		var _p11 = _p10;
+		return A2(_elm_lang$core$Dict$member, k, _p11._0);
+	});
+var _elm_lang$core$Set$isEmpty = function (_p12) {
+	var _p13 = _p12;
+	return _elm_lang$core$Dict$isEmpty(_p13._0);
+};
+var _elm_lang$core$Set$Set_elm_builtin = function (a) {
+	return {ctor: 'Set_elm_builtin', _0: a};
+};
+var _elm_lang$core$Set$empty = _elm_lang$core$Set$Set_elm_builtin(_elm_lang$core$Dict$empty);
+var _elm_lang$core$Set$singleton = function (k) {
+	return _elm_lang$core$Set$Set_elm_builtin(
+		A2(
+			_elm_lang$core$Dict$singleton,
+			k,
+			{ctor: '_Tuple0'}));
+};
+var _elm_lang$core$Set$insert = F2(
+	function (k, _p14) {
+		var _p15 = _p14;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A3(
+				_elm_lang$core$Dict$insert,
+				k,
+				{ctor: '_Tuple0'},
+				_p15._0));
+	});
+var _elm_lang$core$Set$fromList = function (xs) {
+	return A3(_elm_lang$core$List$foldl, _elm_lang$core$Set$insert, _elm_lang$core$Set$empty, xs);
+};
+var _elm_lang$core$Set$map = F2(
+	function (f, s) {
+		return _elm_lang$core$Set$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				f,
+				_elm_lang$core$Set$toList(s)));
+	});
+var _elm_lang$core$Set$remove = F2(
+	function (k, _p16) {
+		var _p17 = _p16;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$remove, k, _p17._0));
+	});
+var _elm_lang$core$Set$union = F2(
+	function (_p19, _p18) {
+		var _p20 = _p19;
+		var _p21 = _p18;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$union, _p20._0, _p21._0));
+	});
+var _elm_lang$core$Set$intersect = F2(
+	function (_p23, _p22) {
+		var _p24 = _p23;
+		var _p25 = _p22;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$intersect, _p24._0, _p25._0));
+	});
+var _elm_lang$core$Set$diff = F2(
+	function (_p27, _p26) {
+		var _p28 = _p27;
+		var _p29 = _p26;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(_elm_lang$core$Dict$diff, _p28._0, _p29._0));
+	});
+var _elm_lang$core$Set$filter = F2(
+	function (p, _p30) {
+		var _p31 = _p30;
+		return _elm_lang$core$Set$Set_elm_builtin(
+			A2(
+				_elm_lang$core$Dict$filter,
+				F2(
+					function (k, _p32) {
+						return p(k);
+					}),
+				_p31._0));
+	});
+var _elm_lang$core$Set$partition = F2(
+	function (p, _p33) {
+		var _p34 = _p33;
+		var _p35 = A2(
+			_elm_lang$core$Dict$partition,
+			F2(
+				function (k, _p36) {
+					return p(k);
+				}),
+			_p34._0);
+		var p1 = _p35._0;
+		var p2 = _p35._1;
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Set$Set_elm_builtin(p1),
+			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
+		};
+	});
+
+var _elm_lang$dom$Native_Dom = function() {
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+return {
+	onDocument: F3(on(document)),
+	onWindow: F3(on(window))
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
+
+var _elm_lang$navigation$Native_Navigation = function() {
+
+function go(n)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		if (n !== 0)
+		{
+			history.go(n);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function pushState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.pushState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function replaceState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.replaceState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function getLocation()
+{
+	var location = document.location;
+
+	return {
+		href: location.href,
+		host: location.host,
+		hostname: location.hostname,
+		protocol: location.protocol,
+		origin: location.origin,
+		port_: location.port,
+		pathname: location.pathname,
+		search: location.search,
+		hash: location.hash,
+		username: location.username,
+		password: location.password
+	};
+}
+
+
+return {
+	go: go,
+	pushState: pushState,
+	replaceState: replaceState,
+	getLocation: getLocation
+};
+
+}();
+
+var _elm_lang$navigation$Navigation$replaceState = _elm_lang$navigation$Native_Navigation.replaceState;
+var _elm_lang$navigation$Navigation$pushState = _elm_lang$navigation$Native_Navigation.pushState;
+var _elm_lang$navigation$Navigation$go = _elm_lang$navigation$Native_Navigation.go;
+var _elm_lang$navigation$Navigation$spawnPopState = function (router) {
+	return _elm_lang$core$Process$spawn(
+		A3(
+			_elm_lang$dom$Dom_LowLevel$onWindow,
+			'popstate',
+			_elm_lang$core$Json_Decode$value,
+			function (_p0) {
+				return A2(
+					_elm_lang$core$Platform$sendToSelf,
+					router,
+					_elm_lang$navigation$Native_Navigation.getLocation(
+						{ctor: '_Tuple0'}));
+			}));
+};
+var _elm_lang$navigation$Navigation_ops = _elm_lang$navigation$Navigation_ops || {};
+_elm_lang$navigation$Navigation_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			task1,
+			function (_p1) {
+				return task2;
+			});
+	});
+var _elm_lang$navigation$Navigation$notify = F3(
+	function (router, subs, location) {
+		var send = function (_p2) {
+			var _p3 = _p2;
+			return A2(
+				_elm_lang$core$Platform$sendToApp,
+				router,
+				_p3._0(location));
+		};
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(_elm_lang$core$List$map, send, subs)),
+			_elm_lang$core$Task$succeed(
+				{ctor: '_Tuple0'}));
+	});
+var _elm_lang$navigation$Navigation$onSelfMsg = F3(
+	function (router, location, state) {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			A3(_elm_lang$navigation$Navigation$notify, router, state.subs, location),
+			_elm_lang$core$Task$succeed(state));
+	});
+var _elm_lang$navigation$Navigation$cmdHelp = F3(
+	function (router, subs, cmd) {
+		var _p4 = cmd;
+		switch (_p4.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$go(_p4._0);
+			case 'New':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					_elm_lang$navigation$Navigation$pushState(_p4._0),
+					A2(_elm_lang$navigation$Navigation$notify, router, subs));
+			default:
+				return A2(
+					_elm_lang$core$Task$andThen,
+					_elm_lang$navigation$Navigation$replaceState(_p4._0),
+					A2(_elm_lang$navigation$Navigation$notify, router, subs));
+		}
+	});
+var _elm_lang$navigation$Navigation$updateHelp = F2(
+	function (func, _p5) {
+		var _p6 = _p5;
+		return {
+			ctor: '_Tuple2',
+			_0: _p6._0,
+			_1: A2(_elm_lang$core$Platform_Cmd$map, func, _p6._1)
+		};
+	});
+var _elm_lang$navigation$Navigation$subscription = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$command = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$Location = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {href: a, host: b, hostname: c, protocol: d, origin: e, port_: f, pathname: g, search: h, hash: i, username: j, password: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _elm_lang$navigation$Navigation$State = F2(
+	function (a, b) {
+		return {subs: a, process: b};
+	});
+var _elm_lang$navigation$Navigation$init = _elm_lang$core$Task$succeed(
+	A2(
+		_elm_lang$navigation$Navigation$State,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Maybe$Nothing));
+var _elm_lang$navigation$Navigation$onEffects = F4(
+	function (router, cmds, subs, _p7) {
+		var _p8 = _p7;
+		var _p10 = _p8.process;
+		var stepState = function () {
+			var _p9 = {ctor: '_Tuple2', _0: subs, _1: _p10};
+			_v4_2:
+			do {
+				if (_p9._0.ctor === '[]') {
+					if (_p9._1.ctor === 'Just') {
+						return A2(
+							_elm_lang$navigation$Navigation_ops['&>'],
+							_elm_lang$core$Process$kill(_p9._1._0),
+							_elm_lang$core$Task$succeed(
+								A2(_elm_lang$navigation$Navigation$State, subs, _elm_lang$core$Maybe$Nothing)));
+					} else {
+						break _v4_2;
+					}
+				} else {
+					if (_p9._1.ctor === 'Nothing') {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							_elm_lang$navigation$Navigation$spawnPopState(router),
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A2(
+										_elm_lang$navigation$Navigation$State,
+										subs,
+										_elm_lang$core$Maybe$Just(pid)));
+							});
+					} else {
+						break _v4_2;
+					}
+				}
+			} while(false);
+			return _elm_lang$core$Task$succeed(
+				A2(_elm_lang$navigation$Navigation$State, subs, _p10));
+		}();
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					A2(_elm_lang$navigation$Navigation$cmdHelp, router, subs),
+					cmds)),
+			stepState);
+	});
+var _elm_lang$navigation$Navigation$UserMsg = function (a) {
+	return {ctor: 'UserMsg', _0: a};
+};
+var _elm_lang$navigation$Navigation$Change = function (a) {
+	return {ctor: 'Change', _0: a};
+};
+var _elm_lang$navigation$Navigation$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _elm_lang$navigation$Navigation$makeParser = _elm_lang$navigation$Navigation$Parser;
+var _elm_lang$navigation$Navigation$Modify = function (a) {
+	return {ctor: 'Modify', _0: a};
+};
+var _elm_lang$navigation$Navigation$modifyUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Modify(url));
+};
+var _elm_lang$navigation$Navigation$New = function (a) {
+	return {ctor: 'New', _0: a};
+};
+var _elm_lang$navigation$Navigation$newUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$New(url));
+};
+var _elm_lang$navigation$Navigation$Jump = function (a) {
+	return {ctor: 'Jump', _0: a};
+};
+var _elm_lang$navigation$Navigation$back = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(0 - n));
+};
+var _elm_lang$navigation$Navigation$forward = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(n));
+};
+var _elm_lang$navigation$Navigation$cmdMap = F2(
+	function (_p11, myCmd) {
+		var _p12 = myCmd;
+		switch (_p12.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$Jump(_p12._0);
+			case 'New':
+				return _elm_lang$navigation$Navigation$New(_p12._0);
+			default:
+				return _elm_lang$navigation$Navigation$Modify(_p12._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$Monitor = function (a) {
+	return {ctor: 'Monitor', _0: a};
+};
+var _elm_lang$navigation$Navigation$programWithFlags = F2(
+	function (_p13, stuff) {
+		var _p14 = _p13;
+		var _p16 = _p14._0;
+		var location = _elm_lang$navigation$Native_Navigation.getLocation(
+			{ctor: '_Tuple0'});
+		var init = function (flags) {
+			return A2(
+				_elm_lang$navigation$Navigation$updateHelp,
+				_elm_lang$navigation$Navigation$UserMsg,
+				A2(
+					stuff.init,
+					flags,
+					_p16(location)));
+		};
+		var view = function (model) {
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_elm_lang$navigation$Navigation$UserMsg,
+				stuff.view(model));
+		};
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(_elm_lang$navigation$Navigation$Change)),
+						A2(
+						_elm_lang$core$Platform_Sub$map,
+						_elm_lang$navigation$Navigation$UserMsg,
+						stuff.subscriptions(model))
+					]));
+		};
+		var update = F2(
+			function (msg, model) {
+				return A2(
+					_elm_lang$navigation$Navigation$updateHelp,
+					_elm_lang$navigation$Navigation$UserMsg,
+					function () {
+						var _p15 = msg;
+						if (_p15.ctor === 'Change') {
+							return A2(
+								stuff.urlUpdate,
+								_p16(_p15._0),
+								model);
+						} else {
+							return A2(stuff.update, _p15._0, model);
+						}
+					}());
+			});
+		return _elm_lang$html$Html_App$programWithFlags(
+			{init: init, view: view, update: update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$program = F2(
+	function (parser, stuff) {
+		return A2(
+			_elm_lang$navigation$Navigation$programWithFlags,
+			parser,
+			_elm_lang$core$Native_Utils.update(
+				stuff,
+				{
+					init: function (_p17) {
+						return stuff.init;
+					}
+				}));
+	});
+var _elm_lang$navigation$Navigation$subMap = F2(
+	function (func, _p18) {
+		var _p19 = _p18;
+		return _elm_lang$navigation$Navigation$Monitor(
+			function (_p20) {
+				return func(
+					_p19._0(_p20));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
+
+var _evancz$elm_graphics$Native_Element = function()
+{
+
+
+// CREATION
+
+var createNode =
+	typeof document === 'undefined'
+		?
+			function(_)
+			{
+				return {
+					style: {},
+					appendChild: function() {}
+				};
+			}
+		:
+			function(elementType)
+			{
+				var node = document.createElement(elementType);
+				node.style.padding = '0';
+				node.style.margin = '0';
+				return node;
+			}
+		;
+
+
+function newElement(width, height, elementPrim)
+{
+	return {
+		ctor: 'Element_elm_builtin',
+		_0: {
+			element: elementPrim,
+			props: {
+				width: width,
+				height: height,
+				opacity: 1,
+				color: _elm_lang$core$Maybe$Nothing,
+				href: '',
+				tag: ''
+			}
+		}
+	};
+}
+
+
+// PROPERTIES
+
+function setProps(elem, node)
+{
+	var props = elem.props;
+
+	var element = elem.element;
+	var width = props.width - (element.adjustWidth || 0);
+	var height = props.height - (element.adjustHeight || 0);
+	node.style.width  = (width | 0) + 'px';
+	node.style.height = (height | 0) + 'px';
+
+	if (props.opacity !== 1)
+	{
+		node.style.opacity = props.opacity;
+	}
+
+	if (props.color.ctor === 'Just')
+	{
+		node.style.backgroundColor = _evancz$elm_graphics$Text$colorToCss(props.color._0);
+	}
+
+	if (props.tag !== '')
+	{
+		node.id = props.tag;
+	}
+
+	if (props.href !== '')
+	{
+		var anchor = createNode('a');
+		anchor.href = props.href;
+		anchor.style.display = 'block';
+		anchor.style.pointerEvents = 'auto';
+		anchor.appendChild(node);
+		node = anchor;
+	}
+
+	return node;
+}
+
+
+// IMAGES
+
+function image(props, img)
+{
+	switch (img._0.ctor)
+	{
+		case 'Plain':
+			return plainImage(img._3);
+
+		case 'Fitted':
+			return fittedImage(props.width, props.height, img._3);
+
+		case 'Cropped':
+			return croppedImage(img, props.width, props.height, img._3);
+
+		case 'Tiled':
+			return tiledImage(img._3);
+	}
+}
+
+function plainImage(src)
+{
+	var img = createNode('img');
+	img.src = src;
+	img.name = src;
+	img.style.display = 'block';
+	return img;
+}
+
+function tiledImage(src)
+{
+	var div = createNode('div');
+	div.style.backgroundImage = 'url(' + src + ')';
+	return div;
+}
+
+function fittedImage(w, h, src)
+{
+	var div = createNode('div');
+	div.style.background = 'url(' + src + ') no-repeat center';
+	div.style.webkitBackgroundSize = 'cover';
+	div.style.MozBackgroundSize = 'cover';
+	div.style.OBackgroundSize = 'cover';
+	div.style.backgroundSize = 'cover';
+	return div;
+}
+
+function croppedImage(elem, w, h, src)
+{
+	var pos = elem._0._0;
+	var e = createNode('div');
+	e.style.overflow = 'hidden';
+
+	var img = createNode('img');
+	img.onload = function() {
+		var sw = w / elem._1, sh = h / elem._2;
+		img.style.width = ((this.width * sw) | 0) + 'px';
+		img.style.height = ((this.height * sh) | 0) + 'px';
+		img.style.marginLeft = ((- pos._0 * sw) | 0) + 'px';
+		img.style.marginTop = ((- pos._1 * sh) | 0) + 'px';
+	};
+	img.src = src;
+	img.name = src;
+	e.appendChild(img);
+	return e;
+}
+
+
+// FLOW
+
+function goOut(node)
+{
+	node.style.position = 'absolute';
+	return node;
+}
+function goDown(node)
+{
+	return node;
+}
+function goRight(node)
+{
+	node.style.styleFloat = 'left';
+	node.style.cssFloat = 'left';
+	return node;
+}
+
+var directionTable = {
+	DUp: goDown,
+	DDown: goDown,
+	DLeft: goRight,
+	DRight: goRight,
+	DIn: goOut,
+	DOut: goOut
+};
+function needsReversal(dir)
+{
+	return dir === 'DUp' || dir === 'DLeft' || dir === 'DIn';
+}
+
+function flow(dir, elist)
+{
+	var array = _elm_lang$core$Native_List.toArray(elist);
+	var container = createNode('div');
+	var goDir = directionTable[dir];
+	if (goDir === goOut)
+	{
+		container.style.pointerEvents = 'none';
+	}
+	if (needsReversal(dir))
+	{
+		array.reverse();
+	}
+	var len = array.length;
+	for (var i = 0; i < len; ++i)
+	{
+		container.appendChild(goDir(render(array[i])));
+	}
+	return container;
+}
+
+
+// CONTAINER
+
+function toPos(pos)
+{
+	return pos.ctor === 'Absolute'
+		? pos._0 + 'px'
+		: (pos._0 * 100) + '%';
+}
+
+// must clear right, left, top, bottom, and transform
+// before calling this function
+function setPos(pos, wrappedElement, e)
+{
+	var elem = wrappedElement._0;
+	var element = elem.element;
+	var props = elem.props;
+	var w = props.width + (element.adjustWidth ? element.adjustWidth : 0);
+	var h = props.height + (element.adjustHeight ? element.adjustHeight : 0);
+
+	e.style.position = 'absolute';
+	e.style.margin = 'auto';
+	var transform = '';
+
+	switch (pos.horizontal.ctor)
+	{
+		case 'P':
+			e.style.right = toPos(pos.x);
+			e.style.removeProperty('left');
+			break;
+
+		case 'Z':
+			transform = 'translateX(' + ((-w / 2) | 0) + 'px) ';
+
+		case 'N':
+			e.style.left = toPos(pos.x);
+			e.style.removeProperty('right');
+			break;
+	}
+	switch (pos.vertical.ctor)
+	{
+		case 'N':
+			e.style.bottom = toPos(pos.y);
+			e.style.removeProperty('top');
+			break;
+
+		case 'Z':
+			transform += 'translateY(' + ((-h / 2) | 0) + 'px)';
+
+		case 'P':
+			e.style.top = toPos(pos.y);
+			e.style.removeProperty('bottom');
+			break;
+	}
+	if (transform !== '')
+	{
+		addTransform(e.style, transform);
+	}
+	return e;
+}
+
+function addTransform(style, transform)
+{
+	style.transform       = transform;
+	style.msTransform     = transform;
+	style.MozTransform    = transform;
+	style.webkitTransform = transform;
+	style.OTransform      = transform;
+}
+
+function container(pos, elem)
+{
+	var e = render(elem);
+	setPos(pos, elem, e);
+	var div = createNode('div');
+	div.style.position = 'relative';
+	div.style.overflow = 'hidden';
+	div.appendChild(e);
+	return div;
+}
+
+
+function rawHtml(elem)
+{
+	var html = elem.html;
+	var align = elem.align;
+
+	var div = createNode('div');
+	div.innerHTML = html;
+	div.style.visibility = 'hidden';
+	if (align)
+	{
+		div.style.textAlign = align;
+	}
+	div.style.visibility = 'visible';
+	div.style.pointerEvents = 'auto';
+	return div;
+}
+
+
+// TO HTML
+
+function toHtml(element)
+{
+	return _elm_lang$virtual_dom$Native_VirtualDom.custom(
+		_elm_lang$core$Native_List.Nil,
+		element,
+		implementation
+	);
+}
+
+
+// WIDGET IMPLEMENTATION
+
+var implementation = {
+	render: render,
+	diff: diff
+};
+
+function diff(a, b)
+{
+	var aModel = a.model;
+	var bModel = b.model;
+
+	if (aModel === bModel)
+	{
+		return null;
+	}
+
+	return {
+		applyPatch: applyPatch,
+		data: { a: aModel, b: bModel }
+	};
+}
+
+function applyPatch(domNode, data)
+{
+	return updateAndReplace(domNode, data.a, data.b);
+}
+
+
+// RENDER
+
+function render(wrappedElement)
+{
+	var elem = wrappedElement._0;
+	return setProps(elem, makeElement(elem));
+}
+
+function makeElement(e)
+{
+	var elem = e.element;
+	switch (elem.ctor)
+	{
+		case 'Image':
+			return image(e.props, elem);
+
+		case 'Flow':
+			return flow(elem._0.ctor, elem._1);
+
+		case 'Container':
+			return container(elem._0, elem._1);
+
+		case 'Spacer':
+			return createNode('div');
+
+		case 'RawHtml':
+			return rawHtml(elem);
+
+		case 'Custom':
+			return elem.render(elem.model);
+	}
+}
+
+function updateAndReplace(node, curr, next)
+{
+	var newNode = update(node, curr, next);
+	if (newNode !== node)
+	{
+		node.parentNode.replaceChild(newNode, node);
+	}
+	return newNode;
+}
+
+
+// UPDATE
+
+function update(node, wrappedCurrent, wrappedNext)
+{
+	var curr = wrappedCurrent._0;
+	var next = wrappedNext._0;
+	var rootNode = node;
+
+	if (curr === next)
+	{
+		return rootNode;
+	}
+
+	if (node.tagName === 'A')
+	{
+		node = node.firstChild;
+	}
+	if (curr.element.ctor !== next.element.ctor)
+	{
+		return render(wrappedNext);
+	}
+	var nextE = next.element;
+	var currE = curr.element;
+	switch (nextE.ctor)
+	{
+		case 'Spacer':
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'RawHtml':
+			if(currE.html.valueOf() !== nextE.html.valueOf())
+			{
+				node.innerHTML = nextE.html;
+			}
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Image':
+			if (nextE._0.ctor === 'Plain')
+			{
+				if (nextE._3 !== currE._3)
+				{
+					node.src = nextE._3;
+				}
+			}
+			else if (!_elm_lang$core$Native_Utils.eq(nextE, currE)
+				|| next.props.width !== curr.props.width
+				|| next.props.height !== curr.props.height)
+			{
+				return render(wrappedNext);
+			}
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Flow':
+			var arr = _elm_lang$core$Native_List.toArray(nextE._1);
+			for (var i = arr.length; i--; )
+			{
+				arr[i] = arr[i]._0.element.ctor;
+			}
+			if (nextE._0.ctor !== currE._0.ctor)
+			{
+				return render(wrappedNext);
+			}
+			var nexts = _elm_lang$core$Native_List.toArray(nextE._1);
+			var kids = node.childNodes;
+			if (nexts.length !== kids.length)
+			{
+				return render(wrappedNext);
+			}
+			var currs = _elm_lang$core$Native_List.toArray(currE._1);
+			var dir = nextE._0.ctor;
+			var goDir = directionTable[dir];
+			var toReverse = needsReversal(dir);
+			var len = kids.length;
+			for (var i = len; i--; )
+			{
+				var subNode = kids[toReverse ? len - i - 1 : i];
+				goDir(updateAndReplace(subNode, currs[i], nexts[i]));
+			}
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Container':
+			var subNode = node.firstChild;
+			var newSubNode = updateAndReplace(subNode, currE._1, nextE._1);
+			setPos(nextE._0, nextE._1, newSubNode);
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Custom':
+			if (currE.type === nextE.type)
+			{
+				var updatedNode = nextE.update(node, currE.model, nextE.model);
+				updateProps(updatedNode, curr, next);
+				return updatedNode;
+			}
+			return render(wrappedNext);
+	}
+}
+
+function updateProps(node, curr, next)
+{
+	var nextProps = next.props;
+	var currProps = curr.props;
+
+	var element = next.element;
+	var width = nextProps.width - (element.adjustWidth || 0);
+	var height = nextProps.height - (element.adjustHeight || 0);
+	if (width !== currProps.width)
+	{
+		node.style.width = (width | 0) + 'px';
+	}
+	if (height !== currProps.height)
+	{
+		node.style.height = (height | 0) + 'px';
+	}
+
+	if (nextProps.opacity !== currProps.opacity)
+	{
+		node.style.opacity = nextProps.opacity;
+	}
+
+	var nextColor = nextProps.color.ctor === 'Just'
+		? _evancz$elm_graphics$Text$colorToCss(nextProps.color._0)
+		: '';
+	if (node.style.backgroundColor !== nextColor)
+	{
+		node.style.backgroundColor = nextColor;
+	}
+
+	if (nextProps.tag !== currProps.tag)
+	{
+		node.id = nextProps.tag;
+	}
+
+	if (nextProps.href !== currProps.href)
+	{
+		if (currProps.href === '')
+		{
+			// add a surrounding href
+			var anchor = createNode('a');
+			anchor.href = nextProps.href;
+			anchor.style.display = 'block';
+			anchor.style.pointerEvents = 'auto';
+
+			node.parentNode.replaceChild(anchor, node);
+			anchor.appendChild(node);
+		}
+		else if (nextProps.href === '')
+		{
+			// remove the surrounding href
+			var anchor = node.parentNode;
+			anchor.parentNode.replaceChild(node, anchor);
+		}
+		else
+		{
+			// just update the link
+			node.parentNode.href = nextProps.href;
+		}
+	}
+}
+
+
+// TEXT
+
+function block(align)
+{
+	return function(text)
+	{
+		var raw = {
+			ctor: 'RawHtml',
+			html: _evancz$elm_graphics$Text$toHtmlString(text),
+			align: align
+		};
+		var pos = htmlHeight(0, raw);
+		return newElement(pos._0, pos._1, raw);
+	};
+}
+
+var htmlHeight =
+	typeof document !== 'undefined'
+		? realHtmlHeight
+		: function(a, b) { return _elm_lang$core$Native_Utils.Tuple2(0, 0); };
+
+function realHtmlHeight(width, rawHtml)
+{
+	// create dummy node
+	var temp = document.createElement('div');
+	temp.innerHTML = rawHtml.html;
+	if (width > 0)
+	{
+		temp.style.width = width + 'px';
+	}
+	temp.style.visibility = 'hidden';
+	temp.style.styleFloat = 'left';
+	temp.style.cssFloat = 'left';
+
+	document.body.appendChild(temp);
+
+	// get dimensions
+	var style = window.getComputedStyle(temp, null);
+	var w = Math.ceil(style.getPropertyValue('width').slice(0, -2) - 0);
+	var h = Math.ceil(style.getPropertyValue('height').slice(0, -2) - 0);
+	document.body.removeChild(temp);
+	return _elm_lang$core$Native_Utils.Tuple2(w, h);
+}
+
+
+return {
+	toHtml: toHtml,
+
+	render: render,
+	update: update,
+	createNode: createNode,
+	newElement: F3(newElement),
+	addTransform: addTransform,
+
+	block: block
+};
+
+}();
+
+
+var _evancz$elm_graphics$Text$wrap = F3(
+	function (maybeHref, styles, insides) {
+		var linkedInsides = function () {
+			var _p0 = maybeHref;
+			if (_p0.ctor === 'Nothing') {
+				return insides;
+			} else {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'<a href=\"',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p0._0,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'\">',
+							A2(_elm_lang$core$Basics_ops['++'], insides, '</a>'))));
+			}
+		}();
+		return _elm_lang$core$Native_Utils.eq(styles, '') ? linkedInsides : A2(
+			_elm_lang$core$Basics_ops['++'],
+			'<span style=\"',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				styles,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'\">',
+					A2(_elm_lang$core$Basics_ops['++'], linkedInsides, '</span>'))));
+	});
+var _evancz$elm_graphics$Text$replace = F3(
+	function (from, to, str) {
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_elm_lang$core$Regex$regex(from),
+			function (_p1) {
+				return to;
+			},
+			str);
+	});
+var _evancz$elm_graphics$Text$toHtmlString = function (text) {
+	return A3(_evancz$elm_graphics$Text$toHtmlStringHelp, _elm_lang$core$Maybe$Nothing, '', text);
+};
+var _evancz$elm_graphics$Text$toHtmlStringHelp = F3(
+	function (maybeHref, styles, text) {
+		toHtmlStringHelp:
+		while (true) {
+			var _p2 = text;
+			switch (_p2.ctor) {
+				case 'Str':
+					return A3(
+						_evancz$elm_graphics$Text$wrap,
+						maybeHref,
+						styles,
+						A2(
+							_elm_lang$core$String$join,
+							'<br>',
+							A2(
+								_elm_lang$core$List$map,
+								A2(_evancz$elm_graphics$Text$replace, ' ', '&nbsp;'),
+								_elm_lang$core$String$lines(
+									A3(
+										_evancz$elm_graphics$Text$replace,
+										'>',
+										'&#62;',
+										A3(
+											_evancz$elm_graphics$Text$replace,
+											'<',
+											'&#60;',
+											A3(
+												_evancz$elm_graphics$Text$replace,
+												'\'',
+												'&#39;',
+												A3(_evancz$elm_graphics$Text$replace, '\"', '&#34;', _p2._0))))))));
+				case 'Append':
+					return A3(
+						_evancz$elm_graphics$Text$wrap,
+						maybeHref,
+						styles,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_evancz$elm_graphics$Text$toHtmlString(_p2._0),
+							_evancz$elm_graphics$Text$toHtmlString(_p2._1)));
+				case 'Link':
+					var _v2 = _elm_lang$core$Maybe$Just(
+						A2(_elm_lang$core$Maybe$withDefault, _p2._0, maybeHref)),
+						_v3 = styles,
+						_v4 = _p2._1;
+					maybeHref = _v2;
+					styles = _v3;
+					text = _v4;
+					continue toHtmlStringHelp;
+				default:
+					var _v5 = maybeHref,
+						_v6 = A2(
+						_elm_lang$core$Basics_ops['++'],
+						styles,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p2._0,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								':',
+								A2(_elm_lang$core$Basics_ops['++'], _p2._1, ';')))),
+						_v7 = _p2._2;
+					maybeHref = _v5;
+					styles = _v6;
+					text = _v7;
+					continue toHtmlStringHelp;
+			}
+		}
+	});
+var _evancz$elm_graphics$Text$colorToCss = function (color) {
+	var _p3 = _elm_lang$core$Color$toRgb(color);
+	var red = _p3.red;
+	var green = _p3.green;
+	var blue = _p3.blue;
+	var alpha = _p3.alpha;
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'rgba(',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(red),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				', ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(green),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						', ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(blue),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(alpha),
+									')'))))))));
+};
+var _evancz$elm_graphics$Text$typefacesToString = function (faces) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'\'',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(_elm_lang$core$String$join, '\', \'', faces),
+			'\''));
+};
+var _evancz$elm_graphics$Text$maybeAdd = F3(
+	function (add, maybeValue, text) {
+		var _p4 = maybeValue;
+		if (_p4.ctor === 'Nothing') {
+			return text;
+		} else {
+			return A2(add, _p4._0, text);
+		}
+	});
+var _evancz$elm_graphics$Text$defaultStyle = {
+	typeface: _elm_lang$core$Native_List.fromArray(
+		[]),
+	height: _elm_lang$core$Maybe$Nothing,
+	color: _elm_lang$core$Color$black,
+	bold: false,
+	italic: false,
+	line: _elm_lang$core$Maybe$Nothing
+};
+var _evancz$elm_graphics$Text$Style = F6(
+	function (a, b, c, d, e, f) {
+		return {typeface: a, height: b, color: c, bold: d, italic: e, line: f};
+	});
+var _evancz$elm_graphics$Text$Meta = F3(
+	function (a, b, c) {
+		return {ctor: 'Meta', _0: a, _1: b, _2: c};
+	});
+var _evancz$elm_graphics$Text$typeface = F2(
+	function (faces, text) {
+		var _p5 = faces;
+		if (_p5.ctor === '[]') {
+			return text;
+		} else {
+			return A3(
+				_evancz$elm_graphics$Text$Meta,
+				'font-family',
+				_evancz$elm_graphics$Text$typefacesToString(faces),
+				text);
+		}
+	});
+var _evancz$elm_graphics$Text$monospace = function (text) {
+	return A3(_evancz$elm_graphics$Text$Meta, 'font-family', 'monospace', text);
+};
+var _evancz$elm_graphics$Text$height = F2(
+	function (px, text) {
+		return A3(
+			_evancz$elm_graphics$Text$Meta,
+			'font-size',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(px),
+				'px'),
+			text);
+	});
+var _evancz$elm_graphics$Text$color = F2(
+	function (color, text) {
+		return A3(
+			_evancz$elm_graphics$Text$Meta,
+			'color',
+			_evancz$elm_graphics$Text$colorToCss(color),
+			text);
+	});
+var _evancz$elm_graphics$Text$bold = function (text) {
+	return A3(_evancz$elm_graphics$Text$Meta, 'font-weight', 'bold', text);
+};
+var _evancz$elm_graphics$Text$italic = function (text) {
+	return A3(_evancz$elm_graphics$Text$Meta, 'font-style', 'italic', text);
+};
+var _evancz$elm_graphics$Text$line = F2(
+	function (lineTag, text) {
+		var decoration = function () {
+			var _p6 = lineTag;
+			switch (_p6.ctor) {
+				case 'Under':
+					return 'underline';
+				case 'Over':
+					return 'overline';
+				default:
+					return 'line-through';
+			}
+		}();
+		return A3(_evancz$elm_graphics$Text$Meta, 'text-decoration', decoration, text);
+	});
+var _evancz$elm_graphics$Text$style = F2(
+	function (sty, text) {
+		return A3(
+			_evancz$elm_graphics$Text$maybeAdd,
+			_evancz$elm_graphics$Text$height,
+			sty.height,
+			A3(
+				_evancz$elm_graphics$Text$maybeAdd,
+				_evancz$elm_graphics$Text$line,
+				sty.line,
+				(sty.italic ? _evancz$elm_graphics$Text$italic : _elm_lang$core$Basics$identity)(
+					(sty.bold ? _evancz$elm_graphics$Text$bold : _elm_lang$core$Basics$identity)(
+						A2(
+							_evancz$elm_graphics$Text$typeface,
+							sty.typeface,
+							A2(_evancz$elm_graphics$Text$color, sty.color, text))))));
+	});
+var _evancz$elm_graphics$Text$Link = F2(
+	function (a, b) {
+		return {ctor: 'Link', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Text$link = _evancz$elm_graphics$Text$Link;
+var _evancz$elm_graphics$Text$Append = F2(
+	function (a, b) {
+		return {ctor: 'Append', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Text$append = _evancz$elm_graphics$Text$Append;
+var _evancz$elm_graphics$Text$Str = function (a) {
+	return {ctor: 'Str', _0: a};
+};
+var _evancz$elm_graphics$Text$fromString = _evancz$elm_graphics$Text$Str;
+var _evancz$elm_graphics$Text$empty = _evancz$elm_graphics$Text$fromString('');
+var _evancz$elm_graphics$Text$concat = function (texts) {
+	return A3(_elm_lang$core$List$foldr, _evancz$elm_graphics$Text$append, _evancz$elm_graphics$Text$empty, texts);
+};
+var _evancz$elm_graphics$Text$join = F2(
+	function (seperator, texts) {
+		return _evancz$elm_graphics$Text$concat(
+			A2(_elm_lang$core$List$intersperse, seperator, texts));
+	});
+var _evancz$elm_graphics$Text$Through = {ctor: 'Through'};
+var _evancz$elm_graphics$Text$Over = {ctor: 'Over'};
+var _evancz$elm_graphics$Text$Under = {ctor: 'Under'};
+
+var _evancz$elm_graphics$Element$justified = _evancz$elm_graphics$Native_Element.block('justify');
+var _evancz$elm_graphics$Element$centered = _evancz$elm_graphics$Native_Element.block('center');
+var _evancz$elm_graphics$Element$rightAligned = _evancz$elm_graphics$Native_Element.block('right');
+var _evancz$elm_graphics$Element$leftAligned = _evancz$elm_graphics$Native_Element.block('left');
+var _evancz$elm_graphics$Element$show = function (value) {
+	return _evancz$elm_graphics$Element$leftAligned(
+		_evancz$elm_graphics$Text$monospace(
+			_evancz$elm_graphics$Text$fromString(
+				_elm_lang$core$Basics$toString(value))));
+};
+var _evancz$elm_graphics$Element$newElement = _evancz$elm_graphics$Native_Element.newElement;
+var _evancz$elm_graphics$Element$sizeOf = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._0;
+	return {ctor: '_Tuple2', _0: _p2.props.width, _1: _p2.props.height};
+};
+var _evancz$elm_graphics$Element$heightOf = function (_p3) {
+	var _p4 = _p3;
+	return _p4._0.props.height;
+};
+var _evancz$elm_graphics$Element$widthOf = function (_p5) {
+	var _p6 = _p5;
+	return _p6._0.props.width;
+};
+var _evancz$elm_graphics$Element$toHtml = _evancz$elm_graphics$Native_Element.toHtml;
+var _evancz$elm_graphics$Element$Properties = F6(
+	function (a, b, c, d, e, f) {
+		return {width: a, height: b, opacity: c, color: d, href: e, tag: f};
+	});
+var _evancz$elm_graphics$Element$RawPosition = F4(
+	function (a, b, c, d) {
+		return {horizontal: a, vertical: b, x: c, y: d};
+	});
+var _evancz$elm_graphics$Element$Element_elm_builtin = function (a) {
+	return {ctor: 'Element_elm_builtin', _0: a};
+};
+var _evancz$elm_graphics$Element$width = F2(
+	function (newWidth, _p7) {
+		var _p8 = _p7;
+		var _p11 = _p8._0.props;
+		var _p10 = _p8._0.element;
+		var newHeight = function () {
+			var _p9 = _p10;
+			switch (_p9.ctor) {
+				case 'Image':
+					return _elm_lang$core$Basics$round(
+						(_elm_lang$core$Basics$toFloat(_p9._2) / _elm_lang$core$Basics$toFloat(_p9._1)) * _elm_lang$core$Basics$toFloat(newWidth));
+				case 'RawHtml':
+					return _elm_lang$core$Basics$snd(
+						A2(_evancz$elm_graphics$Native_Element.htmlHeight, newWidth, _p10));
+				default:
+					return _p11.height;
+			}
+		}();
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p10,
+				props: _elm_lang$core$Native_Utils.update(
+					_p11,
+					{width: newWidth, height: newHeight})
+			});
+	});
+var _evancz$elm_graphics$Element$height = F2(
+	function (newHeight, _p12) {
+		var _p13 = _p12;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p13._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p13._0.props,
+					{height: newHeight})
+			});
+	});
+var _evancz$elm_graphics$Element$size = F3(
+	function (w, h, e) {
+		return A2(
+			_evancz$elm_graphics$Element$height,
+			h,
+			A2(_evancz$elm_graphics$Element$width, w, e));
+	});
+var _evancz$elm_graphics$Element$opacity = F2(
+	function (givenOpacity, _p14) {
+		var _p15 = _p14;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p15._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p15._0.props,
+					{opacity: givenOpacity})
+			});
+	});
+var _evancz$elm_graphics$Element$color = F2(
+	function (clr, _p16) {
+		var _p17 = _p16;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p17._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p17._0.props,
+					{
+						color: _elm_lang$core$Maybe$Just(clr)
+					})
+			});
+	});
+var _evancz$elm_graphics$Element$tag = F2(
+	function (name, _p18) {
+		var _p19 = _p18;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p19._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p19._0.props,
+					{tag: name})
+			});
+	});
+var _evancz$elm_graphics$Element$link = F2(
+	function (href, _p20) {
+		var _p21 = _p20;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p21._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p21._0.props,
+					{href: href})
+			});
+	});
+var _evancz$elm_graphics$Element$Custom = {ctor: 'Custom'};
+var _evancz$elm_graphics$Element$RawHtml = {ctor: 'RawHtml'};
+var _evancz$elm_graphics$Element$Spacer = {ctor: 'Spacer'};
+var _evancz$elm_graphics$Element$spacer = F2(
+	function (w, h) {
+		return A3(_evancz$elm_graphics$Element$newElement, w, h, _evancz$elm_graphics$Element$Spacer);
+	});
+var _evancz$elm_graphics$Element$empty = A2(_evancz$elm_graphics$Element$spacer, 0, 0);
+var _evancz$elm_graphics$Element$Flow = F2(
+	function (a, b) {
+		return {ctor: 'Flow', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Element$flow = F2(
+	function (dir, es) {
+		var newFlow = F2(
+			function (w, h) {
+				return A3(
+					_evancz$elm_graphics$Element$newElement,
+					w,
+					h,
+					A2(_evancz$elm_graphics$Element$Flow, dir, es));
+			});
+		var maxOrZero = function (list) {
+			return A2(
+				_elm_lang$core$Maybe$withDefault,
+				0,
+				_elm_lang$core$List$maximum(list));
+		};
+		var hs = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$heightOf, es);
+		var ws = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$widthOf, es);
+		if (_elm_lang$core$Native_Utils.eq(
+			es,
+			_elm_lang$core$Native_List.fromArray(
+				[]))) {
+			return _evancz$elm_graphics$Element$empty;
+		} else {
+			var _p22 = dir;
+			switch (_p22.ctor) {
+				case 'DUp':
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						_elm_lang$core$List$sum(hs));
+				case 'DDown':
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						_elm_lang$core$List$sum(hs));
+				case 'DLeft':
+					return A2(
+						newFlow,
+						_elm_lang$core$List$sum(ws),
+						maxOrZero(hs));
+				case 'DRight':
+					return A2(
+						newFlow,
+						_elm_lang$core$List$sum(ws),
+						maxOrZero(hs));
+				case 'DIn':
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						maxOrZero(hs));
+				default:
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						maxOrZero(hs));
+			}
+		}
+	});
+var _evancz$elm_graphics$Element$Container = F2(
+	function (a, b) {
+		return {ctor: 'Container', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Element$container = F4(
+	function (w, h, _p23, e) {
+		var _p24 = _p23;
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A2(_evancz$elm_graphics$Element$Container, _p24._0, e));
+	});
+var _evancz$elm_graphics$Element$Image = F4(
+	function (a, b, c, d) {
+		return {ctor: 'Image', _0: a, _1: b, _2: c, _3: d};
+	});
+var _evancz$elm_graphics$Element$Tiled = {ctor: 'Tiled'};
+var _evancz$elm_graphics$Element$tiledImage = F3(
+	function (w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(_evancz$elm_graphics$Element$Image, _evancz$elm_graphics$Element$Tiled, w, h, src));
+	});
+var _evancz$elm_graphics$Element$Cropped = function (a) {
+	return {ctor: 'Cropped', _0: a};
+};
+var _evancz$elm_graphics$Element$croppedImage = F4(
+	function (pos, w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(
+				_evancz$elm_graphics$Element$Image,
+				_evancz$elm_graphics$Element$Cropped(pos),
+				w,
+				h,
+				src));
+	});
+var _evancz$elm_graphics$Element$Fitted = {ctor: 'Fitted'};
+var _evancz$elm_graphics$Element$fittedImage = F3(
+	function (w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(_evancz$elm_graphics$Element$Image, _evancz$elm_graphics$Element$Fitted, w, h, src));
+	});
+var _evancz$elm_graphics$Element$Plain = {ctor: 'Plain'};
+var _evancz$elm_graphics$Element$image = F3(
+	function (w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(_evancz$elm_graphics$Element$Image, _evancz$elm_graphics$Element$Plain, w, h, src));
+	});
+var _evancz$elm_graphics$Element$N = {ctor: 'N'};
+var _evancz$elm_graphics$Element$Z = {ctor: 'Z'};
+var _evancz$elm_graphics$Element$P = {ctor: 'P'};
+var _evancz$elm_graphics$Element$Relative = function (a) {
+	return {ctor: 'Relative', _0: a};
+};
+var _evancz$elm_graphics$Element$relative = _evancz$elm_graphics$Element$Relative;
+var _evancz$elm_graphics$Element$Absolute = function (a) {
+	return {ctor: 'Absolute', _0: a};
+};
+var _evancz$elm_graphics$Element$absolute = _evancz$elm_graphics$Element$Absolute;
+var _evancz$elm_graphics$Element$Position = function (a) {
+	return {ctor: 'Position', _0: a};
+};
+var _evancz$elm_graphics$Element$middle = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$Z,
+		vertical: _evancz$elm_graphics$Element$Z,
+		x: _evancz$elm_graphics$Element$Relative(0.5),
+		y: _evancz$elm_graphics$Element$Relative(0.5)
+	});
+var _evancz$elm_graphics$Element$topLeft = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$N,
+		vertical: _evancz$elm_graphics$Element$P,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$topRight = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$P,
+		vertical: _evancz$elm_graphics$Element$P,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$bottomLeft = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$N,
+		vertical: _evancz$elm_graphics$Element$N,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$bottomRight = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$P,
+		vertical: _evancz$elm_graphics$Element$N,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$midLeft = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$N,
+		vertical: _evancz$elm_graphics$Element$Z,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Relative(0.5)
+	});
+var _evancz$elm_graphics$Element$midRight = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$P,
+		vertical: _evancz$elm_graphics$Element$Z,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Relative(0.5)
+	});
+var _evancz$elm_graphics$Element$midTop = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$Z,
+		vertical: _evancz$elm_graphics$Element$P,
+		x: _evancz$elm_graphics$Element$Relative(0.5),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$midBottom = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$Z,
+		vertical: _evancz$elm_graphics$Element$N,
+		x: _evancz$elm_graphics$Element$Relative(0.5),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$middleAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$Z, vertical: _evancz$elm_graphics$Element$Z, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$topLeftAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$N, vertical: _evancz$elm_graphics$Element$P, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$topRightAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$P, vertical: _evancz$elm_graphics$Element$P, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$bottomLeftAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$N, vertical: _evancz$elm_graphics$Element$N, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$bottomRightAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$P, vertical: _evancz$elm_graphics$Element$N, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midLeftAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$N, vertical: _evancz$elm_graphics$Element$Z, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midRightAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$P, vertical: _evancz$elm_graphics$Element$Z, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midTopAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$Z, vertical: _evancz$elm_graphics$Element$P, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midBottomAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$Z, vertical: _evancz$elm_graphics$Element$N, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$DOut = {ctor: 'DOut'};
+var _evancz$elm_graphics$Element$layers = function (es) {
+	var hs = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$heightOf, es);
+	var ws = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$widthOf, es);
+	return A3(
+		_evancz$elm_graphics$Element$newElement,
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			_elm_lang$core$List$maximum(ws)),
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			_elm_lang$core$List$maximum(hs)),
+		A2(_evancz$elm_graphics$Element$Flow, _evancz$elm_graphics$Element$DOut, es));
+};
+var _evancz$elm_graphics$Element$outward = _evancz$elm_graphics$Element$DOut;
+var _evancz$elm_graphics$Element$DIn = {ctor: 'DIn'};
+var _evancz$elm_graphics$Element$inward = _evancz$elm_graphics$Element$DIn;
+var _evancz$elm_graphics$Element$DRight = {ctor: 'DRight'};
+var _evancz$elm_graphics$Element$right = _evancz$elm_graphics$Element$DRight;
+var _evancz$elm_graphics$Element$beside = F2(
+	function (lft, rht) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			_evancz$elm_graphics$Element$widthOf(lft) + _evancz$elm_graphics$Element$widthOf(rht),
+			A2(
+				_elm_lang$core$Basics$max,
+				_evancz$elm_graphics$Element$heightOf(lft),
+				_evancz$elm_graphics$Element$heightOf(rht)),
+			A2(
+				_evancz$elm_graphics$Element$Flow,
+				_evancz$elm_graphics$Element$right,
+				_elm_lang$core$Native_List.fromArray(
+					[lft, rht])));
+	});
+var _evancz$elm_graphics$Element$DLeft = {ctor: 'DLeft'};
+var _evancz$elm_graphics$Element$left = _evancz$elm_graphics$Element$DLeft;
+var _evancz$elm_graphics$Element$DDown = {ctor: 'DDown'};
+var _evancz$elm_graphics$Element$above = F2(
+	function (hi, lo) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			A2(
+				_elm_lang$core$Basics$max,
+				_evancz$elm_graphics$Element$widthOf(hi),
+				_evancz$elm_graphics$Element$widthOf(lo)),
+			_evancz$elm_graphics$Element$heightOf(hi) + _evancz$elm_graphics$Element$heightOf(lo),
+			A2(
+				_evancz$elm_graphics$Element$Flow,
+				_evancz$elm_graphics$Element$DDown,
+				_elm_lang$core$Native_List.fromArray(
+					[hi, lo])));
+	});
+var _evancz$elm_graphics$Element$below = F2(
+	function (lo, hi) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			A2(
+				_elm_lang$core$Basics$max,
+				_evancz$elm_graphics$Element$widthOf(hi),
+				_evancz$elm_graphics$Element$widthOf(lo)),
+			_evancz$elm_graphics$Element$heightOf(hi) + _evancz$elm_graphics$Element$heightOf(lo),
+			A2(
+				_evancz$elm_graphics$Element$Flow,
+				_evancz$elm_graphics$Element$DDown,
+				_elm_lang$core$Native_List.fromArray(
+					[hi, lo])));
+	});
+var _evancz$elm_graphics$Element$down = _evancz$elm_graphics$Element$DDown;
+var _evancz$elm_graphics$Element$DUp = {ctor: 'DUp'};
+var _evancz$elm_graphics$Element$up = _evancz$elm_graphics$Element$DUp;
+
 //import Dict, List, Maybe, Native.Scheduler //
 
 var _evancz$elm_http$Native_Http = function() {
@@ -13627,6 +16734,483 @@ var _evancz$elm_http$Http$post = F3(
 			_evancz$elm_http$Http$fromJson,
 			decoder,
 			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
+	});
+
+var _evancz$focus$Focus$update = F3(
+	function (_p0, f, big) {
+		var _p1 = _p0;
+		return A2(_p1._0.update, f, big);
+	});
+var _evancz$focus$Focus$set = F3(
+	function (_p2, small, big) {
+		var _p3 = _p2;
+		return A2(
+			_p3._0.update,
+			_elm_lang$core$Basics$always(small),
+			big);
+	});
+var _evancz$focus$Focus$get = F2(
+	function (_p4, big) {
+		var _p5 = _p4;
+		return _p5._0.get(big);
+	});
+var _evancz$focus$Focus$Focus = function (a) {
+	return {ctor: 'Focus', _0: a};
+};
+var _evancz$focus$Focus$create = F2(
+	function (get, update) {
+		return _evancz$focus$Focus$Focus(
+			{get: get, update: update});
+	});
+var _evancz$focus$Focus_ops = _evancz$focus$Focus_ops || {};
+_evancz$focus$Focus_ops['=>'] = F2(
+	function (_p7, _p6) {
+		var _p8 = _p7;
+		var _p11 = _p8._0;
+		var _p9 = _p6;
+		var _p10 = _p9._0;
+		var update = F2(
+			function (f, big) {
+				return A2(
+					_p11.update,
+					_p10.update(f),
+					big);
+			});
+		var get = function (big) {
+			return _p10.get(
+				_p11.get(big));
+		};
+		return _evancz$focus$Focus$Focus(
+			{get: get, update: update});
+	});
+
+var _mgold$elm_date_format$Date_Format$padWith = function (c) {
+	return function (_p0) {
+		return A3(
+			_elm_lang$core$String$padLeft,
+			2,
+			c,
+			_elm_lang$core$Basics$toString(_p0));
+	};
+};
+var _mgold$elm_date_format$Date_Format$zero2twelve = function (n) {
+	return _elm_lang$core$Native_Utils.eq(n, 0) ? 12 : n;
+};
+var _mgold$elm_date_format$Date_Format$mod12 = function (h) {
+	return A2(_elm_lang$core$Basics_ops['%'], h, 12);
+};
+var _mgold$elm_date_format$Date_Format$fullDayOfWeek = function (dow) {
+	var _p1 = dow;
+	switch (_p1.ctor) {
+		case 'Mon':
+			return 'Monday';
+		case 'Tue':
+			return 'Tuesday';
+		case 'Wed':
+			return 'Wednesday';
+		case 'Thu':
+			return 'Thursday';
+		case 'Fri':
+			return 'Friday';
+		case 'Sat':
+			return 'Saturday';
+		default:
+			return 'Sunday';
+	}
+};
+var _mgold$elm_date_format$Date_Format$monthToFullName = function (m) {
+	var _p2 = m;
+	switch (_p2.ctor) {
+		case 'Jan':
+			return 'January';
+		case 'Feb':
+			return 'February';
+		case 'Mar':
+			return 'March';
+		case 'Apr':
+			return 'April';
+		case 'May':
+			return 'May';
+		case 'Jun':
+			return 'June';
+		case 'Jul':
+			return 'July';
+		case 'Aug':
+			return 'August';
+		case 'Sep':
+			return 'September';
+		case 'Oct':
+			return 'October';
+		case 'Nov':
+			return 'November';
+		default:
+			return 'December';
+	}
+};
+var _mgold$elm_date_format$Date_Format$monthToInt = function (m) {
+	var _p3 = m;
+	switch (_p3.ctor) {
+		case 'Jan':
+			return 1;
+		case 'Feb':
+			return 2;
+		case 'Mar':
+			return 3;
+		case 'Apr':
+			return 4;
+		case 'May':
+			return 5;
+		case 'Jun':
+			return 6;
+		case 'Jul':
+			return 7;
+		case 'Aug':
+			return 8;
+		case 'Sep':
+			return 9;
+		case 'Oct':
+			return 10;
+		case 'Nov':
+			return 11;
+		default:
+			return 12;
+	}
+};
+var _mgold$elm_date_format$Date_Format$formatToken = F2(
+	function (d, m) {
+		var symbol = function () {
+			var _p4 = m.submatches;
+			if (((_p4.ctor === '::') && (_p4._0.ctor === 'Just')) && (_p4._1.ctor === '[]')) {
+				return _p4._0._0;
+			} else {
+				return ' ';
+			}
+		}();
+		var _p5 = symbol;
+		switch (_p5) {
+			case '%':
+				return '%';
+			case 'Y':
+				return _elm_lang$core$Basics$toString(
+					_elm_lang$core$Date$year(d));
+			case 'm':
+				return A3(
+					_elm_lang$core$String$padLeft,
+					2,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Basics$toString(
+						_mgold$elm_date_format$Date_Format$monthToInt(
+							_elm_lang$core$Date$month(d))));
+			case 'B':
+				return _mgold$elm_date_format$Date_Format$monthToFullName(
+					_elm_lang$core$Date$month(d));
+			case 'b':
+				return _elm_lang$core$Basics$toString(
+					_elm_lang$core$Date$month(d));
+			case 'd':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$day(d));
+			case 'e':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr(' '),
+					_elm_lang$core$Date$day(d));
+			case 'a':
+				return _elm_lang$core$Basics$toString(
+					_elm_lang$core$Date$dayOfWeek(d));
+			case 'A':
+				return _mgold$elm_date_format$Date_Format$fullDayOfWeek(
+					_elm_lang$core$Date$dayOfWeek(d));
+			case 'H':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$hour(d));
+			case 'k':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr(' '),
+					_elm_lang$core$Date$hour(d));
+			case 'I':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_mgold$elm_date_format$Date_Format$zero2twelve(
+						_mgold$elm_date_format$Date_Format$mod12(
+							_elm_lang$core$Date$hour(d))));
+			case 'l':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr(' '),
+					_mgold$elm_date_format$Date_Format$zero2twelve(
+						_mgold$elm_date_format$Date_Format$mod12(
+							_elm_lang$core$Date$hour(d))));
+			case 'p':
+				return (_elm_lang$core$Native_Utils.cmp(
+					_elm_lang$core$Date$hour(d),
+					13) < 0) ? 'AM' : 'PM';
+			case 'P':
+				return (_elm_lang$core$Native_Utils.cmp(
+					_elm_lang$core$Date$hour(d),
+					13) < 0) ? 'am' : 'pm';
+			case 'M':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$minute(d));
+			case 'S':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$second(d));
+			default:
+				return '';
+		}
+	});
+var _mgold$elm_date_format$Date_Format$re = _elm_lang$core$Regex$regex('%(%|Y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)');
+var _mgold$elm_date_format$Date_Format$format = F2(
+	function (s, d) {
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_mgold$elm_date_format$Date_Format$re,
+			_mgold$elm_date_format$Date_Format$formatToken(d),
+			s);
+	});
+var _mgold$elm_date_format$Date_Format$formatISO8601 = _mgold$elm_date_format$Date_Format$format('%Y-%m-%dT%H:%M:%SZ');
+
+var _narkisr$elm_ui$Common_Redirect$redirect = _elm_lang$core$Native_Platform.outgoingPort(
+	'redirect',
+	function (v) {
+		return v;
+	});
+
+var _narkisr$elm_ui$Common_Http$apply = F2(
+	function (func, value) {
+		return A3(
+			_elm_lang$core$Json_Decode$object2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			func,
+			value);
+	});
+var _narkisr$elm_ui$Common_Http$httpJson = F4(
+	function (verb, body, decoder, url) {
+		var request = {
+			verb: verb,
+			headers: _elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'Content-Type', _1: 'application/json;charset=UTF-8'},
+					{ctor: '_Tuple2', _0: 'Accept', _1: 'application/json, text/plain, */*'}
+				]),
+			url: url,
+			body: body
+		};
+		return A2(
+			_evancz$elm_http$Http$fromJson,
+			decoder,
+			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
+	});
+var _narkisr$elm_ui$Common_Http$delete = A2(_narkisr$elm_ui$Common_Http$httpJson, 'DELETE', _evancz$elm_http$Http$empty);
+var _narkisr$elm_ui$Common_Http$getJson = A2(_narkisr$elm_ui$Common_Http$httpJson, 'GET', _evancz$elm_http$Http$empty);
+var _narkisr$elm_ui$Common_Http$postJson = _narkisr$elm_ui$Common_Http$httpJson('POST');
+var _narkisr$elm_ui$Common_Http$putJson = _narkisr$elm_ui$Common_Http$httpJson('PUT');
+var _narkisr$elm_ui$Common_Http$SaveResponse = F2(
+	function (a, b) {
+		return {message: a, id: b};
+	});
+var _narkisr$elm_ui$Common_Http$saveResponse = A3(
+	_elm_lang$core$Json_Decode$object2,
+	_narkisr$elm_ui$Common_Http$SaveResponse,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$int)));
+
+var _narkisr$elm_ui$Common_Model$valueOf = function (option) {
+	var _p0 = option;
+	switch (_p0.ctor) {
+		case 'BoolOption':
+			return _elm_lang$core$String$toLower(
+				_elm_lang$core$Basics$toString(_p0._0));
+		case 'StringOption':
+			return _p0._0;
+		case 'IntOption':
+			return _elm_lang$core$Basics$toString(_p0._0);
+		default:
+			return _elm_lang$core$Basics$toString(_p0._0);
+	}
+};
+var _narkisr$elm_ui$Common_Model$DictOption = function (a) {
+	return {ctor: 'DictOption', _0: a};
+};
+var _narkisr$elm_ui$Common_Model$IntOption = function (a) {
+	return {ctor: 'IntOption', _0: a};
+};
+var _narkisr$elm_ui$Common_Model$StringOption = function (a) {
+	return {ctor: 'StringOption', _0: a};
+};
+var _narkisr$elm_ui$Common_Model$BoolOption = function (a) {
+	return {ctor: 'BoolOption', _0: a};
+};
+var _narkisr$elm_ui$Common_Model$option = function (_p1) {
+	return _elm_lang$core$Json_Decode$oneOf(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(_elm_lang$core$Json_Decode$map, _narkisr$elm_ui$Common_Model$BoolOption, _elm_lang$core$Json_Decode$bool),
+				A2(_elm_lang$core$Json_Decode$map, _narkisr$elm_ui$Common_Model$StringOption, _elm_lang$core$Json_Decode$string),
+				A2(_elm_lang$core$Json_Decode$map, _narkisr$elm_ui$Common_Model$IntOption, _elm_lang$core$Json_Decode$int),
+				_narkisr$elm_ui$Common_Model$dictOption$(
+				{ctor: '_Tuple0'})
+			]));
+};
+var _narkisr$elm_ui$Common_Model$dictOption$ = function (_p2) {
+	return A2(
+		_elm_lang$core$Json_Decode$andThen,
+		_elm_lang$core$Json_Decode$succeed(
+			{ctor: '_Tuple0'}),
+		function (_p3) {
+			return A2(
+				_elm_lang$core$Json_Decode$map,
+				_narkisr$elm_ui$Common_Model$DictOption,
+				_elm_lang$core$Json_Decode$dict(
+					_narkisr$elm_ui$Common_Model$option(_p3)));
+		});
+};
+
+var _narkisr$elm_ui$Environments_List$environmentsKeys = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['environments']),
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Environments_List$getEnvironmentKeys = function (msg) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		msg,
+		_elm_lang$core$Task$toResult(
+			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Environments_List$environmentsKeys, '/environments/keys')));
+};
+var _narkisr$elm_ui$Environments_List$template = _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string);
+var _narkisr$elm_ui$Environments_List$Empty = {ctor: 'Empty'};
+var _narkisr$elm_ui$Environments_List$Physical = {ctor: 'Physical'};
+var _narkisr$elm_ui$Environments_List$GCE = {ctor: 'GCE'};
+var _narkisr$elm_ui$Environments_List$AWS = {ctor: 'AWS'};
+var _narkisr$elm_ui$Environments_List$KVM = F2(
+	function (a, b) {
+		return {ctor: 'KVM', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Environments_List$Openstack = F2(
+	function (a, b) {
+		return {ctor: 'Openstack', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Environments_List$Proxmox = F2(
+	function (a, b) {
+		return {ctor: 'Proxmox', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Environments_List$OSTemplates = function (a) {
+	return {ctor: 'OSTemplates', _0: a};
+};
+var _narkisr$elm_ui$Environments_List$hypervisor = _elm_lang$core$Json_Decode$oneOf(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A3(
+			_elm_lang$core$Json_Decode$object2,
+			_narkisr$elm_ui$Environments_List$Openstack,
+			A2(
+				_elm_lang$core$Json_Decode_ops[':='],
+				'flavors',
+				_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)),
+			A2(
+				_elm_lang$core$Json_Decode_ops[':='],
+				'ostemplates',
+				_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$template))),
+			A3(
+			_elm_lang$core$Json_Decode$object2,
+			_narkisr$elm_ui$Environments_List$KVM,
+			A2(
+				_elm_lang$core$Json_Decode_ops[':='],
+				'ostemplates',
+				_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$template)),
+			A2(
+				_elm_lang$core$Json_Decode_ops[':='],
+				'nodes',
+				_elm_lang$core$Json_Decode$dict(
+					_elm_lang$core$Json_Decode$dict(
+						_narkisr$elm_ui$Common_Model$option(
+							{ctor: '_Tuple0'}))))),
+			A2(
+			_elm_lang$core$Json_Decode$object1,
+			_narkisr$elm_ui$Environments_List$OSTemplates,
+			A2(
+				_elm_lang$core$Json_Decode_ops[':='],
+				'ostemplates',
+				_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$template))),
+			_elm_lang$core$Json_Decode$succeed(_narkisr$elm_ui$Environments_List$Physical)
+		]));
+var _narkisr$elm_ui$Environments_List$environment = _elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$hypervisor);
+var _narkisr$elm_ui$Environments_List$environmentsList = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['environments']),
+	_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$environment));
+var _narkisr$elm_ui$Environments_List$getEnvironments = function (msg) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		msg,
+		_elm_lang$core$Task$toResult(
+			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Environments_List$environmentsList, '/environments')));
+};
+
+var _narkisr$elm_ui$Systems_Add_Common$setMachine = F2(
+	function (f, _p0) {
+		var _p1 = _p0;
+		var newMachine = f(_p1.machine);
+		return _elm_lang$core$Native_Utils.update(
+			_p1,
+			{machine: newMachine});
+	});
+var _narkisr$elm_ui$Systems_Add_Common$getOses = F2(
+	function (hyp, model) {
+		var hypervisor = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_narkisr$elm_ui$Environments_List$Empty,
+			A2(_elm_lang$core$Dict$get, hyp, model.environment));
+		var _p2 = hypervisor;
+		switch (_p2.ctor) {
+			case 'OSTemplates':
+				return _p2._0;
+			case 'Openstack':
+				return _p2._1;
+			case 'KVM':
+				return _p2._0;
+			default:
+				return _elm_lang$core$Dict$empty;
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Common$setDefaultOS = F2(
+	function (hyp, _p3) {
+		var _p4 = _p3;
+		var _p7 = _p4;
+		var _p6 = _p4.machine;
+		var _p5 = _elm_lang$core$List$head(
+			_elm_lang$core$Dict$keys(
+				A2(_narkisr$elm_ui$Systems_Add_Common$getOses, hyp, _p7)));
+		if (_p5.ctor === 'Just') {
+			return _elm_lang$core$String$isEmpty(_p6.os) ? _elm_lang$core$Native_Utils.update(
+				_p7,
+				{
+					machine: _elm_lang$core$Native_Utils.update(
+						_p6,
+						{os: _p5._0})
+				}) : _p7;
+		} else {
+			return _p7;
+		}
 	});
 
 var _narkisr$elm_ui$Systems_Add_Validations$validate = F3(
@@ -14304,238 +17888,6 @@ var _narkisr$elm_ui$Common_Components$notImplemented = A2(
 			_elm_lang$html$Html$text('not implemented')
 		]));
 
-var _narkisr$elm_ui$Common_Redirect$redirect = _elm_lang$core$Native_Platform.outgoingPort(
-	'redirect',
-	function (v) {
-		return v;
-	});
-
-var _narkisr$elm_ui$Common_Http$apply = F2(
-	function (func, value) {
-		return A3(
-			_elm_lang$core$Json_Decode$object2,
-			F2(
-				function (x, y) {
-					return x(y);
-				}),
-			func,
-			value);
-	});
-var _narkisr$elm_ui$Common_Http$httpJson = F4(
-	function (verb, body, decoder, url) {
-		var request = {
-			verb: verb,
-			headers: _elm_lang$core$Native_List.fromArray(
-				[
-					{ctor: '_Tuple2', _0: 'Content-Type', _1: 'application/json;charset=UTF-8'},
-					{ctor: '_Tuple2', _0: 'Accept', _1: 'application/json, text/plain, */*'}
-				]),
-			url: url,
-			body: body
-		};
-		return A2(
-			_evancz$elm_http$Http$fromJson,
-			decoder,
-			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
-	});
-var _narkisr$elm_ui$Common_Http$delete = A2(_narkisr$elm_ui$Common_Http$httpJson, 'DELETE', _evancz$elm_http$Http$empty);
-var _narkisr$elm_ui$Common_Http$getJson = A2(_narkisr$elm_ui$Common_Http$httpJson, 'GET', _evancz$elm_http$Http$empty);
-var _narkisr$elm_ui$Common_Http$postJson = _narkisr$elm_ui$Common_Http$httpJson('POST');
-var _narkisr$elm_ui$Common_Http$putJson = _narkisr$elm_ui$Common_Http$httpJson('PUT');
-var _narkisr$elm_ui$Common_Http$SaveResponse = F2(
-	function (a, b) {
-		return {message: a, id: b};
-	});
-var _narkisr$elm_ui$Common_Http$saveResponse = A3(
-	_elm_lang$core$Json_Decode$object2,
-	_narkisr$elm_ui$Common_Http$SaveResponse,
-	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$int)));
-
-var _narkisr$elm_ui$Common_Model$valueOf = function (option) {
-	var _p0 = option;
-	switch (_p0.ctor) {
-		case 'BoolOption':
-			return _elm_lang$core$String$toLower(
-				_elm_lang$core$Basics$toString(_p0._0));
-		case 'StringOption':
-			return _p0._0;
-		case 'IntOption':
-			return _elm_lang$core$Basics$toString(_p0._0);
-		default:
-			return _elm_lang$core$Basics$toString(_p0._0);
-	}
-};
-var _narkisr$elm_ui$Common_Model$DictOption = function (a) {
-	return {ctor: 'DictOption', _0: a};
-};
-var _narkisr$elm_ui$Common_Model$IntOption = function (a) {
-	return {ctor: 'IntOption', _0: a};
-};
-var _narkisr$elm_ui$Common_Model$StringOption = function (a) {
-	return {ctor: 'StringOption', _0: a};
-};
-var _narkisr$elm_ui$Common_Model$BoolOption = function (a) {
-	return {ctor: 'BoolOption', _0: a};
-};
-var _narkisr$elm_ui$Common_Model$option = function (_p1) {
-	return _elm_lang$core$Json_Decode$oneOf(
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(_elm_lang$core$Json_Decode$map, _narkisr$elm_ui$Common_Model$BoolOption, _elm_lang$core$Json_Decode$bool),
-				A2(_elm_lang$core$Json_Decode$map, _narkisr$elm_ui$Common_Model$StringOption, _elm_lang$core$Json_Decode$string),
-				A2(_elm_lang$core$Json_Decode$map, _narkisr$elm_ui$Common_Model$IntOption, _elm_lang$core$Json_Decode$int),
-				_narkisr$elm_ui$Common_Model$dictOption$(
-				{ctor: '_Tuple0'})
-			]));
-};
-var _narkisr$elm_ui$Common_Model$dictOption$ = function (_p2) {
-	return A2(
-		_elm_lang$core$Json_Decode$andThen,
-		_elm_lang$core$Json_Decode$succeed(
-			{ctor: '_Tuple0'}),
-		function (_p3) {
-			return A2(
-				_elm_lang$core$Json_Decode$map,
-				_narkisr$elm_ui$Common_Model$DictOption,
-				_elm_lang$core$Json_Decode$dict(
-					_narkisr$elm_ui$Common_Model$option(_p3)));
-		});
-};
-
-var _narkisr$elm_ui$Environments_List$environmentsKeys = A2(
-	_elm_lang$core$Json_Decode$at,
-	_elm_lang$core$Native_List.fromArray(
-		['environments']),
-	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
-var _narkisr$elm_ui$Environments_List$getEnvironmentKeys = function (msg) {
-	return A3(
-		_elm_lang$core$Task$perform,
-		_elm_community$basics_extra$Basics_Extra$never,
-		msg,
-		_elm_lang$core$Task$toResult(
-			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Environments_List$environmentsKeys, '/environments/keys')));
-};
-var _narkisr$elm_ui$Environments_List$template = _elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string);
-var _narkisr$elm_ui$Environments_List$Empty = {ctor: 'Empty'};
-var _narkisr$elm_ui$Environments_List$Physical = {ctor: 'Physical'};
-var _narkisr$elm_ui$Environments_List$GCE = {ctor: 'GCE'};
-var _narkisr$elm_ui$Environments_List$AWS = {ctor: 'AWS'};
-var _narkisr$elm_ui$Environments_List$KVM = F2(
-	function (a, b) {
-		return {ctor: 'KVM', _0: a, _1: b};
-	});
-var _narkisr$elm_ui$Environments_List$Openstack = F2(
-	function (a, b) {
-		return {ctor: 'Openstack', _0: a, _1: b};
-	});
-var _narkisr$elm_ui$Environments_List$Proxmox = F2(
-	function (a, b) {
-		return {ctor: 'Proxmox', _0: a, _1: b};
-	});
-var _narkisr$elm_ui$Environments_List$OSTemplates = function (a) {
-	return {ctor: 'OSTemplates', _0: a};
-};
-var _narkisr$elm_ui$Environments_List$hypervisor = _elm_lang$core$Json_Decode$oneOf(
-	_elm_lang$core$Native_List.fromArray(
-		[
-			A3(
-			_elm_lang$core$Json_Decode$object2,
-			_narkisr$elm_ui$Environments_List$Openstack,
-			A2(
-				_elm_lang$core$Json_Decode_ops[':='],
-				'flavors',
-				_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string)),
-			A2(
-				_elm_lang$core$Json_Decode_ops[':='],
-				'ostemplates',
-				_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$template))),
-			A3(
-			_elm_lang$core$Json_Decode$object2,
-			_narkisr$elm_ui$Environments_List$KVM,
-			A2(
-				_elm_lang$core$Json_Decode_ops[':='],
-				'ostemplates',
-				_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$template)),
-			A2(
-				_elm_lang$core$Json_Decode_ops[':='],
-				'nodes',
-				_elm_lang$core$Json_Decode$dict(
-					_elm_lang$core$Json_Decode$dict(
-						_narkisr$elm_ui$Common_Model$option(
-							{ctor: '_Tuple0'}))))),
-			A2(
-			_elm_lang$core$Json_Decode$object1,
-			_narkisr$elm_ui$Environments_List$OSTemplates,
-			A2(
-				_elm_lang$core$Json_Decode_ops[':='],
-				'ostemplates',
-				_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$template))),
-			_elm_lang$core$Json_Decode$succeed(_narkisr$elm_ui$Environments_List$Physical)
-		]));
-var _narkisr$elm_ui$Environments_List$environment = _elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$hypervisor);
-var _narkisr$elm_ui$Environments_List$environmentsList = A2(
-	_elm_lang$core$Json_Decode$at,
-	_elm_lang$core$Native_List.fromArray(
-		['environments']),
-	_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Environments_List$environment));
-var _narkisr$elm_ui$Environments_List$getEnvironments = function (msg) {
-	return A3(
-		_elm_lang$core$Task$perform,
-		_elm_community$basics_extra$Basics_Extra$never,
-		msg,
-		_elm_lang$core$Task$toResult(
-			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Environments_List$environmentsList, '/environments')));
-};
-
-var _narkisr$elm_ui$Systems_Add_Common$setMachine = F2(
-	function (f, _p0) {
-		var _p1 = _p0;
-		var newMachine = f(_p1.machine);
-		return _elm_lang$core$Native_Utils.update(
-			_p1,
-			{machine: newMachine});
-	});
-var _narkisr$elm_ui$Systems_Add_Common$getOses = F2(
-	function (hyp, model) {
-		var hypervisor = A2(
-			_elm_lang$core$Maybe$withDefault,
-			_narkisr$elm_ui$Environments_List$Empty,
-			A2(_elm_lang$core$Dict$get, hyp, model.environment));
-		var _p2 = hypervisor;
-		switch (_p2.ctor) {
-			case 'OSTemplates':
-				return _p2._0;
-			case 'Openstack':
-				return _p2._1;
-			case 'KVM':
-				return _p2._0;
-			default:
-				return _elm_lang$core$Dict$empty;
-		}
-	});
-var _narkisr$elm_ui$Systems_Add_Common$setDefaultOS = F2(
-	function (hyp, _p3) {
-		var _p4 = _p3;
-		var _p7 = _p4;
-		var _p6 = _p4.machine;
-		var _p5 = _elm_lang$core$List$head(
-			_elm_lang$core$Dict$keys(
-				A2(_narkisr$elm_ui$Systems_Add_Common$getOses, hyp, _p7)));
-		if (_p5.ctor === 'Just') {
-			return _elm_lang$core$String$isEmpty(_p6.os) ? _elm_lang$core$Native_Utils.update(
-				_p7,
-				{
-					machine: _elm_lang$core$Native_Utils.update(
-						_p6,
-						{os: _p5._0})
-				}) : _p7;
-		} else {
-			return _p7;
-		}
-	});
-
 var _narkisr$elm_ui$Common_Errors$setErrors = F2(
 	function (_p0, es) {
 		var _p1 = _p0;
@@ -14912,25 +18264,84 @@ var _narkisr$elm_ui$Common_Errors$decodeError = function (error) {
 };
 var _narkisr$elm_ui$Common_Errors$NoOp = {ctor: 'NoOp'};
 
-var _narkisr$elm_ui$Common_NewTab$newtab = _elm_lang$core$Native_Platform.outgoingPort(
-	'newtab',
-	function (v) {
-		return v;
+var _narkisr$elm_ui$Users_Model$rolesList = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['roles']),
+	_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Users_Model$getRoles = function (msg) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		msg,
+		_elm_lang$core$Task$toResult(
+			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Users_Model$rolesList, '/users/roles')));
+};
+var _narkisr$elm_ui$Users_Model$User = F5(
+	function (a, b, c, d, e) {
+		return {username: a, password: b, operations: c, roles: d, envs: e};
 	});
-
-var _narkisr$elm_ui$Nav_Common$Users = {ctor: 'Users'};
-var _narkisr$elm_ui$Nav_Common$Stacks = {ctor: 'Stacks'};
-var _narkisr$elm_ui$Nav_Common$Templates = {ctor: 'Templates'};
-var _narkisr$elm_ui$Nav_Common$Jobs = {ctor: 'Jobs'};
-var _narkisr$elm_ui$Nav_Common$Types = {ctor: 'Types'};
-var _narkisr$elm_ui$Nav_Common$Systems = {ctor: 'Systems'};
-var _narkisr$elm_ui$Nav_Common$Stats = {ctor: 'Stats'};
-var _narkisr$elm_ui$Nav_Common$View = {ctor: 'View'};
-var _narkisr$elm_ui$Nav_Common$List = {ctor: 'List'};
-var _narkisr$elm_ui$Nav_Common$Edit = {ctor: 'Edit'};
-var _narkisr$elm_ui$Nav_Common$Delete = {ctor: 'Delete'};
-var _narkisr$elm_ui$Nav_Common$Launch = {ctor: 'Launch'};
-var _narkisr$elm_ui$Nav_Common$Add = {ctor: 'Add'};
+var _narkisr$elm_ui$Users_Model$emptyUser = A5(
+	_narkisr$elm_ui$Users_Model$User,
+	'',
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Native_List.fromArray(
+		[]),
+	_elm_lang$core$Native_List.fromArray(
+		[]),
+	_elm_lang$core$Native_List.fromArray(
+		[]));
+var _narkisr$elm_ui$Users_Model$userBase = F3(
+	function (name, password, role) {
+		return A5(
+			_narkisr$elm_ui$Users_Model$User,
+			name,
+			_elm_lang$core$Maybe$Just(password),
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[role]),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+var _narkisr$elm_ui$Users_Model$permBase = F2(
+	function (envs, operations) {
+		return A5(
+			_narkisr$elm_ui$Users_Model$User,
+			'',
+			_elm_lang$core$Maybe$Nothing,
+			operations,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			envs);
+	});
+var _narkisr$elm_ui$Users_Model$user = A6(
+	_elm_lang$core$Json_Decode$object5,
+	_narkisr$elm_ui$Users_Model$User,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'username', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'password', _elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'operations',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'roles',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'envs',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Users_Model$usersList = _elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Users_Model$user);
+var _narkisr$elm_ui$Users_Model$getUsers = function (msg) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		msg,
+		_elm_lang$core$Task$toResult(
+			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Users_Model$usersList, '/users')));
+};
 
 var _narkisr$elm_ui$Users_Session$isUser = function (_p0) {
 	var _p1 = _p0;
@@ -14983,6 +18394,14987 @@ var _narkisr$elm_ui$Users_Session$getSession = function (msg) {
 		_elm_lang$core$Task$toResult(
 			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Users_Session$session, '/sessions')));
 };
+
+var _narkisr$elm_ui$Admin_Core$ownersList = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1.owners;
+	return _elm_lang$core$List$isEmpty(_p2) ? _elm_lang$core$Native_List.fromArray(
+		[_p1.owner]) : _p2;
+};
+var _narkisr$elm_ui$Admin_Core$setEnvironments = F2(
+	function (model, es) {
+		var environment = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(
+				_elm_lang$core$Dict$keys(es)));
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{
+					environments: _elm_lang$core$Dict$keys(es),
+					environment: environment,
+					rawEnvironments: es
+				}));
+	});
+var _narkisr$elm_ui$Admin_Core$setOwners = F2(
+	function (model, owners) {
+		var users = A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.username;
+			},
+			owners);
+		var user = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(users));
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{owners: users, owner: user}));
+	});
+var _narkisr$elm_ui$Admin_Core$Model = F5(
+	function (a, b, c, d, e) {
+		return {environments: a, environment: b, rawEnvironments: c, owners: d, owner: e};
+	});
+var _narkisr$elm_ui$Admin_Core$partialAdmin = F2(
+	function (owner, environment) {
+		return A5(
+			_narkisr$elm_ui$Admin_Core$Model,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			environment,
+			_elm_lang$core$Dict$empty,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			owner);
+	});
+var _narkisr$elm_ui$Admin_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Admin_Core$LoadSession = function (a) {
+	return {ctor: 'LoadSession', _0: a};
+};
+var _narkisr$elm_ui$Admin_Core$SelectEnvironment = function (a) {
+	return {ctor: 'SelectEnvironment', _0: a};
+};
+var _narkisr$elm_ui$Admin_Core$SelectOwner = function (a) {
+	return {ctor: 'SelectOwner', _0: a};
+};
+var _narkisr$elm_ui$Admin_Core$view = function (_p3) {
+	var _p4 = _p3;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_narkisr$elm_ui$Common_Components$group$,
+				'Environment',
+				A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Admin_Core$SelectEnvironment, _p4.environments, _p4.environment)),
+				A2(
+				_narkisr$elm_ui$Common_Components$group$,
+				'Owner',
+				A3(
+					_narkisr$elm_ui$Common_Components$selector,
+					_narkisr$elm_ui$Admin_Core$SelectOwner,
+					_narkisr$elm_ui$Admin_Core$ownersList(_p4),
+					_p4.owner))
+			]));
+};
+var _narkisr$elm_ui$Admin_Core$SetOwners = function (a) {
+	return {ctor: 'SetOwners', _0: a};
+};
+var _narkisr$elm_ui$Admin_Core$setSession = F2(
+	function (model, _p5) {
+		var _p6 = _p5;
+		return _narkisr$elm_ui$Users_Session$isUser(_p6) ? _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{owner: _p6.username})) : {
+			ctor: '_Tuple2',
+			_0: model,
+			_1: _narkisr$elm_ui$Users_Model$getUsers(_narkisr$elm_ui$Admin_Core$SetOwners)
+		};
+	});
+var _narkisr$elm_ui$Admin_Core$update = F2(
+	function (msg, model) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
+			case 'SetEnvironments':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p7._0,
+					model,
+					_narkisr$elm_ui$Admin_Core$setEnvironments(model),
+					_narkisr$elm_ui$Admin_Core$NoOp);
+			case 'SelectEnvironment':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{environment: _p7._0}));
+			case 'SetOwners':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p7._0,
+					model,
+					_narkisr$elm_ui$Admin_Core$setOwners(model),
+					_narkisr$elm_ui$Admin_Core$NoOp);
+			case 'SelectOwner':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{owner: _p7._0}));
+			case 'LoadSession':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p7._0,
+					model,
+					_narkisr$elm_ui$Admin_Core$setSession(model),
+					_narkisr$elm_ui$Admin_Core$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Admin_Core$SetEnvironments = function (a) {
+	return {ctor: 'SetEnvironments', _0: a};
+};
+var _narkisr$elm_ui$Admin_Core$init = {
+	ctor: '_Tuple2',
+	_0: A5(
+		_narkisr$elm_ui$Admin_Core$Model,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		'',
+		_elm_lang$core$Dict$empty,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		''),
+	_1: _elm_lang$core$Platform_Cmd$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_narkisr$elm_ui$Environments_List$getEnvironments(_narkisr$elm_ui$Admin_Core$SetEnvironments),
+				_narkisr$elm_ui$Users_Session$getSession(_narkisr$elm_ui$Admin_Core$LoadSession)
+			]))
+};
+
+var _narkisr$elm_ui$Systems_Model_AWS$endpoints = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			{
+			ctor: '_Tuple2',
+			_0: 'us-east-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'US East (N. Virginia)',
+				_1: 'ec2.us-east-1.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b', 'd', 'e'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'us-west-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'US West (N. California)',
+				_1: 'ec2.us-west-1.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'us-west-2',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'US West (Oregon)',
+				_1: 'ec2.us-west-2.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b', 'c'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'eu-west-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'EU (Ireland)',
+				_1: 'ec2.eu-west-1.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b', 'c'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'eu-central-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'EU (Frankfurt)',
+				_1: 'ec2.eu-central-1.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'ap-southeast-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'Asia Pacific (Singapore)',
+				_1: 'ec2.ap-southeast-1.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'ap-southeast-2',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'Asia Pacific (Sydney)',
+				_1: 'ec2.ap-southeast-2.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'ap-northeast-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'Asia Pacific (Tokyo)',
+				_1: 'ec2.ap-northeast-1.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'c'])
+			}
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'sa-east-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'South America (Sao Paulo)',
+				_1: 'ec2.sa-east-1.amazonaws.com',
+				_2: _elm_lang$core$Native_List.fromArray(
+					['a', 'b', 'c'])
+			}
+		}
+		]));
+var _narkisr$elm_ui$Systems_Model_AWS$instanceTypes = _elm_lang$core$Native_List.fromArray(
+	['t1.micro', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge', 'm3.medium', 'm3.large', 'm3.xlarge', 'm3.2xlarge', 'c1.medium', 'c1.xlarge', 'c1.xlarge', 'cc2.8xlarge', 'c3.large', 'c3.xlarge', 'c3.2xlarge', 'c3.4xlarge', 'c3.8xlarge', 'r3.large', 'r3.xlarge', 'r3.2xlarge', 'r3.4xlarge', 'r3.8xlarge', 'm2.xlarge', 'm2.2xlarge', 'm2.4xlarge', 'cr1.8xlarge', 'hi1.4xlarge', 'cg1.4xlarge']);
+var _narkisr$elm_ui$Systems_Model_AWS$Volume = F5(
+	function (a, b, c, d, e) {
+		return {type$: a, size: b, iops: c, device: d, clear: e};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyVolume = A5(_narkisr$elm_ui$Systems_Model_AWS$Volume, 'Magnetic', 50, _elm_lang$core$Maybe$Nothing, '', false);
+var _narkisr$elm_ui$Systems_Model_AWS$Block = F2(
+	function (a, b) {
+		return {volume: a, device: b};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyBlock = A2(_narkisr$elm_ui$Systems_Model_AWS$Block, '', '');
+var _narkisr$elm_ui$Systems_Model_AWS$VPC = F3(
+	function (a, b, c) {
+		return {subnetId: a, vpcId: b, assignPublic: c};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyVpc = A3(_narkisr$elm_ui$Systems_Model_AWS$VPC, '', '', false);
+var _narkisr$elm_ui$Systems_Model_AWS$AWS = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {instanceType: a, instanceId: b, keyName: c, endpoint: d, availabilityZone: e, securityGroups: f, ebsOptimized: g, volumes: h, blockDevices: i, vpc: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Systems_Model_AWS$emptyAws = function () {
+	var instanceType = function () {
+		var _p0 = _elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_AWS$instanceTypes);
+		if (_p0.ctor === 'Just') {
+			return _p0._0;
+		} else {
+			return '';
+		}
+	}();
+	var _p1 = A2(
+		_elm_lang$core$Maybe$withDefault,
+		{
+			ctor: '_Tuple3',
+			_0: '',
+			_1: '',
+			_2: _elm_lang$core$Native_List.fromArray(
+				[])
+		},
+		A2(_elm_lang$core$Dict$get, 'us-east-1', _narkisr$elm_ui$Systems_Model_AWS$endpoints));
+	var url = _p1._1;
+	var justString = _elm_lang$core$Maybe$Just('');
+	return _narkisr$elm_ui$Systems_Model_AWS$AWS(instanceType)(_elm_lang$core$Maybe$Nothing)('')(url)(_elm_lang$core$Maybe$Nothing)(
+		_elm_lang$core$Maybe$Just(
+			_elm_lang$core$Native_List.fromArray(
+				[])))(
+		_elm_lang$core$Maybe$Just(false))(
+		_elm_lang$core$Maybe$Just(
+			_elm_lang$core$Native_List.fromArray(
+				[])))(
+		_elm_lang$core$Maybe$Just(
+			_elm_lang$core$Native_List.fromArray(
+				[])))(
+		_elm_lang$core$Maybe$Just(_narkisr$elm_ui$Systems_Model_AWS$emptyVpc));
+}();
+
+var _narkisr$elm_ui$Systems_Model_GCE$zones = _elm_lang$core$Native_List.fromArray(
+	['us-east1-b', 'us-east1-c', 'us-east1-d', 'us-central1-a', 'us-central1-b', 'us-central1-c', 'us-central1-f', 'europe-west1-b', 'europe-west1-c', 'europe-west1-d', 'asia-east1-a', 'asia-east1-b', 'asia-east1-c']);
+var _narkisr$elm_ui$Systems_Model_GCE$machineTypes = _elm_lang$core$Native_List.fromArray(
+	['n1-standard-1', 'n1-standard-2', 'n1-standard-4', 'n1-standard-8', 'n1-standard-16', 'n1-standard-32']);
+var _narkisr$elm_ui$Systems_Model_GCE$GCE = F5(
+	function (a, b, c, d, e) {
+		return {machineType: a, zone: b, tags: c, projectId: d, staticIp: e};
+	});
+var _narkisr$elm_ui$Systems_Model_GCE$emptyGce = function () {
+	var zone = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$zones));
+	var type$ = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$machineTypes));
+	return A5(
+		_narkisr$elm_ui$Systems_Model_GCE$GCE,
+		type$,
+		zone,
+		_elm_lang$core$Maybe$Just(
+			_elm_lang$core$Native_List.fromArray(
+				[])),
+		'',
+		_elm_lang$core$Maybe$Just(''));
+}();
+
+var _narkisr$elm_ui$Systems_Model_Digital$regions = _elm_lang$core$Native_List.fromArray(
+	['lon1', 'nyc1', 'ams1', 'sfo1', 'nyc2', 'ams2', 'sgp1']);
+var _narkisr$elm_ui$Systems_Model_Digital$sizes = _elm_lang$core$Native_List.fromArray(
+	['512mb', '1gb', '2gb', '4gb', '8gb', '16gb', '32gb', '48gb', '64gb']);
+var _narkisr$elm_ui$Systems_Model_Digital$Digital = F3(
+	function (a, b, c) {
+		return {size: a, region: b, privateNetworking: c};
+	});
+var _narkisr$elm_ui$Systems_Model_Digital$emptyDigital = A3(
+	_narkisr$elm_ui$Systems_Model_Digital$Digital,
+	A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$sizes)),
+	A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$regions)),
+	false);
+
+var _narkisr$elm_ui$Systems_Model_Openstack$Volume = F3(
+	function (a, b, c) {
+		return {device: a, size: b, clear: c};
+	});
+var _narkisr$elm_ui$Systems_Model_Openstack$emptyVolume = A3(_narkisr$elm_ui$Systems_Model_Openstack$Volume, '', 0, false);
+var _narkisr$elm_ui$Systems_Model_Openstack$Openstack = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {flavor: a, tenant: b, keyName: c, floatingIp: d, floatingIpPool: e, securityGroups: f, networks: g, volumes: h};
+	});
+var _narkisr$elm_ui$Systems_Model_Openstack$emptyOpenstack = A8(
+	_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
+	'',
+	'',
+	'',
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Native_List.fromArray(
+		[]),
+	_elm_lang$core$Maybe$Nothing);
+
+var _narkisr$elm_ui$Systems_Model_Physical$Physical = F2(
+	function (a, b) {
+		return {mac: a, broadcast: b};
+	});
+var _narkisr$elm_ui$Systems_Model_Physical$emptyPhysical = A2(_narkisr$elm_ui$Systems_Model_Physical$Physical, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+
+var _narkisr$elm_ui$Systems_Model_KVM$KVM = function (a) {
+	return {node: a};
+};
+var _narkisr$elm_ui$Systems_Model_KVM$emptyKVM = _narkisr$elm_ui$Systems_Model_KVM$KVM('');
+
+var _narkisr$elm_ui$Systems_Model_Common$Machine = F7(
+	function (a, b, c, d, e, f, g) {
+		return {user: a, hostname: b, domain: c, ip: d, os: e, ram: f, cpu: g};
+	});
+var _narkisr$elm_ui$Systems_Model_Common$emptyMachine = A7(_narkisr$elm_ui$Systems_Model_Common$Machine, '', '', '', _elm_lang$core$Maybe$Nothing, '', _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+var _narkisr$elm_ui$Systems_Model_Common$resourcedMachine = F2(
+	function (cpu, ram) {
+		return A7(
+			_narkisr$elm_ui$Systems_Model_Common$Machine,
+			'',
+			'',
+			'',
+			_elm_lang$core$Maybe$Just(''),
+			'',
+			_elm_lang$core$Maybe$Just(ram),
+			_elm_lang$core$Maybe$Just(cpu));
+	});
+var _narkisr$elm_ui$Systems_Model_Common$System = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {owner: a, env: b, type$: c, machine: d, aws: e, gce: f, digital: g, openstack: h, physical: i, kvm: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Systems_Model_Common$emptySystem = function () {
+	var base = A3(_narkisr$elm_ui$Systems_Model_Common$System, '', '', '');
+	return A7(base, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+}();
+
+var _narkisr$elm_ui$Systems_Decoders$machineDecoder = A8(
+	_elm_lang$core$Json_Decode$object7,
+	_narkisr$elm_ui$Systems_Model_Common$Machine,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'user', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'hostname', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'domain', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'ip', _elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'os', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'ram', _elm_lang$core$Json_Decode$int)),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'cpu', _elm_lang$core$Json_Decode$int)));
+var _narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder = A4(
+	_elm_lang$core$Json_Decode$object3,
+	_narkisr$elm_ui$Systems_Model_Openstack$Volume,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'device', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'size', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'clear', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$openstackDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_elm_lang$core$Json_Decode$map,
+								_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
+								A2(_elm_lang$core$Json_Decode_ops[':='], 'flavor', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode_ops[':='], 'tenant', _elm_lang$core$Json_Decode$string)),
+						A2(_elm_lang$core$Json_Decode_ops[':='], 'key-name', _elm_lang$core$Json_Decode$string)),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(_elm_lang$core$Json_Decode_ops[':='], 'floating-ip', _elm_lang$core$Json_Decode$string))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'floating-ip-pool', _elm_lang$core$Json_Decode$string))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode_ops[':='],
+					'security-groups',
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
+		A2(
+			_elm_lang$core$Json_Decode_ops[':='],
+			'networks',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode_ops[':='],
+			'volumes',
+			_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder))));
+var _narkisr$elm_ui$Systems_Decoders$kvmDecoder = A2(
+	_elm_lang$core$Json_Decode$object1,
+	_narkisr$elm_ui$Systems_Model_KVM$KVM,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'node', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Systems_Decoders$physicalDecoder = A3(
+	_elm_lang$core$Json_Decode$object2,
+	_narkisr$elm_ui$Systems_Model_Physical$Physical,
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'mac', _elm_lang$core$Json_Decode$string)),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'broadcast', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Systems_Decoders$digitalDecoder = A4(
+	_elm_lang$core$Json_Decode$object3,
+	_narkisr$elm_ui$Systems_Model_Digital$Digital,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'size', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'region', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'private-networking', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$gceDecoder = A6(
+	_elm_lang$core$Json_Decode$object5,
+	_narkisr$elm_ui$Systems_Model_GCE$GCE,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'machine-type', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'zone', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode_ops[':='],
+			'tags',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'project-id', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'static-ip', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder = A6(
+	_elm_lang$core$Json_Decode$object5,
+	_narkisr$elm_ui$Systems_Model_AWS$Volume,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'volume-type', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'size', _elm_lang$core$Json_Decode$int),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'iops', _elm_lang$core$Json_Decode$int)),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'device', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'clear', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$blockDecoder = A3(
+	_elm_lang$core$Json_Decode$object2,
+	_narkisr$elm_ui$Systems_Model_AWS$Block,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'volume', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'device', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Systems_Decoders$vpcDecoder = A4(
+	_elm_lang$core$Json_Decode$object3,
+	_narkisr$elm_ui$Systems_Model_AWS$VPC,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'subnetId', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'vpcId', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'assignIp', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$awsDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_narkisr$elm_ui$Common_Http$apply,
+								A2(
+									_narkisr$elm_ui$Common_Http$apply,
+									A2(
+										_elm_lang$core$Json_Decode$map,
+										_narkisr$elm_ui$Systems_Model_AWS$AWS,
+										A2(_elm_lang$core$Json_Decode_ops[':='], 'instance-type', _elm_lang$core$Json_Decode$string)),
+									_elm_lang$core$Json_Decode$maybe(
+										A2(_elm_lang$core$Json_Decode_ops[':='], 'instance-id', _elm_lang$core$Json_Decode$string))),
+								A2(_elm_lang$core$Json_Decode_ops[':='], 'key-name', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode_ops[':='], 'endpoint', _elm_lang$core$Json_Decode$string)),
+						_elm_lang$core$Json_Decode$maybe(
+							A2(_elm_lang$core$Json_Decode_ops[':='], 'availability-zone', _elm_lang$core$Json_Decode$string))),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(
+							_elm_lang$core$Json_Decode_ops[':='],
+							'security-groups',
+							_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'ebs-optimized', _elm_lang$core$Json_Decode$bool))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode_ops[':='],
+					'volumes',
+					_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder)))),
+		_elm_lang$core$Json_Decode$maybe(
+			A2(
+				_elm_lang$core$Json_Decode_ops[':='],
+				'block-devices',
+				_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$blockDecoder)))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'vpc', _narkisr$elm_ui$Systems_Decoders$vpcDecoder)));
+var _narkisr$elm_ui$Systems_Decoders$systemDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_narkisr$elm_ui$Common_Http$apply,
+								A2(
+									_narkisr$elm_ui$Common_Http$apply,
+									A2(
+										_elm_lang$core$Json_Decode$map,
+										_narkisr$elm_ui$Systems_Model_Common$System,
+										A2(_elm_lang$core$Json_Decode_ops[':='], 'owner', _elm_lang$core$Json_Decode$string)),
+									A2(_elm_lang$core$Json_Decode_ops[':='], 'env', _elm_lang$core$Json_Decode$string)),
+								A2(_elm_lang$core$Json_Decode_ops[':='], 'type', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode_ops[':='], 'machine', _narkisr$elm_ui$Systems_Decoders$machineDecoder)),
+						_elm_lang$core$Json_Decode$maybe(
+							A2(_elm_lang$core$Json_Decode_ops[':='], 'aws', _narkisr$elm_ui$Systems_Decoders$awsDecoder))),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(_elm_lang$core$Json_Decode_ops[':='], 'gce', _narkisr$elm_ui$Systems_Decoders$gceDecoder))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'digital-ocean', _narkisr$elm_ui$Systems_Decoders$digitalDecoder))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(_elm_lang$core$Json_Decode_ops[':='], 'openstack', _narkisr$elm_ui$Systems_Decoders$openstackDecoder))),
+		_elm_lang$core$Json_Decode$maybe(
+			A2(_elm_lang$core$Json_Decode_ops[':='], 'physical', _narkisr$elm_ui$Systems_Decoders$physicalDecoder))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'kvm', _narkisr$elm_ui$Systems_Decoders$kvmDecoder)));
+
+var _narkisr$elm_ui$Pager$pageCount = function (model) {
+	return _elm_lang$core$Basics$ceiling(model.total / model.offset);
+};
+var _narkisr$elm_ui$Pager$update = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p8 = _p1.slice;
+		var _p7 = _p1.page;
+		var _p6 = _p1;
+		var _p5 = _p1.maxButtons;
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'NextPage':
+				var _p3 = _p2._0;
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p6,
+					{page: _p3});
+				var end = _p8 + _p5;
+				var start = _p8;
+				return ((_elm_lang$core$Native_Utils.cmp(start, _p3) < 0) && (_elm_lang$core$Native_Utils.cmp(_p3, end) < 0)) ? newModel : (((_elm_lang$core$Native_Utils.cmp(_p3, end) > -1) && (_elm_lang$core$Native_Utils.cmp(
+					_p3 + _p5,
+					_narkisr$elm_ui$Pager$pageCount(_p6)) > -1)) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: _p3 - _p5}) : ((_elm_lang$core$Native_Utils.cmp(_p3, end) > -1) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: _p3 - 1}) : (_elm_lang$core$Native_Utils.eq(_p3, 1) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: 0}) : ((_elm_lang$core$Native_Utils.cmp(_p3, start) < 1) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: _p3 - 1}) : newModel))));
+			case 'UpdateTotal':
+				var _p4 = _p2._0;
+				return (_elm_lang$core$Native_Utils.cmp(
+					_p4,
+					_elm_lang$core$Basics$toFloat(_p7)) < 0) ? _elm_lang$core$Native_Utils.update(
+					_p6,
+					{total: _p4, page: 1}) : _elm_lang$core$Native_Utils.update(
+					_p6,
+					{total: _p4, page: _p7});
+			default:
+				return _p6;
+		}
+	});
+var _narkisr$elm_ui$Pager$init = {total: 0, page: 1, offset: 10, maxButtons: 5, slice: 0};
+var _narkisr$elm_ui$Pager$Model = F5(
+	function (a, b, c, d, e) {
+		return {total: a, page: b, offset: c, maxButtons: d, slice: e};
+	});
+var _narkisr$elm_ui$Pager$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Pager$UpdateTotal = function (a) {
+	return {ctor: 'UpdateTotal', _0: a};
+};
+var _narkisr$elm_ui$Pager$NextPage = function (a) {
+	return {ctor: 'NextPage', _0: a};
+};
+var _narkisr$elm_ui$Pager$arrows = F2(
+	function (shapes, active) {
+		var _p9 = shapes;
+		var firstShape = _p9._0._0;
+		var firstPos = _p9._0._1;
+		var secondShape = _p9._1._0;
+		var secondPos = _p9._1._1;
+		var isActive = active ? '' : 'disabled';
+		var operation = function (p) {
+			return active ? _narkisr$elm_ui$Pager$NextPage(p) : _narkisr$elm_ui$Pager$NoOp;
+		};
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class(isActive)
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Events$onClick(
+								operation(firstPos))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(firstShape)
+							]))
+					])),
+				A2(
+				_elm_lang$html$Html$li,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class(isActive)
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$a,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Events$onClick(
+								operation(secondPos))
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(secondShape)
+							]))
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Pager$pageLinks = function (_p10) {
+	var _p11 = _p10;
+	var _p14 = _p11.slice;
+	var _p13 = _p11;
+	var _p12 = _p11.maxButtons;
+	var last = A2(
+		_narkisr$elm_ui$Pager$arrows,
+		{
+			ctor: '_Tuple2',
+			_0: {ctor: '_Tuple2', _0: '<<', _1: 1},
+			_1: {ctor: '_Tuple2', _0: '<', _1: _p13.page - 1}
+		},
+		_elm_lang$core$Native_Utils.cmp(_p13.page, 1) > 0);
+	var next = A2(
+		_narkisr$elm_ui$Pager$arrows,
+		{
+			ctor: '_Tuple2',
+			_0: {ctor: '_Tuple2', _0: '>', _1: _p13.page + 1},
+			_1: {
+				ctor: '_Tuple2',
+				_0: '>>',
+				_1: _narkisr$elm_ui$Pager$pageCount(_p13)
+			}
+		},
+		_elm_lang$core$Native_Utils.cmp(
+			_p13.page,
+			_narkisr$elm_ui$Pager$pageCount(_p13)) < 0);
+	var isActive = function (page) {
+		return _elm_lang$core$Native_Utils.eq(_p13.page, page) ? 'active' : '';
+	};
+	var pageLink = function (page) {
+		return A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class(
+					isActive(page))
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$a,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Events$onClick(
+							_narkisr$elm_ui$Pager$NextPage(page))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(
+							_elm_lang$core$Basics$toString(page))
+						]))
+				]));
+	};
+	var links = A2(
+		_elm_lang$core$Array$map,
+		function (p) {
+			return pageLink(p + 1);
+		},
+		A2(
+			_elm_lang$core$Array$initialize,
+			_narkisr$elm_ui$Pager$pageCount(_p13),
+			_elm_lang$core$Basics$identity));
+	var sliced = A3(_elm_lang$core$Array$slice, _p14, _p14 + _p12, links);
+	var windowed = (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$Array$length(links),
+		_p12) > 0) ? sliced : links;
+	return _elm_lang$core$List$concat(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				last,
+				_elm_lang$core$Array$toList(windowed),
+				next
+			]));
+};
+var _narkisr$elm_ui$Pager$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$p,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('text-center')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$nav,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$ul,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('pagination')
+							]),
+						_narkisr$elm_ui$Pager$pageLinks(model))
+					]))
+			]));
+};
+
+var _narkisr$elm_ui$Table$withCaption = F3(
+	function (enabled, title, body) {
+		return enabled ? A2(
+			_elm_lang$core$List$append,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$caption,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(title)
+						]))
+				]),
+			body) : body;
+	});
+var _narkisr$elm_ui$Table$headersMap = function (keys) {
+	return A2(
+		_elm_lang$core$List$map,
+		function (k) {
+			return A2(
+				_elm_lang$html$Html$th,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(k)
+					]));
+		},
+		keys);
+};
+var _narkisr$elm_ui$Table$update = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p7 = _p1.selected;
+		var _p6 = _p1;
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'UpdateRows':
+				return _elm_lang$core$Native_Utils.update(
+					_p6,
+					{rows: _p2._0, selected: _elm_lang$core$Set$empty});
+			case 'SelectAll':
+				var all = _elm_lang$core$Set$fromList(
+					A2(
+						_elm_lang$core$List$map,
+						function (_p3) {
+							var _p4 = _p3;
+							return _p4._0;
+						},
+						_p1.rows));
+				return _elm_lang$core$Native_Utils.eq(_p7, all) ? _elm_lang$core$Native_Utils.update(
+					_p6,
+					{selected: _elm_lang$core$Set$empty}) : _elm_lang$core$Native_Utils.update(
+					_p6,
+					{selected: all});
+			case 'Select':
+				var _p5 = _p2._0;
+				return A2(_elm_lang$core$Set$member, _p5, _p6.selected) ? _elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						selected: A2(_elm_lang$core$Set$remove, _p5, _p7)
+					}) : _elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						selected: A2(_elm_lang$core$Set$insert, _p5, _p7)
+					});
+			default:
+				return _p6;
+		}
+	});
+var _narkisr$elm_ui$Table$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {id: a, caption: b, rows: c, headers: d, selected: e, title: f, rowFn: g};
+	});
+var _narkisr$elm_ui$Table$init = F5(
+	function (id, caption, hs, f, title) {
+		return A7(
+			_narkisr$elm_ui$Table$Model,
+			id,
+			caption,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			hs,
+			_elm_lang$core$Set$empty,
+			title,
+			f);
+	});
+var _narkisr$elm_ui$Table$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Table$UpdateRows = function (a) {
+	return {ctor: 'UpdateRows', _0: a};
+};
+var _narkisr$elm_ui$Table$SelectAll = {ctor: 'SelectAll'};
+var _narkisr$elm_ui$Table$View = function (a) {
+	return {ctor: 'View', _0: a};
+};
+var _narkisr$elm_ui$Table$Select = function (a) {
+	return {ctor: 'Select', _0: a};
+};
+var _narkisr$elm_ui$Table$applySelect = F3(
+	function (model, id, cols) {
+		var background = A2(_elm_lang$core$Set$member, id, model.selected) ? '#e7e7e7' : '';
+		return A2(
+			_elm_lang$html$Html$tr,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$style(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							{ctor: '_Tuple2', _0: 'background', _1: background}
+						])),
+					_elm_lang$html$Html_Events$onClick(
+					_narkisr$elm_ui$Table$Select(id)),
+					_elm_lang$html$Html_Events$onDoubleClick(
+					_narkisr$elm_ui$Table$View(id))
+				]),
+			cols);
+	});
+var _narkisr$elm_ui$Table$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$table,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('table table-bordered'),
+				_elm_lang$html$Html_Attributes$id(model.id)
+			]),
+		A3(
+			_narkisr$elm_ui$Table$withCaption,
+			model.caption,
+			model.title,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$thead,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html$tr,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Table$SelectAll)
+								]),
+							_narkisr$elm_ui$Table$headersMap(model.headers))
+						])),
+					A2(
+					_elm_lang$html$Html$tbody,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					A2(
+						_elm_lang$core$List$map,
+						function (_p8) {
+							var _p9 = _p8;
+							var _p10 = _p9._0;
+							return A3(
+								_narkisr$elm_ui$Table$applySelect,
+								model,
+								_p10,
+								A2(model.rowFn, _p10, _p9._1));
+						},
+						model.rows))
+				])));
+};
+
+var _narkisr$elm_ui$Search$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'Result') {
+			if (_p0._0 === true) {
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{parsed: _p0._1.result, input: _p0._1.source, error: ''});
+			} else {
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{error: _p0._1.message, input: _p0._1.source});
+			}
+		} else {
+			return model;
+		}
+	});
+var _narkisr$elm_ui$Search$init = {input: '', parsed: '', error: ''};
+var _narkisr$elm_ui$Search$Model = F3(
+	function (a, b, c) {
+		return {input: a, parsed: b, error: c};
+	});
+var _narkisr$elm_ui$Search$ParseResult = F3(
+	function (a, b, c) {
+		return {message: a, source: b, result: c};
+	});
+var _narkisr$elm_ui$Search$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Search$Result = F2(
+	function (a, b) {
+		return {ctor: 'Result', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Search$Parse = function (a) {
+	return {ctor: 'Parse', _0: a};
+};
+var _narkisr$elm_ui$Search$searchForm = function (model) {
+	return A2(
+		_elm_lang$html$Html$form,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('form-horizontal')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('form-group'),
+						A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$label,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$for('systemSearch'),
+								_elm_lang$html$Html_Attributes$class('col-sm-1 control-label')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Filter:')
+							])),
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-sm-6')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$input,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('form-control'),
+										_elm_lang$html$Html_Attributes$type$('search'),
+										_elm_lang$html$Html_Attributes$id('systemSearch'),
+										_elm_lang$html$Html_Attributes$placeholder(''),
+										_elm_lang$html$Html_Events$onInput(_narkisr$elm_ui$Search$Parse)
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[]))
+							]))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Search$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('container-fluid')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-md-8 col-md-offset-2')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_narkisr$elm_ui$Search$searchForm(model)
+							]))
+					]))
+			]));
+};
+
+var _narkisr$elm_ui$Systems_List$systemPair = A3(
+	_elm_lang$core$Json_Decode$tuple2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	_elm_lang$core$Json_Decode$string,
+	_narkisr$elm_ui$Systems_Decoders$systemDecoder);
+var _narkisr$elm_ui$Systems_List$systemPage = A3(
+	_elm_lang$core$Json_Decode$object2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'meta',
+		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$int)),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'systems',
+		_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_List$systemPair)));
+var _narkisr$elm_ui$Systems_List$flash = function (model) {
+	var result = _elm_lang$html$Html$div(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('callout callout-danger')
+			]));
+	var _p0 = model.error;
+	switch (_p0.ctor) {
+		case 'NoError':
+			return A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[]));
+		case 'NoSystemSelected':
+			return A2(
+				_narkisr$elm_ui$Common_Components$callout,
+				'danger',
+				_narkisr$elm_ui$Common_Components$info('Please select a system first'));
+		default:
+			return A2(
+				_narkisr$elm_ui$Common_Components$callout,
+				'danger',
+				_narkisr$elm_ui$Common_Components$info(_p0._0));
+	}
+};
+var _narkisr$elm_ui$Systems_List$systemRow = F2(
+	function (id, _p1) {
+		var _p2 = _p1;
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(id)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						function (_) {
+							return _.hostname;
+						}(_p2.machine))
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p2.type$)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p2.env)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p2.owner)
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Systems_List$setSystems = F2(
+	function (model, _p3) {
+		var _p4 = _p3;
+		var newTable = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(_p4._1),
+			model.table);
+		var total = A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			A2(_elm_lang$core$Dict$get, 'total', _p4._0));
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(total)),
+			model.pager);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{systems: _p4, pager: newPager, table: newTable}));
+	});
+var _narkisr$elm_ui$Systems_List$Model = F5(
+	function (a, b, c, d, e) {
+		return {error: a, systems: b, pager: c, table: d, search: e};
+	});
+var _narkisr$elm_ui$Systems_List$NoError = {ctor: 'NoError'};
+var _narkisr$elm_ui$Systems_List$SearchParseFailed = function (a) {
+	return {ctor: 'SearchParseFailed', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$NoSystemSelected = {ctor: 'NoSystemSelected'};
+var _narkisr$elm_ui$Systems_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_List$Searching = function (a) {
+	return {ctor: 'Searching', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$view = function (model) {
+	var _p5 = model.systems;
+	var meta = _p5._0;
+	var systems = _p5._1;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-md-12')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html_App$map,
+								_narkisr$elm_ui$Systems_List$Searching,
+								_narkisr$elm_ui$Search$view(model.search))
+							]))
+					])),
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_narkisr$elm_ui$Systems_List$flash(model),
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_circuithub$elm_bootstrap_html$Bootstrap_Html$panelDefault_(
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html_App$map,
+										_narkisr$elm_ui$Systems_List$LoadPage,
+										_narkisr$elm_ui$Table$view(model.table))
+									]))
+							]))
+					])),
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_narkisr$elm_ui$Systems_List$GotoPage,
+						_narkisr$elm_ui$Pager$view(model.pager))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Systems_List$SetSystems = function (a) {
+	return {ctor: 'SetSystems', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$getSystems = F2(
+	function (page, offset) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			_narkisr$elm_ui$Systems_List$SetSystems,
+			_elm_lang$core$Task$toResult(
+				A2(
+					_narkisr$elm_ui$Common_Http$getJson,
+					_narkisr$elm_ui$Systems_List$systemPage,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'/systems?page=',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(page),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'&offset=',
+								_elm_lang$core$Basics$toString(offset)))))));
+	});
+var _narkisr$elm_ui$Systems_List$init = function () {
+	var search = _narkisr$elm_ui$Search$init;
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'systemsListing',
+		true,
+		_elm_lang$core$Native_List.fromArray(
+			['#', 'Hostname', 'Type', 'Env', 'Owner']),
+		_narkisr$elm_ui$Systems_List$systemRow,
+		'Systems');
+	var systems = {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Dict$empty,
+		_1: _elm_lang$core$Native_List.fromArray(
+			[
+				{ctor: '_Tuple2', _0: '', _1: _narkisr$elm_ui$Systems_Model_Common$emptySystem}
+			])
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: A5(_narkisr$elm_ui$Systems_List$Model, _narkisr$elm_ui$Systems_List$NoError, systems, _narkisr$elm_ui$Pager$init, table, search),
+		_1: A2(_narkisr$elm_ui$Systems_List$getSystems, 1, 10)
+	};
+}();
+var _narkisr$elm_ui$Systems_List$getSystemsQuery = F3(
+	function (page, offset, query) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			_narkisr$elm_ui$Systems_List$SetSystems,
+			_elm_lang$core$Task$toResult(
+				A2(
+					_narkisr$elm_ui$Common_Http$getJson,
+					_narkisr$elm_ui$Systems_List$systemPage,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'/systems/query?page=',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(page),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'&offset=',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(offset),
+									A2(_elm_lang$core$Basics_ops['++'], '&query=', query))))))));
+	});
+var _narkisr$elm_ui$Systems_List$update = F2(
+	function (msg, _p6) {
+		var _p7 = _p6;
+		var _p14 = _p7;
+		var _p8 = msg;
+		switch (_p8.ctor) {
+			case 'SetSystems':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p8._0,
+					_p14,
+					_narkisr$elm_ui$Systems_List$setSystems(_p14),
+					_narkisr$elm_ui$Systems_List$NoOp);
+			case 'GotoPage':
+				var _p11 = _p8._0;
+				var _p9 = _p11;
+				if (_p9.ctor === 'NextPage') {
+					var _p10 = _p9._0;
+					var newPager = A2(_narkisr$elm_ui$Pager$update, _p11, _p14.pager);
+					return _elm_lang$core$String$isEmpty(_p14.search.input) ? {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p14,
+							{pager: newPager}),
+						_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p10, 10)
+					} : {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p14,
+							{pager: newPager}),
+						_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p10, 10, _p14.search.parsed)
+					};
+				} else {
+					return _narkisr$elm_ui$Common_Utils$none(_p14);
+				}
+			case 'Searching':
+				var _p13 = _p8._0;
+				var newSearch = A2(_narkisr$elm_ui$Search$update, _p13, _p14.search);
+				var _p12 = _p13;
+				if (_p12.ctor === 'Result') {
+					if (_p12._0 === true) {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p14,
+								{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
+							_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p14.pager.page, 10, newSearch.parsed)
+						};
+					} else {
+						return _elm_lang$core$String$isEmpty(newSearch.input) ? {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p14,
+								{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
+							_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p14.pager.page, 10)
+						} : _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p14,
+								{
+									search: newSearch,
+									error: _narkisr$elm_ui$Systems_List$SearchParseFailed(newSearch.error)
+								}));
+					}
+				} else {
+					return _narkisr$elm_ui$Common_Utils$none(_p14);
+				}
+			case 'LoadPage':
+				var newTable = A2(_narkisr$elm_ui$Table$update, _p8._0, _p14.table);
+				return (_elm_lang$core$Native_Utils.eq(_p7.error, _narkisr$elm_ui$Systems_List$NoSystemSelected) && (!_elm_lang$core$Native_Utils.eq(newTable.selected, _elm_lang$core$Set$empty))) ? _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p14,
+						{table: newTable, error: _narkisr$elm_ui$Systems_List$NoError})) : _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p14,
+						{table: newTable}));
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p14);
+		}
+	});
+
+var _narkisr$elm_ui$Common_Summary$tablizedRow = F2(
+	function (props, v) {
+		return A2(
+			_elm_lang$html$Html$tr,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			A2(
+				_elm_lang$core$List$map,
+				function (prop) {
+					return A2(
+						_elm_lang$html$Html$td,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(
+								prop(v))
+							]));
+				},
+				props));
+	});
+var _narkisr$elm_ui$Common_Summary$tablizedSection = F4(
+	function (title, headers, rows, props) {
+		return _elm_lang$core$Basics$not(
+			_elm_lang$core$List$isEmpty(rows)) ? _elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text(title),
+				A2(
+				_elm_lang$html$Html$table,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('table'),
+						_elm_lang$html$Html_Attributes$id(title)
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$thead,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$tr,
+								_elm_lang$core$Native_List.fromArray(
+									[]),
+								A2(
+									_elm_lang$core$List$map,
+									function (k) {
+										return A2(
+											_elm_lang$html$Html$th,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(k)
+												]));
+									},
+									headers))
+							])),
+						A2(
+						_elm_lang$html$Html$tbody,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						A2(
+							_elm_lang$core$List$map,
+							function (value) {
+								return A2(_narkisr$elm_ui$Common_Summary$tablizedRow, props, value);
+							},
+							rows))
+					]))
+			]) : _elm_lang$core$Native_List.fromArray(
+			[]);
+	});
+var _narkisr$elm_ui$Common_Summary$summaryPanel = function (contents) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('panel col-md-4 col-md-offset-1')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('panel-body')
+						]),
+					contents)
+				]))
+		]);
+};
+var _narkisr$elm_ui$Common_Summary$overviewSection = F3(
+	function (title, headers, values) {
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text(title),
+				A2(
+				_elm_lang$html$Html$ul,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$style(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+							]))
+					]),
+				A3(
+					_elm_lang$core$List$map2,
+					F2(
+						function (title, value) {
+							return A2(
+								_elm_lang$html$Html$li,
+								_elm_lang$core$Native_List.fromArray(
+									[]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html$text(
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											title,
+											A2(_elm_lang$core$Basics_ops['++'], ': ', value)))
+									]));
+						}),
+					headers,
+					values))
+			]);
+	});
+var _narkisr$elm_ui$Common_Summary$optionalSection = F4(
+	function (title, headers, values, pred) {
+		return pred ? A3(_narkisr$elm_ui$Common_Summary$overviewSection, title, headers, values) : _elm_lang$core$Native_List.fromArray(
+			[]);
+	});
+
+var _narkisr$elm_ui$Systems_View_AWS$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[])));
+};
+var _narkisr$elm_ui$Systems_View_AWS$summarySections = function (_p0) {
+	var _p1 = _p0;
+	var _p6 = _p1._1;
+	var _p5 = _p1._0;
+	return A2(
+		_elm_lang$core$List$filter,
+		function (_p2) {
+			return _elm_lang$core$Basics$not(
+				_elm_lang$core$List$isEmpty(_p2));
+		},
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Instance',
+				_elm_lang$core$Native_List.fromArray(
+					['type', 'os', 'endpoint', 'availability zone']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p5.instanceType,
+						_p6.os,
+						_p5.endpoint,
+						A2(_elm_lang$core$Maybe$withDefault, '', _p5.availabilityZone)
+					])),
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Security',
+				_elm_lang$core$Native_List.fromArray(
+					['user', 'keypair', 'security groups']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p6.user,
+						_p5.keyName,
+						A2(
+						_elm_lang$core$String$join,
+						' ',
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_p5.securityGroups))
+					])),
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'DNS',
+				_elm_lang$core$Native_List.fromArray(
+					['hostname', 'domain', 'ip']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p6.hostname,
+						_p6.domain,
+						A2(_elm_lang$core$Maybe$withDefault, '', _p6.ip)
+					])),
+				A4(
+				_narkisr$elm_ui$Common_Summary$optionalSection,
+				'VPC',
+				_elm_lang$core$Native_List.fromArray(
+					['VPC id', 'Subnet id', 'Assign IP']),
+				A2(
+					_elm_lang$core$List$map,
+					A2(_narkisr$elm_ui$Common_Utils$withDefaultProp, _p5.vpc, ''),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							function (_) {
+							return _.vpcId;
+						},
+							function (_) {
+							return _.subnetId;
+						}
+						])),
+				!_elm_lang$core$Native_Utils.eq(_p5.vpc, _elm_lang$core$Maybe$Nothing)),
+				A4(
+				_narkisr$elm_ui$Common_Summary$tablizedSection,
+				'EBS volumes',
+				_elm_lang$core$Native_List.fromArray(
+					['device', 'size', 'type', 'clear']),
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_p5.volumes),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						function (_) {
+						return _.device;
+					},
+						function (_p3) {
+						return _elm_lang$core$Basics$toString(
+							function (_) {
+								return _.size;
+							}(_p3));
+					},
+						function (_) {
+						return _.type$;
+					},
+						function (_p4) {
+						return _elm_lang$core$Basics$toString(
+							function (_) {
+								return _.clear;
+							}(_p4));
+					}
+					])),
+				A4(
+				_narkisr$elm_ui$Common_Summary$tablizedSection,
+				'Instance store blocks',
+				_elm_lang$core$Native_List.fromArray(
+					['device', 'volume']),
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_p5.blockDevices),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						function (_) {
+						return _.device;
+					},
+						function (_) {
+						return _.volume;
+					}
+					]))
+			]));
+};
+var _narkisr$elm_ui$Systems_View_AWS$summarize = function (model) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h4,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('System overview')
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+									{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+								]))
+						]),
+					A2(
+						_elm_lang$core$List$map,
+						_circuithub$elm_bootstrap_html$Bootstrap_Html$row_,
+						A2(
+							_elm_lang$core$List$map,
+							_elm_lang$core$List$concat,
+							A2(
+								_narkisr$elm_ui$Common_Utils$partition,
+								2,
+								A2(
+									_elm_lang$core$List$map,
+									_narkisr$elm_ui$Common_Summary$summaryPanel,
+									_narkisr$elm_ui$Systems_View_AWS$summarySections(model))))))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_AWS$Model = function (a) {
+	return {id: a};
+};
+var _narkisr$elm_ui$Systems_View_AWS$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Systems_View_AWS$Model(0));
+
+var _narkisr$elm_ui$Common_Wizard$hasPrev = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Basics$not(
+		_elm_lang$core$List$isEmpty(_p1.wizard.prev));
+};
+var _narkisr$elm_ui$Common_Wizard$hasNext = function (_p2) {
+	var _p3 = _p2;
+	return _elm_lang$core$Basics$not(
+		_elm_lang$core$List$isEmpty(_p3.wizard.next));
+};
+var _narkisr$elm_ui$Common_Wizard$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[]));
+};
+var _narkisr$elm_ui$Common_Wizard$update = F3(
+	function (noErrors, msg, _p4) {
+		var _p5 = _p4;
+		var _p11 = _p5.zero;
+		var _p10 = _p5.step;
+		var _p9 = _p5.prev;
+		var _p8 = _p5.next;
+		var _p7 = _p5;
+		var _p6 = msg;
+		switch (_p6.ctor) {
+			case 'Next':
+				var prevSteps = (!_elm_lang$core$Native_Utils.eq(_p10, _p11)) ? A2(
+					_elm_lang$core$List$append,
+					_p9,
+					_elm_lang$core$Native_List.fromArray(
+						[_p10])) : _p9;
+				var nextSteps = _narkisr$elm_ui$Common_Utils$defaultEmpty(
+					_elm_lang$core$List$tail(_p8));
+				var nextStep = A2(
+					_elm_lang$core$Maybe$withDefault,
+					_p5.$default,
+					_elm_lang$core$List$head(_p8));
+				return noErrors ? _elm_lang$core$Native_Utils.update(
+					_p7,
+					{step: nextStep, next: nextSteps, prev: prevSteps}) : _p7;
+			case 'Back':
+				var nextSteps = (!_elm_lang$core$Native_Utils.eq(_p10, _p11)) ? A2(
+					_elm_lang$core$List$append,
+					_elm_lang$core$Native_List.fromArray(
+						[_p10]),
+					_p8) : _p8;
+				var prevSteps = A2(
+					_elm_lang$core$List$take,
+					_elm_lang$core$List$length(_p9) - 1,
+					_p9);
+				var prevStep = A2(
+					_elm_lang$core$Maybe$withDefault,
+					_p11,
+					_elm_lang$core$List$head(
+						_elm_lang$core$List$reverse(_p9)));
+				return noErrors ? _elm_lang$core$Native_Utils.update(
+					_p7,
+					{step: prevStep, next: nextSteps, prev: prevSteps}) : _p7;
+			default:
+				return _p7;
+		}
+	});
+var _narkisr$elm_ui$Common_Wizard$Model = F5(
+	function (a, b, c, d, e) {
+		return {zero: a, step: b, $default: c, prev: d, next: e};
+	});
+var _narkisr$elm_ui$Common_Wizard$init = F3(
+	function (zero, $default, steps) {
+		return A5(
+			_narkisr$elm_ui$Common_Wizard$Model,
+			zero,
+			zero,
+			$default,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			steps);
+	});
+var _narkisr$elm_ui$Common_Wizard$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Common_Wizard$Back = {ctor: 'Back'};
+var _narkisr$elm_ui$Common_Wizard$Next = {ctor: 'Next'};
+
+var _narkisr$elm_ui$Systems_Add_AWS$ebsTypes = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			{ctor: '_Tuple2', _0: 'Magnetic', _1: 'standard'},
+			{ctor: '_Tuple2', _0: 'General Purpose (SSD)', _1: 'gp2'},
+			{ctor: '_Tuple2', _0: 'Provisioned IOPS (SSD)', _1: 'io1'}
+		]));
+var _narkisr$elm_ui$Systems_Add_AWS$ignoreDevices = function (_p0) {
+	var _p1 = _p0;
+	var ignored = A2(
+		_elm_lang$core$Dict$remove,
+		'Volume',
+		A2(
+			_elm_lang$core$Dict$remove,
+			'Instance Device',
+			A2(_elm_lang$core$Dict$remove, 'EBS Device', _p1.errors)));
+	return _elm_lang$core$Native_Utils.update(
+		_p1,
+		{errors: ignored});
+};
+var _narkisr$elm_ui$Systems_Add_AWS$setBlock = F2(
+	function (f, _p2) {
+		var _p3 = _p2;
+		var newBlock = f(_p3.block);
+		return _elm_lang$core$Native_Utils.update(
+			_p3,
+			{block: newBlock});
+	});
+var _narkisr$elm_ui$Systems_Add_AWS$setVolume = F2(
+	function (f, _p4) {
+		var _p5 = _p4;
+		var newVolume = f(_p5.volume);
+		return _elm_lang$core$Native_Utils.update(
+			_p5,
+			{volume: newVolume});
+	});
+var _narkisr$elm_ui$Systems_Add_AWS$setAWS = F2(
+	function (f, _p6) {
+		var _p7 = _p6;
+		var newAws = f(_p7.aws);
+		return _elm_lang$core$Native_Utils.update(
+			_p7,
+			{aws: newAws});
+	});
+var _narkisr$elm_ui$Systems_Add_AWS$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {wizard: a, aws: b, machine: c, environment: d, errors: e, volume: f, block: g};
+	});
+var _narkisr$elm_ui$Systems_Add_AWS$BlockRemove = function (a) {
+	return {ctor: 'BlockRemove', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$blockRow = function (_p8) {
+	var _p9 = _p8;
+	var props = _elm_lang$core$Native_List.fromArray(
+		[
+			function (_) {
+			return _.device;
+		},
+			function (_) {
+			return _.volume;
+		}
+		]);
+	var remove = A2(
+		_elm_lang$html$Html$span,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('glyphicon glyphicon-remove'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'aria-hidden', 'true'),
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'top', _1: '5px'}
+					])),
+				_elm_lang$html$Html_Events$onClick(
+				_narkisr$elm_ui$Systems_Add_AWS$BlockRemove(_p9.device))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[]));
+	return A2(
+		_elm_lang$html$Html$tr,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		A2(
+			_elm_lang$core$List$append,
+			A2(
+				_elm_lang$core$List$map,
+				function (prop) {
+					return A2(
+						_elm_lang$html$Html$td,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(
+								prop(_p9))
+							]));
+				},
+				props),
+			_elm_lang$core$Native_List.fromArray(
+				[remove])));
+};
+var _narkisr$elm_ui$Systems_Add_AWS$blocks = function (bs) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('col-md-8 col-md-offset-2 ')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$table,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('table'),
+						_elm_lang$html$Html_Attributes$id('instanceVolumes')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$thead,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$tr,
+								_elm_lang$core$Native_List.fromArray(
+									[]),
+								A2(
+									_elm_lang$core$List$map,
+									function (k) {
+										return A2(
+											_elm_lang$html$Html$th,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(k)
+												]));
+									},
+									_elm_lang$core$Native_List.fromArray(
+										['device', 'volume', ''])))
+							])),
+						A2(
+						_elm_lang$html$Html$tbody,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						A2(
+							_elm_lang$core$List$map,
+							function (block) {
+								return _narkisr$elm_ui$Systems_Add_AWS$blockRow(block);
+							},
+							bs))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_AWS$BlockAdd = {ctor: 'BlockAdd'};
+var _narkisr$elm_ui$Systems_Add_AWS$InstanceVolumeInput = function (a) {
+	return {ctor: 'InstanceVolumeInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$InstanceDeviceInput = function (a) {
+	return {ctor: 'InstanceDeviceInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$store = function (_p10) {
+	var _p11 = _p10;
+	var _p12 = _p11.block;
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p11.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Instance Store')
+						])),
+					A2(
+					check,
+					'Instance Device',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$InstanceDeviceInput, 'sdb', _p12.device)),
+					A2(
+					check,
+					'Volume',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$InstanceVolumeInput, 'ephemeral0', _p12.volume)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'',
+					A2(
+						_elm_lang$html$Html$button,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('btn btn-sm col-md-2'),
+								_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Systems_Add_AWS$BlockAdd)
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Add')
+							]))),
+					_narkisr$elm_ui$Systems_Add_AWS$blocks(
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(_p11.aws.blockDevices))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_AWS$AssignIp = {ctor: 'AssignIp'};
+var _narkisr$elm_ui$Systems_Add_AWS$SubnetIdInput = function (a) {
+	return {ctor: 'SubnetIdInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$VPCIdInput = function (a) {
+	return {ctor: 'VPCIdInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$EBSClear = {ctor: 'EBSClear'};
+var _narkisr$elm_ui$Systems_Add_AWS$EBSOptimized = {ctor: 'EBSOptimized'};
+var _narkisr$elm_ui$Systems_Add_AWS$VolumeRemove = function (a) {
+	return {ctor: 'VolumeRemove', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$volumeRow = function (_p13) {
+	var _p14 = _p13;
+	var props = _elm_lang$core$Native_List.fromArray(
+		[
+			function (_) {
+			return _.device;
+		},
+			function (_p15) {
+			return _elm_lang$core$Basics$toString(
+				function (_) {
+					return _.size;
+				}(_p15));
+		},
+			function (_) {
+			return _.type$;
+		},
+			function (_p16) {
+			return _elm_lang$core$Basics$toString(
+				function (_) {
+					return _.clear;
+				}(_p16));
+		}
+		]);
+	var remove = A2(
+		_elm_lang$html$Html$span,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('glyphicon glyphicon-remove'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'aria-hidden', 'true'),
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'top', _1: '5px'}
+					])),
+				_elm_lang$html$Html_Events$onClick(
+				_narkisr$elm_ui$Systems_Add_AWS$VolumeRemove(_p14.device))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[]));
+	return A2(
+		_elm_lang$html$Html$tr,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		A2(
+			_elm_lang$core$List$append,
+			A2(
+				_elm_lang$core$List$map,
+				function (prop) {
+					return A2(
+						_elm_lang$html$Html$td,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(
+								prop(_p14))
+							]));
+				},
+				props),
+			_elm_lang$core$Native_List.fromArray(
+				[remove])));
+};
+var _narkisr$elm_ui$Systems_Add_AWS$volumes = function (vs) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('col-md-8 col-md-offset-2 ')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$table,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('table'),
+						_elm_lang$html$Html_Attributes$id('ebsVolumes')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$thead,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$tr,
+								_elm_lang$core$Native_List.fromArray(
+									[]),
+								A2(
+									_elm_lang$core$List$map,
+									function (k) {
+										return A2(
+											_elm_lang$html$Html$th,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(k)
+												]));
+									},
+									_elm_lang$core$Native_List.fromArray(
+										['device', 'size', 'type', 'clear', ''])))
+							])),
+						A2(
+						_elm_lang$html$Html$tbody,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						A2(
+							_elm_lang$core$List$map,
+							function (volume) {
+								return _narkisr$elm_ui$Systems_Add_AWS$volumeRow(volume);
+							},
+							vs))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_AWS$VolumeAdd = {ctor: 'VolumeAdd'};
+var _narkisr$elm_ui$Systems_Add_AWS$EBSDeviceInput = function (a) {
+	return {ctor: 'EBSDeviceInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$EBSIOPSInput = function (a) {
+	return {ctor: 'EBSIOPSInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$EBSSizeInput = function (a) {
+	return {ctor: 'EBSSizeInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$SelectEBSType = function (a) {
+	return {ctor: 'SelectEBSType', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$ebs = function (_p17) {
+	var _p18 = _p17;
+	var _p20 = _p18.volume;
+	var _p19 = _p18.aws;
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p18.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Global')
+						])),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'EBS Optimized',
+					A2(
+						_narkisr$elm_ui$Common_Components$checkbox,
+						_narkisr$elm_ui$Systems_Add_AWS$EBSOptimized,
+						A2(_elm_lang$core$Maybe$withDefault, false, _p19.ebsOptimized))),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Devices')
+						])),
+					A2(
+					check,
+					'EBS Device',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$EBSDeviceInput, 'sdh', _p20.device)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Size',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputNumber,
+						_narkisr$elm_ui$Systems_Add_AWS$EBSSizeInput,
+						'',
+						_elm_lang$core$Basics$toString(_p20.size))),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Type',
+					A3(
+						_narkisr$elm_ui$Common_Components$selector,
+						_narkisr$elm_ui$Systems_Add_AWS$SelectEBSType,
+						_elm_lang$core$Dict$keys(_narkisr$elm_ui$Systems_Add_AWS$ebsTypes),
+						_p20.type$)),
+					_elm_lang$core$Native_Utils.eq(_p20.type$, 'Provisioned IOPS (SSD)') ? A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'IOPS',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputNumber,
+						_narkisr$elm_ui$Systems_Add_AWS$EBSIOPSInput,
+						'50',
+						_elm_lang$core$Basics$toString(
+							A2(_elm_lang$core$Maybe$withDefault, 50, _p20.iops)))) : A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[])),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Clear',
+					A2(_narkisr$elm_ui$Common_Components$checkbox, _narkisr$elm_ui$Systems_Add_AWS$EBSClear, _p20.clear)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'',
+					A2(
+						_elm_lang$html$Html$button,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('btn btn-sm col-md-2'),
+								_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Systems_Add_AWS$VolumeAdd)
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Add')
+							]))),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Volumes')
+						])),
+					_narkisr$elm_ui$Systems_Add_AWS$volumes(
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(_p19.volumes))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_AWS$IPInput = function (a) {
+	return {ctor: 'IPInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$DomainInput = function (a) {
+	return {ctor: 'DomainInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$HostnameInput = function (a) {
+	return {ctor: 'HostnameInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$networking = function (_p21) {
+	var _p22 = _p21;
+	var _p24 = _p22.machine;
+	var _p23 = _p22.aws;
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p22.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('DNS')
+						])),
+					A2(
+					check,
+					'Hostname',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$HostnameInput, '', _p24.hostname)),
+					A2(
+					check,
+					'Domain',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$DomainInput, '', _p24.domain)),
+					A2(
+					check,
+					'IP',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_AWS$IPInput,
+						'',
+						A2(_elm_lang$core$Maybe$withDefault, '', _p24.ip))),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('VPC')
+						])),
+					A2(
+					check,
+					'VPC Id',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_AWS$VPCIdInput,
+						'',
+						A3(
+							_narkisr$elm_ui$Common_Utils$withDefaultProp,
+							_p23.vpc,
+							'',
+							function (_) {
+								return _.vpcId;
+							}))),
+					A2(
+					check,
+					'Subnet Id',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_AWS$SubnetIdInput,
+						'',
+						A3(
+							_narkisr$elm_ui$Common_Utils$withDefaultProp,
+							_p23.vpc,
+							'',
+							function (_) {
+								return _.subnetId;
+							}))),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Assign public IP',
+					A2(
+						_narkisr$elm_ui$Common_Components$checkbox,
+						_narkisr$elm_ui$Systems_Add_AWS$AssignIp,
+						A3(
+							_narkisr$elm_ui$Common_Utils$withDefaultProp,
+							_p23.vpc,
+							false,
+							function (_) {
+								return _.assignPublic;
+							})))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_AWS$UserInput = function (a) {
+	return {ctor: 'UserInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$SecurityGroupsInput = function (a) {
+	return {ctor: 'SecurityGroupsInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$KeyPairInput = function (a) {
+	return {ctor: 'KeyPairInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$SelectZone = function (a) {
+	return {ctor: 'SelectZone', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$SelectEndpoint = function (a) {
+	return {ctor: 'SelectEndpoint', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$SelectOS = function (a) {
+	return {ctor: 'SelectOS', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$SelectInstanceType = function (a) {
+	return {ctor: 'SelectInstanceType', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$instance = function (_p25) {
+	var _p26 = _p25;
+	var _p33 = _p26;
+	var _p32 = _p26.aws;
+	var zone = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(
+			_elm_lang$core$Dict$keys(
+				A2(
+					_elm_lang$core$Dict$filter,
+					F2(
+						function (k, _p27) {
+							var _p28 = _p27;
+							return _elm_lang$core$Native_Utils.eq(_p28._1, _p32.endpoint);
+						}),
+					_narkisr$elm_ui$Systems_Model_AWS$endpoints))));
+	var _p29 = A2(
+		_elm_lang$core$Maybe$withDefault,
+		{
+			ctor: '_Tuple3',
+			_0: '',
+			_1: '',
+			_2: _elm_lang$core$Native_List.fromArray(
+				[])
+		},
+		A2(_elm_lang$core$Dict$get, zone, _narkisr$elm_ui$Systems_Model_AWS$endpoints));
+	var name = _p29._0;
+	var zones = _p29._2;
+	var zoneOptions = A2(
+		_elm_lang$core$List$append,
+		_elm_lang$core$Native_List.fromArray(
+			['']),
+		A2(
+			_elm_lang$core$List$map,
+			function (k) {
+				return A2(_elm_lang$core$Basics_ops['++'], zone, k);
+			},
+			zones));
+	var points = A2(
+		_elm_lang$core$List$map,
+		function (_p30) {
+			var _p31 = _p30;
+			return _p31._0;
+		},
+		_elm_lang$core$Dict$values(_narkisr$elm_ui$Systems_Model_AWS$endpoints));
+	var groups = A2(
+		_elm_lang$core$String$join,
+		' ',
+		_narkisr$elm_ui$Common_Utils$defaultEmpty(_p32.securityGroups));
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p26.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Properties')
+						])),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Instance type',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_AWS$SelectInstanceType, _narkisr$elm_ui$Systems_Model_AWS$instanceTypes, _p32.instanceType)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'OS',
+					A3(
+						_narkisr$elm_ui$Common_Components$selector,
+						_narkisr$elm_ui$Systems_Add_AWS$SelectOS,
+						_elm_lang$core$Dict$keys(
+							A2(_narkisr$elm_ui$Systems_Add_Common$getOses, 'aws', _p33)),
+						_p26.machine.os)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Endpoint',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_AWS$SelectEndpoint, points, name)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Availability Zone',
+					A3(
+						_narkisr$elm_ui$Common_Components$selector,
+						_narkisr$elm_ui$Systems_Add_AWS$SelectZone,
+						zoneOptions,
+						A2(_elm_lang$core$Maybe$withDefault, '', _p32.availabilityZone))),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Security')
+						])),
+					A2(
+					check,
+					'User',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$UserInput, '', _p33.machine.user)),
+					A2(
+					check,
+					'Keypair',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$KeyPairInput, '', _p32.keyName)),
+					A2(
+					check,
+					'Security groups',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_AWS$SecurityGroupsInput, ' ', groups))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_AWS$stepView = function (_p34) {
+	var _p35 = _p34;
+	var _p38 = _p35.wizard;
+	var _p37 = _p35;
+	var _p36 = _p38.step;
+	switch (_p36.ctor) {
+		case 'Instance':
+			return _narkisr$elm_ui$Systems_Add_AWS$instance(_p37);
+		case 'Networking':
+			return _narkisr$elm_ui$Systems_Add_AWS$networking(_p37);
+		case 'EBS':
+			return _narkisr$elm_ui$Systems_Add_AWS$ebs(_p37);
+		case 'Store':
+			return _narkisr$elm_ui$Systems_Add_AWS$store(_p37);
+		case 'Summary':
+			return _narkisr$elm_ui$Systems_View_AWS$summarize(
+				{ctor: '_Tuple2', _0: _p35.aws, _1: _p35.machine});
+		default:
+			return A2(
+				_elm_lang$core$Debug$log,
+				_elm_lang$core$Basics$toString(_p38.step),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[]))
+					]));
+	}
+};
+var _narkisr$elm_ui$Systems_Add_AWS$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Systems_Add_AWS$stepView(model)));
+};
+var _narkisr$elm_ui$Systems_Add_AWS$Update = function (a) {
+	return {ctor: 'Update', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_AWS$Summary = {ctor: 'Summary'};
+var _narkisr$elm_ui$Systems_Add_AWS$Store = {ctor: 'Store'};
+var _narkisr$elm_ui$Systems_Add_AWS$EBS = {ctor: 'EBS'};
+var _narkisr$elm_ui$Systems_Add_AWS$tupleValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_AWS$EBS,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'EBS Device',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'EBS Device',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notContained]),
+						function (_p39) {
+							var _p40 = _p39;
+							return {
+								ctor: '_Tuple2',
+								_0: _p40.volume.device,
+								_1: A2(
+									_elm_lang$core$List$map,
+									function (_) {
+										return _.device;
+									},
+									_narkisr$elm_ui$Common_Utils$defaultEmpty(_p40.aws.volumes))
+							};
+						})
+				}
+				])),
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_AWS$Store,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Instance Device',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Instance Device',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notContained]),
+						function (_p41) {
+							var _p42 = _p41;
+							return {
+								ctor: '_Tuple2',
+								_0: _p42.block.device,
+								_1: A2(
+									_elm_lang$core$List$map,
+									function (_) {
+										return _.device;
+									},
+									_narkisr$elm_ui$Common_Utils$defaultEmpty(_p42.aws.blockDevices))
+							};
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Volume',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Volume',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notContained]),
+						function (_p43) {
+							var _p44 = _p43;
+							return {
+								ctor: '_Tuple2',
+								_0: _p44.block.volume,
+								_1: A2(
+									_elm_lang$core$List$map,
+									function (_) {
+										return _.volume;
+									},
+									A2(
+										_elm_lang$core$Maybe$withDefault,
+										_elm_lang$core$Native_List.fromArray(
+											[]),
+										_p44.aws.blockDevices))
+							};
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_AWS$Networking = {ctor: 'Networking'};
+var _narkisr$elm_ui$Systems_Add_AWS$Instance = {ctor: 'Instance'};
+var _narkisr$elm_ui$Systems_Add_AWS$stringValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_AWS$Networking,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Hostname',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Hostname',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p45) {
+							var _p46 = _p45;
+							return _p46.machine.hostname;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Domain',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Domain',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p47) {
+							var _p48 = _p47;
+							return _p48.machine.domain;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'IP',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'IP',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$validIp]),
+						function (_p49) {
+							var _p50 = _p49;
+							return A2(_elm_lang$core$Maybe$withDefault, '', _p50.machine.ip);
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'VPC Id',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'VPC Id',
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A3(_narkisr$elm_ui$Systems_Add_Validations$validId, 12, 'vpc-', true)
+							]),
+						function (_p51) {
+							var _p52 = _p51;
+							return A3(
+								_narkisr$elm_ui$Common_Utils$withDefaultProp,
+								_p52.aws.vpc,
+								'',
+								function (_) {
+									return _.vpcId;
+								});
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Subnet Id',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Subnet Id',
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A3(_narkisr$elm_ui$Systems_Add_Validations$validId, 15, 'subnet-', true)
+							]),
+						function (_p53) {
+							var _p54 = _p53;
+							return A3(
+								_narkisr$elm_ui$Common_Utils$withDefaultProp,
+								_p54.aws.vpc,
+								'',
+								function (_) {
+									return _.subnetId;
+								});
+						})
+				}
+				])),
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_AWS$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'User',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'User',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p55) {
+							var _p56 = _p55;
+							return _p56.machine.user;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Keypair',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Keypair',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p57) {
+							var _p58 = _p57;
+							return _p58.aws.keyName;
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_AWS$listValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_AWS$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Security groups',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Security groups',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$hasItems]),
+						function (_p59) {
+							var _p60 = _p59;
+							return _narkisr$elm_ui$Common_Utils$defaultEmpty(_p60.aws.securityGroups);
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_AWS$validateAWS = _narkisr$elm_ui$Systems_Add_Validations$validateAll(
+	_elm_lang$core$Native_List.fromArray(
+		[_narkisr$elm_ui$Systems_Add_AWS$listValidations, _narkisr$elm_ui$Systems_Add_AWS$stringValidations]));
+var _narkisr$elm_ui$Systems_Add_AWS$update = F2(
+	function (msg, _p61) {
+		var _p62 = _p61;
+		var _p74 = _p62.wizard;
+		var _p73 = _p62;
+		var _p72 = _p62.aws;
+		var _p63 = msg;
+		switch (_p63.ctor) {
+			case 'WizardMsg':
+				var _p64 = _narkisr$elm_ui$Systems_Add_AWS$ignoreDevices(
+					A2(_narkisr$elm_ui$Systems_Add_AWS$validateAWS, _p74.step, _p73));
+				var newModel = _p64;
+				var errors = _p64.errors;
+				var newWizard = A3(
+					_narkisr$elm_ui$Common_Wizard$update,
+					_narkisr$elm_ui$Systems_Add_Validations$notAny(errors),
+					_p63._0,
+					_p74);
+				return _elm_lang$core$Native_Utils.update(
+					newModel,
+					{wizard: newWizard});
+			case 'Update':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Common$setDefaultOS,
+					'aws',
+					_elm_lang$core$Native_Utils.update(
+						_p73,
+						{environment: _p63._0}));
+			case 'SelectInstanceType':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+					function (aws) {
+						return _elm_lang$core$Native_Utils.update(
+							aws,
+							{instanceType: _p63._0});
+					},
+					_p73);
+			case 'SelectOS':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Common$setMachine,
+					function (machine) {
+						return _elm_lang$core$Native_Utils.update(
+							machine,
+							{os: _p63._0});
+					},
+					_p73);
+			case 'SelectEndpoint':
+				var _p65 = A2(
+					_elm_lang$core$Maybe$withDefault,
+					{
+						ctor: '_Tuple3',
+						_0: '',
+						_1: '',
+						_2: _elm_lang$core$Native_List.fromArray(
+							[])
+					},
+					_elm_lang$core$List$head(
+						A2(
+							_elm_lang$core$List$filter,
+							function (_p66) {
+								var _p67 = _p66;
+								return _elm_lang$core$Native_Utils.eq(_p67._0, _p63._0);
+							},
+							_elm_lang$core$Dict$values(_narkisr$elm_ui$Systems_Model_AWS$endpoints))));
+				var url = _p65._1;
+				return A2(
+					_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+					function (aws) {
+						return _elm_lang$core$Native_Utils.update(
+							aws,
+							{endpoint: url});
+					},
+					_p73);
+			case 'SelectZone':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+					function (aws) {
+						return _elm_lang$core$Native_Utils.update(
+							aws,
+							{
+								availabilityZone: _elm_lang$core$Maybe$Just(_p63._0)
+							});
+					},
+					_p73);
+			case 'KeyPairInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Keypair',
+					_narkisr$elm_ui$Systems_Add_AWS$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+						function (aws) {
+							return _elm_lang$core$Native_Utils.update(
+								aws,
+								{keyName: _p63._0});
+						},
+						_p73));
+			case 'SecurityGroupsInput':
+				var splited = A2(_elm_lang$core$String$split, ' ', _p63._0);
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Security groups',
+					_narkisr$elm_ui$Systems_Add_AWS$listValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+						function (aws) {
+							return _elm_lang$core$Native_Utils.update(
+								aws,
+								{
+									securityGroups: _elm_lang$core$Maybe$Just(
+										_elm_lang$core$Native_Utils.eq(
+											splited,
+											_elm_lang$core$Native_List.fromArray(
+												[''])) ? _elm_lang$core$Native_List.fromArray(
+											[]) : splited)
+								});
+						},
+						_p73));
+			case 'UserInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'User',
+					_narkisr$elm_ui$Systems_Add_AWS$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{user: _p63._0});
+						},
+						_p73));
+			case 'HostnameInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Hostname',
+					_narkisr$elm_ui$Systems_Add_AWS$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{hostname: _p63._0});
+						},
+						_p73));
+			case 'DomainInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Domain',
+					_narkisr$elm_ui$Systems_Add_AWS$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{domain: _p63._0});
+						},
+						_p73));
+			case 'IPInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'IP',
+					_narkisr$elm_ui$Systems_Add_AWS$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{
+									ip: _elm_lang$core$Maybe$Just(_p63._0)
+								});
+						},
+						_p73));
+			case 'VPCIdInput':
+				var newVpc = A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_AWS$emptyVpc, _p72.vpc);
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'VPC Id',
+					_narkisr$elm_ui$Systems_Add_AWS$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+						function (aws) {
+							return _elm_lang$core$Native_Utils.update(
+								aws,
+								{
+									vpc: _elm_lang$core$Maybe$Just(
+										_elm_lang$core$Native_Utils.update(
+											newVpc,
+											{vpcId: _p63._0}))
+								});
+						},
+						_p73));
+			case 'SubnetIdInput':
+				var newVpc = A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_AWS$emptyVpc, _p72.vpc);
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Subnet Id',
+					_narkisr$elm_ui$Systems_Add_AWS$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+						function (aws) {
+							return _elm_lang$core$Native_Utils.update(
+								aws,
+								{
+									vpc: _elm_lang$core$Maybe$Just(
+										_elm_lang$core$Native_Utils.update(
+											newVpc,
+											{subnetId: _p63._0}))
+								});
+						},
+						_p73));
+			case 'AssignIp':
+				var newVpc = A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_AWS$emptyVpc, _p72.vpc);
+				return A2(
+					_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+					function (aws) {
+						return _elm_lang$core$Native_Utils.update(
+							aws,
+							{
+								vpc: _elm_lang$core$Maybe$Just(
+									_elm_lang$core$Native_Utils.update(
+										newVpc,
+										{
+											assignPublic: _elm_lang$core$Basics$not(newVpc.assignPublic)
+										}))
+							});
+					},
+					_p73);
+			case 'SelectEBSType':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_AWS$setVolume,
+					function (volume) {
+						return _elm_lang$core$Native_Utils.update(
+							volume,
+							{type$: _p63._0});
+					},
+					_p73);
+			case 'EBSSizeInput':
+				var _p68 = _elm_lang$core$String$toInt(_p63._0);
+				if (_p68.ctor === 'Ok') {
+					return A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setVolume,
+						function (volume) {
+							return _elm_lang$core$Native_Utils.update(
+								volume,
+								{size: _p68._0});
+						},
+						_p73);
+				} else {
+					return _p73;
+				}
+			case 'EBSIOPSInput':
+				var _p69 = _elm_lang$core$String$toInt(_p63._0);
+				if (_p69.ctor === 'Ok') {
+					return A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setVolume,
+						function (volume) {
+							return _elm_lang$core$Native_Utils.update(
+								volume,
+								{
+									iops: _elm_lang$core$Maybe$Just(_p69._0)
+								});
+						},
+						_p73);
+				} else {
+					return _p73;
+				}
+			case 'EBSDeviceInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'EBS Device',
+					_narkisr$elm_ui$Systems_Add_AWS$tupleValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setVolume,
+						function (volume) {
+							return _elm_lang$core$Native_Utils.update(
+								volume,
+								{device: _p63._0});
+						},
+						_p73));
+			case 'EBSOptimized':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_AWS$setAWS,
+					function (aws) {
+						return _elm_lang$core$Native_Utils.update(
+							aws,
+							{
+								ebsOptimized: _elm_lang$core$Maybe$Just(
+									_elm_lang$core$Basics$not(
+										A2(_elm_lang$core$Maybe$withDefault, false, aws.ebsOptimized)))
+							});
+					},
+					_p73);
+			case 'EBSClear':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_AWS$setVolume,
+					function (volume) {
+						return _elm_lang$core$Native_Utils.update(
+							volume,
+							{
+								clear: _elm_lang$core$Basics$not(volume.clear)
+							});
+					},
+					_p73);
+			case 'VolumeAdd':
+				var newAws = _elm_lang$core$Native_Utils.update(
+					_p72,
+					{
+						volumes: _elm_lang$core$Maybe$Just(
+							A2(
+								_elm_lang$core$List$append,
+								_elm_lang$core$Native_List.fromArray(
+									[_p62.volume]),
+								_narkisr$elm_ui$Common_Utils$defaultEmpty(_p72.volumes)))
+					});
+				var _p70 = A4(_narkisr$elm_ui$Systems_Add_Validations$validate, _p74.step, 'EBS Device', _narkisr$elm_ui$Systems_Add_AWS$tupleValidations, _p73);
+				var newModel = _p70;
+				var errors = _p70.errors;
+				return _narkisr$elm_ui$Systems_Add_Validations$notAny(errors) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{volume: _narkisr$elm_ui$Systems_Model_AWS$emptyVolume, aws: newAws}) : _elm_lang$core$Native_Utils.update(
+					newModel,
+					{aws: _p72});
+			case 'InstanceDeviceInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Instance Device',
+					_narkisr$elm_ui$Systems_Add_AWS$tupleValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setBlock,
+						function (block) {
+							return _elm_lang$core$Native_Utils.update(
+								block,
+								{device: _p63._0});
+						},
+						_p73));
+			case 'InstanceVolumeInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Volume',
+					_narkisr$elm_ui$Systems_Add_AWS$tupleValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_AWS$setBlock,
+						function (block) {
+							return _elm_lang$core$Native_Utils.update(
+								block,
+								{volume: _p63._0});
+						},
+						_p73));
+			case 'BlockAdd':
+				var newAws = _elm_lang$core$Native_Utils.update(
+					_p72,
+					{
+						blockDevices: _elm_lang$core$Maybe$Just(
+							A2(
+								_elm_lang$core$List$append,
+								_elm_lang$core$Native_List.fromArray(
+									[_p62.block]),
+								_narkisr$elm_ui$Common_Utils$defaultEmpty(_p72.blockDevices)))
+					});
+				var _p71 = A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p74.step,
+					'Volume',
+					_narkisr$elm_ui$Systems_Add_AWS$tupleValidations,
+					A4(_narkisr$elm_ui$Systems_Add_Validations$validate, _p74.step, 'Instance Device', _narkisr$elm_ui$Systems_Add_AWS$tupleValidations, _p73));
+				var newModel = _p71;
+				var errors = _p71.errors;
+				return _narkisr$elm_ui$Systems_Add_Validations$notAny(errors) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{block: _narkisr$elm_ui$Systems_Model_AWS$emptyBlock, aws: newAws}) : _elm_lang$core$Native_Utils.update(
+					newModel,
+					{aws: _p72});
+			case 'VolumeRemove':
+				var newVolumes = A2(
+					_elm_lang$core$List$filter,
+					function (volume) {
+						return !_elm_lang$core$Native_Utils.eq(volume.device, _p63._0);
+					},
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(_p72.volumes));
+				var newAws = _elm_lang$core$Native_Utils.update(
+					_p72,
+					{
+						volumes: _elm_lang$core$Maybe$Just(newVolumes)
+					});
+				return _elm_lang$core$Native_Utils.update(
+					_p73,
+					{aws: newAws});
+			default:
+				var newBlocks = A2(
+					_elm_lang$core$List$filter,
+					function (block) {
+						return !_elm_lang$core$Native_Utils.eq(block.device, _p63._0);
+					},
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(_p72.blockDevices));
+				var newAws = _elm_lang$core$Native_Utils.update(
+					_p72,
+					{
+						blockDevices: _elm_lang$core$Maybe$Just(newBlocks)
+					});
+				return _elm_lang$core$Native_Utils.update(
+					_p73,
+					{aws: newAws});
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_AWS$next = F2(
+	function (model, environment) {
+		return A2(
+			_narkisr$elm_ui$Systems_Add_AWS$update,
+			_narkisr$elm_ui$Systems_Add_AWS$WizardMsg(_narkisr$elm_ui$Common_Wizard$Next),
+			A2(
+				_narkisr$elm_ui$Systems_Add_AWS$update,
+				_narkisr$elm_ui$Systems_Add_AWS$Update(environment),
+				model));
+	});
+var _narkisr$elm_ui$Systems_Add_AWS$back = function (model) {
+	return A2(
+		_narkisr$elm_ui$Systems_Add_AWS$update,
+		_narkisr$elm_ui$Systems_Add_AWS$WizardMsg(_narkisr$elm_ui$Common_Wizard$Back),
+		model);
+};
+var _narkisr$elm_ui$Systems_Add_AWS$Zero = {ctor: 'Zero'};
+var _narkisr$elm_ui$Systems_Add_AWS$init = function () {
+	var wizard = A3(
+		_narkisr$elm_ui$Common_Wizard$init,
+		_narkisr$elm_ui$Systems_Add_AWS$Zero,
+		_narkisr$elm_ui$Systems_Add_AWS$Instance,
+		_elm_lang$core$Native_List.fromArray(
+			[_narkisr$elm_ui$Systems_Add_AWS$Instance, _narkisr$elm_ui$Systems_Add_AWS$Networking, _narkisr$elm_ui$Systems_Add_AWS$EBS, _narkisr$elm_ui$Systems_Add_AWS$Store, _narkisr$elm_ui$Systems_Add_AWS$Summary]));
+	return A7(_narkisr$elm_ui$Systems_Add_AWS$Model, wizard, _narkisr$elm_ui$Systems_Model_AWS$emptyAws, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty, _narkisr$elm_ui$Systems_Model_AWS$emptyVolume, _narkisr$elm_ui$Systems_Model_AWS$emptyBlock);
+}();
+
+var _narkisr$elm_ui$Systems_View_Physical$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[])));
+};
+var _narkisr$elm_ui$Systems_View_Physical$summarySections = function (_p0) {
+	var _p1 = _p0;
+	var _p3 = _p1._0;
+	var _p2 = _p1._1;
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Instance',
+			_elm_lang$core$Native_List.fromArray(
+				['os', 'user']),
+			_elm_lang$core$Native_List.fromArray(
+				[_p2.os, _p2.user])),
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Networking',
+			_elm_lang$core$Native_List.fromArray(
+				['ip', 'hostname', 'domain']),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(_elm_lang$core$Maybe$withDefault, '', _p2.ip),
+					_p2.hostname,
+					_p2.domain
+				])),
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Interface',
+			_elm_lang$core$Native_List.fromArray(
+				['MAC', 'Broadcast']),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(_elm_lang$core$Maybe$withDefault, '', _p3.mac),
+					A2(_elm_lang$core$Maybe$withDefault, '', _p3.broadcast)
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_Physical$summarize = function (model) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h4,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('System overview')
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+									{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+								]))
+						]),
+					A2(
+						_elm_lang$core$List$map,
+						_circuithub$elm_bootstrap_html$Bootstrap_Html$row_,
+						A2(
+							_elm_lang$core$List$map,
+							_elm_lang$core$List$concat,
+							A2(
+								_narkisr$elm_ui$Common_Utils$partition,
+								2,
+								A2(
+									_elm_lang$core$List$map,
+									_narkisr$elm_ui$Common_Summary$summaryPanel,
+									_narkisr$elm_ui$Systems_View_Physical$summarySections(model))))))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_Physical$Model = function (a) {
+	return {id: a};
+};
+var _narkisr$elm_ui$Systems_View_Physical$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Systems_View_Physical$Model(0));
+
+var _narkisr$elm_ui$Systems_Add_Physical$getOses = function (model) {
+	var hypervisor = A2(
+		_elm_lang$core$Maybe$withDefault,
+		_narkisr$elm_ui$Environments_List$OSTemplates(_elm_lang$core$Dict$empty),
+		A2(_elm_lang$core$Dict$get, 'physical', model.environment));
+	var _p0 = hypervisor;
+	if (_p0.ctor === 'OSTemplates') {
+		return _p0._0;
+	} else {
+		return _elm_lang$core$Dict$empty;
+	}
+};
+var _narkisr$elm_ui$Systems_Add_Physical$setPhysical = F2(
+	function (f, _p1) {
+		var _p2 = _p1;
+		var newPhysical = f(_p2.physical);
+		return _elm_lang$core$Native_Utils.update(
+			_p2,
+			{physical: newPhysical});
+	});
+var _narkisr$elm_ui$Systems_Add_Physical$Model = F5(
+	function (a, b, c, d, e) {
+		return {wizard: a, physical: b, machine: c, environment: d, errors: e};
+	});
+var _narkisr$elm_ui$Systems_Add_Physical$IPInput = function (a) {
+	return {ctor: 'IPInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$BroadcastInput = function (a) {
+	return {ctor: 'BroadcastInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$MacInput = function (a) {
+	return {ctor: 'MacInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$DomainInput = function (a) {
+	return {ctor: 'DomainInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$HostnameInput = function (a) {
+	return {ctor: 'HostnameInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$UserInput = function (a) {
+	return {ctor: 'UserInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$instance = function (_p3) {
+	var _p4 = _p3;
+	var _p6 = _p4.physical;
+	var _p5 = _p4.machine;
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p4.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Security')
+						])),
+					A2(
+					check,
+					'User',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Physical$UserInput, '', _p5.user)),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Networking')
+						])),
+					A2(
+					check,
+					'IP',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_Physical$IPInput,
+						'',
+						A2(_elm_lang$core$Maybe$withDefault, '', _p5.ip))),
+					A2(
+					check,
+					'Hostname',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Physical$HostnameInput, '', _p5.hostname)),
+					A2(
+					check,
+					'Domain',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Physical$DomainInput, '', _p5.domain)),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('WOL')
+						])),
+					A2(
+					check,
+					'Mac',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_Physical$MacInput,
+						'',
+						A2(_elm_lang$core$Maybe$withDefault, '', _p6.mac))),
+					A2(
+					check,
+					'Broadcast',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_Physical$BroadcastInput,
+						'',
+						A2(_elm_lang$core$Maybe$withDefault, '', _p6.broadcast)))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_Physical$stepView = function (_p7) {
+	var _p8 = _p7;
+	var _p10 = _p8.wizard;
+	var _p9 = _p10.step;
+	switch (_p9.ctor) {
+		case 'Instance':
+			return _narkisr$elm_ui$Systems_Add_Physical$instance(_p8);
+		case 'Summary':
+			return _narkisr$elm_ui$Systems_View_Physical$summarize(
+				{ctor: '_Tuple2', _0: _p8.physical, _1: _p8.machine});
+		default:
+			return A2(
+				_elm_lang$core$Debug$log,
+				_elm_lang$core$Basics$toString(_p10.step),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[]))
+					]));
+	}
+};
+var _narkisr$elm_ui$Systems_Add_Physical$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Systems_Add_Physical$stepView(model)));
+};
+var _narkisr$elm_ui$Systems_Add_Physical$SelectOS = function (a) {
+	return {ctor: 'SelectOS', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$Update = function (a) {
+	return {ctor: 'Update', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Physical$Summary = {ctor: 'Summary'};
+var _narkisr$elm_ui$Systems_Add_Physical$Instance = {ctor: 'Instance'};
+var _narkisr$elm_ui$Systems_Add_Physical$stringValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_Physical$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Hostname',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Hostname',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p11) {
+							var _p12 = _p11;
+							return _p12.machine.hostname;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Domain',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Domain',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p13) {
+							var _p14 = _p13;
+							return _p14.machine.domain;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'User',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'User',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p15) {
+							var _p16 = _p15;
+							return _p16.machine.user;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'IP',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'IP',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$validIp, _narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p17) {
+							var _p18 = _p17;
+							return A2(_elm_lang$core$Maybe$withDefault, '', _p18.machine.ip);
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_Physical$validatePhysical = _narkisr$elm_ui$Systems_Add_Validations$validateAll(
+	_elm_lang$core$Native_List.fromArray(
+		[_narkisr$elm_ui$Systems_Add_Physical$stringValidations]));
+var _narkisr$elm_ui$Systems_Add_Physical$update = F2(
+	function (msg, _p19) {
+		var _p20 = _p19;
+		var _p26 = _p20.wizard;
+		var _p25 = _p20;
+		var _p24 = _p20.machine;
+		var _p21 = msg;
+		switch (_p21.ctor) {
+			case 'WizardMsg':
+				var _p22 = A2(_narkisr$elm_ui$Systems_Add_Physical$validatePhysical, _p26.step, _p25);
+				var newModel = _p22;
+				var errors = _p22.errors;
+				var newWizard = A3(
+					_narkisr$elm_ui$Common_Wizard$update,
+					_narkisr$elm_ui$Systems_Add_Validations$notAny(errors),
+					_p21._0,
+					_p26);
+				return _elm_lang$core$Native_Utils.update(
+					newModel,
+					{wizard: newWizard});
+			case 'Update':
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p25,
+					{environment: _p21._0});
+				var _p23 = _elm_lang$core$List$head(
+					_elm_lang$core$Dict$keys(
+						_narkisr$elm_ui$Systems_Add_Physical$getOses(newModel)));
+				if (_p23.ctor === 'Just') {
+					return _elm_lang$core$String$isEmpty(_p24.os) ? _elm_lang$core$Native_Utils.update(
+						newModel,
+						{
+							machine: _elm_lang$core$Native_Utils.update(
+								_p24,
+								{os: _p23._0})
+						}) : newModel;
+				} else {
+					return newModel;
+				}
+			case 'SelectOS':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Common$setMachine,
+					function (machine) {
+						return _elm_lang$core$Native_Utils.update(
+							machine,
+							{os: _p21._0});
+					},
+					_p25);
+			case 'UserInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p26.step,
+					'User',
+					_narkisr$elm_ui$Systems_Add_Physical$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{user: _p21._0});
+						},
+						_p25));
+			case 'HostnameInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p26.step,
+					'Hostname',
+					_narkisr$elm_ui$Systems_Add_Physical$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{hostname: _p21._0});
+						},
+						_p25));
+			case 'DomainInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p26.step,
+					'Domain',
+					_narkisr$elm_ui$Systems_Add_Physical$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{domain: _p21._0});
+						},
+						_p25));
+			case 'MacInput':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Physical$setPhysical,
+					function (physical) {
+						return _elm_lang$core$Native_Utils.update(
+							physical,
+							{
+								mac: _elm_lang$core$Maybe$Just(_p21._0)
+							});
+					},
+					_p25);
+			case 'BroadcastInput':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Physical$setPhysical,
+					function (physical) {
+						return _elm_lang$core$Native_Utils.update(
+							physical,
+							{
+								broadcast: _elm_lang$core$Maybe$Just(_p21._0)
+							});
+					},
+					_p25);
+			default:
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p26.step,
+					'IP',
+					_narkisr$elm_ui$Systems_Add_Physical$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{
+									ip: _elm_lang$core$Maybe$Just(_p21._0)
+								});
+						},
+						_p25));
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Physical$next = F2(
+	function (model, environment) {
+		return A2(
+			_narkisr$elm_ui$Systems_Add_Physical$update,
+			_narkisr$elm_ui$Systems_Add_Physical$WizardMsg(_narkisr$elm_ui$Common_Wizard$Next),
+			A2(
+				_narkisr$elm_ui$Systems_Add_Physical$update,
+				_narkisr$elm_ui$Systems_Add_Physical$Update(environment),
+				model));
+	});
+var _narkisr$elm_ui$Systems_Add_Physical$back = function (model) {
+	return A2(
+		_narkisr$elm_ui$Systems_Add_Physical$update,
+		_narkisr$elm_ui$Systems_Add_Physical$WizardMsg(_narkisr$elm_ui$Common_Wizard$Back),
+		model);
+};
+var _narkisr$elm_ui$Systems_Add_Physical$Zero = {ctor: 'Zero'};
+var _narkisr$elm_ui$Systems_Add_Physical$init = function () {
+	var wizard = A3(
+		_narkisr$elm_ui$Common_Wizard$init,
+		_narkisr$elm_ui$Systems_Add_Physical$Zero,
+		_narkisr$elm_ui$Systems_Add_Physical$Instance,
+		_elm_lang$core$Native_List.fromArray(
+			[_narkisr$elm_ui$Systems_Add_Physical$Instance, _narkisr$elm_ui$Systems_Add_Physical$Summary]));
+	return A5(_narkisr$elm_ui$Systems_Add_Physical$Model, wizard, _narkisr$elm_ui$Systems_Model_Physical$emptyPhysical, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty);
+}();
+
+var _narkisr$elm_ui$Systems_View_Openstack$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[])));
+};
+var _narkisr$elm_ui$Systems_View_Openstack$summarySections = function (_p0) {
+	var _p1 = _p0;
+	var _p6 = _p1._0;
+	var _p5 = _p1._1;
+	return A2(
+		_elm_lang$core$List$filter,
+		function (_p2) {
+			return _elm_lang$core$Basics$not(
+				_elm_lang$core$List$isEmpty(_p2));
+		},
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Instance',
+				_elm_lang$core$Native_List.fromArray(
+					['flavor', 'os', 'tenant']),
+				_elm_lang$core$Native_List.fromArray(
+					[_p6.flavor, _p5.os, _p6.tenant])),
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Security',
+				_elm_lang$core$Native_List.fromArray(
+					['user', 'keypair', 'security groups']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p5.user,
+						_p6.keyName,
+						A2(
+						_elm_lang$core$String$join,
+						' ',
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_p6.securityGroups))
+					])),
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Networking',
+				_elm_lang$core$Native_List.fromArray(
+					['hostname', 'domain', 'ip', 'ip pool', 'networks']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p5.hostname,
+						_p5.domain,
+						A2(_elm_lang$core$Maybe$withDefault, '', _p6.floatingIp),
+						A2(_elm_lang$core$Maybe$withDefault, '', _p6.floatingIpPool),
+						A2(_elm_lang$core$String$join, ' ', _p6.networks)
+					])),
+				A4(
+				_narkisr$elm_ui$Common_Summary$tablizedSection,
+				'Volumes',
+				_elm_lang$core$Native_List.fromArray(
+					['device', 'size', 'clear']),
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_p6.volumes),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						function (_) {
+						return _.device;
+					},
+						function (_p3) {
+						return _elm_lang$core$Basics$toString(
+							function (_) {
+								return _.size;
+							}(_p3));
+					},
+						function (_p4) {
+						return _elm_lang$core$Basics$toString(
+							function (_) {
+								return _.clear;
+							}(_p4));
+					}
+					]))
+			]));
+};
+var _narkisr$elm_ui$Systems_View_Openstack$summarize = function (model) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h4,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('System overview')
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+									{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+								]))
+						]),
+					A2(
+						_elm_lang$core$List$map,
+						_circuithub$elm_bootstrap_html$Bootstrap_Html$row_,
+						A2(
+							_elm_lang$core$List$map,
+							_elm_lang$core$List$concat,
+							A2(
+								_narkisr$elm_ui$Common_Utils$partition,
+								2,
+								A2(
+									_elm_lang$core$List$map,
+									_narkisr$elm_ui$Common_Summary$summaryPanel,
+									_narkisr$elm_ui$Systems_View_Openstack$summarySections(model))))))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_Openstack$Model = function (a) {
+	return {id: a};
+};
+var _narkisr$elm_ui$Systems_View_Openstack$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Systems_View_Openstack$Model(0));
+
+var _narkisr$elm_ui$Systems_Add_Openstack$getFlavors = function (model) {
+	var hypervisor = A2(
+		_elm_lang$core$Maybe$withDefault,
+		_narkisr$elm_ui$Environments_List$Empty,
+		A2(_elm_lang$core$Dict$get, 'openstack', model.environment));
+	var _p0 = hypervisor;
+	if (_p0.ctor === 'Openstack') {
+		return _p0._0;
+	} else {
+		return _elm_lang$core$Dict$empty;
+	}
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$setDefaultFlavor = F2(
+	function (hyp, _p1) {
+		var _p2 = _p1;
+		var _p5 = _p2.openstack;
+		var _p4 = _p2;
+		var _p3 = _elm_lang$core$List$head(
+			_elm_lang$core$Dict$keys(
+				_narkisr$elm_ui$Systems_Add_Openstack$getFlavors(_p4)));
+		if (_p3.ctor === 'Just') {
+			return _elm_lang$core$String$isEmpty(_p5.flavor) ? _elm_lang$core$Native_Utils.update(
+				_p4,
+				{
+					openstack: _elm_lang$core$Native_Utils.update(
+						_p5,
+						{flavor: _p3._0})
+				}) : _p4;
+		} else {
+			return _p4;
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Openstack$ignoreDevices = function (_p6) {
+	var _p7 = _p6;
+	var ignored = A2(
+		_elm_lang$core$Dict$remove,
+		'Volume',
+		A2(
+			_elm_lang$core$Dict$remove,
+			'Instance Device',
+			A2(_elm_lang$core$Dict$remove, 'Cinder Device', _p7.errors)));
+	return _elm_lang$core$Native_Utils.update(
+		_p7,
+		{errors: ignored});
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$setVolume = F2(
+	function (f, _p8) {
+		var _p9 = _p8;
+		var newVolume = f(_p9.volume);
+		return _elm_lang$core$Native_Utils.update(
+			_p9,
+			{volume: newVolume});
+	});
+var _narkisr$elm_ui$Systems_Add_Openstack$setOpenstack = F2(
+	function (f, _p10) {
+		var _p11 = _p10;
+		var newOpenstack = f(_p11.openstack);
+		return _elm_lang$core$Native_Utils.update(
+			_p11,
+			{openstack: newOpenstack});
+	});
+var _narkisr$elm_ui$Systems_Add_Openstack$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {wizard: a, openstack: b, machine: c, environment: d, errors: e, volume: f};
+	});
+var _narkisr$elm_ui$Systems_Add_Openstack$VolumeRemove = function (a) {
+	return {ctor: 'VolumeRemove', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$volumeRow = function (_p12) {
+	var _p13 = _p12;
+	var props = _elm_lang$core$Native_List.fromArray(
+		[
+			function (_) {
+			return _.device;
+		},
+			function (_p14) {
+			return _elm_lang$core$Basics$toString(
+				function (_) {
+					return _.size;
+				}(_p14));
+		},
+			function (_p15) {
+			return _elm_lang$core$Basics$toString(
+				function (_) {
+					return _.clear;
+				}(_p15));
+		}
+		]);
+	var remove = A2(
+		_elm_lang$html$Html$span,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('glyphicon glyphicon-remove'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'aria-hidden', 'true'),
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'top', _1: '5px'}
+					])),
+				_elm_lang$html$Html_Events$onClick(
+				_narkisr$elm_ui$Systems_Add_Openstack$VolumeRemove(_p13.device))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[]));
+	return A2(
+		_elm_lang$html$Html$tr,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		A2(
+			_elm_lang$core$List$append,
+			A2(
+				_elm_lang$core$List$map,
+				function (prop) {
+					return A2(
+						_elm_lang$html$Html$td,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text(
+								prop(_p13))
+							]));
+				},
+				props),
+			_elm_lang$core$Native_List.fromArray(
+				[remove])));
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$volumes = function (vs) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('col-md-8 col-md-offset-2 ')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$table,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('table'),
+						_elm_lang$html$Html_Attributes$id('ebsVolumes')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$thead,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$tr,
+								_elm_lang$core$Native_List.fromArray(
+									[]),
+								A2(
+									_elm_lang$core$List$map,
+									function (k) {
+										return A2(
+											_elm_lang$html$Html$th,
+											_elm_lang$core$Native_List.fromArray(
+												[]),
+											_elm_lang$core$Native_List.fromArray(
+												[
+													_elm_lang$html$Html$text(k)
+												]));
+									},
+									_elm_lang$core$Native_List.fromArray(
+										['device', 'size', 'clear', ''])))
+							])),
+						A2(
+						_elm_lang$html$Html$tbody,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						A2(
+							_elm_lang$core$List$map,
+							function (volume) {
+								return _narkisr$elm_ui$Systems_Add_Openstack$volumeRow(volume);
+							},
+							vs))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$VolumeAdd = {ctor: 'VolumeAdd'};
+var _narkisr$elm_ui$Systems_Add_Openstack$CinderClear = {ctor: 'CinderClear'};
+var _narkisr$elm_ui$Systems_Add_Openstack$CinderDeviceInput = function (a) {
+	return {ctor: 'CinderDeviceInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$CinderSizeInput = function (a) {
+	return {ctor: 'CinderSizeInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$cinder = function (_p16) {
+	var _p17 = _p16;
+	var _p18 = _p17.volume;
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p17.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Devices')
+						])),
+					A2(
+					check,
+					'Cinder Device',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$CinderDeviceInput, 'sdh', _p18.device)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Size',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputNumber,
+						_narkisr$elm_ui$Systems_Add_Openstack$CinderSizeInput,
+						'',
+						_elm_lang$core$Basics$toString(_p18.size))),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Clear',
+					A2(_narkisr$elm_ui$Common_Components$checkbox, _narkisr$elm_ui$Systems_Add_Openstack$CinderClear, _p18.clear)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'',
+					A2(
+						_elm_lang$html$Html$button,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('btn btn-sm col-md-2'),
+								_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Systems_Add_Openstack$VolumeAdd)
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html$text('Add')
+							]))),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Volumes')
+						])),
+					_narkisr$elm_ui$Systems_Add_Openstack$volumes(
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(_p17.openstack.volumes))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$NetworksInput = function (a) {
+	return {ctor: 'NetworksInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$IPPoolInput = function (a) {
+	return {ctor: 'IPPoolInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$IPInput = function (a) {
+	return {ctor: 'IPInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$DomainInput = function (a) {
+	return {ctor: 'DomainInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$HostnameInput = function (a) {
+	return {ctor: 'HostnameInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$networking = function (_p19) {
+	var _p20 = _p19;
+	var _p22 = _p20.openstack;
+	var _p21 = _p20.machine;
+	var networks = A2(_elm_lang$core$String$join, ' ', _p22.networks);
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p20.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Networking')
+						])),
+					A2(
+					check,
+					'Hostname',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$HostnameInput, '', _p21.hostname)),
+					A2(
+					check,
+					'Domain',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$DomainInput, '', _p21.domain)),
+					A2(
+					check,
+					'IP',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_Openstack$IPInput,
+						'',
+						A2(_elm_lang$core$Maybe$withDefault, '', _p22.floatingIp))),
+					A2(
+					check,
+					'IP-Pool',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_Openstack$IPPoolInput,
+						'',
+						A2(_elm_lang$core$Maybe$withDefault, '', _p22.floatingIpPool))),
+					A2(
+					check,
+					'Networks',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$NetworksInput, ' ', networks))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$TenantInput = function (a) {
+	return {ctor: 'TenantInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$UserInput = function (a) {
+	return {ctor: 'UserInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$SecurityGroupsInput = function (a) {
+	return {ctor: 'SecurityGroupsInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$KeyPairInput = function (a) {
+	return {ctor: 'KeyPairInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$SelectOS = function (a) {
+	return {ctor: 'SelectOS', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$SelectFlavor = function (a) {
+	return {ctor: 'SelectFlavor', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$instance = function (_p23) {
+	var _p24 = _p23;
+	var _p27 = _p24.openstack;
+	var _p26 = _p24;
+	var _p25 = _p24.machine;
+	var oses = _elm_lang$core$Dict$keys(
+		A2(_narkisr$elm_ui$Systems_Add_Common$getOses, 'openstack', _p26));
+	var flavors = _elm_lang$core$Dict$keys(
+		_narkisr$elm_ui$Systems_Add_Openstack$getFlavors(_p26));
+	var groups = A2(
+		_elm_lang$core$String$join,
+		' ',
+		_narkisr$elm_ui$Common_Utils$defaultEmpty(_p27.securityGroups));
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p24.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Properties')
+						])),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Flavor',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_Openstack$SelectFlavor, flavors, _p27.flavor)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'OS',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_Openstack$SelectOS, oses, _p25.os)),
+					A2(
+					check,
+					'Tenant',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$TenantInput, '', _p27.tenant)),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Security')
+						])),
+					A2(
+					check,
+					'User',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$UserInput, '', _p25.user)),
+					A2(
+					check,
+					'Keypair',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$KeyPairInput, '', _p27.keyName)),
+					A2(
+					check,
+					'Security groups',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Openstack$SecurityGroupsInput, ' ', groups))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$stepView = function (_p28) {
+	var _p29 = _p28;
+	var _p32 = _p29.wizard;
+	var _p31 = _p29;
+	var _p30 = _p32.step;
+	switch (_p30.ctor) {
+		case 'Instance':
+			return _narkisr$elm_ui$Systems_Add_Openstack$instance(_p31);
+		case 'Networking':
+			return _narkisr$elm_ui$Systems_Add_Openstack$networking(_p31);
+		case 'Cinder':
+			return _narkisr$elm_ui$Systems_Add_Openstack$cinder(_p31);
+		case 'Summary':
+			return _narkisr$elm_ui$Systems_View_Openstack$summarize(
+				{ctor: '_Tuple2', _0: _p29.openstack, _1: _p29.machine});
+		default:
+			return A2(
+				_elm_lang$core$Debug$log,
+				_elm_lang$core$Basics$toString(_p32.step),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[]))
+					]));
+	}
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Systems_Add_Openstack$stepView(model)));
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$Update = function (a) {
+	return {ctor: 'Update', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$Summary = {ctor: 'Summary'};
+var _narkisr$elm_ui$Systems_Add_Openstack$Cinder = {ctor: 'Cinder'};
+var _narkisr$elm_ui$Systems_Add_Openstack$tupleValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_Openstack$Cinder,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Cinder Device',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Cinder Device',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notContained]),
+						function (_p33) {
+							var _p34 = _p33;
+							return {
+								ctor: '_Tuple2',
+								_0: _p34.volume.device,
+								_1: A2(
+									_elm_lang$core$List$map,
+									function (_) {
+										return _.device;
+									},
+									_narkisr$elm_ui$Common_Utils$defaultEmpty(_p34.openstack.volumes))
+							};
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_Openstack$Networking = {ctor: 'Networking'};
+var _narkisr$elm_ui$Systems_Add_Openstack$Instance = {ctor: 'Instance'};
+var _narkisr$elm_ui$Systems_Add_Openstack$stringValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_Openstack$Networking,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Hostname',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Hostname',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p35) {
+							var _p36 = _p35;
+							return _p36.machine.hostname;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Domain',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Domain',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p37) {
+							var _p38 = _p37;
+							return _p38.machine.domain;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'IP',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'IP',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$validIp]),
+						function (_p39) {
+							var _p40 = _p39;
+							return A2(_elm_lang$core$Maybe$withDefault, '', _p40.openstack.floatingIp);
+						})
+				}
+				])),
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_Openstack$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'User',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'User',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p41) {
+							var _p42 = _p41;
+							return _p42.machine.user;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Keypair',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Keypair',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p43) {
+							var _p44 = _p43;
+							return _p44.openstack.keyName;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Tenant',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Tenant',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p45) {
+							var _p46 = _p45;
+							return _p46.openstack.tenant;
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_Openstack$listValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_Openstack$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Security groups',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Security groups',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$hasItems]),
+						function (_p47) {
+							var _p48 = _p47;
+							return _narkisr$elm_ui$Common_Utils$defaultEmpty(_p48.openstack.securityGroups);
+						})
+				}
+				])),
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_Openstack$Networking,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Networks',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Networks',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$hasItems]),
+						function (_p49) {
+							var _p50 = _p49;
+							return _p50.openstack.networks;
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_Openstack$validateOpenstack = _narkisr$elm_ui$Systems_Add_Validations$validateAll(
+	_elm_lang$core$Native_List.fromArray(
+		[_narkisr$elm_ui$Systems_Add_Openstack$stringValidations, _narkisr$elm_ui$Systems_Add_Openstack$listValidations]));
+var _narkisr$elm_ui$Systems_Add_Openstack$update = F2(
+	function (msg, _p51) {
+		var _p52 = _p51;
+		var _p59 = _p52.wizard;
+		var _p58 = _p52.openstack;
+		var _p57 = _p52;
+		var _p53 = msg;
+		switch (_p53.ctor) {
+			case 'WizardMsg':
+				var _p54 = _narkisr$elm_ui$Systems_Add_Openstack$ignoreDevices(
+					A2(_narkisr$elm_ui$Systems_Add_Openstack$validateOpenstack, _p59.step, _p57));
+				var newModel = _p54;
+				var errors = _p54.errors;
+				var newWizard = A3(
+					_narkisr$elm_ui$Common_Wizard$update,
+					_narkisr$elm_ui$Systems_Add_Validations$notAny(errors),
+					_p53._0,
+					_p59);
+				return _elm_lang$core$Native_Utils.update(
+					newModel,
+					{wizard: newWizard});
+			case 'Update':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Openstack$setDefaultFlavor,
+					_p57,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setDefaultOS,
+						'openstack',
+						_elm_lang$core$Native_Utils.update(
+							_p57,
+							{environment: _p53._0})));
+			case 'SelectFlavor':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Openstack$setOpenstack,
+					function (openstack) {
+						return _elm_lang$core$Native_Utils.update(
+							openstack,
+							{flavor: _p53._0});
+					},
+					_p57);
+			case 'SelectOS':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Common$setMachine,
+					function (machine) {
+						return _elm_lang$core$Native_Utils.update(
+							machine,
+							{os: _p53._0});
+					},
+					_p57);
+			case 'TenantInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'Tenant',
+					_narkisr$elm_ui$Systems_Add_Openstack$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Openstack$setOpenstack,
+						function (openstack) {
+							return _elm_lang$core$Native_Utils.update(
+								openstack,
+								{tenant: _p53._0});
+						},
+						_p57));
+			case 'KeyPairInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'Keypair',
+					_narkisr$elm_ui$Systems_Add_Openstack$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Openstack$setOpenstack,
+						function (openstack) {
+							return _elm_lang$core$Native_Utils.update(
+								openstack,
+								{keyName: _p53._0});
+						},
+						_p57));
+			case 'SecurityGroupsInput':
+				var splited = A2(_elm_lang$core$String$split, ' ', _p53._0);
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'Security groups',
+					_narkisr$elm_ui$Systems_Add_Openstack$listValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Openstack$setOpenstack,
+						function (openstack) {
+							return _elm_lang$core$Native_Utils.update(
+								openstack,
+								{
+									securityGroups: _elm_lang$core$Maybe$Just(
+										_elm_lang$core$Native_Utils.eq(
+											splited,
+											_elm_lang$core$Native_List.fromArray(
+												[''])) ? _elm_lang$core$Native_List.fromArray(
+											[]) : splited)
+								});
+						},
+						_p57));
+			case 'NetworksInput':
+				var splited = A2(_elm_lang$core$String$split, ' ', _p53._0);
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'Networks',
+					_narkisr$elm_ui$Systems_Add_Openstack$listValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Openstack$setOpenstack,
+						function (openstack) {
+							return _elm_lang$core$Native_Utils.update(
+								openstack,
+								{networks: splited});
+						},
+						_p57));
+			case 'UserInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'User',
+					_narkisr$elm_ui$Systems_Add_Openstack$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{user: _p53._0});
+						},
+						_p57));
+			case 'HostnameInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'Hostname',
+					_narkisr$elm_ui$Systems_Add_Openstack$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{hostname: _p53._0});
+						},
+						_p57));
+			case 'DomainInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'Domain',
+					_narkisr$elm_ui$Systems_Add_Openstack$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{domain: _p53._0});
+						},
+						_p57));
+			case 'IPInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'IP',
+					_narkisr$elm_ui$Systems_Add_Openstack$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Openstack$setOpenstack,
+						function (openstack) {
+							return _elm_lang$core$Native_Utils.update(
+								openstack,
+								{
+									floatingIp: _elm_lang$core$Maybe$Just(_p53._0)
+								});
+						},
+						_p57));
+			case 'IPPoolInput':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Openstack$setOpenstack,
+					function (openstack) {
+						return _elm_lang$core$Native_Utils.update(
+							openstack,
+							{
+								floatingIpPool: _elm_lang$core$Maybe$Just(_p53._0)
+							});
+					},
+					_p57);
+			case 'CinderSizeInput':
+				var _p55 = _elm_lang$core$String$toInt(_p53._0);
+				if (_p55.ctor === 'Ok') {
+					return A2(
+						_narkisr$elm_ui$Systems_Add_Openstack$setVolume,
+						function (volume) {
+							return _elm_lang$core$Native_Utils.update(
+								volume,
+								{size: _p55._0});
+						},
+						_p57);
+				} else {
+					return _p57;
+				}
+			case 'CinderDeviceInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p59.step,
+					'Cinder Device',
+					_narkisr$elm_ui$Systems_Add_Openstack$tupleValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Openstack$setVolume,
+						function (volume) {
+							return _elm_lang$core$Native_Utils.update(
+								volume,
+								{device: _p53._0});
+						},
+						_p57));
+			case 'CinderClear':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Openstack$setVolume,
+					function (volume) {
+						return _elm_lang$core$Native_Utils.update(
+							volume,
+							{
+								clear: _elm_lang$core$Basics$not(volume.clear)
+							});
+					},
+					_p57);
+			case 'VolumeAdd':
+				var newOpenstack = _elm_lang$core$Native_Utils.update(
+					_p58,
+					{
+						volumes: _elm_lang$core$Maybe$Just(
+							A2(
+								_elm_lang$core$List$append,
+								_elm_lang$core$Native_List.fromArray(
+									[_p52.volume]),
+								_narkisr$elm_ui$Common_Utils$defaultEmpty(_p58.volumes)))
+					});
+				var _p56 = A4(_narkisr$elm_ui$Systems_Add_Validations$validate, _p59.step, 'Cinder Device', _narkisr$elm_ui$Systems_Add_Openstack$tupleValidations, _p57);
+				var newModel = _p56;
+				var errors = _p56.errors;
+				return _narkisr$elm_ui$Systems_Add_Validations$notAny(errors) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{volume: _narkisr$elm_ui$Systems_Model_Openstack$emptyVolume, openstack: newOpenstack}) : _elm_lang$core$Native_Utils.update(
+					newModel,
+					{openstack: _p58});
+			default:
+				var newVolumes = A2(
+					_elm_lang$core$List$filter,
+					function (volume) {
+						return !_elm_lang$core$Native_Utils.eq(volume.device, _p53._0);
+					},
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(_p58.volumes));
+				var newOpenstack = _elm_lang$core$Native_Utils.update(
+					_p58,
+					{
+						volumes: _elm_lang$core$Maybe$Just(newVolumes)
+					});
+				return _elm_lang$core$Native_Utils.update(
+					_p57,
+					{openstack: newOpenstack});
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Openstack$next = F2(
+	function (model, environment) {
+		return A2(
+			_narkisr$elm_ui$Systems_Add_Openstack$update,
+			_narkisr$elm_ui$Systems_Add_Openstack$WizardMsg(_narkisr$elm_ui$Common_Wizard$Next),
+			A2(
+				_narkisr$elm_ui$Systems_Add_Openstack$update,
+				_narkisr$elm_ui$Systems_Add_Openstack$Update(environment),
+				model));
+	});
+var _narkisr$elm_ui$Systems_Add_Openstack$back = function (model) {
+	return A2(
+		_narkisr$elm_ui$Systems_Add_Openstack$update,
+		_narkisr$elm_ui$Systems_Add_Openstack$WizardMsg(_narkisr$elm_ui$Common_Wizard$Back),
+		model);
+};
+var _narkisr$elm_ui$Systems_Add_Openstack$Zero = {ctor: 'Zero'};
+var _narkisr$elm_ui$Systems_Add_Openstack$init = function () {
+	var wizard = A3(
+		_narkisr$elm_ui$Common_Wizard$init,
+		_narkisr$elm_ui$Systems_Add_Openstack$Zero,
+		_narkisr$elm_ui$Systems_Add_Openstack$Instance,
+		_elm_lang$core$Native_List.fromArray(
+			[_narkisr$elm_ui$Systems_Add_Openstack$Instance, _narkisr$elm_ui$Systems_Add_Openstack$Networking, _narkisr$elm_ui$Systems_Add_Openstack$Cinder, _narkisr$elm_ui$Systems_Add_Openstack$Summary]));
+	return A6(_narkisr$elm_ui$Systems_Add_Openstack$Model, wizard, _narkisr$elm_ui$Systems_Model_Openstack$emptyOpenstack, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty, _narkisr$elm_ui$Systems_Model_Openstack$emptyVolume);
+}();
+
+var _narkisr$elm_ui$Systems_View_KVM$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[])));
+};
+var _narkisr$elm_ui$Systems_View_KVM$summarySections = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._1;
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Network',
+			_elm_lang$core$Native_List.fromArray(
+				['user', 'hostname', 'domain']),
+			_elm_lang$core$Native_List.fromArray(
+				[_p2.os, _p2.user, _p2.hostname, _p2.domain])),
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Domain',
+			_elm_lang$core$Native_List.fromArray(
+				['os', 'node']),
+			_elm_lang$core$Native_List.fromArray(
+				[_p2.os, _p1._0.node])),
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Resources',
+			_elm_lang$core$Native_List.fromArray(
+				['cpu', 'ram']),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$core$Basics$toString(
+					A2(_elm_lang$core$Maybe$withDefault, 0, _p2.cpu)),
+					_elm_lang$core$Basics$toString(
+					A2(_elm_lang$core$Maybe$withDefault, 0, _p2.ram))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_KVM$summarize = function (model) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h4,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('System overview')
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+									{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+								]))
+						]),
+					A2(
+						_elm_lang$core$List$map,
+						_circuithub$elm_bootstrap_html$Bootstrap_Html$row_,
+						A2(
+							_elm_lang$core$List$map,
+							_elm_lang$core$List$concat,
+							A2(
+								_narkisr$elm_ui$Common_Utils$partition,
+								2,
+								A2(
+									_elm_lang$core$List$map,
+									_narkisr$elm_ui$Common_Summary$summaryPanel,
+									_narkisr$elm_ui$Systems_View_KVM$summarySections(model))))))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_KVM$Model = function (a) {
+	return {id: a};
+};
+var _narkisr$elm_ui$Systems_View_KVM$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Systems_View_KVM$Model(0));
+
+var _narkisr$elm_ui$Systems_Add_KVM$setKVM = F2(
+	function (f, _p0) {
+		var _p1 = _p0;
+		var newKvm = f(_p1.kvm);
+		return _elm_lang$core$Native_Utils.update(
+			_p1,
+			{kvm: newKvm});
+	});
+var _narkisr$elm_ui$Systems_Add_KVM$getNodes = function (model) {
+	var hypervisor = A2(
+		_elm_lang$core$Maybe$withDefault,
+		_narkisr$elm_ui$Environments_List$Empty,
+		A2(_elm_lang$core$Dict$get, 'kvm', model.environment));
+	var _p2 = hypervisor;
+	if (_p2.ctor === 'KVM') {
+		return _p2._1;
+	} else {
+		return _elm_lang$core$Dict$empty;
+	}
+};
+var _narkisr$elm_ui$Systems_Add_KVM$setDefaultNode = F2(
+	function (hyp, _p3) {
+		var _p4 = _p3;
+		var _p7 = _p4;
+		var _p6 = _p4.kvm;
+		var _p5 = _elm_lang$core$List$head(
+			_elm_lang$core$Dict$keys(
+				_narkisr$elm_ui$Systems_Add_KVM$getNodes(_p7)));
+		if (_p5.ctor === 'Just') {
+			return _elm_lang$core$String$isEmpty(_p6.node) ? _elm_lang$core$Native_Utils.update(
+				_p7,
+				{
+					kvm: _elm_lang$core$Native_Utils.update(
+						_p6,
+						{node: _p5._0})
+				}) : _p7;
+		} else {
+			return _p7;
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_KVM$Model = F5(
+	function (a, b, c, d, e) {
+		return {wizard: a, kvm: b, machine: c, environment: d, errors: e};
+	});
+var _narkisr$elm_ui$Systems_Add_KVM$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Add_KVM$DomainInput = function (a) {
+	return {ctor: 'DomainInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$HostnameInput = function (a) {
+	return {ctor: 'HostnameInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$RamInput = function (a) {
+	return {ctor: 'RamInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$CpuInput = function (a) {
+	return {ctor: 'CpuInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$UserInput = function (a) {
+	return {ctor: 'UserInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$SelectNode = function (a) {
+	return {ctor: 'SelectNode', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$SelectOS = function (a) {
+	return {ctor: 'SelectOS', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$instance = function (_p8) {
+	var _p9 = _p8;
+	var _p11 = _p9;
+	var _p10 = _p9.machine;
+	var nodes = _elm_lang$core$Dict$keys(
+		_narkisr$elm_ui$Systems_Add_KVM$getNodes(_p11));
+	var oses = _elm_lang$core$Dict$keys(
+		A2(_narkisr$elm_ui$Systems_Add_Common$getOses, 'kvm', _p11));
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p9.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Domain')
+						])),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'OS',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_KVM$SelectOS, oses, _p10.os)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Node',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_KVM$SelectNode, nodes, _p9.kvm.node)),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Resources')
+						])),
+					A2(
+					check,
+					'Cpu',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_KVM$CpuInput,
+						'',
+						_elm_lang$core$Basics$toString(
+							A2(_elm_lang$core$Maybe$withDefault, 0, _p10.cpu)))),
+					A2(
+					check,
+					'Ram (mb)',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_KVM$RamInput,
+						'',
+						_elm_lang$core$Basics$toString(
+							A2(_elm_lang$core$Maybe$withDefault, 0, _p10.ram)))),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Network')
+						])),
+					A2(
+					check,
+					'User',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_KVM$UserInput, '', _p10.user)),
+					A2(
+					check,
+					'Hostname',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_KVM$HostnameInput, '', _p10.hostname)),
+					A2(
+					check,
+					'Domain',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_KVM$DomainInput, '', _p10.domain))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_KVM$stepView = function (_p12) {
+	var _p13 = _p12;
+	var _p14 = _p13.wizard.step;
+	switch (_p14.ctor) {
+		case 'Instance':
+			return _narkisr$elm_ui$Systems_Add_KVM$instance(_p13);
+		case 'Summary':
+			return _narkisr$elm_ui$Systems_View_KVM$summarize(
+				{ctor: '_Tuple2', _0: _p13.kvm, _1: _p13.machine});
+		default:
+			return _elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				]);
+	}
+};
+var _narkisr$elm_ui$Systems_Add_KVM$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Systems_Add_KVM$stepView(model)));
+};
+var _narkisr$elm_ui$Systems_Add_KVM$Update = function (a) {
+	return {ctor: 'Update', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_KVM$Summary = {ctor: 'Summary'};
+var _narkisr$elm_ui$Systems_Add_KVM$Instance = {ctor: 'Instance'};
+var _narkisr$elm_ui$Systems_Add_KVM$stringValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_KVM$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'User',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'User',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p15) {
+							var _p16 = _p15;
+							return _p16.machine.user;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Hostname',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Hostname',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p17) {
+							var _p18 = _p17;
+							return _p18.machine.hostname;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Domain',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Domain',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p19) {
+							var _p20 = _p19;
+							return _p20.machine.domain;
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_KVM$validateKvm = _narkisr$elm_ui$Systems_Add_Validations$validateAll(
+	_elm_lang$core$Native_List.fromArray(
+		[_narkisr$elm_ui$Systems_Add_KVM$stringValidations]));
+var _narkisr$elm_ui$Systems_Add_KVM$update = F2(
+	function (msg, _p21) {
+		var _p22 = _p21;
+		var _p28 = _p22.wizard;
+		var _p27 = _p22;
+		var _p23 = msg;
+		switch (_p23.ctor) {
+			case 'WizardMsg':
+				var _p24 = A2(_narkisr$elm_ui$Systems_Add_KVM$validateKvm, _p28.step, _p27);
+				var newModel = _p24;
+				var errors = _p24.errors;
+				var newWizard = A3(
+					_narkisr$elm_ui$Common_Wizard$update,
+					_narkisr$elm_ui$Systems_Add_Validations$notAny(errors),
+					_p23._0,
+					_p28);
+				return _elm_lang$core$Native_Utils.update(
+					newModel,
+					{wizard: newWizard});
+			case 'Update':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_KVM$setDefaultNode,
+					_p27,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setDefaultOS,
+						'kvm',
+						_elm_lang$core$Native_Utils.update(
+							_p27,
+							{environment: _p23._0})));
+			case 'SelectOS':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Common$setMachine,
+					function (machine) {
+						return _elm_lang$core$Native_Utils.update(
+							machine,
+							{os: _p23._0});
+					},
+					_p27);
+			case 'SelectNode':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_KVM$setKVM,
+					function (kvm) {
+						return _elm_lang$core$Native_Utils.update(
+							kvm,
+							{node: _p23._0});
+					},
+					_p27);
+			case 'UserInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p28.step,
+					'User',
+					_narkisr$elm_ui$Systems_Add_KVM$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{user: _p23._0});
+						},
+						_p27));
+			case 'HostnameInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p28.step,
+					'Hostname',
+					_narkisr$elm_ui$Systems_Add_KVM$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{hostname: _p23._0});
+						},
+						_p27));
+			case 'DomainInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p28.step,
+					'Domain',
+					_narkisr$elm_ui$Systems_Add_KVM$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{domain: _p23._0});
+						},
+						_p27));
+			case 'CpuInput':
+				var _p25 = A2(
+					_elm_lang$core$Debug$log,
+					'',
+					_elm_lang$core$String$toInt(_p23._0));
+				if (_p25.ctor === 'Ok') {
+					return A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{
+									cpu: _elm_lang$core$Maybe$Just(_p25._0)
+								});
+						},
+						_p27);
+				} else {
+					return _p27;
+				}
+			case 'RamInput':
+				var _p26 = _elm_lang$core$String$toInt(_p23._0);
+				if (_p26.ctor === 'Ok') {
+					return A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{
+									ram: _elm_lang$core$Maybe$Just(_p26._0)
+								});
+						},
+						_p27);
+				} else {
+					return _p27;
+				}
+			default:
+				return _p27;
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_KVM$next = F2(
+	function (model, environment) {
+		return A2(
+			_narkisr$elm_ui$Systems_Add_KVM$update,
+			_narkisr$elm_ui$Systems_Add_KVM$WizardMsg(_narkisr$elm_ui$Common_Wizard$Next),
+			A2(
+				_narkisr$elm_ui$Systems_Add_KVM$update,
+				_narkisr$elm_ui$Systems_Add_KVM$Update(environment),
+				model));
+	});
+var _narkisr$elm_ui$Systems_Add_KVM$back = function (model) {
+	return A2(
+		_narkisr$elm_ui$Systems_Add_KVM$update,
+		_narkisr$elm_ui$Systems_Add_KVM$WizardMsg(_narkisr$elm_ui$Common_Wizard$Back),
+		model);
+};
+var _narkisr$elm_ui$Systems_Add_KVM$Zero = {ctor: 'Zero'};
+var _narkisr$elm_ui$Systems_Add_KVM$init = function () {
+	var wizard = A3(
+		_narkisr$elm_ui$Common_Wizard$init,
+		_narkisr$elm_ui$Systems_Add_KVM$Zero,
+		_narkisr$elm_ui$Systems_Add_KVM$Instance,
+		_elm_lang$core$Native_List.fromArray(
+			[_narkisr$elm_ui$Systems_Add_KVM$Instance, _narkisr$elm_ui$Systems_Add_KVM$Summary]));
+	return A5(
+		_narkisr$elm_ui$Systems_Add_KVM$Model,
+		wizard,
+		_narkisr$elm_ui$Systems_Model_KVM$emptyKVM,
+		A2(_narkisr$elm_ui$Systems_Model_Common$resourcedMachine, 1, 512),
+		_elm_lang$core$Dict$empty,
+		_elm_lang$core$Dict$empty);
+}();
+
+var _narkisr$elm_ui$Systems_View_GCE$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[])));
+};
+var _narkisr$elm_ui$Systems_View_GCE$summarySections = function (_p0) {
+	var _p1 = _p0;
+	var _p4 = _p1._1;
+	var _p3 = _p1._0;
+	return A2(
+		_elm_lang$core$List$filter,
+		function (_p2) {
+			return _elm_lang$core$Basics$not(
+				_elm_lang$core$List$isEmpty(_p2));
+		},
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Instance',
+				_elm_lang$core$Native_List.fromArray(
+					['type', 'os', 'zone', 'project id']),
+				_elm_lang$core$Native_List.fromArray(
+					[_p3.machineType, _p4.os, _p3.zone, _p3.projectId])),
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Security',
+				_elm_lang$core$Native_List.fromArray(
+					['user', 'tags']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p4.user,
+						A2(
+						_elm_lang$core$String$join,
+						' ',
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_p3.tags))
+					])),
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Networking',
+				_elm_lang$core$Native_List.fromArray(
+					['hostname', 'domain', 'ip', 'static ip']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p4.hostname,
+						_p4.domain,
+						A2(_elm_lang$core$Maybe$withDefault, '', _p4.ip),
+						A2(_elm_lang$core$Maybe$withDefault, '', _p3.staticIp)
+					]))
+			]));
+};
+var _narkisr$elm_ui$Systems_View_GCE$summarize = function (model) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h4,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('System overview')
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+									{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+								]))
+						]),
+					A2(
+						_elm_lang$core$List$map,
+						_circuithub$elm_bootstrap_html$Bootstrap_Html$row_,
+						A2(
+							_elm_lang$core$List$map,
+							_elm_lang$core$List$concat,
+							A2(
+								_narkisr$elm_ui$Common_Utils$partition,
+								2,
+								A2(
+									_elm_lang$core$List$map,
+									_narkisr$elm_ui$Common_Summary$summaryPanel,
+									_narkisr$elm_ui$Systems_View_GCE$summarySections(model))))))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_GCE$Model = function (a) {
+	return {id: a};
+};
+var _narkisr$elm_ui$Systems_View_GCE$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Systems_View_GCE$Model(0));
+
+var _narkisr$elm_ui$Systems_Add_GCE$getOses = function (model) {
+	var hypervisor = A2(
+		_elm_lang$core$Maybe$withDefault,
+		_narkisr$elm_ui$Environments_List$OSTemplates(_elm_lang$core$Dict$empty),
+		A2(_elm_lang$core$Dict$get, 'gce', model.environment));
+	var _p0 = hypervisor;
+	if (_p0.ctor === 'OSTemplates') {
+		return _p0._0;
+	} else {
+		return _elm_lang$core$Dict$empty;
+	}
+};
+var _narkisr$elm_ui$Systems_Add_GCE$setGCE = F2(
+	function (f, _p1) {
+		var _p2 = _p1;
+		var newGce = f(_p2.gce);
+		return _elm_lang$core$Native_Utils.update(
+			_p2,
+			{gce: newGce});
+	});
+var _narkisr$elm_ui$Systems_Add_GCE$Model = F5(
+	function (a, b, c, d, e) {
+		return {wizard: a, gce: b, machine: c, environment: d, errors: e};
+	});
+var _narkisr$elm_ui$Systems_Add_GCE$IPInput = function (a) {
+	return {ctor: 'IPInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$DomainInput = function (a) {
+	return {ctor: 'DomainInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$HostnameInput = function (a) {
+	return {ctor: 'HostnameInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$networking = function (_p3) {
+	var _p4 = _p3;
+	var _p5 = _p4.machine;
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p4.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('DNS')
+						])),
+					A2(
+					check,
+					'Hostname',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_GCE$HostnameInput, '', _p5.hostname)),
+					A2(
+					check,
+					'Domain',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_GCE$DomainInput, '', _p5.domain)),
+					A2(
+					check,
+					'IP',
+					A3(
+						_narkisr$elm_ui$Common_Components$inputText,
+						_narkisr$elm_ui$Systems_Add_GCE$IPInput,
+						'',
+						A2(_elm_lang$core$Maybe$withDefault, '', _p4.gce.staticIp)))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_GCE$TagsInput = function (a) {
+	return {ctor: 'TagsInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$ProjectIdInput = function (a) {
+	return {ctor: 'ProjectIdInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$UserInput = function (a) {
+	return {ctor: 'UserInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$SelectZone = function (a) {
+	return {ctor: 'SelectZone', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$SelectOS = function (a) {
+	return {ctor: 'SelectOS', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$SelectMachineType = function (a) {
+	return {ctor: 'SelectMachineType', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$instance = function (_p6) {
+	var _p7 = _p6;
+	var _p9 = _p7;
+	var _p8 = _p7.gce;
+	var zone = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$zones));
+	var tags = A2(
+		_elm_lang$core$String$join,
+		' ',
+		_narkisr$elm_ui$Common_Utils$defaultEmpty(_p8.tags));
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p7.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Properties')
+						])),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Machine type',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_GCE$SelectMachineType, _narkisr$elm_ui$Systems_Model_GCE$machineTypes, _p8.machineType)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'OS',
+					A3(
+						_narkisr$elm_ui$Common_Components$selector,
+						_narkisr$elm_ui$Systems_Add_GCE$SelectOS,
+						_elm_lang$core$Dict$keys(
+							_narkisr$elm_ui$Systems_Add_GCE$getOses(_p9)),
+						_p7.machine.os)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Zone',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_GCE$SelectZone, _narkisr$elm_ui$Systems_Model_GCE$zones, _p8.zone)),
+					A2(
+					check,
+					'Project id',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_GCE$ProjectIdInput, '', _p8.projectId)),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Security')
+						])),
+					A2(
+					check,
+					'User',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_GCE$UserInput, '', _p9.machine.user)),
+					A2(
+					check,
+					'Tags',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_GCE$TagsInput, ' ', tags))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_GCE$stepView = function (_p10) {
+	var _p11 = _p10;
+	var _p14 = _p11.wizard;
+	var _p13 = _p11;
+	var _p12 = _p14.step;
+	switch (_p12.ctor) {
+		case 'Instance':
+			return _narkisr$elm_ui$Systems_Add_GCE$instance(_p13);
+		case 'Networking':
+			return _narkisr$elm_ui$Systems_Add_GCE$networking(_p13);
+		case 'Summary':
+			return _narkisr$elm_ui$Systems_View_GCE$summarize(
+				{ctor: '_Tuple2', _0: _p11.gce, _1: _p11.machine});
+		default:
+			return A2(
+				_elm_lang$core$Debug$log,
+				_elm_lang$core$Basics$toString(_p14.step),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[]))
+					]));
+	}
+};
+var _narkisr$elm_ui$Systems_Add_GCE$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Systems_Add_GCE$stepView(model)));
+};
+var _narkisr$elm_ui$Systems_Add_GCE$Update = function (a) {
+	return {ctor: 'Update', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_GCE$Summary = {ctor: 'Summary'};
+var _narkisr$elm_ui$Systems_Add_GCE$Networking = {ctor: 'Networking'};
+var _narkisr$elm_ui$Systems_Add_GCE$Instance = {ctor: 'Instance'};
+var _narkisr$elm_ui$Systems_Add_GCE$stringValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_GCE$Networking,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Hostname',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Hostname',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p15) {
+							var _p16 = _p15;
+							return _p16.machine.hostname;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Domain',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Domain',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p17) {
+							var _p18 = _p17;
+							return _p18.machine.domain;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'IP',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'IP',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$validIp]),
+						function (_p19) {
+							var _p20 = _p19;
+							return A2(_elm_lang$core$Maybe$withDefault, '', _p20.gce.staticIp);
+						})
+				}
+				])),
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_GCE$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'User',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'User',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p21) {
+							var _p22 = _p21;
+							return _p22.machine.user;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Project id',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Project id',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p23) {
+							var _p24 = _p23;
+							return _p24.gce.projectId;
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_GCE$listValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_GCE$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Tags',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Tags',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$hasItems]),
+						function (_p25) {
+							var _p26 = _p25;
+							return _narkisr$elm_ui$Common_Utils$defaultEmpty(_p26.gce.tags);
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_GCE$validateGce = _narkisr$elm_ui$Systems_Add_Validations$validateAll(
+	_elm_lang$core$Native_List.fromArray(
+		[_narkisr$elm_ui$Systems_Add_GCE$listValidations, _narkisr$elm_ui$Systems_Add_GCE$stringValidations]));
+var _narkisr$elm_ui$Systems_Add_GCE$update = F2(
+	function (msg, _p27) {
+		var _p28 = _p27;
+		var _p34 = _p28.wizard;
+		var _p33 = _p28;
+		var _p32 = _p28.machine;
+		var _p29 = msg;
+		switch (_p29.ctor) {
+			case 'WizardMsg':
+				var _p30 = A2(_narkisr$elm_ui$Systems_Add_GCE$validateGce, _p34.step, _p33);
+				var newModel = _p30;
+				var errors = _p30.errors;
+				var newWizard = A3(
+					_narkisr$elm_ui$Common_Wizard$update,
+					_narkisr$elm_ui$Systems_Add_Validations$notAny(errors),
+					_p29._0,
+					_p34);
+				return _elm_lang$core$Native_Utils.update(
+					newModel,
+					{wizard: newWizard});
+			case 'Update':
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p33,
+					{environment: _p29._0});
+				var _p31 = _elm_lang$core$List$head(
+					_elm_lang$core$Dict$keys(
+						_narkisr$elm_ui$Systems_Add_GCE$getOses(newModel)));
+				if (_p31.ctor === 'Just') {
+					return _elm_lang$core$String$isEmpty(_p32.os) ? _elm_lang$core$Native_Utils.update(
+						newModel,
+						{
+							machine: _elm_lang$core$Native_Utils.update(
+								_p32,
+								{os: _p31._0})
+						}) : newModel;
+				} else {
+					return newModel;
+				}
+			case 'SelectMachineType':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_GCE$setGCE,
+					function (gce) {
+						return _elm_lang$core$Native_Utils.update(
+							gce,
+							{machineType: _p29._0});
+					},
+					_p33);
+			case 'SelectOS':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Common$setMachine,
+					function (machine) {
+						return _elm_lang$core$Native_Utils.update(
+							machine,
+							{os: _p29._0});
+					},
+					_p33);
+			case 'SelectZone':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_GCE$setGCE,
+					function (gce) {
+						return _elm_lang$core$Native_Utils.update(
+							gce,
+							{zone: _p29._0});
+					},
+					_p33);
+			case 'UserInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p34.step,
+					'User',
+					_narkisr$elm_ui$Systems_Add_GCE$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{user: _p29._0});
+						},
+						_p33));
+			case 'HostnameInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p34.step,
+					'Hostname',
+					_narkisr$elm_ui$Systems_Add_GCE$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{hostname: _p29._0});
+						},
+						_p33));
+			case 'ProjectIdInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p34.step,
+					'Project id',
+					_narkisr$elm_ui$Systems_Add_GCE$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_GCE$setGCE,
+						function (gce) {
+							return _elm_lang$core$Native_Utils.update(
+								gce,
+								{projectId: _p29._0});
+						},
+						_p33));
+			case 'TagsInput':
+				var splited = A2(_elm_lang$core$String$split, ' ', _p29._0);
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p34.step,
+					'Tags',
+					_narkisr$elm_ui$Systems_Add_GCE$listValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_GCE$setGCE,
+						function (gce) {
+							return _elm_lang$core$Native_Utils.update(
+								gce,
+								{
+									tags: _elm_lang$core$Maybe$Just(
+										_elm_lang$core$Native_Utils.eq(
+											splited,
+											_elm_lang$core$Native_List.fromArray(
+												[''])) ? _elm_lang$core$Native_List.fromArray(
+											[]) : splited)
+								});
+						},
+						_p33));
+			case 'DomainInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p34.step,
+					'Domain',
+					_narkisr$elm_ui$Systems_Add_GCE$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{domain: _p29._0});
+						},
+						_p33));
+			default:
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p34.step,
+					'IP',
+					_narkisr$elm_ui$Systems_Add_GCE$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_GCE$setGCE,
+						function (gce) {
+							return _elm_lang$core$Native_Utils.update(
+								gce,
+								{
+									staticIp: _elm_lang$core$Maybe$Just(_p29._0)
+								});
+						},
+						_p33));
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_GCE$next = F2(
+	function (model, environment) {
+		return A2(
+			_narkisr$elm_ui$Systems_Add_GCE$update,
+			_narkisr$elm_ui$Systems_Add_GCE$WizardMsg(_narkisr$elm_ui$Common_Wizard$Next),
+			A2(
+				_narkisr$elm_ui$Systems_Add_GCE$update,
+				_narkisr$elm_ui$Systems_Add_GCE$Update(environment),
+				model));
+	});
+var _narkisr$elm_ui$Systems_Add_GCE$back = function (model) {
+	return A2(
+		_narkisr$elm_ui$Systems_Add_GCE$update,
+		_narkisr$elm_ui$Systems_Add_GCE$WizardMsg(_narkisr$elm_ui$Common_Wizard$Back),
+		model);
+};
+var _narkisr$elm_ui$Systems_Add_GCE$Zero = {ctor: 'Zero'};
+var _narkisr$elm_ui$Systems_Add_GCE$init = function () {
+	var wizard = A3(
+		_narkisr$elm_ui$Common_Wizard$init,
+		_narkisr$elm_ui$Systems_Add_GCE$Zero,
+		_narkisr$elm_ui$Systems_Add_GCE$Instance,
+		_elm_lang$core$Native_List.fromArray(
+			[_narkisr$elm_ui$Systems_Add_GCE$Instance, _narkisr$elm_ui$Systems_Add_GCE$Networking, _narkisr$elm_ui$Systems_Add_GCE$Summary]));
+	return A5(_narkisr$elm_ui$Systems_Add_GCE$Model, wizard, _narkisr$elm_ui$Systems_Model_GCE$emptyGce, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty);
+}();
+
+var _narkisr$elm_ui$Systems_View_Digital$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[])));
+};
+var _narkisr$elm_ui$Systems_View_Digital$summarySections = function (_p0) {
+	var _p1 = _p0;
+	var _p3 = _p1._1;
+	var _p2 = _p1._0;
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Instance',
+			_elm_lang$core$Native_List.fromArray(
+				['size', 'os', 'region']),
+			_elm_lang$core$Native_List.fromArray(
+				[_p2.size, _p3.os, _p2.region])),
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Security',
+			_elm_lang$core$Native_List.fromArray(
+				['user']),
+			_elm_lang$core$Native_List.fromArray(
+				[_p3.user])),
+			A3(
+			_narkisr$elm_ui$Common_Summary$overviewSection,
+			'Networking',
+			_elm_lang$core$Native_List.fromArray(
+				['hostname', 'domain', 'private networking']),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_p3.hostname,
+					_p3.domain,
+					_elm_lang$core$Basics$toString(_p2.privateNetworking)
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_Digital$summarize = function (model) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h4,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('System overview')
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+									{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+								]))
+						]),
+					A2(
+						_elm_lang$core$List$map,
+						_circuithub$elm_bootstrap_html$Bootstrap_Html$row_,
+						A2(
+							_elm_lang$core$List$map,
+							_elm_lang$core$List$concat,
+							A2(
+								_narkisr$elm_ui$Common_Utils$partition,
+								2,
+								A2(
+									_elm_lang$core$List$map,
+									_narkisr$elm_ui$Common_Summary$summaryPanel,
+									_narkisr$elm_ui$Systems_View_Digital$summarySections(model))))))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_View_Digital$Model = function (a) {
+	return {id: a};
+};
+var _narkisr$elm_ui$Systems_View_Digital$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Systems_View_Digital$Model(0));
+
+var _narkisr$elm_ui$Systems_Add_Digital$getOses = function (model) {
+	var hypervisor = A2(
+		_elm_lang$core$Maybe$withDefault,
+		_narkisr$elm_ui$Environments_List$OSTemplates(_elm_lang$core$Dict$empty),
+		A2(_elm_lang$core$Dict$get, 'digital-ocean', model.environment));
+	var _p0 = hypervisor;
+	if (_p0.ctor === 'OSTemplates') {
+		return _p0._0;
+	} else {
+		return _elm_lang$core$Dict$empty;
+	}
+};
+var _narkisr$elm_ui$Systems_Add_Digital$setDigital = F2(
+	function (f, _p1) {
+		var _p2 = _p1;
+		var newDigital = f(
+			A2(_elm_lang$core$Debug$log, '', _p2.digital));
+		return _elm_lang$core$Native_Utils.update(
+			_p2,
+			{digital: newDigital});
+	});
+var _narkisr$elm_ui$Systems_Add_Digital$Model = F5(
+	function (a, b, c, d, e) {
+		return {wizard: a, digital: b, machine: c, environment: d, errors: e};
+	});
+var _narkisr$elm_ui$Systems_Add_Digital$DomainInput = function (a) {
+	return {ctor: 'DomainInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$HostnameInput = function (a) {
+	return {ctor: 'HostnameInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$UserInput = function (a) {
+	return {ctor: 'UserInput', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$SelectRegion = function (a) {
+	return {ctor: 'SelectRegion', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$PrivateNetworking = {ctor: 'PrivateNetworking'};
+var _narkisr$elm_ui$Systems_Add_Digital$SelectOS = function (a) {
+	return {ctor: 'SelectOS', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$SelectSize = function (a) {
+	return {ctor: 'SelectSize', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$instance = function (_p3) {
+	var _p4 = _p3;
+	var _p6 = _p4.machine;
+	var _p5 = _p4.digital;
+	var region = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$regions));
+	var check = _narkisr$elm_ui$Common_Components$withErrors(_p4.errors);
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Properties')
+						])),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Size',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_Digital$SelectSize, _narkisr$elm_ui$Systems_Model_Digital$sizes, _p5.size)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'OS',
+					A3(
+						_narkisr$elm_ui$Common_Components$selector,
+						_narkisr$elm_ui$Systems_Add_Digital$SelectOS,
+						_elm_lang$core$Dict$keys(
+							_narkisr$elm_ui$Systems_Add_Digital$getOses(_p4)),
+						_p6.os)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Region',
+					A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_Digital$SelectRegion, _narkisr$elm_ui$Systems_Model_Digital$regions, _p5.region)),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Security')
+						])),
+					A2(
+					check,
+					'User',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Digital$UserInput, '', _p6.user)),
+					A2(
+					_elm_lang$html$Html$legend,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Networking')
+						])),
+					A2(
+					check,
+					'Hostname',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Digital$HostnameInput, '', _p6.hostname)),
+					A2(
+					check,
+					'Domain',
+					A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Systems_Add_Digital$DomainInput, '', _p6.domain)),
+					A2(
+					_narkisr$elm_ui$Common_Components$group$,
+					'Private Networking',
+					A2(_narkisr$elm_ui$Common_Components$checkbox, _narkisr$elm_ui$Systems_Add_Digital$PrivateNetworking, _p5.privateNetworking))
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Add_Digital$stepView = function (_p7) {
+	var _p8 = _p7;
+	var _p10 = _p8.wizard;
+	var _p9 = _p10.step;
+	switch (_p9.ctor) {
+		case 'Instance':
+			return _narkisr$elm_ui$Systems_Add_Digital$instance(_p8);
+		case 'Summary':
+			return _narkisr$elm_ui$Systems_View_Digital$summarize(
+				{ctor: '_Tuple2', _0: _p8.digital, _1: _p8.machine});
+		default:
+			return A2(
+				_elm_lang$core$Debug$log,
+				_elm_lang$core$Basics$toString(_p10.step),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[]))
+					]));
+	}
+};
+var _narkisr$elm_ui$Systems_Add_Digital$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Systems_Add_Digital$stepView(model)));
+};
+var _narkisr$elm_ui$Systems_Add_Digital$Update = function (a) {
+	return {ctor: 'Update', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_Digital$Summary = {ctor: 'Summary'};
+var _narkisr$elm_ui$Systems_Add_Digital$Instance = {ctor: 'Instance'};
+var _narkisr$elm_ui$Systems_Add_Digital$stringValidations = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_narkisr$elm_ui$Systems_Add_Validations$vpair,
+			_narkisr$elm_ui$Systems_Add_Digital$Instance,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'Hostname',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Hostname',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p11) {
+							var _p12 = _p11;
+							return _p12.machine.hostname;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'Domain',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'Domain',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p13) {
+							var _p14 = _p13;
+							return _p14.machine.domain;
+						})
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'User',
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Validations$validationOf,
+						'User',
+						_elm_lang$core$Native_List.fromArray(
+							[_narkisr$elm_ui$Systems_Add_Validations$notEmpty]),
+						function (_p15) {
+							var _p16 = _p15;
+							return _p16.machine.user;
+						})
+				}
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add_Digital$validateDigital = _narkisr$elm_ui$Systems_Add_Validations$validateAll(
+	_elm_lang$core$Native_List.fromArray(
+		[_narkisr$elm_ui$Systems_Add_Digital$stringValidations]));
+var _narkisr$elm_ui$Systems_Add_Digital$update = F2(
+	function (msg, _p17) {
+		var _p18 = _p17;
+		var _p24 = _p18.wizard;
+		var _p23 = _p18;
+		var _p22 = _p18.machine;
+		var _p19 = msg;
+		switch (_p19.ctor) {
+			case 'WizardMsg':
+				var _p20 = A2(_narkisr$elm_ui$Systems_Add_Digital$validateDigital, _p24.step, _p23);
+				var newModel = _p20;
+				var errors = _p20.errors;
+				var newWizard = A3(
+					_narkisr$elm_ui$Common_Wizard$update,
+					_narkisr$elm_ui$Systems_Add_Validations$notAny(errors),
+					_p19._0,
+					_p24);
+				return _elm_lang$core$Native_Utils.update(
+					newModel,
+					{wizard: newWizard});
+			case 'Update':
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p23,
+					{environment: _p19._0});
+				var _p21 = _elm_lang$core$List$head(
+					_elm_lang$core$Dict$keys(
+						_narkisr$elm_ui$Systems_Add_Digital$getOses(newModel)));
+				if (_p21.ctor === 'Just') {
+					return _elm_lang$core$String$isEmpty(_p22.os) ? _elm_lang$core$Native_Utils.update(
+						newModel,
+						{
+							machine: _elm_lang$core$Native_Utils.update(
+								_p22,
+								{os: _p21._0})
+						}) : newModel;
+				} else {
+					return newModel;
+				}
+			case 'SelectSize':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Digital$setDigital,
+					function (digital) {
+						return _elm_lang$core$Native_Utils.update(
+							digital,
+							{size: _p19._0});
+					},
+					_p23);
+			case 'SelectOS':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Common$setMachine,
+					function (machine) {
+						return _elm_lang$core$Native_Utils.update(
+							machine,
+							{os: _p19._0});
+					},
+					_p23);
+			case 'SelectRegion':
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Digital$setDigital,
+					function (digital) {
+						return _elm_lang$core$Native_Utils.update(
+							digital,
+							{region: _p19._0});
+					},
+					_p23);
+			case 'UserInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p24.step,
+					'User',
+					_narkisr$elm_ui$Systems_Add_Digital$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{user: _p19._0});
+						},
+						_p23));
+			case 'HostnameInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p24.step,
+					'Hostname',
+					_narkisr$elm_ui$Systems_Add_Digital$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{hostname: _p19._0});
+						},
+						_p23));
+			case 'DomainInput':
+				return A4(
+					_narkisr$elm_ui$Systems_Add_Validations$validate,
+					_p24.step,
+					'Domain',
+					_narkisr$elm_ui$Systems_Add_Digital$stringValidations,
+					A2(
+						_narkisr$elm_ui$Systems_Add_Common$setMachine,
+						function (machine) {
+							return _elm_lang$core$Native_Utils.update(
+								machine,
+								{domain: _p19._0});
+						},
+						_p23));
+			default:
+				return A2(
+					_narkisr$elm_ui$Systems_Add_Digital$setDigital,
+					function (digital) {
+						return _elm_lang$core$Native_Utils.update(
+							digital,
+							{
+								privateNetworking: _elm_lang$core$Basics$not(digital.privateNetworking)
+							});
+					},
+					_p23);
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Digital$next = F2(
+	function (model, environment) {
+		return A2(
+			_narkisr$elm_ui$Systems_Add_Digital$update,
+			_narkisr$elm_ui$Systems_Add_Digital$WizardMsg(_narkisr$elm_ui$Common_Wizard$Next),
+			A2(
+				_narkisr$elm_ui$Systems_Add_Digital$update,
+				_narkisr$elm_ui$Systems_Add_Digital$Update(environment),
+				model));
+	});
+var _narkisr$elm_ui$Systems_Add_Digital$back = function (model) {
+	return A2(
+		_narkisr$elm_ui$Systems_Add_Digital$update,
+		_narkisr$elm_ui$Systems_Add_Digital$WizardMsg(_narkisr$elm_ui$Common_Wizard$Back),
+		model);
+};
+var _narkisr$elm_ui$Systems_Add_Digital$Zero = {ctor: 'Zero'};
+var _narkisr$elm_ui$Systems_Add_Digital$init = function () {
+	var wizard = A3(
+		_narkisr$elm_ui$Common_Wizard$init,
+		_narkisr$elm_ui$Systems_Add_Digital$Zero,
+		_narkisr$elm_ui$Systems_Add_Digital$Instance,
+		_elm_lang$core$Native_List.fromArray(
+			[_narkisr$elm_ui$Systems_Add_Digital$Instance, _narkisr$elm_ui$Systems_Add_Digital$Summary]));
+	return A5(_narkisr$elm_ui$Systems_Add_Digital$Model, wizard, _narkisr$elm_ui$Systems_Model_Digital$emptyDigital, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty);
+}();
+
+var _narkisr$elm_ui$Types_Model$classesDecoder = _elm_lang$core$Json_Decode$dict(
+	_narkisr$elm_ui$Common_Model$option(
+		{ctor: '_Tuple0'}));
+var _narkisr$elm_ui$Types_Model$decodeClasses = function (json) {
+	var _p0 = A2(_elm_lang$core$Json_Decode$decodeString, _narkisr$elm_ui$Types_Model$classesDecoder, json);
+	if (_p0.ctor === 'Ok') {
+		return _p0._0;
+	} else {
+		return A2(_elm_lang$core$Debug$log, _p0._0, _elm_lang$core$Dict$empty);
+	}
+};
+var _narkisr$elm_ui$Types_Model$Module = F3(
+	function (a, b, c) {
+		return {name: a, src: b, options: c};
+	});
+var _narkisr$elm_ui$Types_Model$module$ = A4(
+	_elm_lang$core$Json_Decode$object3,
+	_narkisr$elm_ui$Types_Model$Module,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'src', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode_ops[':='],
+			'options',
+			_elm_lang$core$Json_Decode$dict(
+				_narkisr$elm_ui$Common_Model$option(
+					{ctor: '_Tuple0'})))));
+var _narkisr$elm_ui$Types_Model$emptyModule = A3(_narkisr$elm_ui$Types_Model$Module, '', '', _elm_lang$core$Maybe$Nothing);
+var _narkisr$elm_ui$Types_Model$PuppetStd = F3(
+	function (a, b, c) {
+		return {module$: a, args: b, classes: c};
+	});
+var _narkisr$elm_ui$Types_Model$puppetStd = A4(
+	_elm_lang$core$Json_Decode$object3,
+	_narkisr$elm_ui$Types_Model$PuppetStd,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'module', _narkisr$elm_ui$Types_Model$module$),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'args',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'classes',
+		_elm_lang$core$Json_Decode$dict(
+			_narkisr$elm_ui$Common_Model$option(
+				{ctor: '_Tuple0'}))));
+var _narkisr$elm_ui$Types_Model$emptyPuppet = A3(
+	_narkisr$elm_ui$Types_Model$PuppetStd,
+	_narkisr$elm_ui$Types_Model$emptyModule,
+	_elm_lang$core$Native_List.fromArray(
+		[]),
+	_elm_lang$core$Dict$empty);
+var _narkisr$elm_ui$Types_Model$Type = F3(
+	function (a, b, c) {
+		return {type$: a, description: b, puppetStd: c};
+	});
+var _narkisr$elm_ui$Types_Model$type$ = A4(
+	_elm_lang$core$Json_Decode$object3,
+	_narkisr$elm_ui$Types_Model$Type,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'type', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'description', _elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'puppet-std',
+		_elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Types_Model$puppetStd)));
+var _narkisr$elm_ui$Types_Model$emptyType = A3(_narkisr$elm_ui$Types_Model$Type, '', _elm_lang$core$Maybe$Nothing, _elm_lang$core$Dict$empty);
+var _narkisr$elm_ui$Types_Model$puppetBase = F4(
+	function (name, src, unsecure, args) {
+		var module$ = A3(
+			_narkisr$elm_ui$Types_Model$Module,
+			name,
+			src,
+			_elm_lang$core$Maybe$Just(
+				_elm_lang$core$Dict$fromList(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							{
+							ctor: '_Tuple2',
+							_0: 'unsecure',
+							_1: _narkisr$elm_ui$Common_Model$BoolOption(unsecure)
+						}
+						]))));
+		var puppet = A3(
+			_narkisr$elm_ui$Types_Model$PuppetStd,
+			module$,
+			A2(_elm_lang$core$String$split, ' ', args),
+			_elm_lang$core$Dict$empty);
+		return _elm_lang$core$Native_Utils.update(
+			_narkisr$elm_ui$Types_Model$emptyType,
+			{
+				puppetStd: _elm_lang$core$Dict$fromList(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							{ctor: '_Tuple2', _0: '--', _1: puppet}
+						]))
+			});
+	});
+var _narkisr$elm_ui$Types_Model$typeBase = F3(
+	function (type$, description, environment) {
+		return A3(
+			_narkisr$elm_ui$Types_Model$Type,
+			type$,
+			_elm_lang$core$Maybe$Just(description),
+			_elm_lang$core$Dict$fromList(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: environment, _1: _narkisr$elm_ui$Types_Model$emptyPuppet}
+					])));
+	});
+
+var _narkisr$elm_ui$Types_List$typesList = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['types']),
+	_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Types_Model$type$));
+var _narkisr$elm_ui$Types_List$getTypes = function (msg) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		msg,
+		_elm_lang$core$Task$toResult(
+			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Types_List$typesList, '/types')));
+};
+var _narkisr$elm_ui$Types_List$setTypes = F2(
+	function (_p0, types) {
+		var _p1 = _p0;
+		var typePairs = A2(
+			_elm_lang$core$List$map,
+			function (_p2) {
+				var _p3 = _p2;
+				return {ctor: '_Tuple2', _0: _p3.type$, _1: _p3};
+			},
+			types);
+		var newTable = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(typePairs),
+			_p1.table);
+		var total = _elm_lang$core$List$length(types);
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(total)),
+			_p1.pager);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				_p1,
+				{types: types, pager: newPager, table: newTable}));
+	});
+var _narkisr$elm_ui$Types_List$typeRow = F2(
+	function (id, _p4) {
+		var _p5 = _p4;
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p5.type$)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('Puppet standalone')
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						A2(_elm_lang$core$Maybe$withDefault, '', _p5.description))
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Types_List$Model = F3(
+	function (a, b, c) {
+		return {types: a, table: b, pager: c};
+	});
+var _narkisr$elm_ui$Types_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Types_List$update = F2(
+	function (msg, model) {
+		var _p6 = msg;
+		if (_p6.ctor === 'SetTypes') {
+			return A4(
+				_narkisr$elm_ui$Common_Errors$successHandler,
+				_p6._0,
+				model,
+				_narkisr$elm_ui$Types_List$setTypes(model),
+				_narkisr$elm_ui$Types_List$NoOp);
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Types_List$SetTypes = function (a) {
+	return {ctor: 'SetTypes', _0: a};
+};
+var _narkisr$elm_ui$Types_List$init = function () {
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'typesListing',
+		true,
+		_elm_lang$core$Native_List.fromArray(
+			['Name', 'Provisioner', 'Description']),
+		_narkisr$elm_ui$Types_List$typeRow,
+		'Types');
+	return {
+		ctor: '_Tuple2',
+		_0: A3(
+			_narkisr$elm_ui$Types_List$Model,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			table,
+			_narkisr$elm_ui$Pager$init),
+		_1: _narkisr$elm_ui$Types_List$getTypes(_narkisr$elm_ui$Types_List$SetTypes)
+	};
+}();
+var _narkisr$elm_ui$Types_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Types_List$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Types_List$view = function (_p7) {
+	var _p8 = _p7;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_circuithub$elm_bootstrap_html$Bootstrap_Html$panelDefault_(
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html_App$map,
+										_narkisr$elm_ui$Types_List$LoadPage,
+										_narkisr$elm_ui$Table$view(_p8.table))
+									]))
+							]))
+					])),
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_narkisr$elm_ui$Types_List$GotoPage,
+						_narkisr$elm_ui$Pager$view(_p8.pager))
+					]))
+			]));
+};
+
+var _narkisr$elm_ui$Systems_Add_General$setTypes = F2(
+	function (model, types) {
+		var typesList = A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.type$;
+			},
+			types);
+		var firstType = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(typesList));
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{types: typesList, type$: firstType}));
+	});
+var _narkisr$elm_ui$Systems_Add_General$setEnvironments = F2(
+	function (model, es) {
+		var environments = _elm_lang$core$Dict$keys(es);
+		var environment = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(
+				_elm_lang$core$Dict$keys(es)));
+		var hypervisors = _elm_lang$core$Dict$keys(
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				_elm_lang$core$Dict$empty,
+				A2(_elm_lang$core$Dict$get, environment, es)));
+		var hypervisor = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(hypervisors));
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{hypervisors: hypervisors, hypervisor: hypervisor}));
+	});
+var _narkisr$elm_ui$Systems_Add_General$Model = F5(
+	function (a, b, c, d, e) {
+		return {type$: a, types: b, hypervisor: c, hypervisors: d, admin: e};
+	});
+var _narkisr$elm_ui$Systems_Add_General$SelectHypervisor = function (a) {
+	return {ctor: 'SelectHypervisor', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_General$SelectType = function (a) {
+	return {ctor: 'SelectType', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_General$SetTypes = function (a) {
+	return {ctor: 'SetTypes', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_General$AdminMsg = function (a) {
+	return {ctor: 'AdminMsg', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_General$general = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('form-horizontal'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add_General$AdminMsg,
+				_narkisr$elm_ui$Admin_Core$view(_p1.admin)),
+				A2(
+				_narkisr$elm_ui$Common_Components$group$,
+				'Type',
+				A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_General$SelectType, _p1.types, _p1.type$)),
+				A2(
+				_narkisr$elm_ui$Common_Components$group$,
+				'Hypervisor',
+				A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Systems_Add_General$SelectHypervisor, _p1.hypervisors, _p1.hypervisor))
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_General$view = function (model) {
+	return _narkisr$elm_ui$Common_Components$fixedPanel(
+		A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Common_Components$asList(
+				_narkisr$elm_ui$Systems_Add_General$general(model))));
+};
+var _narkisr$elm_ui$Systems_Add_General$SetEnvironments = function (a) {
+	return {ctor: 'SetEnvironments', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add_General$init = function () {
+	var _p2 = _narkisr$elm_ui$Admin_Core$init;
+	var admin = _p2._0;
+	var adminEffects = _p2._1;
+	var msgs = _elm_lang$core$Platform_Cmd$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_narkisr$elm_ui$Types_List$getTypes(_narkisr$elm_ui$Systems_Add_General$SetTypes),
+				_narkisr$elm_ui$Environments_List$getEnvironments(_narkisr$elm_ui$Systems_Add_General$SetEnvironments),
+				A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Add_General$AdminMsg, adminEffects)
+			]));
+	return {
+		ctor: '_Tuple2',
+		_0: A5(
+			_narkisr$elm_ui$Systems_Add_General$Model,
+			'',
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			'',
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			admin),
+		_1: msgs
+	};
+}();
+var _narkisr$elm_ui$Systems_Add_General$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Add_General$update = F2(
+	function (msg, _p3) {
+		var _p4 = _p3;
+		var _p7 = _p4;
+		var _p5 = msg;
+		switch (_p5.ctor) {
+			case 'SetEnvironments':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p5._0,
+					_p7,
+					_narkisr$elm_ui$Systems_Add_General$setEnvironments(_p7),
+					_narkisr$elm_ui$Systems_Add_General$NoOp);
+			case 'AdminMsg':
+				var _p6 = A2(_narkisr$elm_ui$Admin_Core$update, _p5._0, _p4.admin);
+				var newAdmin = _p6._0;
+				var msgs = _p6._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p7,
+						{admin: newAdmin}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Add_General$AdminMsg, msgs)
+				};
+			case 'SelectHypervisor':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{hypervisor: _p5._0}));
+			case 'SetTypes':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p5._0,
+					_p7,
+					_narkisr$elm_ui$Systems_Add_General$setTypes(_p7),
+					_narkisr$elm_ui$Systems_Add_General$NoOp);
+			case 'SelectType':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{type$: _p5._0}));
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+
+var _narkisr$elm_ui$Systems_Add_Encoders$combine = F4(
+	function (enc, value, key, curr) {
+		var _p0 = value;
+		if (_p0.ctor === 'Just') {
+			return A2(
+				_elm_lang$core$List$append,
+				curr,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{
+						ctor: '_Tuple2',
+						_0: key,
+						_1: enc(_p0._0)
+					}
+					]));
+		} else {
+			return curr;
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Encoders$machineEncoder = function (machine) {
+	var encoded = _elm_lang$core$Native_List.fromArray(
+		[
+			{
+			ctor: '_Tuple2',
+			_0: 'domain',
+			_1: _elm_lang$core$Json_Encode$string(machine.domain)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'hostname',
+			_1: _elm_lang$core$Json_Encode$string(machine.hostname)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'os',
+			_1: _elm_lang$core$Json_Encode$string(machine.os)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'user',
+			_1: _elm_lang$core$Json_Encode$string(machine.user)
+		}
+		]);
+	return _elm_lang$core$Json_Encode$object(
+		A4(
+			_narkisr$elm_ui$Systems_Add_Encoders$combine,
+			_elm_lang$core$Json_Encode$string,
+			machine.ip,
+			'ip',
+			A4(
+				_narkisr$elm_ui$Systems_Add_Encoders$combine,
+				_elm_lang$core$Json_Encode$int,
+				machine.ram,
+				'ram',
+				A4(_narkisr$elm_ui$Systems_Add_Encoders$combine, _elm_lang$core$Json_Encode$int, machine.cpu, 'cpu', encoded))));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$maybeString = function (optional) {
+	var _p1 = optional;
+	if (_p1.ctor === 'Just') {
+		return _elm_lang$core$Json_Encode$string(_p1._0);
+	} else {
+		return _elm_lang$core$Json_Encode$null;
+	}
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$openstackVolumeEncoder = function (volume) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'device',
+				_1: _elm_lang$core$Json_Encode$string(volume.device)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'size',
+				_1: _elm_lang$core$Json_Encode$int(volume.size)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'clear',
+				_1: _elm_lang$core$Json_Encode$bool(volume.clear)
+			}
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$openstackEncoder = function (openstack) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'flavor',
+				_1: _elm_lang$core$Json_Encode$string(openstack.flavor)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'tenant',
+				_1: _elm_lang$core$Json_Encode$string(openstack.tenant)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'floating-ip',
+				_1: _narkisr$elm_ui$Systems_Add_Encoders$maybeString(openstack.floatingIp)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'floating-ip-pool',
+				_1: _narkisr$elm_ui$Systems_Add_Encoders$maybeString(openstack.floatingIpPool)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'key-name',
+				_1: _elm_lang$core$Json_Encode$string(openstack.keyName)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'security-groups',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(
+						_elm_lang$core$List$map,
+						_elm_lang$core$Json_Encode$string,
+						_narkisr$elm_ui$Common_Utils$defaultEmpty(openstack.securityGroups)))
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'networks',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, openstack.networks))
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'volumes',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(
+						_elm_lang$core$List$map,
+						_narkisr$elm_ui$Systems_Add_Encoders$openstackVolumeEncoder,
+						_narkisr$elm_ui$Common_Utils$defaultEmpty(openstack.volumes)))
+			}
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$optional = F2(
+	function (enc, value) {
+		var _p2 = value;
+		if (_p2.ctor === 'Just') {
+			return enc(_p2._0);
+		} else {
+			return _elm_lang$core$Json_Encode$null;
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Encoders$physicalEncoder = function (physical) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'mac',
+				_1: A2(_narkisr$elm_ui$Systems_Add_Encoders$optional, _elm_lang$core$Json_Encode$string, physical.mac)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'broadcast',
+				_1: A2(_narkisr$elm_ui$Systems_Add_Encoders$optional, _elm_lang$core$Json_Encode$string, physical.broadcast)
+			}
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$kvmEncoder = function (kvm) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'node',
+				_1: _elm_lang$core$Json_Encode$string(kvm.node)
+			}
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$digitalEncoder = function (digital) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'size',
+				_1: _elm_lang$core$Json_Encode$string(digital.size)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'region',
+				_1: _elm_lang$core$Json_Encode$string(digital.region)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'private-networking',
+				_1: _elm_lang$core$Json_Encode$bool(digital.privateNetworking)
+			}
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$gceEncoder = function (gce) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'machine-type',
+				_1: _elm_lang$core$Json_Encode$string(gce.machineType)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'zone',
+				_1: _elm_lang$core$Json_Encode$string(gce.zone)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'tags',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(
+						_elm_lang$core$List$map,
+						_elm_lang$core$Json_Encode$string,
+						_narkisr$elm_ui$Common_Utils$defaultEmpty(gce.tags)))
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'project-id',
+				_1: _elm_lang$core$Json_Encode$string(gce.projectId)
+			}
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$vpcEncoder = F2(
+	function (_p3, curr) {
+		var _p4 = _p3;
+		var _p5 = _p4;
+		return _elm_lang$core$String$isEmpty(_p4.vpcId) ? curr : A2(
+			_elm_lang$core$List$append,
+			curr,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'vpc',
+					_1: _elm_lang$core$Json_Encode$object(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								{
+								ctor: '_Tuple2',
+								_0: 'subnet-id',
+								_1: _elm_lang$core$Json_Encode$string(_p5.subnetId)
+							},
+								{
+								ctor: '_Tuple2',
+								_0: 'vpc-id',
+								_1: _elm_lang$core$Json_Encode$string(_p5.vpcId)
+							},
+								{
+								ctor: '_Tuple2',
+								_0: 'assign-public',
+								_1: _elm_lang$core$Json_Encode$bool(_p5.assignPublic)
+							}
+							]))
+				}
+				]));
+	});
+var _narkisr$elm_ui$Systems_Add_Encoders$blockEncoder = function (block) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'volume',
+				_1: _elm_lang$core$Json_Encode$string(block.volume)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'device',
+				_1: _elm_lang$core$Json_Encode$string(block.device)
+			}
+			]));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$awsVolumeEncoder = function (volume) {
+	var enc = _elm_lang$core$Native_List.fromArray(
+		[
+			{
+			ctor: '_Tuple2',
+			_0: 'volume-type',
+			_1: _narkisr$elm_ui$Systems_Add_Encoders$maybeString(
+				A2(_elm_lang$core$Dict$get, volume.type$, _narkisr$elm_ui$Systems_Add_AWS$ebsTypes))
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'size',
+			_1: _elm_lang$core$Json_Encode$int(volume.size)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'device',
+			_1: _elm_lang$core$Json_Encode$string(volume.device)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'clear',
+			_1: _elm_lang$core$Json_Encode$bool(volume.clear)
+		}
+		]);
+	return _elm_lang$core$Json_Encode$object(
+		A4(_narkisr$elm_ui$Systems_Add_Encoders$combine, _elm_lang$core$Json_Encode$int, volume.iops, 'iops', enc));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$awsEncoder = function (aws) {
+	var root = _elm_lang$core$Native_List.fromArray(
+		[
+			{
+			ctor: '_Tuple2',
+			_0: 'key-name',
+			_1: _elm_lang$core$Json_Encode$string(aws.keyName)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'endpoint',
+			_1: _elm_lang$core$Json_Encode$string(aws.endpoint)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'instance-type',
+			_1: _elm_lang$core$Json_Encode$string(aws.instanceType)
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'ebs-optimized',
+			_1: _elm_lang$core$Json_Encode$bool(
+				A2(_elm_lang$core$Maybe$withDefault, false, aws.ebsOptimized))
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'security-groups',
+			_1: _elm_lang$core$Json_Encode$list(
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Json_Encode$string,
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(aws.securityGroups)))
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'block-devices',
+			_1: _elm_lang$core$Json_Encode$list(
+				A2(
+					_elm_lang$core$List$map,
+					_narkisr$elm_ui$Systems_Add_Encoders$blockEncoder,
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(aws.blockDevices)))
+		},
+			{
+			ctor: '_Tuple2',
+			_0: 'volumes',
+			_1: _elm_lang$core$Json_Encode$list(
+				A2(
+					_elm_lang$core$List$map,
+					_narkisr$elm_ui$Systems_Add_Encoders$awsVolumeEncoder,
+					_narkisr$elm_ui$Common_Utils$defaultEmpty(aws.volumes)))
+		}
+		]);
+	return _elm_lang$core$Json_Encode$object(
+		A4(
+			_narkisr$elm_ui$Systems_Add_Encoders$combine,
+			_elm_lang$core$Json_Encode$string,
+			aws.availabilityZone,
+			'availability-zone',
+			A2(
+				_narkisr$elm_ui$Systems_Add_Encoders$vpcEncoder,
+				A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_AWS$emptyVpc, aws.vpc),
+				root)));
+};
+var _narkisr$elm_ui$Systems_Add_Encoders$encoderOf = F2(
+	function (_p6, stage) {
+		var _p7 = _p6;
+		var _p8 = stage;
+		switch (_p8) {
+			case 'AWS':
+				return {
+					ctor: '_Tuple2',
+					_0: 'aws',
+					_1: _narkisr$elm_ui$Systems_Add_Encoders$awsEncoder(
+						A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_AWS$emptyAws, _p7.aws))
+				};
+			case 'GCE':
+				return {
+					ctor: '_Tuple2',
+					_0: 'gce',
+					_1: _narkisr$elm_ui$Systems_Add_Encoders$gceEncoder(
+						A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_GCE$emptyGce, _p7.gce))
+				};
+			case 'Digital':
+				return {
+					ctor: '_Tuple2',
+					_0: 'digital-ocean',
+					_1: _narkisr$elm_ui$Systems_Add_Encoders$digitalEncoder(
+						A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_Digital$emptyDigital, _p7.digital))
+				};
+			case 'Physical':
+				return {
+					ctor: '_Tuple2',
+					_0: 'physical',
+					_1: _narkisr$elm_ui$Systems_Add_Encoders$physicalEncoder(
+						A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_Physical$emptyPhysical, _p7.physical))
+				};
+			case 'Openstack':
+				return {
+					ctor: '_Tuple2',
+					_0: 'openstack',
+					_1: _narkisr$elm_ui$Systems_Add_Encoders$openstackEncoder(
+						A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_Openstack$emptyOpenstack, _p7.openstack))
+				};
+			case 'KVM':
+				return {
+					ctor: '_Tuple2',
+					_0: 'kvm',
+					_1: _narkisr$elm_ui$Systems_Add_Encoders$kvmEncoder(
+						A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_KVM$emptyKVM, _p7.kvm))
+				};
+			default:
+				return {ctor: '_Tuple2', _0: '', _1: _elm_lang$core$Json_Encode$null};
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Encoders$encode = F2(
+	function (_p9, stage) {
+		var _p10 = _p9;
+		return _elm_lang$core$Json_Encode$object(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'type',
+					_1: _elm_lang$core$Json_Encode$string(_p10.type$)
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'owner',
+					_1: _elm_lang$core$Json_Encode$string(_p10.owner)
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'env',
+					_1: _elm_lang$core$Json_Encode$string(_p10.env)
+				},
+					A2(_narkisr$elm_ui$Systems_Add_Encoders$encoderOf, _p10, stage),
+					{
+					ctor: '_Tuple2',
+					_0: 'machine',
+					_1: _narkisr$elm_ui$Systems_Add_Encoders$machineEncoder(_p10.machine)
+				}
+				]));
+	});
+
+var _narkisr$elm_ui$Jobs_Common$JobResponse = F3(
+	function (a, b, c) {
+		return {message: a, id: b, job: c};
+	});
+var _narkisr$elm_ui$Jobs_Common$jobResponse = A4(
+	_elm_lang$core$Json_Decode$object3,
+	_narkisr$elm_ui$Jobs_Common$JobResponse,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'job', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Jobs_Common$runJob = F3(
+	function (id, job, msg) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			msg,
+			_elm_lang$core$Task$toResult(
+				A3(
+					_evancz$elm_http$Http$post,
+					_narkisr$elm_ui$Jobs_Common$jobResponse,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'/jobs/',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							job,
+							A2(_elm_lang$core$Basics_ops['++'], '/', id))),
+					_evancz$elm_http$Http$empty)));
+	});
+
+var _narkisr$elm_ui$Systems_Add_Persistency$addDevice = function (vs) {
+	return _elm_lang$core$Maybe$Just(
+		A2(
+			_elm_lang$core$List$map,
+			function (_p0) {
+				var _p1 = _p0;
+				return _elm_lang$core$Native_Utils.update(
+					_p1,
+					{
+						device: A2(_elm_lang$core$Basics_ops['++'], '/dev/', _p1.device)
+					});
+			},
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				vs)));
+};
+var _narkisr$elm_ui$Systems_Add_Persistency$transform = F2(
+	function (_p2, stage) {
+		var _p3 = _p2;
+		var _p5 = _p3;
+		var _p4 = stage;
+		switch (_p4) {
+			case 'AWS':
+				var justAws = A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_AWS$emptyAws, _p3.aws);
+				var newAws = _elm_lang$core$Native_Utils.update(
+					justAws,
+					{
+						blockDevices: _narkisr$elm_ui$Systems_Add_Persistency$addDevice(justAws.blockDevices),
+						volumes: _narkisr$elm_ui$Systems_Add_Persistency$addDevice(justAws.volumes)
+					});
+				return _elm_lang$core$Native_Utils.update(
+					_p5,
+					{
+						aws: _elm_lang$core$Maybe$Just(newAws)
+					});
+			case 'Openstack':
+				var justStack = A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Systems_Model_Openstack$emptyOpenstack, _p3.openstack);
+				var newStack = _elm_lang$core$Native_Utils.update(
+					justStack,
+					{
+						volumes: _narkisr$elm_ui$Systems_Add_Persistency$addDevice(justStack.volumes)
+					});
+				return _elm_lang$core$Native_Utils.update(
+					_p5,
+					{
+						openstack: _elm_lang$core$Maybe$Just(newStack)
+					});
+			default:
+				return _p5;
+		}
+	});
+var _narkisr$elm_ui$Systems_Add_Persistency$persistModel = F3(
+	function (f, system, stage) {
+		return f(
+			A2(
+				_elm_lang$core$Json_Encode$encode,
+				0,
+				A2(
+					_narkisr$elm_ui$Systems_Add_Encoders$encode,
+					A2(_narkisr$elm_ui$Systems_Add_Persistency$transform, system, stage),
+					stage)));
+	});
+
+var _narkisr$elm_ui$Systems_Add$machineFrom = F2(
+	function (stage, _p0) {
+		var _p1 = _p0;
+		var machines = _elm_lang$core$Dict$fromList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'aws', _1: _p1.awsModel.machine},
+					{ctor: '_Tuple2', _0: 'gce', _1: _p1.gceModel.machine},
+					{ctor: '_Tuple2', _0: 'openstack', _1: _p1.openstackModel.machine},
+					{ctor: '_Tuple2', _0: 'digital', _1: _p1.digitalModel.machine},
+					{ctor: '_Tuple2', _0: 'kvm', _1: _p1.kvmModel.machine},
+					{ctor: '_Tuple2', _0: 'physical', _1: _p1.physicalModel.machine}
+				]));
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			_narkisr$elm_ui$Systems_Model_Common$emptyMachine,
+			A2(
+				_elm_lang$core$Dict$get,
+				_elm_lang$core$String$toLower(stage),
+				machines));
+	});
+var _narkisr$elm_ui$Systems_Add$intoSystem = function (_p2) {
+	var _p3 = _p2;
+	var _p4 = _p3.general;
+	var admin = _p4.admin;
+	var type$ = _p4.type$;
+	var baseSystem = A4(
+		_narkisr$elm_ui$Systems_Model_Common$System,
+		admin.owner,
+		admin.environment,
+		type$,
+		A2(
+			_narkisr$elm_ui$Systems_Add$machineFrom,
+			_elm_lang$core$Basics$toString(_p3.stage),
+			_p3));
+	return A6(
+		baseSystem,
+		_elm_lang$core$Maybe$Just(_p3.awsModel.aws),
+		_elm_lang$core$Maybe$Just(_p3.gceModel.gce),
+		_elm_lang$core$Maybe$Just(_p3.digitalModel.digital),
+		_elm_lang$core$Maybe$Just(_p3.openstackModel.openstack),
+		_elm_lang$core$Maybe$Just(_p3.physicalModel.physical),
+		_elm_lang$core$Maybe$Just(_p3.kvmModel.kvm));
+};
+var _narkisr$elm_ui$Systems_Add$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {awsModel: a, gceModel: b, physicalModel: c, digitalModel: d, openstackModel: e, general: f, kvmModel: g, hasNext: h, saveErrors: i, stage: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Systems_Add$Physical = {ctor: 'Physical'};
+var _narkisr$elm_ui$Systems_Add$Digital = {ctor: 'Digital'};
+var _narkisr$elm_ui$Systems_Add$GCE = {ctor: 'GCE'};
+var _narkisr$elm_ui$Systems_Add$KVM = {ctor: 'KVM'};
+var _narkisr$elm_ui$Systems_Add$Openstack = {ctor: 'Openstack'};
+var _narkisr$elm_ui$Systems_Add$AWS = {ctor: 'AWS'};
+var _narkisr$elm_ui$Systems_Add$Proxmox = {ctor: 'Proxmox'};
+var _narkisr$elm_ui$Systems_Add$Error = {ctor: 'Error'};
+var _narkisr$elm_ui$Systems_Add$General = {ctor: 'General'};
+var _narkisr$elm_ui$Systems_Add$back = F2(
+	function (hasPrev, model) {
+		var newModel = _elm_lang$core$Native_Utils.update(
+			model,
+			{hasNext: true});
+		return hasPrev ? newModel : _elm_lang$core$Native_Utils.update(
+			newModel,
+			{stage: _narkisr$elm_ui$Systems_Add$General});
+	});
+var _narkisr$elm_ui$Systems_Add$getBack = F2(
+	function (_p5, hyp) {
+		var _p6 = _p5;
+		var _p13 = _p6.physicalModel;
+		var _p12 = _p6.openstackModel;
+		var _p11 = _p6;
+		var _p10 = _p6.kvmModel;
+		var _p9 = _p6.gceModel;
+		var _p8 = _p6.digitalModel;
+		var _p7 = _p6.awsModel;
+		var backs = _elm_lang$core$Dict$fromList(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'aws',
+					_1: A2(
+						_narkisr$elm_ui$Systems_Add$back,
+						_narkisr$elm_ui$Common_Wizard$hasPrev(_p7),
+						_elm_lang$core$Native_Utils.update(
+							_p11,
+							{
+								stage: _narkisr$elm_ui$Systems_Add$AWS,
+								awsModel: _narkisr$elm_ui$Systems_Add_AWS$back(_p7)
+							}))
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'gce',
+					_1: A2(
+						_narkisr$elm_ui$Systems_Add$back,
+						_narkisr$elm_ui$Common_Wizard$hasPrev(_p9),
+						_elm_lang$core$Native_Utils.update(
+							_p11,
+							{
+								stage: _narkisr$elm_ui$Systems_Add$GCE,
+								gceModel: _narkisr$elm_ui$Systems_Add_GCE$back(_p9)
+							}))
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'kvm',
+					_1: A2(
+						_narkisr$elm_ui$Systems_Add$back,
+						_narkisr$elm_ui$Common_Wizard$hasPrev(_p10),
+						_elm_lang$core$Native_Utils.update(
+							_p11,
+							{
+								stage: _narkisr$elm_ui$Systems_Add$KVM,
+								kvmModel: _narkisr$elm_ui$Systems_Add_KVM$back(_p10)
+							}))
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'openstack',
+					_1: A2(
+						_narkisr$elm_ui$Systems_Add$back,
+						_narkisr$elm_ui$Common_Wizard$hasPrev(_p12),
+						_elm_lang$core$Native_Utils.update(
+							_p11,
+							{
+								stage: _narkisr$elm_ui$Systems_Add$Openstack,
+								openstackModel: _narkisr$elm_ui$Systems_Add_Openstack$back(_p12)
+							}))
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'digital-ocean',
+					_1: A2(
+						_narkisr$elm_ui$Systems_Add$back,
+						_narkisr$elm_ui$Common_Wizard$hasPrev(_p8),
+						_elm_lang$core$Native_Utils.update(
+							_p11,
+							{
+								stage: _narkisr$elm_ui$Systems_Add$Digital,
+								digitalModel: _narkisr$elm_ui$Systems_Add_Digital$back(_p8)
+							}))
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'physical',
+					_1: A2(
+						_narkisr$elm_ui$Systems_Add$back,
+						_narkisr$elm_ui$Common_Wizard$hasPrev(_p13),
+						_elm_lang$core$Native_Utils.update(
+							_p11,
+							{
+								stage: _narkisr$elm_ui$Systems_Add$Physical,
+								physicalModel: _narkisr$elm_ui$Systems_Add_Physical$back(_p13)
+							}))
+				}
+				]));
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			_p11,
+			A2(_elm_lang$core$Dict$get, hyp, backs));
+	});
+var _narkisr$elm_ui$Systems_Add$JobLaunched = function (a) {
+	return {ctor: 'JobLaunched', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$setSaved = F3(
+	function (next, model, _p14) {
+		var _p15 = _p14;
+		var _p16 = _p15.id;
+		if (_p16.ctor === 'Just') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: A3(
+					_narkisr$elm_ui$Jobs_Common$runJob,
+					_elm_lang$core$Basics$toString(_p16._0),
+					_elm_lang$core$String$toLower(
+						_elm_lang$core$Basics$toString(next)),
+					_narkisr$elm_ui$Systems_Add$JobLaunched)
+			};
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Systems_Add$Saved = F2(
+	function (a, b) {
+		return {ctor: 'Saved', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Systems_Add$saveSystem = F2(
+	function (next, json) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			_narkisr$elm_ui$Systems_Add$Saved(next),
+			_elm_lang$core$Task$toResult(
+				A3(
+					_narkisr$elm_ui$Common_Http$postJson,
+					_evancz$elm_http$Http$string(json),
+					_narkisr$elm_ui$Common_Http$saveResponse,
+					'/systems')));
+	});
+var _narkisr$elm_ui$Systems_Add$ErrorsView = function (a) {
+	return {ctor: 'ErrorsView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$errorsView = function (_p17) {
+	var _p18 = _p17;
+	var body = A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Systems_Add$ErrorsView,
+		_narkisr$elm_ui$Common_Errors$view(_p18.saveErrors));
+	return A3(
+		_narkisr$elm_ui$Common_Components$dialogPanel,
+		'danger',
+		_narkisr$elm_ui$Common_Components$error('Failed to save system'),
+		_narkisr$elm_ui$Common_Components$panel(
+			_narkisr$elm_ui$Common_Components$panelContents(body)));
+};
+var _narkisr$elm_ui$Systems_Add$GeneralView = function (a) {
+	return {ctor: 'GeneralView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$init = function () {
+	var _p19 = _narkisr$elm_ui$Systems_Add_General$init;
+	var general = _p19._0;
+	var msgs = _p19._1;
+	var withModels = A7(_narkisr$elm_ui$Systems_Add$Model, _narkisr$elm_ui$Systems_Add_AWS$init, _narkisr$elm_ui$Systems_Add_GCE$init, _narkisr$elm_ui$Systems_Add_Physical$init, _narkisr$elm_ui$Systems_Add_Digital$init, _narkisr$elm_ui$Systems_Add_Openstack$init, general, _narkisr$elm_ui$Systems_Add_KVM$init);
+	return {
+		ctor: '_Tuple2',
+		_0: A3(withModels, true, _narkisr$elm_ui$Common_Errors$init, _narkisr$elm_ui$Systems_Add$General),
+		_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Add$GeneralView, msgs)
+	};
+}();
+var _narkisr$elm_ui$Systems_Add$KVMView = function (a) {
+	return {ctor: 'KVMView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$OpenstackView = function (a) {
+	return {ctor: 'OpenstackView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$DigitalView = function (a) {
+	return {ctor: 'DigitalView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$PhysicalView = function (a) {
+	return {ctor: 'PhysicalView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$GCEView = function (a) {
+	return {ctor: 'GCEView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$AWSView = function (a) {
+	return {ctor: 'AWSView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Add$currentView = function (_p20) {
+	var _p21 = _p20;
+	var _p22 = _p21.stage;
+	switch (_p22.ctor) {
+		case 'General':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add$GeneralView,
+				_narkisr$elm_ui$Systems_Add_General$view(_p21.general));
+		case 'AWS':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add$AWSView,
+				_narkisr$elm_ui$Systems_Add_AWS$view(_p21.awsModel));
+		case 'GCE':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add$GCEView,
+				_narkisr$elm_ui$Systems_Add_GCE$view(_p21.gceModel));
+		case 'Digital':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add$DigitalView,
+				_narkisr$elm_ui$Systems_Add_Digital$view(_p21.digitalModel));
+		case 'Physical':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add$PhysicalView,
+				_narkisr$elm_ui$Systems_Add_Physical$view(_p21.physicalModel));
+		case 'Openstack':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add$OpenstackView,
+				_narkisr$elm_ui$Systems_Add_Openstack$view(_p21.openstackModel));
+		case 'KVM':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Add$KVMView,
+				_narkisr$elm_ui$Systems_Add_KVM$view(_p21.kvmModel));
+		default:
+			return _narkisr$elm_ui$Common_Components$notImplemented;
+	}
+};
+var _narkisr$elm_ui$Systems_Add$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Add$Back = {ctor: 'Back'};
+var _narkisr$elm_ui$Systems_Add$Stage = {ctor: 'Stage'};
+var _narkisr$elm_ui$Systems_Add$Create = {ctor: 'Create'};
+var _narkisr$elm_ui$Systems_Add$update = F2(
+	function (msg, _p23) {
+		var _p24 = _p23;
+		var _p38 = _p24.stage;
+		var _p37 = _p24.physicalModel;
+		var _p36 = _p24.openstackModel;
+		var _p35 = _p24;
+		var _p34 = _p24.kvmModel;
+		var _p33 = _p24.general;
+		var _p32 = _p24.gceModel;
+		var _p31 = _p24.digitalModel;
+		var _p30 = _p24.awsModel;
+		var _p25 = msg;
+		switch (_p25.ctor) {
+			case 'Next':
+				var _p26 = _p33;
+				var admin = _p26.admin;
+				var current = A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Dict$empty,
+					A2(_elm_lang$core$Dict$get, admin.environment, admin.rawEnvironments));
+				var _p27 = _p33.hypervisor;
+				switch (_p27) {
+					case 'aws':
+						var newAws = A2(_narkisr$elm_ui$Systems_Add_AWS$next, _p30, current);
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p35,
+								{
+									stage: _narkisr$elm_ui$Systems_Add$AWS,
+									awsModel: newAws,
+									hasNext: _narkisr$elm_ui$Common_Wizard$hasNext(newAws)
+								}));
+					case 'gce':
+						var newGce = A2(_narkisr$elm_ui$Systems_Add_GCE$next, _p32, current);
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p35,
+								{
+									stage: _narkisr$elm_ui$Systems_Add$GCE,
+									gceModel: newGce,
+									hasNext: _narkisr$elm_ui$Common_Wizard$hasNext(newGce)
+								}));
+					case 'digital-ocean':
+						var newDigital = A2(_narkisr$elm_ui$Systems_Add_Digital$next, _p31, current);
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p35,
+								{
+									stage: _narkisr$elm_ui$Systems_Add$Digital,
+									digitalModel: newDigital,
+									hasNext: _narkisr$elm_ui$Common_Wizard$hasNext(newDigital)
+								}));
+					case 'physical':
+						var newPhysical = A2(_narkisr$elm_ui$Systems_Add_Physical$next, _p37, current);
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p35,
+								{
+									stage: _narkisr$elm_ui$Systems_Add$Physical,
+									physicalModel: newPhysical,
+									hasNext: _narkisr$elm_ui$Common_Wizard$hasNext(newPhysical)
+								}));
+					case 'openstack':
+						var newOpenstack = A2(_narkisr$elm_ui$Systems_Add_Openstack$next, _p36, current);
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p35,
+								{
+									stage: _narkisr$elm_ui$Systems_Add$Openstack,
+									openstackModel: newOpenstack,
+									hasNext: _narkisr$elm_ui$Common_Wizard$hasNext(newOpenstack)
+								}));
+					case 'kvm':
+						var newKvm = A2(_narkisr$elm_ui$Systems_Add_KVM$next, _p34, current);
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p35,
+								{
+									stage: _narkisr$elm_ui$Systems_Add$KVM,
+									kvmModel: newKvm,
+									hasNext: _narkisr$elm_ui$Common_Wizard$hasNext(newKvm)
+								}));
+					default:
+						return _narkisr$elm_ui$Common_Utils$none(_p35);
+				}
+			case 'Back':
+				return _narkisr$elm_ui$Common_Utils$none(
+					A2(_narkisr$elm_ui$Systems_Add$getBack, _p35, _p33.hypervisor));
+			case 'AWSView':
+				var newAws = A2(_narkisr$elm_ui$Systems_Add_AWS$update, _p25._0, _p30);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p35,
+						{awsModel: newAws}));
+			case 'GCEView':
+				var newGce = A2(_narkisr$elm_ui$Systems_Add_GCE$update, _p25._0, _p32);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p35,
+						{gceModel: newGce}));
+			case 'DigitalView':
+				var newDigital = A2(_narkisr$elm_ui$Systems_Add_Digital$update, _p25._0, _p31);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p35,
+						{digitalModel: newDigital}));
+			case 'PhysicalView':
+				var newPhysical = A2(_narkisr$elm_ui$Systems_Add_Physical$update, _p25._0, _p37);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p35,
+						{physicalModel: newPhysical}));
+			case 'OpenstackView':
+				var newOpenstack = A2(_narkisr$elm_ui$Systems_Add_Openstack$update, _p25._0, _p36);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p35,
+						{openstackModel: newOpenstack}));
+			case 'KVMView':
+				var newKvm = A2(_narkisr$elm_ui$Systems_Add_KVM$update, _p25._0, _p34);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p35,
+						{kvmModel: newKvm}));
+			case 'GeneralView':
+				var _p28 = A2(_narkisr$elm_ui$Systems_Add_General$update, _p25._0, _p33);
+				var newGeneral = _p28._0;
+				var msgs = _p28._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p35,
+						{general: newGeneral}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Add$GeneralView, msgs)
+				};
+			case 'Stage':
+				return {
+					ctor: '_Tuple2',
+					_0: _p35,
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Persistency$persistModel,
+						_narkisr$elm_ui$Systems_Add$saveSystem(_narkisr$elm_ui$Systems_Add$Stage),
+						_narkisr$elm_ui$Systems_Add$intoSystem(_p35),
+						_elm_lang$core$Basics$toString(_p38))
+				};
+			case 'SaveSystem':
+				return {
+					ctor: '_Tuple2',
+					_0: _p35,
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Persistency$persistModel,
+						_narkisr$elm_ui$Systems_Add$saveSystem(_narkisr$elm_ui$Systems_Add$NoOp),
+						_narkisr$elm_ui$Systems_Add$intoSystem(_p35),
+						_elm_lang$core$Basics$toString(_p38))
+				};
+			case 'Create':
+				return {
+					ctor: '_Tuple2',
+					_0: _p35,
+					_1: A3(
+						_narkisr$elm_ui$Systems_Add_Persistency$persistModel,
+						_narkisr$elm_ui$Systems_Add$saveSystem(_narkisr$elm_ui$Systems_Add$Create),
+						_narkisr$elm_ui$Systems_Add$intoSystem(_p35),
+						_elm_lang$core$Basics$toString(_p38))
+				};
+			case 'SaveTemplate':
+				return _narkisr$elm_ui$Common_Utils$none(_p35);
+			case 'Saved':
+				var _p29 = A4(
+					_narkisr$elm_ui$Common_Errors$errorsSuccessHandler,
+					_p25._1,
+					_p35,
+					A2(_narkisr$elm_ui$Systems_Add$setSaved, _p25._0, _p35),
+					_narkisr$elm_ui$Systems_Add$NoOp);
+				var newModel = _p29._0;
+				var saveErrors = _p29._0.saveErrors;
+				var msgs = _p29._1;
+				return _narkisr$elm_ui$Common_Errors$hasErrors(saveErrors) ? {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						newModel,
+						{stage: _narkisr$elm_ui$Systems_Add$Error}),
+					_1: msgs
+				} : {ctor: '_Tuple2', _0: _p35, _1: msgs};
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p35);
+		}
+	});
+var _narkisr$elm_ui$Systems_Add$SaveTemplate = {ctor: 'SaveTemplate'};
+var _narkisr$elm_ui$Systems_Add$SaveSystem = {ctor: 'SaveSystem'};
+var _narkisr$elm_ui$Systems_Add$saveMenu = A2(
+	_elm_lang$html$Html$ul,
+	_elm_lang$core$Native_List.fromArray(
+		[
+			_elm_lang$html$Html_Attributes$class('dropdown-menu')
+		]),
+	_elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$a,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('SaveSystem'),
+							_elm_lang$html$Html_Attributes$href('#'),
+							_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Systems_Add$SaveSystem)
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Save system')
+						]))
+				])),
+			A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$a,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('SaveTemplate'),
+							_elm_lang$html$Html_Attributes$href('#'),
+							_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Systems_Add$SaveTemplate)
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Save as template')
+						]))
+				])),
+			A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$a,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('Create'),
+							_elm_lang$html$Html_Attributes$href('#'),
+							_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Systems_Add$Create)
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('Create System')
+						]))
+				]))
+		]));
+var _narkisr$elm_ui$Systems_Add$dropdown = _elm_lang$core$Native_List.fromArray(
+	[
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$type$('button'),
+				_elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Systems_Add$Stage)
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Stage')
+			])),
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('btn btn-primary dropdown-toggle'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'dropdown'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'aria-haspopup', 'true'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'aria-expanded', 'false')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$span,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('caret')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[])),
+				A2(
+				_elm_lang$html$Html$span,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('sr-only')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[]))
+			])),
+		_narkisr$elm_ui$Systems_Add$saveMenu
+	]);
+var _narkisr$elm_ui$Systems_Add$Next = {ctor: 'Next'};
+var _narkisr$elm_ui$Systems_Add$view = function (_p39) {
+	var _p40 = _p39;
+	var _p41 = _p40;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						(!_elm_lang$core$Native_Utils.eq(_p40.stage, _narkisr$elm_ui$Systems_Add$Error)) ? A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-md-offset-2 col-md-8')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_narkisr$elm_ui$Common_Components$panel(
+								_narkisr$elm_ui$Systems_Add$currentView(_p41))
+							])) : A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_narkisr$elm_ui$Systems_Add$errorsView(_p41))
+					])),
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				A4(_narkisr$elm_ui$Common_Components$buttons, _p41, _narkisr$elm_ui$Systems_Add$Next, _narkisr$elm_ui$Systems_Add$Back, _narkisr$elm_ui$Systems_Add$dropdown))
+			]));
+};
+
+var _narkisr$elm_ui$Systems_View$toHtml = F3(
+	function (_p0, f, prop) {
+		var _p1 = _p0;
+		var _p2 = prop;
+		if (_p2.ctor === 'Just') {
+			return _narkisr$elm_ui$Common_Components$fixedPanel(
+				A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					f(
+						{ctor: '_Tuple2', _0: _p2._0, _1: _p1.system.machine})));
+		} else {
+			return A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[]));
+		}
+	});
+var _narkisr$elm_ui$Systems_View$view = function (_p3) {
+	var _p4 = _p3;
+	var _p6 = _p4.system;
+	var _p5 = _p4;
+	var empty = function (op) {
+		return !_elm_lang$core$Native_Utils.eq(
+			op,
+			A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[])));
+	};
+	var options = _elm_lang$core$Native_List.fromArray(
+		[
+			A3(_narkisr$elm_ui$Systems_View$toHtml, _p5, _narkisr$elm_ui$Systems_View_AWS$summarize, _p6.aws),
+			A3(_narkisr$elm_ui$Systems_View$toHtml, _p5, _narkisr$elm_ui$Systems_View_GCE$summarize, _p6.gce),
+			A3(_narkisr$elm_ui$Systems_View$toHtml, _p5, _narkisr$elm_ui$Systems_View_Openstack$summarize, _p6.openstack),
+			A3(_narkisr$elm_ui$Systems_View$toHtml, _p5, _narkisr$elm_ui$Systems_View_KVM$summarize, _p6.kvm),
+			A3(_narkisr$elm_ui$Systems_View$toHtml, _p5, _narkisr$elm_ui$Systems_View_Digital$summarize, _p6.digital)
+		]);
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		_narkisr$elm_ui$Common_Components$notImplemented,
+		_elm_lang$core$List$head(
+			A2(_elm_lang$core$List$filter, empty, options)));
+};
+var _narkisr$elm_ui$Systems_View$setSystem = F2(
+	function (model, system) {
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{system: system}));
+	});
+var _narkisr$elm_ui$Systems_View$Model = function (a) {
+	return {system: a};
+};
+var _narkisr$elm_ui$Systems_View$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Systems_View$Model(_narkisr$elm_ui$Systems_Model_Common$emptySystem));
+var _narkisr$elm_ui$Systems_View$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_View$SetSystem = function (a) {
+	return {ctor: 'SetSystem', _0: a};
+};
+var _narkisr$elm_ui$Systems_View$getSystem = function (id) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Systems_View$SetSystem,
+		_elm_lang$core$Task$toResult(
+			A2(
+				_narkisr$elm_ui$Common_Http$getJson,
+				_narkisr$elm_ui$Systems_Decoders$systemDecoder,
+				A2(_elm_lang$core$Basics_ops['++'], '/systems/', id))));
+};
+var _narkisr$elm_ui$Systems_View$update = F2(
+	function (msg, model) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
+			case 'ViewSystem':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _narkisr$elm_ui$Systems_View$getSystem(_p7._0)
+				};
+			case 'SetSystem':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p7._0,
+					model,
+					_narkisr$elm_ui$Systems_View$setSystem(model),
+					_narkisr$elm_ui$Systems_View$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Systems_View$ViewSystem = function (a) {
+	return {ctor: 'ViewSystem', _0: a};
+};
+
+var _narkisr$elm_ui$Systems_Launch$message = function (job) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$h4,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text('Notice!')
+				])),
+			A2(
+			_elm_lang$html$Html$span,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text('A '),
+					A2(
+					_elm_lang$html$Html$strong,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(job)
+						])),
+					_elm_lang$html$Html$text(' operation '),
+					_elm_lang$html$Html$text('will be performed on the following systems:')
+				]))
+		]);
+};
+var _narkisr$elm_ui$Systems_Launch$systemRow = F2(
+	function (id, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(id)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						function (_) {
+							return _.hostname;
+						}(_p1.machine))
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p1.type$)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p1.env)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p1.owner)
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Systems_Launch$Model = F2(
+	function (a, b) {
+		return {job: a, table: b};
+	});
+var _narkisr$elm_ui$Systems_Launch$init = function () {
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'launchListing',
+		false,
+		_elm_lang$core$Native_List.fromArray(
+			['#', 'Hostname', 'Type', 'Env', 'Owner']),
+		_narkisr$elm_ui$Systems_Launch$systemRow,
+		'Systems');
+	return _narkisr$elm_ui$Common_Utils$none(
+		A2(_narkisr$elm_ui$Systems_Launch$Model, '', table));
+}();
+var _narkisr$elm_ui$Systems_Launch$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Systems_Launch$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Launch$Run = {ctor: 'Run'};
+var _narkisr$elm_ui$Systems_Launch$JobLaunched = function (a) {
+	return {ctor: 'JobLaunched', _0: a};
+};
+var _narkisr$elm_ui$Systems_Launch$update = F2(
+	function (msg, _p2) {
+		var _p3 = _p2;
+		var _p7 = _p3;
+		var _p4 = msg;
+		switch (_p4.ctor) {
+			case 'JobLaunched':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p4._0,
+					_p7,
+					function (res) {
+						return _narkisr$elm_ui$Common_Utils$none(_p7);
+					},
+					_narkisr$elm_ui$Systems_Launch$NoOp);
+			case 'SetupJob':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{job: _p4._0}));
+			case 'LoadPage':
+				var newTable = A2(_narkisr$elm_ui$Table$update, _p4._0, _p7.table);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{table: newTable}));
+			case 'Run':
+				var runAll = _elm_lang$core$Platform_Cmd$batch(
+					A2(
+						_elm_lang$core$List$map,
+						function (id) {
+							return A3(_narkisr$elm_ui$Jobs_Common$runJob, id, _p3.job, _narkisr$elm_ui$Systems_Launch$JobLaunched);
+						},
+						A2(
+							_elm_lang$core$List$map,
+							function (_p5) {
+								var _p6 = _p5;
+								return _p6._0;
+							},
+							_p7.table.rows)));
+				return {ctor: '_Tuple2', _0: _p7, _1: runAll};
+			case 'Cancel':
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+var _narkisr$elm_ui$Systems_Launch$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_Launch$view = function (_p8) {
+	var _p9 = _p8;
+	var systemsTable = _circuithub$elm_bootstrap_html$Bootstrap_Html$panelDefault_(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Systems_Launch$LoadPage,
+				_narkisr$elm_ui$Table$view(_p9.table))
+			]));
+	return A4(
+		_narkisr$elm_ui$Common_Components$dangerCallout,
+		_narkisr$elm_ui$Systems_Launch$message(_p9.job),
+		systemsTable,
+		_narkisr$elm_ui$Systems_Launch$Cancel,
+		_narkisr$elm_ui$Systems_Launch$Run);
+};
+var _narkisr$elm_ui$Systems_Launch$SetupJob = function (a) {
+	return {ctor: 'SetupJob', _0: a};
+};
+
+var _sporto$hop$Hop_Types$newQuery = _elm_lang$core$Dict$empty;
+var _sporto$hop$Hop_Types$newLocation = {
+	query: _sporto$hop$Hop_Types$newQuery,
+	path: _elm_lang$core$Native_List.fromArray(
+		[])
+};
+var _sporto$hop$Hop_Types$Location = F2(
+	function (a, b) {
+		return {path: a, query: b};
+	});
+var _sporto$hop$Hop_Types$PathMatcher = F2(
+	function (a, b) {
+		return {parser: a, segments: b};
+	});
+var _sporto$hop$Hop_Types$Config = F4(
+	function (a, b, c, d) {
+		return {basePath: a, hash: b, matchers: c, notFound: d};
+	});
+var _sporto$hop$Hop_Types$Router = function (a) {
+	return {run: a};
+};
+
+var _sporto$hop$Hop_Matchers$str = _Bogdanp$elm_combine$Combine$regex('[^/]+');
+var _sporto$hop$Hop_Matchers$int = _Bogdanp$elm_combine$Combine_Num$int;
+var _sporto$hop$Hop_Matchers$parserWithBeginningAndEnd = function (parser) {
+	return A2(_Bogdanp$elm_combine$Combine_Infix_ops['<*'], parser, _Bogdanp$elm_combine$Combine$end);
+};
+var _sporto$hop$Hop_Matchers$match1 = F2(
+	function (constructor, segment1) {
+		var constructor$ = function (_p0) {
+			var _p1 = _p0;
+			return constructor;
+		};
+		var parser = A2(
+			_Bogdanp$elm_combine$Combine$map,
+			constructor$,
+			_sporto$hop$Hop_Matchers$parserWithBeginningAndEnd(
+				_Bogdanp$elm_combine$Combine$skip(
+					_Bogdanp$elm_combine$Combine$string(segment1))));
+		return {
+			parser: parser,
+			segments: _elm_lang$core$Native_List.fromArray(
+				[segment1])
+		};
+	});
+var _sporto$hop$Hop_Matchers$match2 = F3(
+	function (constructor, segment1, parser1) {
+		var parser = A2(
+			_Bogdanp$elm_combine$Combine$map,
+			constructor,
+			_sporto$hop$Hop_Matchers$parserWithBeginningAndEnd(
+				A2(
+					_Bogdanp$elm_combine$Combine_Infix_ops['*>'],
+					_Bogdanp$elm_combine$Combine$string(segment1),
+					parser1)));
+		return {
+			parser: parser,
+			segments: _elm_lang$core$Native_List.fromArray(
+				[segment1])
+		};
+	});
+var _sporto$hop$Hop_Matchers$match3 = F4(
+	function (constructor, segment1, parser1, segment2) {
+		var parser = A2(
+			_Bogdanp$elm_combine$Combine$map,
+			constructor,
+			_sporto$hop$Hop_Matchers$parserWithBeginningAndEnd(
+				A2(
+					_Bogdanp$elm_combine$Combine_Infix_ops['<*'],
+					A2(
+						_Bogdanp$elm_combine$Combine_Infix_ops['*>'],
+						_Bogdanp$elm_combine$Combine$string(segment1),
+						parser1),
+					_Bogdanp$elm_combine$Combine$string(segment2))));
+		return {
+			parser: parser,
+			segments: _elm_lang$core$Native_List.fromArray(
+				[segment1, segment2])
+		};
+	});
+var _sporto$hop$Hop_Matchers$match4 = F5(
+	function (constructor, segment1, parser1, segment2, parser2) {
+		var constructor$ = function (_p2) {
+			var _p3 = _p2;
+			return A2(constructor, _p3._0, _p3._1);
+		};
+		var parser = A2(
+			_Bogdanp$elm_combine$Combine$map,
+			constructor$,
+			_sporto$hop$Hop_Matchers$parserWithBeginningAndEnd(
+				A2(
+					_Bogdanp$elm_combine$Combine$andThen,
+					A2(
+						_Bogdanp$elm_combine$Combine_Infix_ops['*>'],
+						_Bogdanp$elm_combine$Combine$string(segment1),
+						parser1),
+					function (r) {
+						return A2(
+							_Bogdanp$elm_combine$Combine$map,
+							function (x) {
+								return {ctor: '_Tuple2', _0: r, _1: x};
+							},
+							A2(
+								_Bogdanp$elm_combine$Combine_Infix_ops['*>'],
+								_Bogdanp$elm_combine$Combine$string(segment2),
+								parser2));
+					})));
+		return {
+			parser: parser,
+			segments: _elm_lang$core$Native_List.fromArray(
+				[segment1, segment2])
+		};
+	});
+var _sporto$hop$Hop_Matchers$nested1 = F3(
+	function (constructor, segment1, children) {
+		var childrenParsers = A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.parser;
+			},
+			children);
+		var parser = A2(
+			_Bogdanp$elm_combine$Combine$map,
+			constructor,
+			_sporto$hop$Hop_Matchers$parserWithBeginningAndEnd(
+				A2(
+					_Bogdanp$elm_combine$Combine$andThen,
+					_Bogdanp$elm_combine$Combine$string(segment1),
+					function (x) {
+						return _Bogdanp$elm_combine$Combine$choice(childrenParsers);
+					})));
+		return {
+			parser: parser,
+			segments: _elm_lang$core$Native_List.fromArray(
+				[segment1])
+		};
+	});
+var _sporto$hop$Hop_Matchers$nested2 = F4(
+	function (constructor, segment1, parser1, children) {
+		var constructor$ = function (_p4) {
+			var _p5 = _p4;
+			return A2(constructor, _p5._0, _p5._1);
+		};
+		var childrenParsers = A2(
+			_elm_lang$core$List$map,
+			function (_) {
+				return _.parser;
+			},
+			children);
+		var parser = A2(
+			_Bogdanp$elm_combine$Combine$map,
+			constructor$,
+			_sporto$hop$Hop_Matchers$parserWithBeginningAndEnd(
+				A2(
+					_Bogdanp$elm_combine$Combine$andThen,
+					A2(
+						_Bogdanp$elm_combine$Combine_Infix_ops['*>'],
+						_Bogdanp$elm_combine$Combine$string(segment1),
+						parser1),
+					function (r) {
+						return A2(
+							_Bogdanp$elm_combine$Combine$map,
+							function (x) {
+								return {ctor: '_Tuple2', _0: r, _1: x};
+							},
+							_Bogdanp$elm_combine$Combine$choice(childrenParsers));
+					})));
+		return {
+			parser: parser,
+			segments: _elm_lang$core$Native_List.fromArray(
+				[segment1])
+		};
+	});
+
+var _narkisr$elm_ui$Systems_Routing$Delete = function (a) {
+	return {ctor: 'Delete', _0: a};
+};
+var _narkisr$elm_ui$Systems_Routing$View = function (a) {
+	return {ctor: 'View', _0: a};
+};
+var _narkisr$elm_ui$Systems_Routing$matcherView = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Systems_Routing$View, '/view/', _sporto$hop$Hop_Matchers$int);
+var _narkisr$elm_ui$Systems_Routing$List = {ctor: 'List'};
+var _narkisr$elm_ui$Systems_Routing$matcherList = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Systems_Routing$List, '/list');
+var _narkisr$elm_ui$Systems_Routing$Launch = {ctor: 'Launch'};
+var _narkisr$elm_ui$Systems_Routing$matcherLaunch = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Systems_Routing$Launch, '/launch');
+var _narkisr$elm_ui$Systems_Routing$Add = {ctor: 'Add'};
+var _narkisr$elm_ui$Systems_Routing$matcherAdd = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Systems_Routing$Add, '/add');
+var _narkisr$elm_ui$Systems_Routing$matchers = _elm_lang$core$Native_List.fromArray(
+	[_narkisr$elm_ui$Systems_Routing$matcherAdd, _narkisr$elm_ui$Systems_Routing$matcherList, _narkisr$elm_ui$Systems_Routing$matcherLaunch, _narkisr$elm_ui$Systems_Routing$matcherView]);
+
+var _narkisr$elm_ui$Nav_Common$Users = {ctor: 'Users'};
+var _narkisr$elm_ui$Nav_Common$Stacks = {ctor: 'Stacks'};
+var _narkisr$elm_ui$Nav_Common$Templates = {ctor: 'Templates'};
+var _narkisr$elm_ui$Nav_Common$Jobs = {ctor: 'Jobs'};
+var _narkisr$elm_ui$Nav_Common$Types = {ctor: 'Types'};
+var _narkisr$elm_ui$Nav_Common$Systems = {ctor: 'Systems'};
+var _narkisr$elm_ui$Nav_Common$Stats = {ctor: 'Stats'};
+var _narkisr$elm_ui$Nav_Common$View = {ctor: 'View'};
+var _narkisr$elm_ui$Nav_Common$List = {ctor: 'List'};
+var _narkisr$elm_ui$Nav_Common$Edit = {ctor: 'Edit'};
+var _narkisr$elm_ui$Nav_Common$Delete = {ctor: 'Delete'};
+var _narkisr$elm_ui$Nav_Common$Launch = {ctor: 'Launch'};
+var _narkisr$elm_ui$Nav_Common$Add = {ctor: 'Add'};
+
+var _narkisr$elm_ui$Systems_Core$addedSystem = function (model) {
+	return {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Basics$toString(model.systemsAdd.stage),
+		_1: _narkisr$elm_ui$Systems_Add$intoSystem(model.systemsAdd)
+	};
+};
+var _narkisr$elm_ui$Systems_Core$Model = F5(
+	function (a, b, c, d, e) {
+		return {systemsList: a, systemsAdd: b, systemsView: c, systemsLaunch: d, navChange: e};
+	});
+var _narkisr$elm_ui$Systems_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Core$SystemsLaunch = function (a) {
+	return {ctor: 'SystemsLaunch', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$setupJob = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p7 = _p1.systemsList;
+		var _p6 = _p1;
+		var table = _p7.table;
+		var _p2 = _p7.systems;
+		var systems = _p2._1;
+		var selected = A2(
+			_elm_lang$core$List$filter,
+			function (_p3) {
+				var _p4 = _p3;
+				return A2(_elm_lang$core$Set$member, _p4._0, table.selected);
+			},
+			systems);
+		var selectedTable = _elm_lang$core$Native_Utils.update(
+			table,
+			{rows: selected, selected: _elm_lang$core$Set$empty, id: 'launchListing'});
+		var _p5 = A2(
+			_narkisr$elm_ui$Systems_Launch$update,
+			msg,
+			_elm_lang$core$Native_Utils.update(
+				_p1.systemsLaunch,
+				{table: selectedTable}));
+		var newLaunch = _p5._0;
+		var effect = _p5._1;
+		if (_elm_lang$core$List$isEmpty(selected)) {
+			return _narkisr$elm_ui$Common_Utils$none(
+				_elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						systemsList: _elm_lang$core$Native_Utils.update(
+							_p7,
+							{error: _narkisr$elm_ui$Systems_List$NoSystemSelected})
+					}));
+		} else {
+			var newList = _elm_lang$core$Native_Utils.update(
+				_p7,
+				{error: _narkisr$elm_ui$Systems_List$NoError});
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						systemsLaunch: newLaunch,
+						systemsList: newList,
+						navChange: _elm_lang$core$Maybe$Just('systems/launch')
+					}),
+				_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
+			};
+		}
+	});
+var _narkisr$elm_ui$Systems_Core$SystemsView = function (a) {
+	return {ctor: 'SystemsView', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$SystemsAdd = function (a) {
+	return {ctor: 'SystemsAdd', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$SystemsListing = function (a) {
+	return {ctor: 'SystemsListing', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$init = function () {
+	var _p8 = _narkisr$elm_ui$Systems_Launch$init;
+	var systemsLaunch = _p8._0;
+	var _p9 = _narkisr$elm_ui$Systems_Add$init;
+	var systemsAdd = _p9._0;
+	var systemsAddMsg = _p9._1;
+	var _p10 = _narkisr$elm_ui$Systems_View$init;
+	var systemsView = _p10._0;
+	var _p11 = _narkisr$elm_ui$Systems_List$init;
+	var systemsList = _p11._0;
+	var systemsListMsg = _p11._1;
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, systemsListMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsAdd, systemsAddMsg)
+		]);
+	return {
+		ctor: '_Tuple2',
+		_0: A5(_narkisr$elm_ui$Systems_Core$Model, systemsList, systemsAdd, systemsView, systemsLaunch, _elm_lang$core$Maybe$Nothing),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Systems_Core$update = F2(
+	function (msg, _p12) {
+		var _p13 = _p12;
+		var _p31 = _p13.systemsView;
+		var _p30 = _p13.systemsAdd;
+		var _p29 = _p13;
+		var _p14 = msg;
+		switch (_p14.ctor) {
+			case 'SystemsView':
+				var _p15 = A2(_narkisr$elm_ui$Systems_View$update, _p14._0, _p31);
+				var newSystems = _p15._0;
+				var msgs = _p15._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p29,
+						{systemsView: newSystems}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsView, msgs)
+				};
+			case 'SystemsListing':
+				var _p20 = _p14._0;
+				var _p16 = _p20;
+				if ((_p16.ctor === 'LoadPage') && (_p16._0.ctor === 'View')) {
+					var _p18 = _p16._0._0;
+					var _p17 = A2(
+						_narkisr$elm_ui$Systems_View$update,
+						_narkisr$elm_ui$Systems_View$ViewSystem(_p18),
+						_p31);
+					var newSystems = _p17._0;
+					var msgs = _p17._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p29,
+							{
+								systemsView: newSystems,
+								navChange: _elm_lang$core$Maybe$Just(
+									A2(_elm_lang$core$Basics_ops['++'], 'systems/view/', _p18))
+							}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsView, msgs)
+					};
+				} else {
+					var _p19 = A2(_narkisr$elm_ui$Systems_List$update, _p20, _p13.systemsList);
+					var newSystems = _p19._0;
+					var effect = _p19._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p29,
+							{systemsList: newSystems}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, effect)
+					};
+				}
+			case 'SystemsAdd':
+				var _p25 = _p14._0;
+				var _p21 = _p25;
+				switch (_p21.ctor) {
+					case 'JobLaunched':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p29,
+								{
+									navChange: _elm_lang$core$Maybe$Just('jobs/list')
+								}));
+					case 'SaveTemplate':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p29,
+								{
+									navChange: _elm_lang$core$Maybe$Just('templates/add')
+								}));
+					case 'Saved':
+						var _p22 = _narkisr$elm_ui$Systems_Add$init;
+						var initial = _p22._0;
+						var initEffects = _p22._1;
+						var _p23 = A2(_narkisr$elm_ui$Systems_Add$update, _p25, _p30);
+						var newSystems = _p23._0;
+						var newEffects = _p23._1;
+						return ((!_elm_lang$core$Native_Utils.eq(newEffects, _elm_lang$core$Platform_Cmd$none)) && _elm_lang$core$Native_Utils.eq(_p21._0, _narkisr$elm_ui$Systems_Add$NoOp)) ? {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p29,
+								{
+									navChange: _elm_lang$core$Maybe$Just('systems/list'),
+									systemsAdd: initial
+								}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsAdd, initEffects)
+						} : {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p29,
+								{systemsAdd: newSystems}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsAdd, newEffects)
+						};
+					default:
+						var _p24 = A2(_narkisr$elm_ui$Systems_Add$update, _p25, _p30);
+						var newSystems = _p24._0;
+						var effect = _p24._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p29,
+								{systemsAdd: newSystems}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsAdd, effect)
+						};
+				}
+			case 'SystemsLaunch':
+				var _p28 = _p14._0;
+				var _p26 = A2(_elm_lang$core$Debug$log, '', _p28);
+				switch (_p26.ctor) {
+					case 'Cancel':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p29,
+								{
+									navChange: _elm_lang$core$Maybe$Just('systems/list')
+								}));
+					case 'JobLaunched':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p29,
+								{
+									navChange: _elm_lang$core$Maybe$Just('jobs/list')
+								}));
+					case 'SetupJob':
+						return A2(_narkisr$elm_ui$Systems_Core$setupJob, _p28, _p29);
+					case 'Run':
+						var _p27 = A2(_narkisr$elm_ui$Systems_Launch$update, _p28, _p29.systemsLaunch);
+						var newLaunch = _p27._0;
+						var effect = _p27._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p29,
+								{systemsLaunch: newLaunch}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
+						};
+					default:
+						return _narkisr$elm_ui$Common_Utils$none(_p29);
+				}
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p29);
+		}
+	});
+var _narkisr$elm_ui$Systems_Core$view = F2(
+	function (model, route) {
+		var _p32 = route;
+		switch (_p32.ctor) {
+			case 'List':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Systems_Core$SystemsListing,
+					_narkisr$elm_ui$Systems_List$view(model.systemsList));
+			case 'Launch':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Systems_Core$SystemsLaunch,
+					_narkisr$elm_ui$Systems_Launch$view(model.systemsLaunch));
+			case 'Add':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Systems_Core$SystemsAdd,
+					_narkisr$elm_ui$Systems_Add$view(model.systemsAdd));
+			case 'View':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Systems_Core$SystemsView,
+					_narkisr$elm_ui$Systems_View$view(model.systemsView));
+			default:
+				return _narkisr$elm_ui$Common_Components$notImplemented;
+		}
+	});
+
+var _narkisr$elm_ui$Stacks_Model$System = F2(
+	function (a, b) {
+		return {count: a, template: b};
+	});
+var _narkisr$elm_ui$Stacks_Model$Stack = F3(
+	function (a, b, c) {
+		return {name: a, description: b, systems: c};
+	});
+var _narkisr$elm_ui$Stacks_Model$emptyStack = A3(
+	_narkisr$elm_ui$Stacks_Model$Stack,
+	'',
+	'',
+	_elm_lang$core$Native_List.fromArray(
+		[]));
+
+var _narkisr$elm_ui$Templates_Model_Common$partialMachine = F2(
+	function (user, os) {
+		return A7(_narkisr$elm_ui$Systems_Model_Common$Machine, user, '', '', _elm_lang$core$Maybe$Nothing, os, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+	});
+var _narkisr$elm_ui$Templates_Model_Common$partialMachineDecoder = A3(
+	_elm_lang$core$Json_Decode$object2,
+	_narkisr$elm_ui$Templates_Model_Common$partialMachine,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'user', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'os', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Templates_Model_Common$emptyDefaults = _elm_lang$core$Dict$empty;
+var _narkisr$elm_ui$Templates_Model_Common$OpenstackDefaults = function (a) {
+	return {networks: a};
+};
+var _narkisr$elm_ui$Templates_Model_Common$emptyOpenstackDefaults = _narkisr$elm_ui$Templates_Model_Common$OpenstackDefaults(
+	_elm_lang$core$Maybe$Just(
+		_elm_lang$core$Native_List.fromArray(
+			[])));
+var _narkisr$elm_ui$Templates_Model_Common$defaultsByEnv = function (envs) {
+	return _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$map,
+			function (env) {
+				return {
+					ctor: '_Tuple2',
+					_0: env,
+					_1: {
+						openstack: _elm_lang$core$Maybe$Just(_narkisr$elm_ui$Templates_Model_Common$emptyOpenstackDefaults)
+					}
+				};
+			},
+			envs));
+};
+var _narkisr$elm_ui$Templates_Model_Common$openstackDefaults = A2(
+	_elm_lang$core$Json_Decode$object1,
+	_narkisr$elm_ui$Templates_Model_Common$OpenstackDefaults,
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode_ops[':='],
+			'networks',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))));
+var _narkisr$elm_ui$Templates_Model_Common$Template = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {name: a, type$: b, description: c, machine: d, aws: e, gce: f, digital: g, openstack: h, kvm: i, physical: j, defaults: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Templates_Model_Common$emptyTemplate = _narkisr$elm_ui$Templates_Model_Common$Template('')('')('')(_narkisr$elm_ui$Systems_Model_Common$emptyMachine)(_elm_lang$core$Maybe$Nothing)(_elm_lang$core$Maybe$Nothing)(_elm_lang$core$Maybe$Nothing)(_elm_lang$core$Maybe$Nothing)(_elm_lang$core$Maybe$Nothing)(_elm_lang$core$Maybe$Nothing)(_elm_lang$core$Maybe$Nothing);
+var _narkisr$elm_ui$Templates_Model_Common$Defaults = function (a) {
+	return {openstack: a};
+};
+var _narkisr$elm_ui$Templates_Model_Common$defaultsDecoder = A2(
+	_elm_lang$core$Json_Decode$object1,
+	_narkisr$elm_ui$Templates_Model_Common$Defaults,
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'openstack', _narkisr$elm_ui$Templates_Model_Common$openstackDefaults)));
+var _narkisr$elm_ui$Templates_Model_Common$defaultsDictDecoder = _elm_lang$core$Json_Decode$dict(_narkisr$elm_ui$Templates_Model_Common$defaultsDecoder);
+var _narkisr$elm_ui$Templates_Model_Common$decodeDefaults = function (json) {
+	var _p0 = A2(_elm_lang$core$Json_Decode$decodeString, _narkisr$elm_ui$Templates_Model_Common$defaultsDictDecoder, json);
+	if (_p0.ctor === 'Ok') {
+		return _p0._0;
+	} else {
+		return A2(_elm_lang$core$Debug$log, _p0._0, _narkisr$elm_ui$Templates_Model_Common$emptyDefaults);
+	}
+};
+var _narkisr$elm_ui$Templates_Model_Common$templateDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_narkisr$elm_ui$Common_Http$apply,
+								A2(
+									_narkisr$elm_ui$Common_Http$apply,
+									A2(
+										_narkisr$elm_ui$Common_Http$apply,
+										A2(
+											_elm_lang$core$Json_Decode$map,
+											_narkisr$elm_ui$Templates_Model_Common$Template,
+											A2(_elm_lang$core$Json_Decode_ops[':='], 'name', _elm_lang$core$Json_Decode$string)),
+										A2(_elm_lang$core$Json_Decode_ops[':='], 'type', _elm_lang$core$Json_Decode$string)),
+									A2(_elm_lang$core$Json_Decode_ops[':='], 'description', _elm_lang$core$Json_Decode$string)),
+								A2(_elm_lang$core$Json_Decode_ops[':='], 'machine', _narkisr$elm_ui$Templates_Model_Common$partialMachineDecoder)),
+							_elm_lang$core$Json_Decode$maybe(
+								A2(_elm_lang$core$Json_Decode_ops[':='], 'aws', _narkisr$elm_ui$Systems_Decoders$awsDecoder))),
+						_elm_lang$core$Json_Decode$maybe(
+							A2(_elm_lang$core$Json_Decode_ops[':='], 'gce', _narkisr$elm_ui$Systems_Decoders$gceDecoder))),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(_elm_lang$core$Json_Decode_ops[':='], 'digital-ocean', _narkisr$elm_ui$Systems_Decoders$digitalDecoder))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'openstack', _narkisr$elm_ui$Systems_Decoders$openstackDecoder))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(_elm_lang$core$Json_Decode_ops[':='], 'kvm', _narkisr$elm_ui$Systems_Decoders$kvmDecoder))),
+		_elm_lang$core$Json_Decode$maybe(
+			A2(_elm_lang$core$Json_Decode_ops[':='], 'physical', _narkisr$elm_ui$Systems_Decoders$physicalDecoder))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'defaults', _narkisr$elm_ui$Templates_Model_Common$defaultsDictDecoder)));
+
+var _narkisr$elm_ui$Templates_List$templateList = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['templates']),
+	_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Templates_Model_Common$templateDecoder));
+var _narkisr$elm_ui$Templates_List$getTemplates = function (msg) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		msg,
+		_elm_lang$core$Task$toResult(
+			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Templates_List$templateList, '/templates')));
+};
+var _narkisr$elm_ui$Templates_List$findTemplate = F2(
+	function (_p0, name) {
+		var _p1 = _p0;
+		return A2(
+			_elm_lang$core$Maybe$withDefault,
+			_narkisr$elm_ui$Templates_Model_Common$emptyTemplate,
+			_elm_lang$core$List$head(
+				A2(
+					_elm_lang$core$List$filter,
+					function (template) {
+						return _elm_lang$core$Native_Utils.eq(template.name, name);
+					},
+					_p1.templates)));
+	});
+var _narkisr$elm_ui$Templates_List$setTemplates = F2(
+	function (model, templates) {
+		var templatePairs = A2(
+			_elm_lang$core$List$map,
+			function (_p2) {
+				var _p3 = _p2;
+				return {ctor: '_Tuple2', _0: _p3.type$, _1: _p3};
+			},
+			templates);
+		var newTable = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(templatePairs),
+			model.table);
+		var total = _elm_lang$core$List$length(templates);
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(total)),
+			model.pager);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{templates: templates, pager: newPager, table: newTable}));
+	});
+var _narkisr$elm_ui$Templates_List$templateRow = F2(
+	function (id, _p4) {
+		var _p5 = _p4;
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p5.name)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p5.type$)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p5.description)
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Templates_List$Model = F3(
+	function (a, b, c) {
+		return {templates: a, table: b, pager: c};
+	});
+var _narkisr$elm_ui$Templates_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Templates_List$update = F2(
+	function (msg, model) {
+		var _p6 = msg;
+		if (_p6.ctor === 'SetTemplates') {
+			return A4(
+				_narkisr$elm_ui$Common_Errors$successHandler,
+				_p6._0,
+				model,
+				_narkisr$elm_ui$Templates_List$setTemplates(model),
+				_narkisr$elm_ui$Templates_List$NoOp);
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Templates_List$SetTemplates = function (a) {
+	return {ctor: 'SetTemplates', _0: a};
+};
+var _narkisr$elm_ui$Templates_List$init = function () {
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'templateListing',
+		true,
+		_elm_lang$core$Native_List.fromArray(
+			['Name', 'Type', 'Description']),
+		_narkisr$elm_ui$Templates_List$templateRow,
+		'Templates');
+	return {
+		ctor: '_Tuple2',
+		_0: A3(
+			_narkisr$elm_ui$Templates_List$Model,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			table,
+			_narkisr$elm_ui$Pager$init),
+		_1: _narkisr$elm_ui$Templates_List$getTemplates(_narkisr$elm_ui$Templates_List$SetTemplates)
+	};
+}();
+var _narkisr$elm_ui$Templates_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Templates_List$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Templates_List$view = function (_p7) {
+	var _p8 = _p7;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_circuithub$elm_bootstrap_html$Bootstrap_Html$panelDefault_(
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html_App$map,
+										_narkisr$elm_ui$Templates_List$LoadPage,
+										_narkisr$elm_ui$Table$view(_p8.table))
+									]))
+							]))
+					])),
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_narkisr$elm_ui$Templates_List$GotoPage,
+						_narkisr$elm_ui$Pager$view(_p8.pager))
+					]))
+			]));
+};
+
+var _narkisr$elm_ui$Stacks_Add$setTemplates = F2(
+	function (model, newTemplates) {
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{
+					templates: A2(
+						_elm_lang$core$List$map,
+						function (_p0) {
+							var _p1 = _p0;
+							return _p1.name;
+						},
+						newTemplates)
+				}));
+	});
+var _narkisr$elm_ui$Stacks_Add$Model = F4(
+	function (a, b, c, d) {
+		return {stack: a, template: b, templates: c, editDefaults: d};
+	});
+var _narkisr$elm_ui$Stacks_Add$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Stacks_Add$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Stacks_Add$Save = {ctor: 'Save'};
+var _narkisr$elm_ui$Stacks_Add$SetTemplates = function (a) {
+	return {ctor: 'SetTemplates', _0: a};
+};
+var _narkisr$elm_ui$Stacks_Add$init = {
+	ctor: '_Tuple2',
+	_0: A4(
+		_narkisr$elm_ui$Stacks_Add$Model,
+		_narkisr$elm_ui$Stacks_Model$emptyStack,
+		'',
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		false),
+	_1: _narkisr$elm_ui$Templates_List$getTemplates(_narkisr$elm_ui$Stacks_Add$SetTemplates)
+};
+var _narkisr$elm_ui$Stacks_Add$update = F2(
+	function (msg, model) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'LoadTemplates':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _narkisr$elm_ui$Templates_List$getTemplates(_narkisr$elm_ui$Stacks_Add$SetTemplates)
+				};
+			case 'Select':
+				return _narkisr$elm_ui$Common_Utils$none(model);
+			case 'SetTemplates':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p2._0,
+					model,
+					_narkisr$elm_ui$Stacks_Add$setTemplates(model),
+					_narkisr$elm_ui$Stacks_Add$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Stacks_Add$Select = function (a) {
+	return {ctor: 'Select', _0: a};
+};
+var _narkisr$elm_ui$Stacks_Add$DescriptionInput = function (a) {
+	return {ctor: 'DescriptionInput', _0: a};
+};
+var _narkisr$elm_ui$Stacks_Add$LoadEditor = {ctor: 'LoadEditor'};
+var _narkisr$elm_ui$Stacks_Add$SelectTemplate = function (a) {
+	return {ctor: 'SelectTemplate', _0: a};
+};
+var _narkisr$elm_ui$Stacks_Add$NameInput = function (a) {
+	return {ctor: 'NameInput', _0: a};
+};
+var _narkisr$elm_ui$Stacks_Add$addView = function (_p3) {
+	var _p4 = _p3;
+	var _p5 = _p4.stack;
+	return _narkisr$elm_ui$Common_Components$panel(
+		_narkisr$elm_ui$Common_Components$panelContents(
+			A2(
+				_elm_lang$html$Html$form,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('form-horizontal'),
+								A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_narkisr$elm_ui$Common_Components$group$,
+								'Name',
+								A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Stacks_Add$NameInput, ' ', _p5.name)),
+								A2(
+								_narkisr$elm_ui$Common_Components$group$,
+								'Description',
+								A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Stacks_Add$DescriptionInput, ' ', _p5.description)),
+								A2(
+								_narkisr$elm_ui$Common_Components$group$,
+								'Templates',
+								A3(_narkisr$elm_ui$Common_Components$selector, _narkisr$elm_ui$Stacks_Add$SelectTemplate, _p4.templates, _p4.template)),
+								A2(
+								_narkisr$elm_ui$Common_Components$group$,
+								'Edit common',
+								A2(_narkisr$elm_ui$Common_Components$checkbox, _narkisr$elm_ui$Stacks_Add$LoadEditor, _p4.editDefaults)),
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$id('jsoneditor'),
+										_elm_lang$html$Html_Attributes$style(
+										_elm_lang$core$Native_List.fromArray(
+											[
+												{ctor: '_Tuple2', _0: 'width', _1: '550px'},
+												{ctor: '_Tuple2', _0: 'height', _1: '400px'},
+												{ctor: '_Tuple2', _0: 'margin-left', _1: '25%'}
+											]))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[]))
+							]))
+					]))));
+};
+var _narkisr$elm_ui$Stacks_Add$view = function (model) {
+	return A4(
+		_narkisr$elm_ui$Common_Components$infoCallout,
+		_narkisr$elm_ui$Common_Components$info('Add a new Stack'),
+		_narkisr$elm_ui$Stacks_Add$addView(model),
+		_narkisr$elm_ui$Stacks_Add$Cancel,
+		_narkisr$elm_ui$Stacks_Add$Save);
+};
+var _narkisr$elm_ui$Stacks_Add$LoadTemplates = {ctor: 'LoadTemplates'};
+
+var _narkisr$elm_ui$Stacks_Core$Model = F2(
+	function (a, b) {
+		return {add: a, navChange: b};
+	});
+var _narkisr$elm_ui$Stacks_Core$StacksAdd = function (a) {
+	return {ctor: 'StacksAdd', _0: a};
+};
+var _narkisr$elm_ui$Stacks_Core$init = function () {
+	var _p0 = _narkisr$elm_ui$Stacks_Add$init;
+	var add = _p0._0;
+	var addEffects = _p0._1;
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Stacks_Core$StacksAdd, addEffects)
+		]);
+	return {
+		ctor: '_Tuple2',
+		_0: A2(_narkisr$elm_ui$Stacks_Core$Model, add, _elm_lang$core$Maybe$Nothing),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Stacks_Core$update = F2(
+	function (msg, _p1) {
+		var _p2 = _p1;
+		var _p5 = _p2;
+		var _p3 = msg;
+		if (_p3.ctor === 'StacksAdd') {
+			var _p4 = A2(_narkisr$elm_ui$Stacks_Add$update, _p3._0, _p2.add);
+			var newAdd = _p4._0;
+			var msgs = _p4._1;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p5,
+					{add: newAdd}),
+				_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Stacks_Core$StacksAdd, msgs)
+			};
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(_p5);
+		}
+	});
+var _narkisr$elm_ui$Stacks_Core$view = F2(
+	function (model, section) {
+		var _p6 = section;
+		if (_p6.ctor === 'Add') {
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Stacks_Core$StacksAdd,
+				_narkisr$elm_ui$Stacks_Add$view(model.add));
+		} else {
+			return _narkisr$elm_ui$Common_Components$notImplemented;
+		}
+	});
+var _narkisr$elm_ui$Stacks_Core$loadTemplates = function (_p7) {
+	var _p8 = _p7;
+	var _p9 = A2(_narkisr$elm_ui$Stacks_Add$update, _narkisr$elm_ui$Stacks_Add$LoadTemplates, _p8.add);
+	var newAdd = _p9._0;
+	var msgs = _p9._1;
+	return {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Native_Utils.update(
+			_p8,
+			{add: newAdd}),
+		_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Stacks_Core$StacksAdd, msgs)
+	};
+};
+var _narkisr$elm_ui$Stacks_Core$NoOp = {ctor: 'NoOp'};
+
+var _narkisr$elm_ui$Jobs_Routing$List = {ctor: 'List'};
+var _narkisr$elm_ui$Jobs_Routing$matcherList = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Jobs_Routing$List, '/list');
+var _narkisr$elm_ui$Jobs_Routing$Stats = {ctor: 'Stats'};
+var _narkisr$elm_ui$Jobs_Routing$matcherStats = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Jobs_Routing$Stats, '/stats');
+var _narkisr$elm_ui$Jobs_Routing$matchers = _elm_lang$core$Native_List.fromArray(
+	[_narkisr$elm_ui$Jobs_Routing$matcherStats, _narkisr$elm_ui$Jobs_Routing$matcherList]);
+
+var _narkisr$elm_ui$Common_NewTab$newtab = _elm_lang$core$Native_Platform.outgoingPort(
+	'newtab',
+	function (v) {
+		return v;
+	});
+
+var _narkisr$elm_ui$Jobs_List$apply = F2(
+	function (func, value) {
+		return A3(
+			_elm_lang$core$Json_Decode$object2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			func,
+			value);
+	});
+var _narkisr$elm_ui$Jobs_List$accordionPanel = F3(
+	function (active, ident, body) {
+		var enabled = active ? ' in' : '';
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('panel panel-default')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('panel panel-heading'),
+							_elm_lang$html$Html_Attributes$id(
+							A2(_elm_lang$core$Basics_ops['++'], 'heading', ident)),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'tab')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html$h4,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class('panel-title')
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									A2(
+									_elm_lang$html$Html$a,
+									_elm_lang$core$Native_List.fromArray(
+										[
+											A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'button'),
+											A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'collapse'),
+											A2(_elm_lang$html$Html_Attributes$attribute, 'data-parent', '#accordion'),
+											_elm_lang$html$Html_Attributes$href(
+											A2(_elm_lang$core$Basics_ops['++'], '#collapse', ident)),
+											A2(
+											_elm_lang$html$Html_Attributes$attribute,
+											'aria-expanded',
+											_elm_lang$core$Basics$toString(active)),
+											A2(
+											_elm_lang$html$Html_Attributes$attribute,
+											'aria-controls',
+											A2(_elm_lang$core$Basics_ops['++'], 'collapse', ident))
+										]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											_elm_lang$html$Html$text(ident)
+										]))
+								]))
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$id(
+							A2(_elm_lang$core$Basics_ops['++'], 'collapse', ident)),
+							_elm_lang$html$Html_Attributes$class(
+							A2(_elm_lang$core$Basics_ops['++'], 'panel-collapse collapse', enabled)),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'tabpanel'),
+							A2(
+							_elm_lang$html$Html_Attributes$attribute,
+							'aria-labelledby',
+							A2(_elm_lang$core$Basics_ops['++'], 'heading', ident))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html$div,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class('panel-body')
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[body]))
+						]))
+				]));
+	});
+var _narkisr$elm_ui$Jobs_List$doneRow = F2(
+	function (tableid, _p0) {
+		var _p1 = _p0;
+		var _p3 = _p1.start;
+		var _p2 = _p1.end;
+		var pad = function (str) {
+			return _elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$String$length(str),
+				1) ? A2(_elm_lang$core$Basics_ops['++'], '0', str) : str;
+		};
+		var sec = _elm_lang$core$Basics$toString(
+			A2(
+				_elm_lang$core$Basics_ops['%'],
+				_elm_lang$core$Basics$round((_p2 - _p3) / 1000),
+				60));
+		var min = _elm_lang$core$Basics$toString(
+			(_elm_lang$core$Basics$round(_p2 - _p3) / (1000 * 60)) | 0);
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p1.identity)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						A2(
+							_mgold$elm_date_format$Date_Format$format,
+							'%d/%m/%Y %H:%M',
+							_elm_lang$core$Date$fromTime(_p3)))
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p1.hostname)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p1.queue)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							pad(min),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								':',
+								pad(sec))))
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p1.status)
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Jobs_List$runningRow = F2(
+	function (tableId, _p4) {
+		var _p5 = _p4;
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p5.id)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p5.type$)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('progress progress-xs progress-striped active')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('progress-bar progress-bar-primary'),
+										_elm_lang$html$Html_Attributes$id(_p5.status),
+										_elm_lang$html$Html_Attributes$style(
+										_elm_lang$core$Native_List.fromArray(
+											[
+												{ctor: '_Tuple2', _0: 'width', _1: '0%'}
+											]))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[]))
+							]))
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Jobs_List$setDoneJobs = F2(
+	function (_p7, _p6) {
+		var _p8 = _p7;
+		var _p9 = _p6;
+		var jobsList = A2(
+			_elm_lang$core$List$map,
+			function (_p10) {
+				var _p11 = _p10;
+				return {ctor: '_Tuple2', _0: _p11.tid, _1: _p11};
+			},
+			_p9._1);
+		var newDone = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(jobsList),
+			_p8.done);
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(_p9._0)),
+			_p8.pager);
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				_p8,
+				{done: newDone, pager: newPager}),
+			_1: _elm_lang$core$Platform_Cmd$none
+		};
+	});
+var _narkisr$elm_ui$Jobs_List$setRunningJobs = F2(
+	function (_p12, res) {
+		var _p13 = _p12;
+		var jobsList = A2(
+			_elm_lang$core$List$map,
+			function (_p14) {
+				var _p15 = _p14;
+				return {ctor: '_Tuple2', _0: _p15.tid, _1: _p15};
+			},
+			res);
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				_p13,
+				{
+					running: A2(
+						_narkisr$elm_ui$Table$update,
+						_narkisr$elm_ui$Table$UpdateRows(jobsList),
+						_p13.running)
+				}),
+			_1: _elm_lang$core$Platform_Cmd$none
+		};
+	});
+var _narkisr$elm_ui$Jobs_List$RunningJob = F7(
+	function (a, b, c, d, e, f, g) {
+		return {env: a, id: b, jid: c, status: d, tid: e, tid_link: f, type$: g};
+	});
+var _narkisr$elm_ui$Jobs_List$runningJob = A8(
+	_elm_lang$core$Json_Decode$object7,
+	_narkisr$elm_ui$Jobs_List$RunningJob,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'env', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'jid', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'status',
+		_elm_lang$core$Json_Decode$oneOf(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$core$Json_Decode$string,
+					_elm_lang$core$Json_Decode$null('')
+				]))),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'tid', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'tid-link',
+		_elm_lang$core$Json_Decode$oneOf(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$core$Json_Decode$string,
+					_elm_lang$core$Json_Decode$null('')
+				]))),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'type', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Jobs_List$runningList = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['jobs']),
+	_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Jobs_List$runningJob));
+var _narkisr$elm_ui$Jobs_List$DoneJob = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {start: a, end: b, env: c, hostname: d, identity: e, queue: f, status: g, tid: h, tid_link: i};
+	});
+var _narkisr$elm_ui$Jobs_List$doneJob = A2(
+	_narkisr$elm_ui$Jobs_List$apply,
+	A2(
+		_narkisr$elm_ui$Jobs_List$apply,
+		A2(
+			_narkisr$elm_ui$Jobs_List$apply,
+			A2(
+				_narkisr$elm_ui$Jobs_List$apply,
+				A2(
+					_narkisr$elm_ui$Jobs_List$apply,
+					A2(
+						_narkisr$elm_ui$Jobs_List$apply,
+						A2(
+							_narkisr$elm_ui$Jobs_List$apply,
+							A2(
+								_narkisr$elm_ui$Jobs_List$apply,
+								A2(
+									_elm_lang$core$Json_Decode$map,
+									_narkisr$elm_ui$Jobs_List$DoneJob,
+									A2(_elm_lang$core$Json_Decode_ops[':='], 'start', _elm_lang$core$Json_Decode$float)),
+								A2(_elm_lang$core$Json_Decode_ops[':='], 'end', _elm_lang$core$Json_Decode$float)),
+							A2(_elm_lang$core$Json_Decode_ops[':='], 'env', _elm_lang$core$Json_Decode$string)),
+						A2(_elm_lang$core$Json_Decode_ops[':='], 'hostname', _elm_lang$core$Json_Decode$string)),
+					A2(_elm_lang$core$Json_Decode_ops[':='], 'identity', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode_ops[':='], 'queue', _elm_lang$core$Json_Decode$string)),
+			A2(_elm_lang$core$Json_Decode_ops[':='], 'status', _elm_lang$core$Json_Decode$string)),
+		A2(_elm_lang$core$Json_Decode_ops[':='], 'tid', _elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'tid-link',
+		_elm_lang$core$Json_Decode$oneOf(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$core$Json_Decode$string,
+					_elm_lang$core$Json_Decode$null('')
+				]))));
+var _narkisr$elm_ui$Jobs_List$doneList = A3(
+	_elm_lang$core$Json_Decode$object2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'total', _elm_lang$core$Json_Decode$int),
+	A2(
+		_elm_lang$core$Json_Decode_ops[':='],
+		'jobs',
+		_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Jobs_List$doneJob)));
+var _narkisr$elm_ui$Jobs_List$Model = F3(
+	function (a, b, c) {
+		return {running: a, done: b, pager: c};
+	});
+var _narkisr$elm_ui$Jobs_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Jobs_List$LoadDone = function (a) {
+	return {ctor: 'LoadDone', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$LoadRunning = function (a) {
+	return {ctor: 'LoadRunning', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$view = function (_p16) {
+	var _p17 = _p16;
+	var _p19 = _p17.running;
+	var _p18 = _p17.done;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('panel-group'),
+				_elm_lang$html$Html_Attributes$id('accordion'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'tablist')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A3(
+				_narkisr$elm_ui$Jobs_List$accordionPanel,
+				_elm_lang$core$Basics$not(
+					_elm_lang$core$List$isEmpty(_p19.rows)),
+				'Running',
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$panelDefault_(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html_App$map,
+							_narkisr$elm_ui$Jobs_List$LoadRunning,
+							_narkisr$elm_ui$Table$view(_p19))
+						]))),
+				A3(
+				_narkisr$elm_ui$Jobs_List$accordionPanel,
+				_elm_lang$core$Basics$not(
+					_elm_lang$core$List$isEmpty(_p18.rows)),
+				'Done',
+				A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									A2(
+									_elm_lang$html$Html$div,
+									_elm_lang$core$Native_List.fromArray(
+										[
+											_elm_lang$html$Html_Attributes$class('col-md-12')
+										]),
+									_elm_lang$core$Native_List.fromArray(
+										[
+											_circuithub$elm_bootstrap_html$Bootstrap_Html$panelDefault_(
+											_elm_lang$core$Native_List.fromArray(
+												[
+													A2(
+													_elm_lang$html$Html_App$map,
+													_narkisr$elm_ui$Jobs_List$LoadDone,
+													_narkisr$elm_ui$Table$view(_p18))
+												]))
+										]))
+								])),
+							_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									A2(
+									_elm_lang$html$Html_App$map,
+									_narkisr$elm_ui$Jobs_List$GotoPage,
+									_narkisr$elm_ui$Pager$view(_p17.pager))
+								]))
+						])))
+			]));
+};
+var _narkisr$elm_ui$Jobs_List$Polling = {ctor: 'Polling'};
+var _narkisr$elm_ui$Jobs_List$SetDone = function (a) {
+	return {ctor: 'SetDone', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$getDone = F2(
+	function (page, offset) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			_narkisr$elm_ui$Jobs_List$SetDone,
+			_elm_lang$core$Task$toResult(
+				A2(
+					_narkisr$elm_ui$Common_Http$getJson,
+					_narkisr$elm_ui$Jobs_List$doneList,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'/jobs/done?offset=',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(offset),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'&page=',
+								_elm_lang$core$Basics$toString(page)))))));
+	});
+var _narkisr$elm_ui$Jobs_List$SetRunning = function (a) {
+	return {ctor: 'SetRunning', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$getRunning = A3(
+	_elm_lang$core$Task$perform,
+	_elm_community$basics_extra$Basics_Extra$never,
+	_narkisr$elm_ui$Jobs_List$SetRunning,
+	_elm_lang$core$Task$toResult(
+		A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Jobs_List$runningList, '/jobs/running')));
+var _narkisr$elm_ui$Jobs_List$init = function () {
+	var done = A5(
+		_narkisr$elm_ui$Table$init,
+		'doneJobs',
+		false,
+		_elm_lang$core$Native_List.fromArray(
+			['#', 'Start', 'Host', 'Queue', 'Runtime (min:sec)', 'Status']),
+		_narkisr$elm_ui$Jobs_List$doneRow,
+		'Done Jobs');
+	var running = A5(
+		_narkisr$elm_ui$Table$init,
+		'runningJobs',
+		false,
+		_elm_lang$core$Native_List.fromArray(
+			['#', 'Queue', 'Status']),
+		_narkisr$elm_ui$Jobs_List$runningRow,
+		'Running Jobs');
+	return {
+		ctor: '_Tuple2',
+		_0: A3(_narkisr$elm_ui$Jobs_List$Model, running, done, _narkisr$elm_ui$Pager$init),
+		_1: _elm_lang$core$Platform_Cmd$batch(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_narkisr$elm_ui$Jobs_List$getRunning,
+					A2(_narkisr$elm_ui$Jobs_List$getDone, 1, 10)
+				]))
+	};
+}();
+var _narkisr$elm_ui$Jobs_List$update = F2(
+	function (msg, _p20) {
+		var _p21 = _p20;
+		var _p33 = _p21;
+		var _p22 = msg;
+		_v9_6:
+		do {
+			switch (_p22.ctor) {
+				case 'Polling':
+					return {
+						ctor: '_Tuple2',
+						_0: _p33,
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_narkisr$elm_ui$Jobs_List$getRunning,
+									A2(_narkisr$elm_ui$Jobs_List$getDone, _p21.pager.page, 10)
+								]))
+					};
+				case 'SetRunning':
+					return A4(
+						_narkisr$elm_ui$Common_Errors$successHandler,
+						_p22._0,
+						_p33,
+						_narkisr$elm_ui$Jobs_List$setRunningJobs(_p33),
+						_narkisr$elm_ui$Jobs_List$NoOp);
+				case 'SetDone':
+					return A4(
+						_narkisr$elm_ui$Common_Errors$successHandler,
+						_p22._0,
+						_p33,
+						_narkisr$elm_ui$Jobs_List$setDoneJobs(_p33),
+						_narkisr$elm_ui$Jobs_List$NoOp);
+				case 'GotoPage':
+					var _p24 = _p22._0;
+					var _p23 = _p24;
+					if (_p23.ctor === 'NextPage') {
+						var newPager = A2(_narkisr$elm_ui$Pager$update, _p24, _p33.pager);
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p33,
+								{pager: newPager}),
+							_1: A2(_narkisr$elm_ui$Jobs_List$getDone, _p23._0, 10)
+						};
+					} else {
+						return {ctor: '_Tuple2', _0: _p33, _1: _elm_lang$core$Platform_Cmd$none};
+					}
+				case 'LoadDone':
+					if (_p22._0.ctor === 'Select') {
+						var _p28 = _p22._0._0;
+						var emptyRow = A9(_narkisr$elm_ui$Jobs_List$DoneJob, 0, 0, '', '', '', '', '', '', '');
+						var _p25 = A2(
+							_elm_lang$core$Maybe$withDefault,
+							{ctor: '_Tuple2', _0: _p28, _1: emptyRow},
+							_elm_lang$core$List$head(
+								A2(
+									_elm_lang$core$List$filter,
+									function (_p26) {
+										var _p27 = _p26;
+										return _elm_lang$core$Native_Utils.eq(_p27._1.tid, _p28);
+									},
+									_p21.done.rows)));
+						var job = _p25._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _p33,
+							_1: _narkisr$elm_ui$Common_NewTab$newtab(job.tid_link)
+						};
+					} else {
+						break _v9_6;
+					}
+				case 'LoadRunning':
+					if (_p22._0.ctor === 'Select') {
+						var _p32 = _p22._0._0;
+						var emptyRow = A7(_narkisr$elm_ui$Jobs_List$RunningJob, '', '', '', '', '', '', '');
+						var _p29 = A2(
+							_elm_lang$core$Maybe$withDefault,
+							{ctor: '_Tuple2', _0: _p32, _1: emptyRow},
+							_elm_lang$core$List$head(
+								A2(
+									_elm_lang$core$List$filter,
+									function (_p30) {
+										var _p31 = _p30;
+										return _elm_lang$core$Native_Utils.eq(_p31._1.tid, _p32);
+									},
+									_p21.running.rows)));
+						var job = _p29._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _p33,
+							_1: _narkisr$elm_ui$Common_NewTab$newtab(job.tid_link)
+						};
+					} else {
+						break _v9_6;
+					}
+				default:
+					break _v9_6;
+			}
+		} while(false);
+		return {ctor: '_Tuple2', _0: _p33, _1: _elm_lang$core$Platform_Cmd$none};
+	});
+
+var _narkisr$elm_ui$Jobs_Stats$emptyTimer = {min: 0, max: 0, mean: 0};
+var _narkisr$elm_ui$Jobs_Stats$Timer = F3(
+	function (a, b, c) {
+		return {max: a, min: b, mean: c};
+	});
+var _narkisr$elm_ui$Jobs_Stats$Metrics = F4(
+	function (a, b, c, d) {
+		return {startTimer: a, stopTimer: b, provisionTimer: c, reloadTimer: d};
+	});
+var _narkisr$elm_ui$Jobs_Stats$Model = F4(
+	function (a, b, c, d) {
+		return {polls: a, charts: b, interval: c, enabled: d};
+	});
+var _narkisr$elm_ui$Jobs_Stats$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Jobs_Stats$LoadSession = function (a) {
+	return {ctor: 'LoadSession', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Stats$init = {
+	ctor: '_Tuple2',
+	_0: A4(
+		_narkisr$elm_ui$Jobs_Stats$Model,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		15,
+		false),
+	_1: _narkisr$elm_ui$Users_Session$getSession(_narkisr$elm_ui$Jobs_Stats$LoadSession)
+};
+var _narkisr$elm_ui$Jobs_Stats$Load = function (a) {
+	return {ctor: 'Load', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Stats$PollMetrics = function (a) {
+	return {ctor: 'PollMetrics', _0: a};
+};
+
+var _narkisr$elm_ui$Jobs_Core$isPolling = function (msg) {
+	var _p0 = msg;
+	_v0_2:
+	do {
+		switch (_p0.ctor) {
+			case 'JobsListing':
+				if (_p0._0.ctor === 'Polling') {
+					return true;
+				} else {
+					break _v0_2;
+				}
+			case 'JobsStats':
+				if (_p0._0.ctor === 'PollMetrics') {
+					return true;
+				} else {
+					break _v0_2;
+				}
+			default:
+				break _v0_2;
+		}
+	} while(false);
+	return false;
+};
+var _narkisr$elm_ui$Jobs_Core$Model = F2(
+	function (a, b) {
+		return {list: a, stats: b};
+	});
+var _narkisr$elm_ui$Jobs_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Jobs_Core$JobsStats = function (a) {
+	return {ctor: 'JobsStats', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Core$JobsListing = function (a) {
+	return {ctor: 'JobsListing', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Core$init = function () {
+	var _p1 = _narkisr$elm_ui$Jobs_List$init;
+	var list = _p1._0;
+	var listEffects = _p1._1;
+	var _p2 = _narkisr$elm_ui$Jobs_Stats$init;
+	var stats = _p2._0;
+	var statsEffects = _p2._1;
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Jobs_Core$JobsListing, listEffects),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Jobs_Core$JobsStats, statsEffects)
+		]);
+	return {
+		ctor: '_Tuple2',
+		_0: A2(_narkisr$elm_ui$Jobs_Core$Model, list, stats),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Jobs_Core$update = F2(
+	function (msg, _p3) {
+		var _p4 = _p3;
+		var _p7 = _p4;
+		var _p5 = msg;
+		if (_p5.ctor === 'JobsListing') {
+			var _p6 = A2(_narkisr$elm_ui$Jobs_List$update, _p5._0, _p4.list);
+			var newListing = _p6._0;
+			var msgs = _p6._1;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p7,
+					{list: newListing}),
+				_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Jobs_Core$JobsListing, msgs)
+			};
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+var _narkisr$elm_ui$Jobs_Core$view = F2(
+	function (_p8, route) {
+		var _p9 = _p8;
+		var _p10 = route;
+		if (_p10.ctor === 'List') {
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Jobs_Core$JobsListing,
+				_narkisr$elm_ui$Jobs_List$view(_p9.list));
+		} else {
+			return _narkisr$elm_ui$Common_Components$notImplemented;
+		}
+	});
+
+var _narkisr$elm_ui$Form_Error$getAt = F2(
+	function (name, error) {
+		var _p0 = error;
+		if (_p0.ctor === 'GroupErrors') {
+			return A2(_elm_lang$core$Dict$get, name, _p0._0);
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _narkisr$elm_ui$Form_Error$CustomError = function (a) {
+	return {ctor: 'CustomError', _0: a};
+};
+var _narkisr$elm_ui$Form_Error$NotIncludedIn = {ctor: 'NotIncludedIn'};
+var _narkisr$elm_ui$Form_Error$LongerStringThan = function (a) {
+	return {ctor: 'LongerStringThan', _0: a};
+};
+var _narkisr$elm_ui$Form_Error$ShorterStringThan = function (a) {
+	return {ctor: 'ShorterStringThan', _0: a};
+};
+var _narkisr$elm_ui$Form_Error$GreaterFloatThan = function (a) {
+	return {ctor: 'GreaterFloatThan', _0: a};
+};
+var _narkisr$elm_ui$Form_Error$SmallerFloatThan = function (a) {
+	return {ctor: 'SmallerFloatThan', _0: a};
+};
+var _narkisr$elm_ui$Form_Error$GreaterIntThan = function (a) {
+	return {ctor: 'GreaterIntThan', _0: a};
+};
+var _narkisr$elm_ui$Form_Error$SmallerIntThan = function (a) {
+	return {ctor: 'SmallerIntThan', _0: a};
+};
+var _narkisr$elm_ui$Form_Error$InvalidDate = {ctor: 'InvalidDate'};
+var _narkisr$elm_ui$Form_Error$InvalidBool = {ctor: 'InvalidBool'};
+var _narkisr$elm_ui$Form_Error$InvalidFloat = {ctor: 'InvalidFloat'};
+var _narkisr$elm_ui$Form_Error$InvalidInt = {ctor: 'InvalidInt'};
+var _narkisr$elm_ui$Form_Error$InvalidFormat = {ctor: 'InvalidFormat'};
+var _narkisr$elm_ui$Form_Error$InvalidUrl = {ctor: 'InvalidUrl'};
+var _narkisr$elm_ui$Form_Error$InvalidEmail = {ctor: 'InvalidEmail'};
+var _narkisr$elm_ui$Form_Error$InvalidString = {ctor: 'InvalidString'};
+var _narkisr$elm_ui$Form_Error$Empty = {ctor: 'Empty'};
+var _narkisr$elm_ui$Form_Error$GroupErrors = function (a) {
+	return {ctor: 'GroupErrors', _0: a};
+};
+
+var _narkisr$elm_ui$Form_Field$asStringList = function (field) {
+	var _p0 = field;
+	if (_p0.ctor === 'MultiSelect') {
+		return _elm_lang$core$Maybe$Just(_p0._0);
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _narkisr$elm_ui$Form_Field$asString = function (field) {
+	var _p1 = field;
+	switch (_p1.ctor) {
+		case 'Text':
+			return _elm_lang$core$Maybe$Just(_p1._0);
+		case 'Textarea':
+			return _elm_lang$core$Maybe$Just(_p1._0);
+		case 'Select':
+			return _elm_lang$core$Maybe$Just(_p1._0);
+		case 'Radio':
+			return _elm_lang$core$Maybe$Just(_p1._0);
+		default:
+			return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _narkisr$elm_ui$Form_Field$asBool = function (field) {
+	var _p2 = field;
+	if (_p2.ctor === 'Check') {
+		return _elm_lang$core$Maybe$Just(_p2._0);
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _narkisr$elm_ui$Form_Field$at = F2(
+	function (name, field) {
+		var _p3 = field;
+		if (_p3.ctor === 'Group') {
+			return A2(_elm_lang$core$Dict$get, name, _p3._0);
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _narkisr$elm_ui$Form_Field$EmptyField = {ctor: 'EmptyField'};
+var _narkisr$elm_ui$Form_Field$Check = function (a) {
+	return {ctor: 'Check', _0: a};
+};
+var _narkisr$elm_ui$Form_Field$Radio = function (a) {
+	return {ctor: 'Radio', _0: a};
+};
+var _narkisr$elm_ui$Form_Field$MultiSelect = function (a) {
+	return {ctor: 'MultiSelect', _0: a};
+};
+var _narkisr$elm_ui$Form_Field$Select = function (a) {
+	return {ctor: 'Select', _0: a};
+};
+var _narkisr$elm_ui$Form_Field$Textarea = function (a) {
+	return {ctor: 'Textarea', _0: a};
+};
+var _narkisr$elm_ui$Form_Field$Text = function (a) {
+	return {ctor: 'Text', _0: a};
+};
+var _narkisr$elm_ui$Form_Field$Group = function (a) {
+	return {ctor: 'Group', _0: a};
+};
+var _narkisr$elm_ui$Form_Field$group = function (_p4) {
+	return _narkisr$elm_ui$Form_Field$Group(
+		_elm_lang$core$Dict$fromList(_p4));
+};
+
+var _narkisr$elm_ui$Form_Validate$oneOf = F2(
+	function (validations, field) {
+		var walkResults = F2(
+			function (result, combined) {
+				var _p0 = {ctor: '_Tuple2', _0: combined, _1: result};
+				if ((_p0.ctor === '_Tuple2') && (_p0._0.ctor === 'Ok')) {
+					return combined;
+				} else {
+					return result;
+				}
+			});
+		var results = A2(
+			_elm_lang$core$List$map,
+			function (v) {
+				return v(field);
+			},
+			validations);
+		return A3(
+			_elm_lang$core$List$foldl,
+			walkResults,
+			_elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$Empty),
+			results);
+	});
+var _narkisr$elm_ui$Form_Validate$customValidation = F3(
+	function (validation, callback, field) {
+		return A2(
+			_elm_lang$core$Result$andThen,
+			validation(field),
+			callback);
+	});
+var _narkisr$elm_ui$Form_Validate$succeed = F2(
+	function (a, field) {
+		return _elm_lang$core$Result$Ok(a);
+	});
+var _narkisr$elm_ui$Form_Validate$fail = F2(
+	function (error, field) {
+		return _elm_lang$core$Result$Err(error);
+	});
+var _narkisr$elm_ui$Form_Validate$includedIn = F3(
+	function (items, s, field) {
+		return A2(_elm_lang$core$List$member, s, items) ? _elm_lang$core$Result$Ok(s) : _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$NotIncludedIn);
+	});
+var _narkisr$elm_ui$Form_Validate$validUrlPattern = _elm_lang$core$Regex$caseInsensitive(
+	_elm_lang$core$Regex$regex('^(https?://)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\w \\.-]*)*/?$'));
+var _narkisr$elm_ui$Form_Validate$validEmailPattern = _elm_lang$core$Regex$caseInsensitive(
+	_elm_lang$core$Regex$regex('^[a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'));
+var _narkisr$elm_ui$Form_Validate$format = F3(
+	function (regex, s, field) {
+		return A2(_elm_lang$core$Regex$contains, regex, s) ? _elm_lang$core$Result$Ok(s) : _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$InvalidFormat);
+	});
+var _narkisr$elm_ui$Form_Validate$maxFloat = F3(
+	function (max, i, field) {
+		return (_elm_lang$core$Native_Utils.cmp(i, max) < 1) ? _elm_lang$core$Result$Ok(i) : _elm_lang$core$Result$Err(
+			_narkisr$elm_ui$Form_Error$GreaterFloatThan(max));
+	});
+var _narkisr$elm_ui$Form_Validate$minFloat = F3(
+	function (min, i, field) {
+		return (_elm_lang$core$Native_Utils.cmp(i, min) > -1) ? _elm_lang$core$Result$Ok(i) : _elm_lang$core$Result$Err(
+			_narkisr$elm_ui$Form_Error$SmallerFloatThan(min));
+	});
+var _narkisr$elm_ui$Form_Validate$maxInt = F3(
+	function (max, i, field) {
+		return (_elm_lang$core$Native_Utils.cmp(i, max) < 1) ? _elm_lang$core$Result$Ok(i) : _elm_lang$core$Result$Err(
+			_narkisr$elm_ui$Form_Error$GreaterIntThan(max));
+	});
+var _narkisr$elm_ui$Form_Validate$minInt = F3(
+	function (min, i, field) {
+		return (_elm_lang$core$Native_Utils.cmp(i, min) > -1) ? _elm_lang$core$Result$Ok(i) : _elm_lang$core$Result$Err(
+			_narkisr$elm_ui$Form_Error$SmallerIntThan(min));
+	});
+var _narkisr$elm_ui$Form_Validate$maxLength = F3(
+	function (max, s, field) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$String$length(s),
+			max) < 1) ? _elm_lang$core$Result$Ok(s) : _elm_lang$core$Result$Err(
+			_narkisr$elm_ui$Form_Error$ShorterStringThan(max));
+	});
+var _narkisr$elm_ui$Form_Validate$minLength = F3(
+	function (min, s, field) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$String$length(s),
+			min) > -1) ? _elm_lang$core$Result$Ok(s) : _elm_lang$core$Result$Err(
+			_narkisr$elm_ui$Form_Error$ShorterStringThan(min));
+	});
+var _narkisr$elm_ui$Form_Validate$nonEmpty = F2(
+	function (s, field) {
+		return _elm_lang$core$String$isEmpty(s) ? _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$Empty) : _elm_lang$core$Result$Ok(s);
+	});
+var _narkisr$elm_ui$Form_Validate$maybe = F2(
+	function (validation, field) {
+		return _elm_lang$core$Result$Ok(
+			_elm_lang$core$Result$toMaybe(
+				validation(field)));
+	});
+var _narkisr$elm_ui$Form_Validate$date = function (v) {
+	var _p1 = _narkisr$elm_ui$Form_Field$asString(v);
+	if (_p1.ctor === 'Just') {
+		return A2(
+			_elm_lang$core$Result$formatError,
+			function (_p2) {
+				return _narkisr$elm_ui$Form_Error$InvalidDate;
+			},
+			_elm_lang$core$Date$fromString(_p1._0));
+	} else {
+		return _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$InvalidDate);
+	}
+};
+var _narkisr$elm_ui$Form_Validate$bool = function (v) {
+	var _p3 = _narkisr$elm_ui$Form_Field$asBool(v);
+	if (_p3.ctor === 'Just') {
+		return _elm_lang$core$Result$Ok(_p3._0);
+	} else {
+		return _elm_lang$core$Result$Ok(false);
+	}
+};
+var _narkisr$elm_ui$Form_Validate$emptyString = function (v) {
+	var _p4 = _narkisr$elm_ui$Form_Field$asString(v);
+	if (_p4.ctor === 'Just') {
+		var _p5 = _p4._0;
+		return _elm_lang$core$String$isEmpty(_p5) ? _elm_lang$core$Result$Ok(_p5) : _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$InvalidString);
+	} else {
+		return _elm_lang$core$Result$Ok('');
+	}
+};
+var _narkisr$elm_ui$Form_Validate$stringList = function (v) {
+	var _p6 = _narkisr$elm_ui$Form_Field$asStringList(v);
+	if (_p6.ctor === 'Just') {
+		var _p7 = _p6._0;
+		return _elm_lang$core$List$isEmpty(_p7) ? _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$Empty) : _elm_lang$core$Result$Ok(_p7);
+	} else {
+		return _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$InvalidString);
+	}
+};
+var _narkisr$elm_ui$Form_Validate$string = function (v) {
+	var _p8 = _narkisr$elm_ui$Form_Field$asString(v);
+	if (_p8.ctor === 'Just') {
+		var _p9 = _p8._0;
+		return _elm_lang$core$String$isEmpty(_p9) ? _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$Empty) : _elm_lang$core$Result$Ok(_p9);
+	} else {
+		return _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$InvalidString);
+	}
+};
+var _narkisr$elm_ui$Form_Validate$float = function (v) {
+	var _p10 = _narkisr$elm_ui$Form_Field$asString(v);
+	if (_p10.ctor === 'Just') {
+		return A2(
+			_elm_lang$core$Result$formatError,
+			function (_p11) {
+				return _narkisr$elm_ui$Form_Error$InvalidFloat;
+			},
+			_elm_lang$core$String$toFloat(_p10._0));
+	} else {
+		return _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$InvalidInt);
+	}
+};
+var _narkisr$elm_ui$Form_Validate$int = function (v) {
+	var _p12 = _narkisr$elm_ui$Form_Field$asString(v);
+	if (_p12.ctor === 'Just') {
+		return A2(
+			_elm_lang$core$Result$formatError,
+			function (_p13) {
+				return _narkisr$elm_ui$Form_Error$InvalidInt;
+			},
+			_elm_lang$core$String$toInt(_p12._0));
+	} else {
+		return _elm_lang$core$Result$Err(_narkisr$elm_ui$Form_Error$InvalidInt);
+	}
+};
+var _narkisr$elm_ui$Form_Validate$getErr = function (res) {
+	var _p14 = res;
+	if (_p14.ctor === 'Ok') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Maybe$Just(_p14._0);
+	}
+};
+var _narkisr$elm_ui$Form_Validate$groupErrorsUnion = F2(
+	function (e1, e2) {
+		var _p15 = {ctor: '_Tuple2', _0: e1, _1: e2};
+		if (((_p15.ctor === '_Tuple2') && (_p15._0.ctor === 'GroupErrors')) && (_p15._1.ctor === 'GroupErrors')) {
+			return _narkisr$elm_ui$Form_Error$GroupErrors(
+				A2(_elm_lang$core$Dict$union, _p15._0._0, _p15._1._0));
+		} else {
+			return e2;
+		}
+	});
+var _narkisr$elm_ui$Form_Validate$mergeMany = function (errors) {
+	return A3(
+		_elm_lang$core$List$foldl,
+		_narkisr$elm_ui$Form_Validate$groupErrorsUnion,
+		_narkisr$elm_ui$Form_Error$GroupErrors(_elm_lang$core$Dict$empty),
+		A2(_elm_lang$core$List$filterMap, _elm_lang$core$Basics$identity, errors));
+};
+var _narkisr$elm_ui$Form_Validate$get = F3(
+	function (key, validation, field) {
+		return A2(
+			_elm_lang$core$Result$formatError,
+			function (e) {
+				return _narkisr$elm_ui$Form_Error$GroupErrors(
+					_elm_lang$core$Dict$fromList(
+						_elm_lang$core$Native_List.fromArray(
+							[
+								{ctor: '_Tuple2', _0: key, _1: e}
+							])));
+			},
+			validation(
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					_narkisr$elm_ui$Form_Field$EmptyField,
+					A2(_narkisr$elm_ui$Form_Field$at, key, field))));
+	});
+var _narkisr$elm_ui$Form_Validate$customError = _narkisr$elm_ui$Form_Error$CustomError;
+var _narkisr$elm_ui$Form_Validate$formatError = F3(
+	function (f, validation, field) {
+		return A2(
+			_elm_lang$core$Result$formatError,
+			f,
+			validation(field));
+	});
+var _narkisr$elm_ui$Form_Validate$defaultValue = F3(
+	function (a, validation, field) {
+		return _elm_lang$core$Result$Ok(
+			A2(
+				_elm_lang$core$Result$withDefault,
+				a,
+				validation(field)));
+	});
+var _narkisr$elm_ui$Form_Validate$apply = F3(
+	function (partialValidation, aValidation, field) {
+		var _p16 = {
+			ctor: '_Tuple2',
+			_0: partialValidation(field),
+			_1: aValidation(field)
+		};
+		if ((_p16._0.ctor === 'Ok') && (_p16._1.ctor === 'Ok')) {
+			return _elm_lang$core$Result$Ok(
+				_p16._0._0(_p16._1._0));
+		} else {
+			return _elm_lang$core$Result$Err(
+				_narkisr$elm_ui$Form_Validate$mergeMany(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_narkisr$elm_ui$Form_Validate$getErr(_p16._0),
+							_narkisr$elm_ui$Form_Validate$getErr(_p16._1)
+						])));
+		}
+	});
+var _narkisr$elm_ui$Form_Validate$andThen = F3(
+	function (validation, callback, field) {
+		return A2(
+			_elm_lang$core$Result$andThen,
+			validation(field),
+			function (next) {
+				return A2(callback, next, field);
+			});
+	});
+var _narkisr$elm_ui$Form_Validate$pipeTo = _elm_lang$core$Basics$flip(_narkisr$elm_ui$Form_Validate$andThen);
+var _narkisr$elm_ui$Form_Validate$email = A2(
+	_narkisr$elm_ui$Form_Validate$andThen,
+	_narkisr$elm_ui$Form_Validate$string,
+	function (s) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$formatError,
+			function (_p17) {
+				return _narkisr$elm_ui$Form_Error$InvalidEmail;
+			},
+			A2(_narkisr$elm_ui$Form_Validate$format, _narkisr$elm_ui$Form_Validate$validEmailPattern, s));
+	});
+var _narkisr$elm_ui$Form_Validate$url = A2(
+	_narkisr$elm_ui$Form_Validate$andThen,
+	_narkisr$elm_ui$Form_Validate$string,
+	function (s) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$formatError,
+			function (_p18) {
+				return _narkisr$elm_ui$Form_Error$InvalidUrl;
+			},
+			A2(_narkisr$elm_ui$Form_Validate$format, _narkisr$elm_ui$Form_Validate$validUrlPattern, s));
+	});
+var _narkisr$elm_ui$Form_Validate$map = F3(
+	function (f, validation, field) {
+		return A2(
+			_elm_lang$core$Result$map,
+			f,
+			validation(field));
+	});
+var _narkisr$elm_ui$Form_Validate$form1 = _narkisr$elm_ui$Form_Validate$map;
+var _narkisr$elm_ui$Form_Validate$form2 = F3(
+	function (func, v1, v2) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$apply,
+			A2(_narkisr$elm_ui$Form_Validate$form1, func, v1),
+			v2);
+	});
+var _narkisr$elm_ui$Form_Validate$form3 = F4(
+	function (func, v1, v2, v3) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$apply,
+			A3(_narkisr$elm_ui$Form_Validate$form2, func, v1, v2),
+			v3);
+	});
+var _narkisr$elm_ui$Form_Validate$form4 = F5(
+	function (func, v1, v2, v3, v4) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$apply,
+			A4(_narkisr$elm_ui$Form_Validate$form3, func, v1, v2, v3),
+			v4);
+	});
+var _narkisr$elm_ui$Form_Validate$form5 = F6(
+	function (func, v1, v2, v3, v4, v5) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$apply,
+			A5(_narkisr$elm_ui$Form_Validate$form4, func, v1, v2, v3, v4),
+			v5);
+	});
+var _narkisr$elm_ui$Form_Validate$form6 = F7(
+	function (func, v1, v2, v3, v4, v5, v6) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$apply,
+			A6(_narkisr$elm_ui$Form_Validate$form5, func, v1, v2, v3, v4, v5),
+			v6);
+	});
+var _narkisr$elm_ui$Form_Validate$form7 = F8(
+	function (func, v1, v2, v3, v4, v5, v6, v7) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$apply,
+			A7(_narkisr$elm_ui$Form_Validate$form6, func, v1, v2, v3, v4, v5, v6),
+			v7);
+	});
+var _narkisr$elm_ui$Form_Validate$form8 = F9(
+	function (func, v1, v2, v3, v4, v5, v6, v7, v8) {
+		return A2(
+			_narkisr$elm_ui$Form_Validate$apply,
+			A8(_narkisr$elm_ui$Form_Validate$form7, func, v1, v2, v3, v4, v5, v6, v7),
+			v8);
+	});
+
+var _narkisr$elm_ui$Form$merge = F2(
+	function (v1, v2) {
+		var _p0 = {ctor: '_Tuple2', _0: v1, _1: v2};
+		if (((_p0.ctor === '_Tuple2') && (_p0._0.ctor === 'Group')) && (_p0._1.ctor === 'Group')) {
+			return _narkisr$elm_ui$Form_Field$Group(
+				A2(_elm_lang$core$Dict$union, _p0._0._0, _p0._1._0));
+		} else {
+			return v1;
+		}
+	});
+var _narkisr$elm_ui$Form$getFocus = function (_p1) {
+	var _p2 = _p1;
+	return _p2._0.focus;
+};
+var _narkisr$elm_ui$Form$isDirtyAt = F2(
+	function (qualifiedName, _p3) {
+		var _p4 = _p3;
+		return A2(_elm_lang$core$Set$member, qualifiedName, _p4._0.dirtyFields);
+	});
+var _narkisr$elm_ui$Form$isChangedAt = F2(
+	function (qualifiedName, _p5) {
+		var _p6 = _p5;
+		return A2(_elm_lang$core$Set$member, qualifiedName, _p6._0.changedFields);
+	});
+var _narkisr$elm_ui$Form$getErrorAt = F2(
+	function (qualifiedName, _p7) {
+		var _p8 = _p7;
+		var walkPath = F2(
+			function (path, maybeNode) {
+				walkPath:
+				while (true) {
+					var _p9 = path;
+					if (_p9.ctor === '::') {
+						var _p10 = maybeNode;
+						if (_p10.ctor === 'Just') {
+							var _p12 = _p10._0;
+							var _p11 = _p12;
+							if (_p11.ctor === 'GroupErrors') {
+								var _v8 = _p9._1,
+									_v9 = A2(_narkisr$elm_ui$Form_Error$getAt, _p9._0, _p12);
+								path = _v8;
+								maybeNode = _v9;
+								continue walkPath;
+							} else {
+								return _elm_lang$core$Maybe$Just(_p12);
+							}
+						} else {
+							return _elm_lang$core$Maybe$Nothing;
+						}
+					} else {
+						return maybeNode;
+					}
+				}
+			});
+		return A2(
+			walkPath,
+			A2(_elm_lang$core$String$split, '.', qualifiedName),
+			_elm_lang$core$Maybe$Just(_p8._0.errors));
+	});
+var _narkisr$elm_ui$Form$getErrors = function (_p13) {
+	var _p14 = _p13;
+	var mapGroupItem = F2(
+		function (path, _p15) {
+			var _p16 = _p15;
+			return A2(
+				walkTree,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					path,
+					_elm_lang$core$Native_List.fromArray(
+						[_p16._0])),
+				_p16._1);
+		});
+	var walkTree = F2(
+		function (path, node) {
+			var _p17 = node;
+			if (_p17.ctor === 'GroupErrors') {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					mapGroupItem(path),
+					_elm_lang$core$Dict$toList(_p17._0));
+			} else {
+				return _elm_lang$core$Native_List.fromArray(
+					[
+						{
+						ctor: '_Tuple2',
+						_0: A2(_elm_lang$core$String$join, '.', path),
+						_1: node
+					}
+					]);
+			}
+		});
+	return A2(
+		walkTree,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_p14._0.errors);
+};
+var _narkisr$elm_ui$Form$isSubmitted = function (_p18) {
+	var _p19 = _p18;
+	return _p19._0.isSubmitted;
+};
+var _narkisr$elm_ui$Form$getLiveErrorAt = F2(
+	function (name, form) {
+		return (_narkisr$elm_ui$Form$isSubmitted(form) || (A2(_narkisr$elm_ui$Form$isChangedAt, name, form) && _elm_lang$core$Basics$not(
+			A2(_narkisr$elm_ui$Form$isDirtyAt, name, form)))) ? A2(_narkisr$elm_ui$Form$getErrorAt, name, form) : _elm_lang$core$Maybe$Nothing;
+	});
+var _narkisr$elm_ui$Form$getOutput = function (_p20) {
+	var _p21 = _p20;
+	return _p21._0.output;
+};
+var _narkisr$elm_ui$Form$setFieldAt = F3(
+	function (qualifiedName, field, _p22) {
+		var _p23 = _p22;
+		var walkPath = F2(
+			function (path, maybeNode) {
+				var _p24 = path;
+				if (_p24.ctor === '::') {
+					var _p25 = _p24._0;
+					var node = A2(
+						_elm_lang$core$Maybe$withDefault,
+						_narkisr$elm_ui$Form_Field$Group(_elm_lang$core$Dict$empty),
+						maybeNode);
+					var childField = A2(
+						walkPath,
+						_p24._1,
+						A2(_narkisr$elm_ui$Form_Field$at, _p25, node));
+					return A2(
+						_narkisr$elm_ui$Form$merge,
+						_narkisr$elm_ui$Form_Field$Group(
+							_elm_lang$core$Dict$fromList(
+								_elm_lang$core$Native_List.fromArray(
+									[
+										{ctor: '_Tuple2', _0: _p25, _1: childField}
+									]))),
+						node);
+				} else {
+					return field;
+				}
+			});
+		return A2(
+			walkPath,
+			A2(_elm_lang$core$String$split, '.', qualifiedName),
+			_elm_lang$core$Maybe$Just(_p23._0.fields));
+	});
+var _narkisr$elm_ui$Form$getFieldAt = F2(
+	function (qualifiedName, _p26) {
+		var _p27 = _p26;
+		var walkPath = F2(
+			function (name, maybeField) {
+				var _p28 = maybeField;
+				if (_p28.ctor === 'Just') {
+					return A2(_narkisr$elm_ui$Form_Field$at, name, _p28._0);
+				} else {
+					return _elm_lang$core$Maybe$Nothing;
+				}
+			});
+		return A3(
+			_elm_lang$core$List$foldl,
+			walkPath,
+			_elm_lang$core$Maybe$Just(_p27._0.fields),
+			A2(_elm_lang$core$String$split, '.', qualifiedName));
+	});
+var _narkisr$elm_ui$Form$getStringListAt = F2(
+	function (name, form) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_narkisr$elm_ui$Form$getFieldAt, name, form),
+			_narkisr$elm_ui$Form_Field$asStringList);
+	});
+var _narkisr$elm_ui$Form$getStringAt = F2(
+	function (name, form) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_narkisr$elm_ui$Form$getFieldAt, name, form),
+			_narkisr$elm_ui$Form_Field$asString);
+	});
+var _narkisr$elm_ui$Form$getBoolAt = F2(
+	function (name, form) {
+		return A2(
+			_elm_lang$core$Maybe$andThen,
+			A2(_narkisr$elm_ui$Form$getFieldAt, name, form),
+			_narkisr$elm_ui$Form_Field$asBool);
+	});
+var _narkisr$elm_ui$Form$updateValidate = function (model) {
+	var _p29 = model.validation(model.fields);
+	if (_p29.ctor === 'Ok') {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				errors: _narkisr$elm_ui$Form_Error$GroupErrors(_elm_lang$core$Dict$empty),
+				output: _elm_lang$core$Maybe$Just(_p29._0)
+			});
+	} else {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{errors: _p29._0, output: _elm_lang$core$Maybe$Nothing});
+	}
+};
+var _narkisr$elm_ui$Form$getField = F3(
+	function (getValue, path, form) {
+		return {
+			path: path,
+			value: A2(getValue, path, form),
+			error: A2(_narkisr$elm_ui$Form$getErrorAt, path, form),
+			liveError: A2(_narkisr$elm_ui$Form$getLiveErrorAt, path, form),
+			isDirty: A2(_narkisr$elm_ui$Form$isDirtyAt, path, form),
+			isChanged: A2(_narkisr$elm_ui$Form$isChangedAt, path, form),
+			hasFocus: _elm_lang$core$Native_Utils.eq(
+				_narkisr$elm_ui$Form$getFocus(form),
+				_elm_lang$core$Maybe$Just(path))
+		};
+	});
+var _narkisr$elm_ui$Form$getFieldAsBool = _narkisr$elm_ui$Form$getField(_narkisr$elm_ui$Form$getBoolAt);
+var _narkisr$elm_ui$Form$getFieldAsString = _narkisr$elm_ui$Form$getField(_narkisr$elm_ui$Form$getStringAt);
+var _narkisr$elm_ui$Form$getFieldAsStringList = _narkisr$elm_ui$Form$getField(_narkisr$elm_ui$Form$getStringListAt);
+var _narkisr$elm_ui$Form$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {fields: a, focus: b, dirtyFields: c, changedFields: d, isSubmitted: e, output: f, errors: g, validation: h};
+	});
+var _narkisr$elm_ui$Form$FieldState = F7(
+	function (a, b, c, d, e, f, g) {
+		return {path: a, value: b, error: c, liveError: d, isDirty: e, isChanged: f, hasFocus: g};
+	});
+var _narkisr$elm_ui$Form$F = function (a) {
+	return {ctor: 'F', _0: a};
+};
+var _narkisr$elm_ui$Form$initial = F2(
+	function (initialFields, validation) {
+		var model = {
+			fields: _narkisr$elm_ui$Form_Field$group(initialFields),
+			focus: _elm_lang$core$Maybe$Nothing,
+			dirtyFields: _elm_lang$core$Set$empty,
+			changedFields: _elm_lang$core$Set$empty,
+			isSubmitted: false,
+			output: _elm_lang$core$Maybe$Nothing,
+			errors: _narkisr$elm_ui$Form_Error$GroupErrors(_elm_lang$core$Dict$empty),
+			validation: validation
+		};
+		return _narkisr$elm_ui$Form$F(
+			_narkisr$elm_ui$Form$updateValidate(model));
+	});
+var _narkisr$elm_ui$Form$update = F2(
+	function (msg, _p30) {
+		var _p31 = _p30;
+		var _p36 = _p31._0;
+		var _p32 = msg;
+		switch (_p32.ctor) {
+			case 'NoOp':
+				return _narkisr$elm_ui$Form$F(_p36);
+			case 'Focus':
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p36,
+					{
+						focus: _elm_lang$core$Maybe$Just(_p32._0)
+					});
+				return _narkisr$elm_ui$Form$F(newModel);
+			case 'Blur':
+				var newDirtyFields = A2(_elm_lang$core$Set$remove, _p32._0, _p36.dirtyFields);
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p36,
+					{focus: _elm_lang$core$Maybe$Nothing, dirtyFields: newDirtyFields});
+				return _narkisr$elm_ui$Form$F(
+					_narkisr$elm_ui$Form$updateValidate(newModel));
+			case 'Input':
+				var _p35 = _p32._0;
+				var _p34 = _p32._1;
+				var newChangedFields = A2(_elm_lang$core$Set$insert, _p35, _p36.changedFields);
+				var isDirty = function () {
+					var _p33 = _p34;
+					switch (_p33.ctor) {
+						case 'Text':
+							return true;
+						case 'Textarea':
+							return true;
+						default:
+							return false;
+					}
+				}();
+				var newDirtyFields = isDirty ? A2(_elm_lang$core$Set$insert, _p35, _p36.dirtyFields) : _p36.dirtyFields;
+				var newFields = A3(
+					_narkisr$elm_ui$Form$setFieldAt,
+					_p35,
+					_p34,
+					_narkisr$elm_ui$Form$F(_p36));
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p36,
+					{fields: newFields, dirtyFields: newDirtyFields, changedFields: newChangedFields});
+				return _narkisr$elm_ui$Form$F(
+					_narkisr$elm_ui$Form$updateValidate(newModel));
+			case 'Submit':
+				var validatedModel = _narkisr$elm_ui$Form$updateValidate(_p36);
+				return _narkisr$elm_ui$Form$F(
+					_elm_lang$core$Native_Utils.update(
+						validatedModel,
+						{isSubmitted: true}));
+			case 'Validate':
+				return _narkisr$elm_ui$Form$F(
+					_narkisr$elm_ui$Form$updateValidate(_p36));
+			default:
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p36,
+					{
+						fields: _narkisr$elm_ui$Form_Field$group(_p32._0),
+						dirtyFields: _elm_lang$core$Set$empty,
+						changedFields: _elm_lang$core$Set$empty,
+						isSubmitted: false,
+						errors: _narkisr$elm_ui$Form_Error$GroupErrors(_elm_lang$core$Dict$empty)
+					});
+				return _narkisr$elm_ui$Form$F(newModel);
+		}
+	});
+var _narkisr$elm_ui$Form$Reset = function (a) {
+	return {ctor: 'Reset', _0: a};
+};
+var _narkisr$elm_ui$Form$Validate = {ctor: 'Validate'};
+var _narkisr$elm_ui$Form$Submit = {ctor: 'Submit'};
+var _narkisr$elm_ui$Form$Input = F2(
+	function (a, b) {
+		return {ctor: 'Input', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Form$Blur = function (a) {
+	return {ctor: 'Blur', _0: a};
+};
+var _narkisr$elm_ui$Form$Focus = function (a) {
+	return {ctor: 'Focus', _0: a};
+};
+var _narkisr$elm_ui$Form$NoOp = {ctor: 'NoOp'};
+
+var _narkisr$elm_ui$Form_Input$dumpErrors = function (form) {
+	var line = function (_p0) {
+		var _p1 = _p0;
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			_p1._0,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				': ',
+				_elm_lang$core$Basics$toString(_p1._1)));
+	};
+	var content = A2(
+		_elm_lang$core$String$join,
+		'\n',
+		A2(
+			_elm_lang$core$List$map,
+			line,
+			_narkisr$elm_ui$Form$getErrors(form)));
+	return A2(
+		_elm_lang$html$Html$pre,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text(content)
+			]));
+};
+var _narkisr$elm_ui$Form_Input$radioInput = F3(
+	function (value, state, attrs) {
+		var formAttrs = _elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$type$('radio'),
+				_elm_lang$html$Html_Attributes$name(value),
+				_elm_lang$html$Html_Attributes$checked(
+				_elm_lang$core$Native_Utils.eq(
+					state.value,
+					_elm_lang$core$Maybe$Just(value))),
+				_elm_lang$html$Html_Events$onFocus(
+				_narkisr$elm_ui$Form$Focus(state.path)),
+				_elm_lang$html$Html_Events$onBlur(
+				_narkisr$elm_ui$Form$Blur(state.path)),
+				A2(
+				_elm_lang$html$Html_Events$on,
+				'change',
+				A2(
+					_elm_lang$core$Json_Decode$map,
+					function (_p2) {
+						return A2(
+							_narkisr$elm_ui$Form$Input,
+							state.path,
+							_narkisr$elm_ui$Form_Field$Radio(_p2));
+					},
+					_elm_lang$html$Html_Events$targetValue))
+			]);
+		return A2(
+			_elm_lang$html$Html$input,
+			A2(_elm_lang$core$Basics_ops['++'], formAttrs, attrs),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+var _narkisr$elm_ui$Form_Input$appendOrClear = F2(
+	function (list, item) {
+		return A2(_elm_lang$core$List$member, item, list) ? A2(
+			_elm_lang$core$List$filter,
+			function (v) {
+				return !_elm_lang$core$Native_Utils.eq(item, v);
+			},
+			list) : A2(_elm_lang$core$List_ops['::'], item, list);
+	});
+var _narkisr$elm_ui$Form_Input$multiSelectInput = F3(
+	function (options, state, attrs) {
+		var values = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			state.value);
+		var formAttrs = _elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$type$('checkbox'),
+				A2(_elm_lang$html$Html_Attributes$attribute, 'multiple', 'true'),
+				A2(
+				_elm_lang$html$Html_Events$on,
+				'click',
+				A2(
+					_elm_lang$core$Json_Decode$map,
+					function (v) {
+						return A2(
+							_narkisr$elm_ui$Form$Input,
+							state.path,
+							_narkisr$elm_ui$Form_Field$MultiSelect(
+								A2(_narkisr$elm_ui$Form_Input$appendOrClear, values, v)));
+					},
+					_elm_lang$html$Html_Events$targetValue)),
+				_elm_lang$html$Html_Events$onFocus(
+				_narkisr$elm_ui$Form$Focus(state.path)),
+				_elm_lang$html$Html_Events$onBlur(
+				_narkisr$elm_ui$Form$Blur(state.path))
+			]);
+		var buildOption = function (_p3) {
+			var _p4 = _p3;
+			var _p5 = _p4._0;
+			return A2(
+				_elm_lang$html$Html$option,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$value(_p5),
+						_elm_lang$html$Html_Attributes$selected(
+						A2(_elm_lang$core$List$member, _p5, values))
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p4._1)
+					]));
+		};
+		return A2(
+			_elm_lang$html$Html$select,
+			A2(_elm_lang$core$Basics_ops['++'], formAttrs, attrs),
+			A2(_elm_lang$core$List$map, buildOption, options));
+	});
+var _narkisr$elm_ui$Form_Input$selectInput = F3(
+	function (options, state, attrs) {
+		var buildOption = function (_p6) {
+			var _p7 = _p6;
+			var _p8 = _p7._0;
+			return A2(
+				_elm_lang$html$Html$option,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$value(_p8),
+						_elm_lang$html$Html_Attributes$selected(
+						_elm_lang$core$Native_Utils.eq(
+							state.value,
+							_elm_lang$core$Maybe$Just(_p8)))
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(_p7._1)
+					]));
+		};
+		var formAttrs = _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html_Events$on,
+				'change',
+				A2(
+					_elm_lang$core$Json_Decode$map,
+					function (_p9) {
+						return A2(
+							_narkisr$elm_ui$Form$Input,
+							state.path,
+							_narkisr$elm_ui$Form_Field$Select(_p9));
+					},
+					_elm_lang$html$Html_Events$targetValue)),
+				_elm_lang$html$Html_Events$onFocus(
+				_narkisr$elm_ui$Form$Focus(state.path)),
+				_elm_lang$html$Html_Events$onBlur(
+				_narkisr$elm_ui$Form$Blur(state.path))
+			]);
+		return A2(
+			_elm_lang$html$Html$select,
+			A2(_elm_lang$core$Basics_ops['++'], formAttrs, attrs),
+			A2(_elm_lang$core$List$map, buildOption, options));
+	});
+var _narkisr$elm_ui$Form_Input_ops = _narkisr$elm_ui$Form_Input_ops || {};
+_narkisr$elm_ui$Form_Input_ops['?='] = _elm_lang$core$Basics$flip(_elm_lang$core$Maybe$withDefault);
+var _narkisr$elm_ui$Form_Input$baseInput = F4(
+	function (t, toField, state, attrs) {
+		var formAttrs = _elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$type$(t),
+				_elm_lang$html$Html_Attributes$value(
+				A2(_narkisr$elm_ui$Form_Input_ops['?='], state.value, '')),
+				_elm_lang$html$Html_Events$onInput(
+				function (_p10) {
+					return A2(
+						_narkisr$elm_ui$Form$Input,
+						state.path,
+						toField(_p10));
+				}),
+				_elm_lang$html$Html_Events$onFocus(
+				_narkisr$elm_ui$Form$Focus(state.path)),
+				_elm_lang$html$Html_Events$onBlur(
+				_narkisr$elm_ui$Form$Blur(state.path))
+			]);
+		return A2(
+			_elm_lang$html$Html$input,
+			A2(_elm_lang$core$Basics_ops['++'], formAttrs, attrs),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+var _narkisr$elm_ui$Form_Input$textInput = A2(_narkisr$elm_ui$Form_Input$baseInput, 'text', _narkisr$elm_ui$Form_Field$Text);
+var _narkisr$elm_ui$Form_Input$passwordInput = A2(_narkisr$elm_ui$Form_Input$baseInput, 'password', _narkisr$elm_ui$Form_Field$Text);
+var _narkisr$elm_ui$Form_Input$textArea = F2(
+	function (state, attrs) {
+		var formAttrs = _elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$value(
+				A2(_narkisr$elm_ui$Form_Input_ops['?='], state.value, '')),
+				_elm_lang$html$Html_Events$onInput(
+				function (_p11) {
+					return A2(
+						_narkisr$elm_ui$Form$Input,
+						state.path,
+						_narkisr$elm_ui$Form_Field$Textarea(_p11));
+				}),
+				_elm_lang$html$Html_Events$onFocus(
+				_narkisr$elm_ui$Form$Focus(state.path)),
+				_elm_lang$html$Html_Events$onBlur(
+				_narkisr$elm_ui$Form$Blur(state.path))
+			]);
+		return A2(
+			_elm_lang$html$Html$textarea,
+			A2(_elm_lang$core$Basics_ops['++'], formAttrs, attrs),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+var _narkisr$elm_ui$Form_Input$checkboxInput = F2(
+	function (state, attrs) {
+		var formAttrs = _elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$type$('checkbox'),
+				_elm_lang$html$Html_Attributes$checked(
+				A2(_narkisr$elm_ui$Form_Input_ops['?='], state.value, false)),
+				_elm_lang$html$Html_Events$onCheck(
+				function (_p12) {
+					return A2(
+						_narkisr$elm_ui$Form$Input,
+						state.path,
+						_narkisr$elm_ui$Form_Field$Check(_p12));
+				}),
+				_elm_lang$html$Html_Events$onFocus(
+				_narkisr$elm_ui$Form$Focus(state.path)),
+				_elm_lang$html$Html_Events$onBlur(
+				_narkisr$elm_ui$Form$Blur(state.path))
+			]);
+		return A2(
+			_elm_lang$html$Html$input,
+			A2(_elm_lang$core$Basics_ops['++'], formAttrs, attrs),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	});
+
+var _narkisr$elm_ui$Common_FormWizard$notDone = function (_p0) {
+	var _p1 = _p0;
+	return !_elm_lang$core$Native_Utils.eq(_p1.wizard.step, _elm_lang$core$Maybe$Nothing);
+};
+var _narkisr$elm_ui$Common_FormWizard$hasPrev = function (_p2) {
+	var _p3 = _p2;
+	return _elm_lang$core$Basics$not(
+		_elm_lang$core$List$isEmpty(_p3.wizard.prev));
+};
+var _narkisr$elm_ui$Common_FormWizard$hasNext = function (_p4) {
+	var _p5 = _p4;
+	return _elm_lang$core$Basics$not(
+		_elm_lang$core$List$isEmpty(_p5.wizard.next));
+};
+var _narkisr$elm_ui$Common_FormWizard$prepend = F2(
+	function (step, target) {
+		var _p6 = step;
+		if (_p6.ctor === 'Just') {
+			return A2(
+				_elm_lang$core$List$append,
+				_elm_lang$core$Native_List.fromArray(
+					[_p6._0]),
+				target);
+		} else {
+			return target;
+		}
+	});
+var _narkisr$elm_ui$Common_FormWizard$append = F2(
+	function (step, target) {
+		var _p7 = step;
+		if (_p7.ctor === 'Just') {
+			return A2(
+				_elm_lang$core$List$append,
+				target,
+				_elm_lang$core$Native_List.fromArray(
+					[_p7._0]));
+		} else {
+			return target;
+		}
+	});
+var _narkisr$elm_ui$Common_FormWizard$noErrors = function (_p8) {
+	var _p9 = _p8;
+	var _p10 = _p9.step;
+	if (_p10.ctor === 'Just') {
+		return _elm_lang$core$List$isEmpty(
+			_narkisr$elm_ui$Form$getErrors(_p10._0.form));
+	} else {
+		return true;
+	}
+};
+var _narkisr$elm_ui$Common_FormWizard$update = F2(
+	function (msg, _p11) {
+		var _p12 = _p11;
+		var _p18 = _p12.step;
+		var _p17 = _p12.prev;
+		var _p16 = _p12.next;
+		var _p15 = _p12;
+		var _p13 = msg;
+		switch (_p13.ctor) {
+			case 'Next':
+				var prevSteps = A2(_narkisr$elm_ui$Common_FormWizard$append, _p18, _p17);
+				var nextSteps = _narkisr$elm_ui$Common_Utils$defaultEmpty(
+					_elm_lang$core$List$tail(_p16));
+				var nextStep = _elm_lang$core$List$head(_p16);
+				return _narkisr$elm_ui$Common_FormWizard$noErrors(_p15) ? _elm_lang$core$Native_Utils.update(
+					_p15,
+					{step: nextStep, next: nextSteps, prev: prevSteps}) : _p15;
+			case 'Back':
+				var nextSteps = A2(_narkisr$elm_ui$Common_FormWizard$prepend, _p18, _p16);
+				var prevSteps = A2(
+					_elm_lang$core$List$take,
+					_elm_lang$core$List$length(_p17) - 1,
+					_p17);
+				var prevStep = _elm_lang$core$List$head(
+					_elm_lang$core$List$reverse(_p17));
+				return (_narkisr$elm_ui$Common_FormWizard$noErrors(_p15) && (!_elm_lang$core$Native_Utils.eq(prevStep, _elm_lang$core$Maybe$Nothing))) ? _elm_lang$core$Native_Utils.update(
+					_p15,
+					{step: prevStep, next: nextSteps, prev: prevSteps}) : _p15;
+			case 'FormMsg':
+				var _p14 = _p18;
+				if (_p14.ctor === 'Just') {
+					var newForm = A2(_narkisr$elm_ui$Form$update, _p13._0, _p14._0.form);
+					var newStep = _elm_lang$core$Native_Utils.update(
+						_p14._0,
+						{form: newForm});
+					return _elm_lang$core$Native_Utils.update(
+						_p15,
+						{
+							step: _elm_lang$core$Maybe$Just(newStep)
+						});
+				} else {
+					return _p15;
+				}
+			default:
+				return _p15;
+		}
+	});
+var _narkisr$elm_ui$Common_FormWizard$Step = F2(
+	function (a, b) {
+		return {form: a, value: b};
+	});
+var _narkisr$elm_ui$Common_FormWizard$Model = F3(
+	function (a, b, c) {
+		return {step: a, prev: b, next: c};
+	});
+var _narkisr$elm_ui$Common_FormWizard$init = F2(
+	function (first, steps) {
+		return A3(
+			_narkisr$elm_ui$Common_FormWizard$Model,
+			_elm_lang$core$Maybe$Just(first),
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			steps);
+	});
+var _narkisr$elm_ui$Common_FormWizard$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Common_FormWizard$Back = {ctor: 'Back'};
+var _narkisr$elm_ui$Common_FormWizard$FormMsg = function (a) {
+	return {ctor: 'FormMsg', _0: a};
+};
+var _narkisr$elm_ui$Common_FormWizard$Next = {ctor: 'Next'};
+
+var _narkisr$elm_ui$Types_Persistency$persistModel = F2(
+	function (f, value) {
+		return f(
+			A2(_elm_lang$core$Json_Encode$encode, 0, value));
+	});
+var _narkisr$elm_ui$Types_Persistency$dictEncoder = F2(
+	function (enc, dict) {
+		return _elm_lang$core$Json_Encode$object(
+			A2(
+				_elm_lang$core$List$map,
+				function (_p0) {
+					var _p1 = _p0;
+					return {
+						ctor: '_Tuple2',
+						_0: _p1._0,
+						_1: enc(_p1._1)
+					};
+				},
+				_elm_lang$core$Dict$toList(dict)));
+	});
+var _narkisr$elm_ui$Types_Persistency$option = function (o) {
+	var _p2 = o;
+	switch (_p2.ctor) {
+		case 'BoolOption':
+			return _elm_lang$core$Json_Encode$bool(_p2._0);
+		case 'StringOption':
+			return _elm_lang$core$Json_Encode$string(_p2._0);
+		case 'IntOption':
+			return _elm_lang$core$Json_Encode$int(_p2._0);
+		default:
+			return A2(_narkisr$elm_ui$Types_Persistency$dictEncoder, _narkisr$elm_ui$Types_Persistency$option, _p2._0);
+	}
+};
+var _narkisr$elm_ui$Types_Persistency$encodeClasses = function (classes) {
+	return A2(
+		_elm_lang$core$Json_Encode$encode,
+		0,
+		A2(_narkisr$elm_ui$Types_Persistency$dictEncoder, _narkisr$elm_ui$Types_Persistency$option, classes));
+};
+var _narkisr$elm_ui$Types_Persistency$moduleEncoder = function (_p3) {
+	var _p4 = _p3;
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'name',
+				_1: _elm_lang$core$Json_Encode$string(_p4.name)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'src',
+				_1: _elm_lang$core$Json_Encode$string(_p4.src)
+			}
+			]));
+};
+var _narkisr$elm_ui$Types_Persistency$puppetEncoder = function (_p5) {
+	var _p6 = _p5;
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'module',
+				_1: _narkisr$elm_ui$Types_Persistency$moduleEncoder(_p6.module$)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'args',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(_elm_lang$core$List$map, _elm_lang$core$Json_Encode$string, _p6.args))
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'classes',
+				_1: A2(_narkisr$elm_ui$Types_Persistency$dictEncoder, _narkisr$elm_ui$Types_Persistency$option, _p6.classes)
+			}
+			]));
+};
+var _narkisr$elm_ui$Types_Persistency$encode = function (_p7) {
+	var _p8 = _p7;
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'type',
+				_1: _elm_lang$core$Json_Encode$string(_p8.type$)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'description',
+				_1: _elm_lang$core$Json_Encode$string(
+					A2(_elm_lang$core$Maybe$withDefault, '', _p8.description))
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'puppet-std',
+				_1: A2(_narkisr$elm_ui$Types_Persistency$dictEncoder, _narkisr$elm_ui$Types_Persistency$puppetEncoder, _p8.puppetStd)
+			}
+			]));
+};
+var _narkisr$elm_ui$Types_Persistency$persistType = F2(
+	function (f, type$) {
+		return A2(
+			_narkisr$elm_ui$Types_Persistency$persistModel,
+			f,
+			_narkisr$elm_ui$Types_Persistency$encode(type$));
+	});
+
+var _narkisr$elm_ui$Types_View$getType = F2(
+	function (id, msg) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			msg,
+			_elm_lang$core$Task$toResult(
+				A2(
+					_narkisr$elm_ui$Common_Http$getJson,
+					_narkisr$elm_ui$Types_Model$type$,
+					A2(_elm_lang$core$Basics_ops['++'], '/types/', id))));
+	});
+var _narkisr$elm_ui$Types_View$optionsList = function (options) {
+	var _p0 = options;
+	if (_p0.ctor === 'Just') {
+		return A2(
+			_elm_lang$core$String$join,
+			',',
+			_elm_lang$core$Dict$values(
+				A2(
+					_elm_lang$core$Dict$map,
+					F2(
+						function (k, o) {
+							return A2(
+								_elm_lang$core$Basics_ops['++'],
+								k,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									': ',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_narkisr$elm_ui$Common_Model$valueOf(o),
+										', ')));
+						}),
+					_p0._0)));
+	} else {
+		return '';
+	}
+};
+var _narkisr$elm_ui$Types_View$moduleSection = F2(
+	function (env, _p1) {
+		var _p2 = _p1;
+		var _p3 = _p2.module$;
+		var args$ = A2(_elm_lang$core$String$join, ', ', _p2.args);
+		var os = _narkisr$elm_ui$Types_View$optionsList(_p3.options);
+		var cs = A2(
+			_elm_lang$core$String$join,
+			' ',
+			_elm_lang$core$Dict$keys(_p2.classes));
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				_narkisr$elm_ui$Common_Utils$capitalize(env),
+				_elm_lang$core$Native_List.fromArray(
+					['name', 'source', 'arguments', 'options', 'classes']),
+				_elm_lang$core$Native_List.fromArray(
+					[_p3.name, _p3.src, args$, os, cs]))
+			]);
+	});
+var _narkisr$elm_ui$Types_View$puppetSummary = function (puppetStd) {
+	return A3(
+		_elm_lang$core$Dict$foldl,
+		F3(
+			function (env, std, res) {
+				return A2(
+					_elm_lang$core$List$append,
+					A2(_narkisr$elm_ui$Types_View$moduleSection, env, std),
+					res);
+			}),
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		puppetStd);
+};
+var _narkisr$elm_ui$Types_View$summarySections = function (_p4) {
+	var _p5 = _p4;
+	return A2(
+		_elm_lang$core$List$append,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A3(
+				_narkisr$elm_ui$Common_Summary$overviewSection,
+				'Type',
+				_elm_lang$core$Native_List.fromArray(
+					['type', 'description']),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_p5.type$,
+						A2(_elm_lang$core$Maybe$withDefault, '', _p5.description)
+					]))
+			]),
+		_narkisr$elm_ui$Types_View$puppetSummary(_p5.puppetStd));
+};
+var _narkisr$elm_ui$Types_View$summarize = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+						{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+					]))
+			]),
+		A2(
+			_elm_lang$core$List$map,
+			_circuithub$elm_bootstrap_html$Bootstrap_Html$row_,
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$List$concat,
+				A2(
+					_narkisr$elm_ui$Common_Utils$partition,
+					2,
+					A2(
+						_elm_lang$core$List$map,
+						_narkisr$elm_ui$Common_Summary$summaryPanel,
+						_narkisr$elm_ui$Types_View$summarySections(model))))));
+};
+var _narkisr$elm_ui$Types_View$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$h4,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('Type')
+					])),
+				_narkisr$elm_ui$Types_View$summarize(model.type$)
+			]));
+};
+var _narkisr$elm_ui$Types_View$setType = F2(
+	function (model, type$) {
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{type$: type$}));
+	});
+var _narkisr$elm_ui$Types_View$Model = function (a) {
+	return {type$: a};
+};
+var _narkisr$elm_ui$Types_View$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Types_View$Model(_narkisr$elm_ui$Types_Model$emptyType));
+var _narkisr$elm_ui$Types_View$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Types_View$SetType = function (a) {
+	return {ctor: 'SetType', _0: a};
+};
+var _narkisr$elm_ui$Types_View$update = F2(
+	function (msg, model) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
+			case 'ViewType':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_narkisr$elm_ui$Types_View$getType, _p6._0, _narkisr$elm_ui$Types_View$SetType)
+				};
+			case 'SetType':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p6._0,
+					model,
+					_narkisr$elm_ui$Types_View$setType(model),
+					_narkisr$elm_ui$Types_View$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Types_View$ViewType = function (a) {
+	return {ctor: 'ViewType', _0: a};
+};
+
+var _narkisr$elm_ui$Common_Editor$editorInPort = _elm_lang$core$Native_Platform.incomingPort(
+	'editorInPort',
+	A3(
+		_elm_lang$core$Json_Decode$tuple2,
+		F2(
+			function (x1, x2) {
+				return {ctor: '_Tuple2', _0: x1, _1: x2};
+			}),
+		_elm_lang$core$Json_Decode$string,
+		_elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Common_Editor$editorOutPort = _elm_lang$core$Native_Platform.outgoingPort(
+	'editorOutPort',
+	function (v) {
+		return [v._0, v._1];
+	});
+var _narkisr$elm_ui$Common_Editor$unloadEditor = _narkisr$elm_ui$Common_Editor$editorOutPort(
+	{ctor: '_Tuple2', _0: 'unload', _1: ''});
+var _narkisr$elm_ui$Common_Editor$loadEditor = F2(
+	function (target, json) {
+		return _narkisr$elm_ui$Common_Editor$editorOutPort(
+			{ctor: '_Tuple2', _0: json, _1: target});
+	});
+var _narkisr$elm_ui$Common_Editor$Load = function (a) {
+	return {ctor: 'Load', _0: a};
+};
+var _narkisr$elm_ui$Common_Editor$NoOp = {ctor: 'NoOp'};
+
+var _narkisr$elm_ui$Types_Add_Common$Puppet = F4(
+	function (a, b, c, d) {
+		return {ctor: 'Puppet', _0: a, _1: b, _2: c, _3: d};
+	});
+var _narkisr$elm_ui$Types_Add_Common$Main = F3(
+	function (a, b, c) {
+		return {ctor: 'Main', _0: a, _1: b, _2: c};
+	});
+
+var _narkisr$elm_ui$Common_FormComponents$withError = F2(
+	function (field, $class) {
+		var _p0 = field.error;
+		if (_p0.ctor === 'Just') {
+			return A2(_elm_lang$core$Basics_ops['++'], $class, ' has-error');
+		} else {
+			return $class;
+		}
+	});
+var _narkisr$elm_ui$Common_FormComponents$errors = _elm_lang$core$Dict$fromList(
+	_elm_lang$core$Native_List.fromArray(
+		[
+			{ctor: '_Tuple2', _0: 'InvalidString', _1: 'Cannot be empty'},
+			{ctor: '_Tuple2', _0: 'Empty', _1: 'Cannot be empty'}
+		]));
+var _narkisr$elm_ui$Common_FormComponents$errorFor = function (field) {
+	var _p1 = field.error;
+	if (_p1.ctor === 'Just') {
+		return A2(
+			_elm_lang$html$Html$span,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('help-block')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(
+					A2(
+						_elm_lang$core$Maybe$withDefault,
+						'Error message missing!',
+						A2(
+							_elm_lang$core$Dict$get,
+							_elm_lang$core$Basics$toString(_p1._0),
+							_narkisr$elm_ui$Common_FormComponents$errors)))
+				]));
+	} else {
+		return A2(
+			_elm_lang$html$Html$span,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('help-block')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[]));
+	}
+};
+var _narkisr$elm_ui$Common_FormComponents$formGroup = F4(
+	function (title, widget, field, attrs) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class(
+					A2(_narkisr$elm_ui$Common_FormComponents$withError, field, 'form-group')),
+					_elm_lang$html$Html_Attributes$id(title)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$label,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$for(title),
+							_elm_lang$html$Html_Attributes$class('col-sm-3 control-label')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(title)
+						])),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('col-sm-6')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(widget, field, attrs)
+						])),
+					_narkisr$elm_ui$Common_FormComponents$errorFor(field)
+				]));
+	});
+var _narkisr$elm_ui$Common_FormComponents$formControl = F3(
+	function (title, widget, field) {
+		return A4(
+			_narkisr$elm_ui$Common_FormComponents$formGroup,
+			title,
+			widget,
+			field,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-control')
+				]));
+	});
+
+var _narkisr$elm_ui$Form_Infix_ops = _narkisr$elm_ui$Form_Infix_ops || {};
+_narkisr$elm_ui$Form_Infix_ops['?='] = F2(
+	function (s, v) {
+		return _narkisr$elm_ui$Form_Validate$maybe(
+			A2(_narkisr$elm_ui$Form_Validate$get, s, v));
+	});
+var _narkisr$elm_ui$Form_Infix_ops = _narkisr$elm_ui$Form_Infix_ops || {};
+_narkisr$elm_ui$Form_Infix_ops[':='] = _narkisr$elm_ui$Form_Validate$get;
+var _narkisr$elm_ui$Form_Infix_ops = _narkisr$elm_ui$Form_Infix_ops || {};
+_narkisr$elm_ui$Form_Infix_ops['|:'] = _narkisr$elm_ui$Form_Validate$apply;
+
+var _narkisr$elm_ui$Types_Add_Puppet$view = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1.form;
+	var unsecure = A2(_narkisr$elm_ui$Form$getFieldAsBool, 'unsecure', _p2);
+	var $arguments = A2(_narkisr$elm_ui$Form$getFieldAsString, 'arguments', _p2);
+	var source = A2(_narkisr$elm_ui$Form$getFieldAsString, 'source', _p2);
+	var editor = A2(_narkisr$elm_ui$Form$getFieldAsBool, 'editor', _p2);
+	var name = A2(_narkisr$elm_ui$Form$getFieldAsString, 'name', _p2);
+	return A2(
+		_elm_lang$html$Html$form,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('form-horizontal'),
+						A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Name', _narkisr$elm_ui$Form_Input$textInput, name),
+						A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Source', _narkisr$elm_ui$Form_Input$textInput, source),
+						A4(
+						_narkisr$elm_ui$Common_FormComponents$formGroup,
+						'Unsecure',
+						_narkisr$elm_ui$Form_Input$checkboxInput,
+						unsecure,
+						_elm_lang$core$Native_List.fromArray(
+							[])),
+						A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Arguments', _narkisr$elm_ui$Form_Input$textInput, $arguments)
+					]))
+			]));
+};
+var _narkisr$elm_ui$Types_Add_Puppet$defaultBool = function (option) {
+	var _p3 = A2(
+		_elm_lang$core$Maybe$withDefault,
+		_narkisr$elm_ui$Common_Model$BoolOption(false),
+		option);
+	if (_p3.ctor === 'BoolOption') {
+		return _p3._0;
+	} else {
+		return false;
+	}
+};
+var _narkisr$elm_ui$Types_Add_Puppet$editDefaults = F2(
+	function (env, _p4) {
+		var _p5 = _p4;
+		var _p6 = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_narkisr$elm_ui$Types_Model$emptyPuppet,
+			A2(_elm_lang$core$Dict$get, env, _p5.puppetStd));
+		var std = _p6;
+		var module$ = _p6.module$;
+		var unsecure = _narkisr$elm_ui$Types_Add_Puppet$defaultBool(
+			A2(
+				_elm_lang$core$Dict$get,
+				'unsecure',
+				A2(_elm_lang$core$Maybe$withDefault, _elm_lang$core$Dict$empty, module$.options)));
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'name',
+				_1: _narkisr$elm_ui$Form_Field$Text(module$.name)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'source',
+				_1: _narkisr$elm_ui$Form_Field$Text(module$.src)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'unsecure',
+				_1: _narkisr$elm_ui$Form_Field$Check(unsecure)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'arguments',
+				_1: _narkisr$elm_ui$Form_Field$Text(
+					A2(_elm_lang$core$String$join, ' ', std.args))
+			}
+			]);
+	});
+var _narkisr$elm_ui$Types_Add_Puppet$validate = A5(
+	_narkisr$elm_ui$Form_Validate$form4,
+	_narkisr$elm_ui$Types_Model$puppetBase,
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'name', _narkisr$elm_ui$Form_Validate$string),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'source', _narkisr$elm_ui$Form_Validate$string),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'unsecure', _narkisr$elm_ui$Form_Validate$bool),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'arguments', _narkisr$elm_ui$Form_Validate$string));
+var _narkisr$elm_ui$Types_Add_Puppet$Model = function (a) {
+	return {form: a};
+};
+var _narkisr$elm_ui$Types_Add_Puppet$init = _narkisr$elm_ui$Types_Add_Puppet$Model(
+	A2(
+		_narkisr$elm_ui$Form$initial,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_narkisr$elm_ui$Types_Add_Puppet$validate));
+var _narkisr$elm_ui$Types_Add_Puppet$reinit = F2(
+	function (env, type$) {
+		return _narkisr$elm_ui$Types_Add_Puppet$Model(
+			A2(
+				_narkisr$elm_ui$Form$initial,
+				A2(_narkisr$elm_ui$Types_Add_Puppet$editDefaults, env, type$),
+				_narkisr$elm_ui$Types_Add_Puppet$validate));
+	});
+
+var _narkisr$elm_ui$Types_Add_Main$typeField = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = A2(_narkisr$elm_ui$Form$getFieldAsString, 'type', _p1.form);
+	var type$ = _p2;
+	var isDirty = _p2.isDirty;
+	var value = _p2.value;
+	var isChanged = _p2.isChanged;
+	var inEdit = _elm_lang$core$Basics$not(isDirty) && ((!_elm_lang$core$Native_Utils.eq(value, _elm_lang$core$Maybe$Nothing)) && _elm_lang$core$Basics$not(isChanged));
+	return A4(
+		_narkisr$elm_ui$Common_FormComponents$formGroup,
+		'Type',
+		_narkisr$elm_ui$Form_Input$textInput,
+		type$,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('form-control'),
+				_elm_lang$html$Html_Attributes$readonly(inEdit)
+			]));
+};
+var _narkisr$elm_ui$Types_Add_Main$view = F2(
+	function (environments, _p3) {
+		var _p4 = _p3;
+		var _p5 = _p4.form;
+		var description = A2(_narkisr$elm_ui$Form$getFieldAsString, 'description', _p5);
+		var environment = A2(_narkisr$elm_ui$Form$getFieldAsString, 'environment', _p5);
+		return A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('form-horizontal'),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_narkisr$elm_ui$Types_Add_Main$typeField(_p4),
+							A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Description', _narkisr$elm_ui$Form_Input$textInput, description),
+							A3(
+							_narkisr$elm_ui$Common_FormComponents$formControl,
+							'Environment',
+							_narkisr$elm_ui$Form_Input$selectInput(environments),
+							environment)
+						]))
+				]));
+	});
+var _narkisr$elm_ui$Types_Add_Main$editDefaults = F2(
+	function (env, _p6) {
+		var _p7 = _p6;
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'type',
+				_1: _narkisr$elm_ui$Form_Field$Text(_p7.type$)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'description',
+				_1: _narkisr$elm_ui$Form_Field$Text(
+					A2(_elm_lang$core$Maybe$withDefault, '', _p7.description))
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'environment',
+				_1: _narkisr$elm_ui$Form_Field$Text(env)
+			}
+			]);
+	});
+var _narkisr$elm_ui$Types_Add_Main$defaults = function (env) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			{
+			ctor: '_Tuple2',
+			_0: 'environment',
+			_1: _narkisr$elm_ui$Form_Field$Text(env)
+		}
+		]);
+};
+var _narkisr$elm_ui$Types_Add_Main$validate = A4(
+	_narkisr$elm_ui$Form_Validate$form3,
+	_narkisr$elm_ui$Types_Model$typeBase,
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'type', _narkisr$elm_ui$Form_Validate$string),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'description', _narkisr$elm_ui$Form_Validate$string),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'environment', _narkisr$elm_ui$Form_Validate$string));
+var _narkisr$elm_ui$Types_Add_Main$Model = function (a) {
+	return {form: a};
+};
+var _narkisr$elm_ui$Types_Add_Main$init = function (env) {
+	return _narkisr$elm_ui$Types_Add_Main$Model(
+		A2(
+			_narkisr$elm_ui$Form$initial,
+			_narkisr$elm_ui$Types_Add_Main$defaults(env),
+			_narkisr$elm_ui$Types_Add_Main$validate));
+};
+var _narkisr$elm_ui$Types_Add_Main$reinit = F2(
+	function (env, type$) {
+		return _narkisr$elm_ui$Types_Add_Main$Model(
+			A2(
+				_narkisr$elm_ui$Form$initial,
+				A2(_narkisr$elm_ui$Types_Add_Main$editDefaults, env, type$),
+				_narkisr$elm_ui$Types_Add_Main$validate));
+	});
+
+var _narkisr$elm_ui$Types_Add$rows = F2(
+	function (contents, buttons) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+					_elm_lang$core$Native_List.fromArray(
+						[contents])),
+					_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(buttons)
+				]));
+	});
+var _narkisr$elm_ui$Types_Add$editor = F2(
+	function (check, puppet) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					puppet,
+					A2(_narkisr$elm_ui$Common_Components$group$, 'Edit classes', check),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$id('jsoneditor'),
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'width', _1: '50%'},
+									{ctor: '_Tuple2', _0: 'height', _1: '400px'},
+									{ctor: '_Tuple2', _0: 'margin-left', _1: '25%'}
+								]))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				]));
+	});
+var _narkisr$elm_ui$Types_Add$merge = F3(
+	function (classes, _p0, acc) {
+		var _p1 = _p0;
+		var type$ = A2(
+			_elm_lang$core$Maybe$withDefault,
+			acc,
+			_narkisr$elm_ui$Form$getOutput(_p1.form));
+		var _p2 = _p1.value;
+		if (_p2.ctor === 'Main') {
+			return type$;
+		} else {
+			var puppet = A2(
+				_elm_lang$core$Maybe$withDefault,
+				_narkisr$elm_ui$Types_Model$emptyPuppet,
+				A2(_elm_lang$core$Dict$get, '--', type$.puppetStd));
+			var withClasses = _elm_lang$core$Native_Utils.update(
+				puppet,
+				{classes: classes});
+			var env = A2(
+				_elm_lang$core$Maybe$withDefault,
+				'',
+				_elm_lang$core$List$head(
+					_elm_lang$core$Dict$keys(acc.puppetStd)));
+			return _elm_lang$core$Native_Utils.update(
+				acc,
+				{
+					puppetStd: A3(_elm_lang$core$Dict$insert, env, withClasses, acc.puppetStd)
+				});
+		}
+	});
+var _narkisr$elm_ui$Types_Add$merged = function (_p3) {
+	var _p4 = _p3;
+	return A3(
+		_elm_lang$core$List$foldl,
+		_narkisr$elm_ui$Types_Add$merge(_p4.classes),
+		_narkisr$elm_ui$Types_Model$emptyType,
+		_p4.wizard.prev);
+};
+var _narkisr$elm_ui$Types_Add$step = F2(
+	function (model, value) {
+		return {form: model.form, value: value};
+	});
+var _narkisr$elm_ui$Types_Add$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {wizard: a, saveErrors: b, hasNext: c, environments: d, editClasses: e, classes: f};
+	});
+var _narkisr$elm_ui$Types_Add$Puppet = {ctor: 'Puppet'};
+var _narkisr$elm_ui$Types_Add$Main = {ctor: 'Main'};
+var _narkisr$elm_ui$Types_Add$reinit = F3(
+	function (model, _p5, env) {
+		var _p6 = _p5;
+		var _p7 = _p6;
+		var classes = A2(
+			_elm_lang$core$Maybe$withDefault,
+			_narkisr$elm_ui$Types_Model$emptyPuppet,
+			A2(_elm_lang$core$Dict$get, env, _p6.puppetStd)).classes;
+		var mainStep = A2(
+			_narkisr$elm_ui$Types_Add$step,
+			A2(_narkisr$elm_ui$Types_Add_Main$reinit, env, _p7),
+			_narkisr$elm_ui$Types_Add$Main);
+		var steps = _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_narkisr$elm_ui$Types_Add$step,
+				A2(_narkisr$elm_ui$Types_Add_Puppet$reinit, env, _p7),
+				_narkisr$elm_ui$Types_Add$Puppet)
+			]);
+		var newWizard = A2(_narkisr$elm_ui$Common_FormWizard$init, mainStep, steps);
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{wizard: newWizard, classes: classes, editClasses: false, saveErrors: _narkisr$elm_ui$Common_Errors$init});
+	});
+var _narkisr$elm_ui$Types_Add$setEnvironment = F2(
+	function (_p8, es) {
+		var _p9 = _p8;
+		var environments = _elm_lang$core$Dict$keys(es);
+		var env = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(
+				_elm_lang$core$Dict$keys(es)));
+		var mainStep = A2(
+			_narkisr$elm_ui$Types_Add$step,
+			_narkisr$elm_ui$Types_Add_Main$init(env),
+			_narkisr$elm_ui$Types_Add$Main);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				_p9,
+				{
+					environments: environments,
+					wizard: _elm_lang$core$Native_Utils.update(
+						_p9.wizard,
+						{
+							step: _elm_lang$core$Maybe$Just(mainStep)
+						})
+				}));
+	});
+var _narkisr$elm_ui$Types_Add$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Types_Add$Saved = function (a) {
+	return {ctor: 'Saved', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$saveType = function (json) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Types_Add$Saved,
+		_elm_lang$core$Task$toResult(
+			A3(
+				_narkisr$elm_ui$Common_Http$postJson,
+				_evancz$elm_http$Http$string(json),
+				_narkisr$elm_ui$Common_Http$saveResponse,
+				'/types')));
+};
+var _narkisr$elm_ui$Types_Add$updateType = function (json) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Types_Add$Saved,
+		_elm_lang$core$Task$toResult(
+			A3(
+				_narkisr$elm_ui$Common_Http$putJson,
+				_evancz$elm_http$Http$string(json),
+				_narkisr$elm_ui$Common_Http$saveResponse,
+				'/types')));
+};
+var _narkisr$elm_ui$Types_Add$Save = function (a) {
+	return {ctor: 'Save', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$saveButton = _elm_lang$core$Native_List.fromArray(
+	[
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$id('Save'),
+				_elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_elm_lang$html$Html_Events$onClick(
+				_narkisr$elm_ui$Types_Add$Save(_narkisr$elm_ui$Types_Add$saveType))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Save  ')
+			]))
+	]);
+var _narkisr$elm_ui$Types_Add$doneButton = _elm_lang$core$Native_List.fromArray(
+	[
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$id('Done'),
+				_elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_elm_lang$html$Html_Events$onClick(
+				_narkisr$elm_ui$Types_Add$Save(_narkisr$elm_ui$Types_Add$saveType))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Done ')
+			]))
+	]);
+var _narkisr$elm_ui$Types_Add$Next = {ctor: 'Next'};
+var _narkisr$elm_ui$Types_Add$Back = {ctor: 'Back'};
+var _narkisr$elm_ui$Types_Add$Done = {ctor: 'Done'};
+var _narkisr$elm_ui$Types_Add$Reset = {ctor: 'Reset'};
+var _narkisr$elm_ui$Types_Add$SetClasses = function (a) {
+	return {ctor: 'SetClasses', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$LoadEditor = function (a) {
+	return {ctor: 'LoadEditor', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$SetEnvironments = function (a) {
+	return {ctor: 'SetEnvironments', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$init = function () {
+	var mainStep = A2(
+		_narkisr$elm_ui$Types_Add$step,
+		_narkisr$elm_ui$Types_Add_Main$init(''),
+		_narkisr$elm_ui$Types_Add$Main);
+	var steps = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_narkisr$elm_ui$Types_Add$step, _narkisr$elm_ui$Types_Add_Puppet$init, _narkisr$elm_ui$Types_Add$Puppet)
+		]);
+	var wizard = A2(_narkisr$elm_ui$Common_FormWizard$init, mainStep, steps);
+	var errors = _narkisr$elm_ui$Common_Errors$init;
+	return {
+		ctor: '_Tuple2',
+		_0: A6(
+			_narkisr$elm_ui$Types_Add$Model,
+			wizard,
+			errors,
+			true,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			false,
+			_elm_lang$core$Dict$empty),
+		_1: _narkisr$elm_ui$Environments_List$getEnvironments(_narkisr$elm_ui$Types_Add$SetEnvironments)
+	};
+}();
+var _narkisr$elm_ui$Types_Add$FormMsg = function (a) {
+	return {ctor: 'FormMsg', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$currentView = function (_p10) {
+	var _p11 = _p10;
+	var environmentList = A2(
+		_elm_lang$core$List$map,
+		function (e) {
+			return {ctor: '_Tuple2', _0: e, _1: e};
+		},
+		_p11.environments);
+	var _p12 = _p11.wizard.step;
+	if (_p12.ctor === 'Just') {
+		var _p14 = _p12._0;
+		var _p13 = _p12._0.value;
+		if (_p13.ctor === 'Main') {
+			return A3(
+				_narkisr$elm_ui$Common_Components$dialogPanel,
+				'info',
+				_narkisr$elm_ui$Common_Components$info('Add a new Type'),
+				_narkisr$elm_ui$Common_Components$panel(
+					_narkisr$elm_ui$Common_Components$fixedPanel(
+						A2(
+							_elm_lang$html$Html_App$map,
+							_narkisr$elm_ui$Types_Add$FormMsg,
+							A2(_narkisr$elm_ui$Types_Add_Main$view, environmentList, _p14)))));
+		} else {
+			var puppet = A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Types_Add$FormMsg,
+				_narkisr$elm_ui$Types_Add_Puppet$view(_p14));
+			var check = A2(
+				_narkisr$elm_ui$Common_Components$checkbox,
+				_narkisr$elm_ui$Types_Add$LoadEditor('typesAdd'),
+				_p11.editClasses);
+			return A3(
+				_narkisr$elm_ui$Common_Components$dialogPanel,
+				'info',
+				_narkisr$elm_ui$Common_Components$info('Module properties'),
+				_narkisr$elm_ui$Common_Components$panel(
+					_narkisr$elm_ui$Common_Components$fixedPanel(
+						A2(_narkisr$elm_ui$Types_Add$editor, check, puppet))));
+		}
+	} else {
+		return A3(
+			_narkisr$elm_ui$Common_Components$dialogPanel,
+			'info',
+			_narkisr$elm_ui$Common_Components$info('Save new type'),
+			_narkisr$elm_ui$Common_Components$panel(
+				_narkisr$elm_ui$Common_Components$fixedPanel(
+					A2(
+						_elm_lang$html$Html_App$map,
+						function (_p15) {
+							return _narkisr$elm_ui$Types_Add$NoOp;
+						},
+						_narkisr$elm_ui$Types_View$summarize(
+							_narkisr$elm_ui$Types_Add$merged(_p11))))));
+	}
+};
+var _narkisr$elm_ui$Types_Add$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$update = F2(
+	function (msg, _p16) {
+		var _p17 = _p16;
+		var _p23 = _p17.wizard;
+		var _p22 = _p17;
+		var _p18 = msg;
+		switch (_p18.ctor) {
+			case 'Next':
+				var _p19 = A2(
+					_narkisr$elm_ui$Types_Add$update,
+					_narkisr$elm_ui$Types_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Next),
+					_p22);
+				var next = _p19._0;
+				var msgs = _p19._1;
+				return {
+					ctor: '_Tuple2',
+					_0: next,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						_elm_lang$core$Native_List.fromArray(
+							[msgs, _narkisr$elm_ui$Common_Editor$unloadEditor]))
+				};
+			case 'Back':
+				var _p20 = A2(
+					_narkisr$elm_ui$Types_Add$update,
+					_narkisr$elm_ui$Types_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Back),
+					_p22);
+				var back = _p20._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						back,
+						{editClasses: false}),
+					_1: _narkisr$elm_ui$Common_Editor$unloadEditor
+				};
+			case 'Reset':
+				var _p21 = A2(
+					_narkisr$elm_ui$Types_Add$update,
+					_narkisr$elm_ui$Types_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Back),
+					_p22);
+				var back = _p21._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						back,
+						{editClasses: false, saveErrors: _narkisr$elm_ui$Common_Errors$init}),
+					_1: _narkisr$elm_ui$Common_Editor$unloadEditor
+				};
+			case 'WizardMsg':
+				var newWizard = A2(_narkisr$elm_ui$Common_FormWizard$update, _p18._0, _p23);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p22,
+						{wizard: newWizard}));
+			case 'FormMsg':
+				var newWizard = A2(
+					_narkisr$elm_ui$Common_FormWizard$update,
+					_narkisr$elm_ui$Common_FormWizard$FormMsg(_p18._0),
+					_p23);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p22,
+						{wizard: newWizard}));
+			case 'SetEnvironments':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p18._0,
+					_p22,
+					_narkisr$elm_ui$Types_Add$setEnvironment(_p22),
+					_narkisr$elm_ui$Types_Add$NoOp);
+			case 'LoadEditor':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p22,
+						{
+							editClasses: _elm_lang$core$Basics$not(_p17.editClasses)
+						}),
+					_1: A2(
+						_narkisr$elm_ui$Common_Editor$loadEditor,
+						_p18._0,
+						_narkisr$elm_ui$Types_Persistency$encodeClasses(_p17.classes))
+				};
+			case 'SetClasses':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p22,
+						{
+							classes: _narkisr$elm_ui$Types_Model$decodeClasses(_p18._0)
+						}));
+			case 'Save':
+				return {
+					ctor: '_Tuple2',
+					_0: _p22,
+					_1: A2(
+						_narkisr$elm_ui$Types_Persistency$persistType,
+						_p18._0,
+						_narkisr$elm_ui$Types_Add$merged(_p22))
+				};
+			case 'Saved':
+				return A3(_narkisr$elm_ui$Common_Errors$errorsHandler, _p18._0, _p22, _narkisr$elm_ui$Types_Add$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p22);
+		}
+	});
+var _narkisr$elm_ui$Types_Add$ErrorsView = function (a) {
+	return {ctor: 'ErrorsView', _0: a};
+};
+var _narkisr$elm_ui$Types_Add$errorsView = function (_p24) {
+	var _p25 = _p24;
+	var body = A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Types_Add$ErrorsView,
+		_narkisr$elm_ui$Common_Errors$view(_p25.saveErrors));
+	return A3(
+		_narkisr$elm_ui$Common_Components$dialogPanel,
+		'danger',
+		_narkisr$elm_ui$Common_Components$error('Failed to save type'),
+		_narkisr$elm_ui$Common_Components$panel(
+			_narkisr$elm_ui$Common_Components$panelContents(body)));
+};
+var _narkisr$elm_ui$Types_Add$view = function (_p26) {
+	var _p27 = _p26;
+	var _p28 = _p27;
+	var buttons$ = _narkisr$elm_ui$Common_Components$buttons(
+		_elm_lang$core$Native_Utils.update(
+			_p28,
+			{
+				hasNext: _narkisr$elm_ui$Common_FormWizard$notDone(_p28)
+			}));
+	return _narkisr$elm_ui$Common_Errors$hasErrors(_p27.saveErrors) ? A2(
+		_narkisr$elm_ui$Types_Add$rows,
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Types_Add$errorsView(_p28)),
+		A3(buttons$, _narkisr$elm_ui$Types_Add$Done, _narkisr$elm_ui$Types_Add$Reset, _narkisr$elm_ui$Types_Add$doneButton)) : A2(
+		_narkisr$elm_ui$Types_Add$rows,
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('col-md-offset-2 col-md-8')
+				]),
+			_narkisr$elm_ui$Types_Add$currentView(_p28)),
+		A3(buttons$, _narkisr$elm_ui$Types_Add$Next, _narkisr$elm_ui$Types_Add$Back, _narkisr$elm_ui$Types_Add$saveButton));
+};
+
+var _narkisr$elm_ui$Types_Edit$envChange = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p4 = _p1.type$;
+		var _p3 = _p1;
+		var _p2 = msg;
+		if ((((_p2.ctor === 'FormMsg') && (_p2._0.ctor === 'Input')) && (_p2._0._0 === 'environment')) && (_p2._0._1.ctor === 'Select')) {
+			return _elm_lang$core$Native_Utils.update(
+				_p3,
+				{
+					type$: _p4,
+					add: A3(_narkisr$elm_ui$Types_Add$reinit, _p1.add, _p4, _p2._0._1._0)
+				});
+		} else {
+			return _p3;
+		}
+	});
+var _narkisr$elm_ui$Types_Edit$setType = F2(
+	function (_p5, type$) {
+		var _p6 = _p5;
+		var _p7 = _p6.add;
+		var env = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(_p7.environments));
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				_p6,
+				{
+					type$: type$,
+					add: A3(_narkisr$elm_ui$Types_Add$reinit, _p7, type$, env)
+				}));
+	});
+var _narkisr$elm_ui$Types_Edit$Model = F3(
+	function (a, b, c) {
+		return {add: a, name: b, type$: c};
+	});
+var _narkisr$elm_ui$Types_Edit$SetClasses = function (a) {
+	return {ctor: 'SetClasses', _0: a};
+};
+var _narkisr$elm_ui$Types_Edit$SetType = function (a) {
+	return {ctor: 'SetType', _0: a};
+};
+var _narkisr$elm_ui$Types_Edit$ViewMsg = function (a) {
+	return {ctor: 'ViewMsg', _0: a};
+};
+var _narkisr$elm_ui$Types_Edit$LoadType = function (a) {
+	return {ctor: 'LoadType', _0: a};
+};
+var _narkisr$elm_ui$Types_Edit$AddMsg = function (a) {
+	return {ctor: 'AddMsg', _0: a};
+};
+var _narkisr$elm_ui$Types_Edit$init = function () {
+	var _p8 = _narkisr$elm_ui$Types_Add$init;
+	var add = _p8._0;
+	var msgs = _p8._1;
+	return {
+		ctor: '_Tuple2',
+		_0: A3(_narkisr$elm_ui$Types_Edit$Model, add, '', _narkisr$elm_ui$Types_Model$emptyType),
+		_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Edit$AddMsg, msgs)
+	};
+}();
+var _narkisr$elm_ui$Types_Edit$view = function (model) {
+	return A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Types_Edit$AddMsg,
+		_narkisr$elm_ui$Types_Add$view(model.add));
+};
+var _narkisr$elm_ui$Types_Edit$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Types_Edit$update = F2(
+	function (msg, _p9) {
+		var _p10 = _p9;
+		var _p17 = _p10;
+		var _p16 = _p10.add;
+		var _p11 = msg;
+		switch (_p11.ctor) {
+			case 'AddMsg':
+				var _p15 = _p11._0;
+				var _p12 = _p15;
+				if (_p12.ctor === 'Save') {
+					var _p13 = A2(
+						_narkisr$elm_ui$Types_Add$update,
+						_narkisr$elm_ui$Types_Add$Save(_narkisr$elm_ui$Types_Add$updateType),
+						_p16);
+					var newAdd = _p13._0;
+					var msgs = _p13._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p17,
+							{add: newAdd}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Edit$AddMsg, msgs)
+					};
+				} else {
+					var _p14 = A2(_narkisr$elm_ui$Types_Add$update, _p15, _p16);
+					var newAdd = _p14._0;
+					var msgs = _p14._1;
+					return {
+						ctor: '_Tuple2',
+						_0: A2(
+							_narkisr$elm_ui$Types_Edit$envChange,
+							_p15,
+							_elm_lang$core$Native_Utils.update(
+								_p17,
+								{add: newAdd})),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Edit$AddMsg, msgs)
+					};
+				}
+			case 'LoadType':
+				return {
+					ctor: '_Tuple2',
+					_0: _p17,
+					_1: A2(_narkisr$elm_ui$Types_View$getType, _p11._0, _narkisr$elm_ui$Types_Edit$SetType)
+				};
+			case 'SetType':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p11._0,
+					_p17,
+					_narkisr$elm_ui$Types_Edit$setType(_p17),
+					_narkisr$elm_ui$Types_Edit$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p17);
+		}
+	});
+
+var _narkisr$elm_ui$Common_Delete$succeeded = F3(
+	function (msg, deleted, expected) {
+		return _elm_lang$core$Native_Utils.eq(
+			msg,
+			deleted(
+				_elm_lang$core$Result$Ok(
+					{message: expected}))) ? true : false;
+	});
+var _narkisr$elm_ui$Common_Delete$refresh = F4(
+	function (init, msg, succeeded, _p0) {
+		var _p1 = _p0;
+		if (succeeded) {
+			var _p2 = init;
+			var listMsgs = _p2._1;
+			var msgs = _elm_lang$core$Native_List.fromArray(
+				[
+					_p1._1,
+					A2(_elm_lang$core$Platform_Cmd$map, msg, listMsgs)
+				]);
+			return {
+				ctor: '_Tuple2',
+				_0: _p1._0,
+				_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+			};
+		} else {
+			return _p1;
+		}
+	});
+var _narkisr$elm_ui$Common_Delete$deleteMessage = F2(
+	function (item, name) {
+		return A2(
+			_narkisr$elm_ui$Common_Components$message,
+			'Notice!',
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], item, ' ')),
+					A2(
+					_elm_lang$html$Html$strong,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(name)
+						])),
+					_elm_lang$html$Html$text(' will be deleted! ')
+				]));
+	});
+var _narkisr$elm_ui$Common_Delete$deleteView = F4(
+	function (_p3, type$, cancel, $delete) {
+		var _p4 = _p3;
+		return A4(
+			_narkisr$elm_ui$Common_Components$dangerCallout,
+			A2(_narkisr$elm_ui$Common_Delete$deleteMessage, _p4.name, type$),
+			A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[])),
+			cancel,
+			$delete);
+	});
+var _narkisr$elm_ui$Common_Delete$view = F5(
+	function (_p5, type$, cancel, $delete, done) {
+		var _p6 = _p5;
+		var _p7 = _p6.errorMsg;
+		return (!_elm_lang$core$Native_Utils.eq(_p7, '')) ? A4(
+			_narkisr$elm_ui$Common_Components$dangerCallout,
+			_narkisr$elm_ui$Common_Components$error(_p7),
+			A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[])),
+			cancel,
+			done) : A4(_narkisr$elm_ui$Common_Delete$deleteView, _p6, type$, cancel, $delete);
+	});
+var _narkisr$elm_ui$Common_Delete$DeleteResponse = function (a) {
+	return {message: a};
+};
+var _narkisr$elm_ui$Common_Delete$deleteResponse = A2(
+	_elm_lang$core$Json_Decode$object1,
+	_narkisr$elm_ui$Common_Delete$DeleteResponse,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string));
+
+var _narkisr$elm_ui$Types_Delete$Model = F2(
+	function (a, b) {
+		return {name: a, errorMsg: b};
+	});
+var _narkisr$elm_ui$Types_Delete$init = _narkisr$elm_ui$Common_Utils$none(
+	A2(_narkisr$elm_ui$Types_Delete$Model, '', ''));
+var _narkisr$elm_ui$Types_Delete$Error = function (a) {
+	return {ctor: 'Error', _0: a};
+};
+var _narkisr$elm_ui$Types_Delete$Deleted = function (a) {
+	return {ctor: 'Deleted', _0: a};
+};
+var _narkisr$elm_ui$Types_Delete$deleteType = function (name) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Types_Delete$Deleted,
+		_elm_lang$core$Task$toResult(
+			A2(
+				_narkisr$elm_ui$Common_Http$delete,
+				_narkisr$elm_ui$Common_Delete$deleteResponse,
+				A2(_elm_lang$core$Basics_ops['++'], '/types/', name))));
+};
+var _narkisr$elm_ui$Types_Delete$succeeded = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_Utils.eq(
+			msg,
+			_narkisr$elm_ui$Types_Delete$Deleted(
+				_elm_lang$core$Result$Ok(
+					{message: 'Type deleted'}))) ? true : false;
+	});
+var _narkisr$elm_ui$Types_Delete$Done = {ctor: 'Done'};
+var _narkisr$elm_ui$Types_Delete$Delete = {ctor: 'Delete'};
+var _narkisr$elm_ui$Types_Delete$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Types_Delete$view = function (model) {
+	return A5(_narkisr$elm_ui$Common_Delete$view, model, 'Type', _narkisr$elm_ui$Types_Delete$Cancel, _narkisr$elm_ui$Types_Delete$Delete, _narkisr$elm_ui$Types_Delete$Done);
+};
+var _narkisr$elm_ui$Types_Delete$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Types_Delete$update = F2(
+	function (msg, _p2) {
+		var _p3 = _p2;
+		var _p7 = _p3;
+		var _p4 = msg;
+		switch (_p4.ctor) {
+			case 'Deleted':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$failHandler,
+					_p4._0,
+					_p7,
+					function (_p5) {
+						var _p6 = _p5;
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p7,
+								{
+									errorMsg: A2(_elm_lang$core$Maybe$withDefault, 'Failed to delete template', _p6.message)
+								}));
+					},
+					_narkisr$elm_ui$Types_Delete$NoOp);
+			case 'Delete':
+				return {
+					ctor: '_Tuple2',
+					_0: _p7,
+					_1: _narkisr$elm_ui$Types_Delete$deleteType(_p3.name)
+				};
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+
+var _narkisr$elm_ui$Types_Routing$Edit = function (a) {
+	return {ctor: 'Edit', _0: a};
+};
+var _narkisr$elm_ui$Types_Routing$matcherEdit = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Types_Routing$Edit, '/edit/', _sporto$hop$Hop_Matchers$str);
+var _narkisr$elm_ui$Types_Routing$Delete = function (a) {
+	return {ctor: 'Delete', _0: a};
+};
+var _narkisr$elm_ui$Types_Routing$matcherDelete = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Types_Routing$Delete, '/delete/', _sporto$hop$Hop_Matchers$str);
+var _narkisr$elm_ui$Types_Routing$View = function (a) {
+	return {ctor: 'View', _0: a};
+};
+var _narkisr$elm_ui$Types_Routing$matcherView = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Types_Routing$View, '/view/', _sporto$hop$Hop_Matchers$str);
+var _narkisr$elm_ui$Types_Routing$List = {ctor: 'List'};
+var _narkisr$elm_ui$Types_Routing$matcherList = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Types_Routing$List, '/list');
+var _narkisr$elm_ui$Types_Routing$Add = {ctor: 'Add'};
+var _narkisr$elm_ui$Types_Routing$matcherAdd = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Types_Routing$Add, '/add');
+var _narkisr$elm_ui$Types_Routing$matchers = _elm_lang$core$Native_List.fromArray(
+	[_narkisr$elm_ui$Types_Routing$matcherAdd, _narkisr$elm_ui$Types_Routing$matcherList, _narkisr$elm_ui$Types_Routing$matcherEdit, _narkisr$elm_ui$Types_Routing$matcherView, _narkisr$elm_ui$Types_Routing$matcherDelete]);
+
+var _narkisr$elm_ui$Types_Core$setName = F2(
+	function (model, name) {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{name: name});
+	});
+var _narkisr$elm_ui$Types_Core$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {list: a, add: b, view: c, $delete: d, edit: e, navChange: f};
+	});
+var _narkisr$elm_ui$Types_Core$Editing = function (a) {
+	return {ctor: 'Editing', _0: a};
+};
+var _narkisr$elm_ui$Types_Core$Deleting = function (a) {
+	return {ctor: 'Deleting', _0: a};
+};
+var _narkisr$elm_ui$Types_Core$Viewing = function (a) {
+	return {ctor: 'Viewing', _0: a};
+};
+var _narkisr$elm_ui$Types_Core$Adding = function (a) {
+	return {ctor: 'Adding', _0: a};
+};
+var _narkisr$elm_ui$Types_Core$MenuClick = function (a) {
+	return {ctor: 'MenuClick', _0: a};
+};
+var _narkisr$elm_ui$Types_Core$Listing = function (a) {
+	return {ctor: 'Listing', _0: a};
+};
+var _narkisr$elm_ui$Types_Core$init = function () {
+	var _p0 = _narkisr$elm_ui$Types_Delete$init;
+	var $delete = _p0._0;
+	var deleteMsg = _p0._1;
+	var _p1 = _narkisr$elm_ui$Types_Edit$init;
+	var edit = _p1._0;
+	var editMsg = _p1._1;
+	var _p2 = _narkisr$elm_ui$Types_View$init;
+	var view = _p2._0;
+	var viewMsg = _p2._1;
+	var _p3 = _narkisr$elm_ui$Types_Add$init;
+	var add = _p3._0;
+	var addMsg = _p3._1;
+	var _p4 = _narkisr$elm_ui$Types_List$init;
+	var list = _p4._0;
+	var listMsg = _p4._1;
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Listing, listMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Adding, addMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Viewing, viewMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Deleting, deleteMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Editing, editMsg)
+		]);
+	return {
+		ctor: '_Tuple2',
+		_0: A6(_narkisr$elm_ui$Types_Core$Model, list, add, view, $delete, edit, _elm_lang$core$Maybe$Nothing),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Types_Core$refreshList = A2(_narkisr$elm_ui$Common_Delete$refresh, _narkisr$elm_ui$Types_List$init, _narkisr$elm_ui$Types_Core$Listing);
+var _narkisr$elm_ui$Types_Core$navigate = F2(
+	function (msg, _p5) {
+		var _p6 = _p5;
+		var _p20 = _p6._0.view;
+		var _p19 = _p6;
+		var _p18 = _p6._1;
+		var _p17 = _p6._0;
+		var _p7 = msg;
+		_v1_5:
+		do {
+			switch (_p7.ctor) {
+				case 'Listing':
+					var _p8 = _p7._0;
+					if ((_p8.ctor === 'LoadPage') && (_p8._0.ctor === 'View')) {
+						var _p10 = _p8._0._0;
+						var _p9 = A2(
+							_narkisr$elm_ui$Types_View$update,
+							_narkisr$elm_ui$Types_View$ViewType(_p10),
+							_p20);
+						var newSystems = _p9._0;
+						var msgs = _p9._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p17,
+								{
+									view: _p20,
+									navChange: _elm_lang$core$Maybe$Just(
+										A2(_elm_lang$core$Basics_ops['++'], '/types/view/', _p10))
+								}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Viewing, msgs)
+						};
+					} else {
+						return {ctor: '_Tuple2', _0: _p17, _1: _p18};
+					}
+				case 'Adding':
+					var _p11 = _p7._0;
+					if ((_p11.ctor === 'Saved') && (_p11._0.ctor === 'Ok')) {
+						return A2(
+							_narkisr$elm_ui$Types_Core$refreshList,
+							true,
+							{
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p17,
+									{
+										navChange: _elm_lang$core$Maybe$Just('/types/list')
+									}),
+								_1: _p18
+							});
+					} else {
+						return {ctor: '_Tuple2', _0: _p17, _1: _p18};
+					}
+				case 'Editing':
+					var _p12 = _p7._0;
+					if (_p12.ctor === 'AddMsg') {
+						var _p13 = _p12._0;
+						if ((_p13.ctor === 'Saved') && (_p13._0.ctor === 'Ok')) {
+							return A2(
+								_narkisr$elm_ui$Types_Core$refreshList,
+								true,
+								{
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p17,
+										{
+											navChange: _elm_lang$core$Maybe$Just('/types/list')
+										}),
+									_1: _p18
+								});
+						} else {
+							return {ctor: '_Tuple2', _0: _p17, _1: _p18};
+						}
+					} else {
+						return {ctor: '_Tuple2', _0: _p17, _1: _p18};
+					}
+				case 'Deleting':
+					var _p14 = _p7._0;
+					switch (_p14.ctor) {
+						case 'Deleted':
+							return _elm_lang$core$Native_Utils.eq(_p6._0.$delete.errorMsg, '') ? {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p17,
+									{
+										navChange: _elm_lang$core$Maybe$Just('/types/list')
+									}),
+								_1: _p18
+							} : _p19;
+						case 'Cancel':
+							return A2(
+								_narkisr$elm_ui$Types_Core$refreshList,
+								true,
+								{
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p17,
+										{
+											navChange: _elm_lang$core$Maybe$Just('/types/list')
+										}),
+									_1: _p18
+								});
+						case 'Done':
+							return A2(
+								_narkisr$elm_ui$Types_Core$refreshList,
+								true,
+								{
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p17,
+										{
+											navChange: _elm_lang$core$Maybe$Just('/types/list')
+										}),
+									_1: _p18
+								});
+						default:
+							return _p19;
+					}
+				case 'MenuClick':
+					if (_p7._0.ctor === '_Tuple2') {
+						var _p16 = _p7._0._1;
+						var _p15 = _p7._0._0;
+						switch (_p15) {
+							case 'edit':
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p17,
+										{
+											navChange: _elm_lang$core$Maybe$Just(
+												A2(_elm_lang$core$Basics_ops['++'], '/types/edit/', _p16))
+										}),
+									_1: _p18
+								};
+							case 'clear':
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p17,
+										{
+											navChange: _elm_lang$core$Maybe$Just(
+												A2(_elm_lang$core$Basics_ops['++'], '/types/delete/', _p16))
+										}),
+									_1: _p18
+								};
+							default:
+								return _p19;
+						}
+					} else {
+						break _v1_5;
+					}
+				default:
+					break _v1_5;
+			}
+		} while(false);
+		return {ctor: '_Tuple2', _0: _p17, _1: _p18};
+	});
+var _narkisr$elm_ui$Types_Core$route = F2(
+	function (msg, _p21) {
+		var _p22 = _p21;
+		var _p35 = _p22;
+		var _p34 = _p22.edit;
+		var _p33 = _p22.$delete;
+		var _p23 = msg;
+		switch (_p23.ctor) {
+			case 'Listing':
+				var _p24 = A2(_narkisr$elm_ui$Types_List$update, _p23._0, _p22.list);
+				var newTypes = _p24._0;
+				var effect = _p24._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p35,
+						{list: newTypes}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Listing, effect)
+				};
+			case 'Adding':
+				var _p25 = A2(_narkisr$elm_ui$Types_Add$update, _p23._0, _p22.add);
+				var newTypes = _p25._0;
+				var effect = _p25._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p35,
+						{add: newTypes}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Adding, effect)
+				};
+			case 'Editing':
+				var _p26 = A2(_narkisr$elm_ui$Types_Edit$update, _p23._0, _p34);
+				var newTypes = _p26._0;
+				var effect = _p26._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p35,
+						{edit: newTypes}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Editing, effect)
+				};
+			case 'Viewing':
+				var _p27 = A2(_narkisr$elm_ui$Types_View$update, _p23._0, _p22.view);
+				var newTypes = _p27._0;
+				var effect = _p27._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p35,
+						{view: newTypes}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Viewing, effect)
+				};
+			case 'Deleting':
+				var _p29 = _p23._0;
+				var success = A3(_narkisr$elm_ui$Common_Delete$succeeded, _p29, _narkisr$elm_ui$Types_Delete$Deleted, 'Type deleted');
+				var _p28 = A2(_narkisr$elm_ui$Types_Delete$update, _p29, _p33);
+				var newDelete = _p28._0;
+				var msgs = _p28._1;
+				return A2(
+					_narkisr$elm_ui$Types_Core$refreshList,
+					success,
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p35,
+							{$delete: newDelete}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Deleting, msgs)
+					});
+			default:
+				var _p32 = _p23._0._1;
+				var _p30 = _p23._0._0;
+				switch (_p30) {
+					case 'clear':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p35,
+								{
+									$delete: A2(_narkisr$elm_ui$Types_Core$setName, _p33, _p32)
+								}));
+					case 'edit':
+						var _p31 = A2(
+							_narkisr$elm_ui$Types_Edit$update,
+							_narkisr$elm_ui$Types_Edit$LoadType(_p32),
+							_p34);
+						var newEdit = _p31._0;
+						var msgs = _p31._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p35,
+								{edit: newEdit}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Types_Core$Editing, msgs)
+						};
+					default:
+						return _narkisr$elm_ui$Common_Utils$none(_p35);
+				}
+		}
+	});
+var _narkisr$elm_ui$Types_Core$update = F2(
+	function (msg, model) {
+		return A2(
+			_narkisr$elm_ui$Types_Core$navigate,
+			msg,
+			A2(_narkisr$elm_ui$Types_Core$route, msg, model));
+	});
+var _narkisr$elm_ui$Types_Core$view = F2(
+	function (_p36, section) {
+		var _p37 = _p36;
+		var _p38 = section;
+		switch (_p38.ctor) {
+			case 'List':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Types_Core$Listing,
+					_narkisr$elm_ui$Types_List$view(_p37.list));
+			case 'Add':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Types_Core$Adding,
+					_narkisr$elm_ui$Types_Add$view(_p37.add));
+			case 'Edit':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Types_Core$Editing,
+					_narkisr$elm_ui$Types_Edit$view(_p37.edit));
+			case 'View':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Types_Core$Viewing,
+					_narkisr$elm_ui$Types_View$view(_p37.view));
+			default:
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Types_Core$Deleting,
+					_narkisr$elm_ui$Types_Delete$view(_p37.$delete));
+		}
+	});
+
+var _narkisr$elm_ui$Users_List$setUsers = F2(
+	function (_p0, users) {
+		var _p1 = _p0;
+		var typePairs = A2(
+			_elm_lang$core$List$map,
+			function (_p2) {
+				var _p3 = _p2;
+				return {ctor: '_Tuple2', _0: _p3.username, _1: _p3};
+			},
+			users);
+		var newTable = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(typePairs),
+			_p1.table);
+		var total = _elm_lang$core$List$length(users);
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(total)),
+			_p1.pager);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				_p1,
+				{users: users, pager: newPager, table: newTable}));
+	});
+var _narkisr$elm_ui$Users_List$userRow = F2(
+	function (name, _p4) {
+		var _p5 = _p4;
+		return _elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(name)
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$String$join,
+							', ',
+							A2(
+								_elm_lang$core$List$map,
+								function (r) {
+									return A2(_elm_lang$core$String$dropLeft, 16, r);
+								},
+								_p5.roles)))
+					])),
+				A2(
+				_elm_lang$html$Html$td,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(
+						A2(_elm_lang$core$String$join, ', ', _p5.envs))
+					]))
+			]);
+	});
+var _narkisr$elm_ui$Users_List$Model = F3(
+	function (a, b, c) {
+		return {users: a, table: b, pager: c};
+	});
+var _narkisr$elm_ui$Users_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Users_List$update = F2(
+	function (msg, model) {
+		var _p6 = msg;
+		if (_p6.ctor === 'SetUsers') {
+			return A4(
+				_narkisr$elm_ui$Common_Errors$successHandler,
+				_p6._0,
+				model,
+				_narkisr$elm_ui$Users_List$setUsers(model),
+				_narkisr$elm_ui$Users_List$NoOp);
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Users_List$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Users_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Users_List$view = function (_p7) {
+	var _p8 = _p7;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_circuithub$elm_bootstrap_html$Bootstrap_Html$panelDefault_(
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html_App$map,
+										_narkisr$elm_ui$Users_List$LoadPage,
+										_narkisr$elm_ui$Table$view(_p8.table))
+									]))
+							]))
+					])),
+				_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_narkisr$elm_ui$Users_List$GotoPage,
+						_narkisr$elm_ui$Pager$view(_p8.pager))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Users_List$SetUsers = function (a) {
+	return {ctor: 'SetUsers', _0: a};
+};
+var _narkisr$elm_ui$Users_List$init = function () {
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'usersListing',
+		true,
+		_elm_lang$core$Native_List.fromArray(
+			['Name', 'Roles', 'Environments']),
+		_narkisr$elm_ui$Users_List$userRow,
+		'Users');
+	return {
+		ctor: '_Tuple2',
+		_0: A3(
+			_narkisr$elm_ui$Users_List$Model,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			table,
+			_narkisr$elm_ui$Pager$init),
+		_1: _narkisr$elm_ui$Users_Model$getUsers(_narkisr$elm_ui$Users_List$SetUsers)
+	};
+}();
+
+var _narkisr$elm_ui$Users_Add_Perm$view = F3(
+	function (envs, operations, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1.form;
+		var operation = A2(_narkisr$elm_ui$Form$getFieldAsStringList, 'operations', _p2);
+		var environment = A2(_narkisr$elm_ui$Form$getFieldAsStringList, 'envs', _p2);
+		return A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('form-horizontal'),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A3(
+							_narkisr$elm_ui$Common_FormComponents$formControl,
+							'Environment',
+							_narkisr$elm_ui$Form_Input$multiSelectInput(envs),
+							environment),
+							A3(
+							_narkisr$elm_ui$Common_FormComponents$formControl,
+							'Operation',
+							_narkisr$elm_ui$Form_Input$multiSelectInput(operations),
+							operation)
+						]))
+				]));
+	});
+var _narkisr$elm_ui$Users_Add_Perm$validate = A3(
+	_narkisr$elm_ui$Form_Validate$form2,
+	_narkisr$elm_ui$Users_Model$permBase,
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'envs', _narkisr$elm_ui$Form_Validate$stringList),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'operations', _narkisr$elm_ui$Form_Validate$stringList));
+var _narkisr$elm_ui$Users_Add_Perm$Model = function (a) {
+	return {form: a};
+};
+var _narkisr$elm_ui$Users_Add_Perm$init = _narkisr$elm_ui$Users_Add_Perm$Model(
+	A2(
+		_narkisr$elm_ui$Form$initial,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_narkisr$elm_ui$Users_Add_Perm$validate));
+
+var _narkisr$elm_ui$Users_Add_Main$view = F2(
+	function (roles, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1.form;
+		var password = A2(_narkisr$elm_ui$Form$getFieldAsString, 'password', _p2);
+		var name = A2(_narkisr$elm_ui$Form$getFieldAsString, 'username', _p2);
+		var role = A2(_narkisr$elm_ui$Form$getFieldAsString, 'role', _p2);
+		return A2(
+			_elm_lang$html$Html$form,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('form-horizontal'),
+							A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Name', _narkisr$elm_ui$Form_Input$textInput, name),
+							A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Password', _narkisr$elm_ui$Form_Input$passwordInput, password),
+							A3(
+							_narkisr$elm_ui$Common_FormComponents$formControl,
+							'Roles',
+							_narkisr$elm_ui$Form_Input$selectInput(roles),
+							role)
+						]))
+				]));
+	});
+var _narkisr$elm_ui$Users_Add_Main$defaults = function (role) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			{
+			ctor: '_Tuple2',
+			_0: 'role',
+			_1: _narkisr$elm_ui$Form_Field$Text(role)
+		}
+		]);
+};
+var _narkisr$elm_ui$Users_Add_Main$validate = A4(
+	_narkisr$elm_ui$Form_Validate$form3,
+	_narkisr$elm_ui$Users_Model$userBase,
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'username', _narkisr$elm_ui$Form_Validate$string),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'password', _narkisr$elm_ui$Form_Validate$string),
+	A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'role', _narkisr$elm_ui$Form_Validate$string));
+var _narkisr$elm_ui$Users_Add_Main$Model = function (a) {
+	return {form: a};
+};
+var _narkisr$elm_ui$Users_Add_Main$init = function (role) {
+	return _narkisr$elm_ui$Users_Add_Main$Model(
+		A2(
+			_narkisr$elm_ui$Form$initial,
+			_narkisr$elm_ui$Users_Add_Main$defaults(role),
+			_narkisr$elm_ui$Users_Add_Main$validate));
+};
+
+var _narkisr$elm_ui$Users_View$getUser = F2(
+	function (name, msg) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			msg,
+			_elm_lang$core$Task$toResult(
+				A2(
+					_narkisr$elm_ui$Common_Http$getJson,
+					_narkisr$elm_ui$Users_Model$user,
+					A2(_elm_lang$core$Basics_ops['++'], '/users/', name))));
+	});
+var _narkisr$elm_ui$Users_View$summarize = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'line-height', _1: '1.8'},
+						{ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'}
+					]))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[]));
+};
+var _narkisr$elm_ui$Users_View$view = function (_p0) {
+	var _p1 = _p0;
+	return _narkisr$elm_ui$Common_Components$asList(
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$h4,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text('User')
+						])),
+					_narkisr$elm_ui$Users_View$summarize(_p1.user)
+				])));
+};
+var _narkisr$elm_ui$Users_View$setUser = F2(
+	function (model, user) {
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{user: user}));
+	});
+var _narkisr$elm_ui$Users_View$Model = function (a) {
+	return {user: a};
+};
+var _narkisr$elm_ui$Users_View$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Users_View$Model(_narkisr$elm_ui$Users_Model$emptyUser));
+var _narkisr$elm_ui$Users_View$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Users_View$SetUser = function (a) {
+	return {ctor: 'SetUser', _0: a};
+};
+var _narkisr$elm_ui$Users_View$update = F2(
+	function (msg, model) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'ViewUser':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: A2(_narkisr$elm_ui$Users_View$getUser, _p2._0, _narkisr$elm_ui$Users_View$SetUser)
+				};
+			case 'SetUser':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p2._0,
+					model,
+					_narkisr$elm_ui$Users_View$setUser(model),
+					_narkisr$elm_ui$Users_View$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Users_View$ViewUser = function (a) {
+	return {ctor: 'ViewUser', _0: a};
+};
+
+var _narkisr$elm_ui$Users_Add$environmentsKeys = A2(
+	_elm_lang$core$Json_Decode$at,
+	_elm_lang$core$Native_List.fromArray(
+		['operations']),
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Users_Add$getOperations = function (msg) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		msg,
+		_elm_lang$core$Task$toResult(
+			A2(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Users_Add$environmentsKeys, '/users/operations')));
+};
+var _narkisr$elm_ui$Users_Add$rows = F2(
+	function (contents, buttons) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(
+					_elm_lang$core$Native_List.fromArray(
+						[contents])),
+					_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(buttons)
+				]));
+	});
+var _narkisr$elm_ui$Users_Add$setOperation = F2(
+	function (model, keys) {
+		var pairs = A2(
+			_elm_lang$core$List$map,
+			function (key) {
+				return {ctor: '_Tuple2', _0: key, _1: key};
+			},
+			keys);
+		var op = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(keys));
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{operations: pairs}));
+	});
+var _narkisr$elm_ui$Users_Add$setEnvironment = F2(
+	function (model, keys) {
+		var pairs = A2(
+			_elm_lang$core$List$map,
+			function (key) {
+				return {ctor: '_Tuple2', _0: key, _1: key};
+			},
+			keys);
+		var env = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(keys));
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{environments: pairs}));
+	});
+var _narkisr$elm_ui$Users_Add$merge = F2(
+	function (_p0, acc) {
+		var _p1 = _p0;
+		var user = A2(
+			_elm_lang$core$Maybe$withDefault,
+			acc,
+			_narkisr$elm_ui$Form$getOutput(_p1.form));
+		var _p2 = _p1.value;
+		if (_p2.ctor === 'Main') {
+			return user;
+		} else {
+			return user;
+		}
+	});
+var _narkisr$elm_ui$Users_Add$merged = function (_p3) {
+	var _p4 = _p3;
+	return A3(_elm_lang$core$List$foldl, _narkisr$elm_ui$Users_Add$merge, _narkisr$elm_ui$Users_Model$emptyUser, _p4.wizard.prev);
+};
+var _narkisr$elm_ui$Users_Add$step = F2(
+	function (model, value) {
+		return {form: model.form, value: value};
+	});
+var _narkisr$elm_ui$Users_Add$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {wizard: a, saveErrors: b, hasNext: c, roles: d, environments: e, operations: f};
+	});
+var _narkisr$elm_ui$Users_Add$Perm = {ctor: 'Perm'};
+var _narkisr$elm_ui$Users_Add$Main = {ctor: 'Main'};
+var _narkisr$elm_ui$Users_Add$setRoles = F2(
+	function (_p5, roles) {
+		var _p6 = _p5;
+		var pairs = A2(
+			_elm_lang$core$List$map,
+			function (_p7) {
+				var _p8 = _p7;
+				return {ctor: '_Tuple2', _0: _p8._1, _1: _p8._0};
+			},
+			_elm_lang$core$Dict$toList(roles));
+		var role = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(
+				_elm_lang$core$Dict$values(roles)));
+		var mainStep = A2(
+			_narkisr$elm_ui$Users_Add$step,
+			_narkisr$elm_ui$Users_Add_Main$init(role),
+			_narkisr$elm_ui$Users_Add$Main);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				_p6,
+				{
+					roles: pairs,
+					wizard: _elm_lang$core$Native_Utils.update(
+						_p6.wizard,
+						{
+							step: _elm_lang$core$Maybe$Just(mainStep)
+						})
+				}));
+	});
+var _narkisr$elm_ui$Users_Add$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Users_Add$Saved = function (a) {
+	return {ctor: 'Saved', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$saveUser = function (json) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Users_Add$Saved,
+		_elm_lang$core$Task$toResult(
+			A3(
+				_narkisr$elm_ui$Common_Http$postJson,
+				_evancz$elm_http$Http$string(json),
+				_narkisr$elm_ui$Common_Http$saveResponse,
+				'/users')));
+};
+var _narkisr$elm_ui$Users_Add$updateUser = function (json) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Users_Add$Saved,
+		_elm_lang$core$Task$toResult(
+			A3(
+				_narkisr$elm_ui$Common_Http$putJson,
+				_evancz$elm_http$Http$string(json),
+				_narkisr$elm_ui$Common_Http$saveResponse,
+				'/users')));
+};
+var _narkisr$elm_ui$Users_Add$Save = function (a) {
+	return {ctor: 'Save', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$saveButton = _elm_lang$core$Native_List.fromArray(
+	[
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$id('Save'),
+				_elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_elm_lang$html$Html_Events$onClick(
+				_narkisr$elm_ui$Users_Add$Save(_narkisr$elm_ui$Users_Add$saveUser))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Save  ')
+			]))
+	]);
+var _narkisr$elm_ui$Users_Add$doneButton = _elm_lang$core$Native_List.fromArray(
+	[
+		A2(
+		_elm_lang$html$Html$button,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$id('Done'),
+				_elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_elm_lang$html$Html_Events$onClick(
+				_narkisr$elm_ui$Users_Add$Save(_narkisr$elm_ui$Users_Add$saveUser))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Done ')
+			]))
+	]);
+var _narkisr$elm_ui$Users_Add$Next = {ctor: 'Next'};
+var _narkisr$elm_ui$Users_Add$Back = {ctor: 'Back'};
+var _narkisr$elm_ui$Users_Add$Done = {ctor: 'Done'};
+var _narkisr$elm_ui$Users_Add$Reset = {ctor: 'Reset'};
+var _narkisr$elm_ui$Users_Add$SetOperations = function (a) {
+	return {ctor: 'SetOperations', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$SetEnvironments = function (a) {
+	return {ctor: 'SetEnvironments', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$SetRoles = function (a) {
+	return {ctor: 'SetRoles', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$init = function () {
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			_narkisr$elm_ui$Users_Model$getRoles(_narkisr$elm_ui$Users_Add$SetRoles),
+			_narkisr$elm_ui$Environments_List$getEnvironmentKeys(_narkisr$elm_ui$Users_Add$SetEnvironments),
+			_narkisr$elm_ui$Users_Add$getOperations(_narkisr$elm_ui$Users_Add$SetOperations)
+		]);
+	var mainStep = A2(
+		_narkisr$elm_ui$Users_Add$step,
+		_narkisr$elm_ui$Users_Add_Main$init(''),
+		_narkisr$elm_ui$Users_Add$Main);
+	var steps = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_narkisr$elm_ui$Users_Add$step, _narkisr$elm_ui$Users_Add_Perm$init, _narkisr$elm_ui$Users_Add$Perm)
+		]);
+	var wizard = A2(_narkisr$elm_ui$Common_FormWizard$init, mainStep, steps);
+	var errors = _narkisr$elm_ui$Common_Errors$init;
+	return {
+		ctor: '_Tuple2',
+		_0: A6(
+			_narkisr$elm_ui$Users_Add$Model,
+			wizard,
+			errors,
+			false,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[])),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Users_Add$FormMsg = function (a) {
+	return {ctor: 'FormMsg', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$currentView = function (_p9) {
+	var _p10 = _p9;
+	var _p11 = _p10.wizard.step;
+	if (_p11.ctor === 'Just') {
+		var _p13 = _p11._0;
+		var _p12 = _p11._0.value;
+		if (_p12.ctor === 'Main') {
+			return A3(
+				_narkisr$elm_ui$Common_Components$dialogPanel,
+				'info',
+				_narkisr$elm_ui$Common_Components$info('Add a new User'),
+				_narkisr$elm_ui$Common_Components$panel(
+					_narkisr$elm_ui$Common_Components$fixedPanel(
+						A2(
+							_elm_lang$html$Html_App$map,
+							_narkisr$elm_ui$Users_Add$FormMsg,
+							A2(_narkisr$elm_ui$Users_Add_Main$view, _p10.roles, _p13)))));
+		} else {
+			return A3(
+				_narkisr$elm_ui$Common_Components$dialogPanel,
+				'info',
+				_narkisr$elm_ui$Common_Components$info('User permissions'),
+				_narkisr$elm_ui$Common_Components$panel(
+					_narkisr$elm_ui$Common_Components$fixedPanel(
+						A2(
+							_elm_lang$html$Html_App$map,
+							_narkisr$elm_ui$Users_Add$FormMsg,
+							A3(_narkisr$elm_ui$Users_Add_Perm$view, _p10.environments, _p10.operations, _p13)))));
+		}
+	} else {
+		return A3(
+			_narkisr$elm_ui$Common_Components$dialogPanel,
+			'info',
+			_narkisr$elm_ui$Common_Components$info('Save new user'),
+			_narkisr$elm_ui$Common_Components$panel(
+				_narkisr$elm_ui$Common_Components$fixedPanel(
+					A2(
+						_elm_lang$html$Html_App$map,
+						function (_p14) {
+							return _narkisr$elm_ui$Users_Add$NoOp;
+						},
+						_narkisr$elm_ui$Users_View$summarize(
+							_narkisr$elm_ui$Users_Add$merged(_p10))))));
+	}
+};
+var _narkisr$elm_ui$Users_Add$WizardMsg = function (a) {
+	return {ctor: 'WizardMsg', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$update = F2(
+	function (msg, _p15) {
+		update:
+		while (true) {
+			var _p16 = _p15;
+			var _p20 = _p16.wizard;
+			var _p19 = _p16;
+			var _p17 = msg;
+			switch (_p17.ctor) {
+				case 'Next':
+					var _v10 = _narkisr$elm_ui$Users_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Next),
+						_v11 = _p19;
+					msg = _v10;
+					_p15 = _v11;
+					continue update;
+				case 'Back':
+					var _v12 = _narkisr$elm_ui$Users_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Back),
+						_v13 = _p19;
+					msg = _v12;
+					_p15 = _v13;
+					continue update;
+				case 'Reset':
+					var _p18 = A2(
+						_narkisr$elm_ui$Users_Add$update,
+						_narkisr$elm_ui$Users_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Back),
+						_p19);
+					var back = _p18._0;
+					return _narkisr$elm_ui$Common_Utils$none(
+						_elm_lang$core$Native_Utils.update(
+							back,
+							{saveErrors: _narkisr$elm_ui$Common_Errors$init}));
+				case 'WizardMsg':
+					var newWizard = A2(_narkisr$elm_ui$Common_FormWizard$update, _p17._0, _p20);
+					return _narkisr$elm_ui$Common_Utils$none(
+						_elm_lang$core$Native_Utils.update(
+							_p19,
+							{wizard: newWizard}));
+				case 'FormMsg':
+					var newWizard = A2(
+						_narkisr$elm_ui$Common_FormWizard$update,
+						_narkisr$elm_ui$Common_FormWizard$FormMsg(_p17._0),
+						_p20);
+					return _narkisr$elm_ui$Common_Utils$none(
+						_elm_lang$core$Native_Utils.update(
+							_p19,
+							{wizard: newWizard}));
+				case 'SetRoles':
+					return A4(
+						_narkisr$elm_ui$Common_Errors$successHandler,
+						_p17._0,
+						_p19,
+						_narkisr$elm_ui$Users_Add$setRoles(_p19),
+						_narkisr$elm_ui$Users_Add$NoOp);
+				case 'SetEnvironments':
+					return A4(
+						_narkisr$elm_ui$Common_Errors$successHandler,
+						_p17._0,
+						_p19,
+						_narkisr$elm_ui$Users_Add$setEnvironment(_p19),
+						_narkisr$elm_ui$Users_Add$NoOp);
+				case 'SetOperations':
+					return A4(
+						_narkisr$elm_ui$Common_Errors$successHandler,
+						_p17._0,
+						_p19,
+						_narkisr$elm_ui$Users_Add$setOperation(_p19),
+						_narkisr$elm_ui$Users_Add$NoOp);
+				case 'Save':
+					return _narkisr$elm_ui$Common_Utils$none(_p19);
+				case 'Saved':
+					return A3(_narkisr$elm_ui$Common_Errors$errorsHandler, _p17._0, _p19, _narkisr$elm_ui$Users_Add$NoOp);
+				default:
+					return _narkisr$elm_ui$Common_Utils$none(_p19);
+			}
+		}
+	});
+var _narkisr$elm_ui$Users_Add$ErrorsView = function (a) {
+	return {ctor: 'ErrorsView', _0: a};
+};
+var _narkisr$elm_ui$Users_Add$errorsView = function (_p21) {
+	var _p22 = _p21;
+	var body = A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Users_Add$ErrorsView,
+		_narkisr$elm_ui$Common_Errors$view(_p22.saveErrors));
+	return A3(
+		_narkisr$elm_ui$Common_Components$dialogPanel,
+		'danger',
+		_narkisr$elm_ui$Common_Components$error('Failed to save user'),
+		_narkisr$elm_ui$Common_Components$panel(
+			_narkisr$elm_ui$Common_Components$panelContents(body)));
+};
+var _narkisr$elm_ui$Users_Add$view = function (_p23) {
+	var _p24 = _p23;
+	var _p25 = _p24;
+	var buttons$ = _narkisr$elm_ui$Common_Components$buttons(
+		_elm_lang$core$Native_Utils.update(
+			_p25,
+			{
+				hasNext: _narkisr$elm_ui$Common_FormWizard$notDone(_p25)
+			}));
+	return _narkisr$elm_ui$Common_Errors$hasErrors(_p24.saveErrors) ? A2(
+		_narkisr$elm_ui$Users_Add$rows,
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_narkisr$elm_ui$Users_Add$errorsView(_p25)),
+		A3(buttons$, _narkisr$elm_ui$Users_Add$Done, _narkisr$elm_ui$Users_Add$Reset, _narkisr$elm_ui$Users_Add$doneButton)) : A2(
+		_narkisr$elm_ui$Users_Add$rows,
+		A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('col-md-offset-2 col-md-8')
+				]),
+			_narkisr$elm_ui$Users_Add$currentView(_p25)),
+		A3(buttons$, _narkisr$elm_ui$Users_Add$Next, _narkisr$elm_ui$Users_Add$Back, _narkisr$elm_ui$Users_Add$saveButton));
+};
+
+var _narkisr$elm_ui$Users_Routing$Delete = function (a) {
+	return {ctor: 'Delete', _0: a};
+};
+var _narkisr$elm_ui$Users_Routing$matcherDelete = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Users_Routing$Delete, '/delete/', _sporto$hop$Hop_Matchers$str);
+var _narkisr$elm_ui$Users_Routing$View = function (a) {
+	return {ctor: 'View', _0: a};
+};
+var _narkisr$elm_ui$Users_Routing$matcherView = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Users_Routing$View, '/view/', _sporto$hop$Hop_Matchers$str);
+var _narkisr$elm_ui$Users_Routing$List = {ctor: 'List'};
+var _narkisr$elm_ui$Users_Routing$matcherList = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Users_Routing$List, '/list');
+var _narkisr$elm_ui$Users_Routing$Add = {ctor: 'Add'};
+var _narkisr$elm_ui$Users_Routing$matcherAdd = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Users_Routing$Add, '/add');
+var _narkisr$elm_ui$Users_Routing$matchers = _elm_lang$core$Native_List.fromArray(
+	[_narkisr$elm_ui$Users_Routing$matcherAdd, _narkisr$elm_ui$Users_Routing$matcherList, _narkisr$elm_ui$Users_Routing$matcherView, _narkisr$elm_ui$Users_Routing$matcherDelete]);
+
+var _narkisr$elm_ui$Users_Core$navigate = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p6 = _p1._1;
+		var _p5 = _p1._0;
+		var _p2 = msg;
+		if ((_p2.ctor === 'MenuClick') && (_p2._0.ctor === '_Tuple2')) {
+			var _p4 = _p2._0._1;
+			var _p3 = _p2._0._0;
+			switch (_p3) {
+				case 'edit':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p5,
+							{
+								navChange: _elm_lang$core$Maybe$Just(
+									A2(_elm_lang$core$Basics_ops['++'], '/users/edit/', _p4))
+							}),
+						_1: _p6
+					};
+				case 'clear':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p5,
+							{
+								navChange: _elm_lang$core$Maybe$Just(
+									A2(_elm_lang$core$Basics_ops['++'], '/users/delete/', _p4))
+							}),
+						_1: _p6
+					};
+				default:
+					return _narkisr$elm_ui$Common_Utils$none(_p5);
+			}
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(_p5);
+		}
+	});
+var _narkisr$elm_ui$Users_Core$Model = F3(
+	function (a, b, c) {
+		return {list: a, add: b, navChange: c};
+	});
+var _narkisr$elm_ui$Users_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Users_Core$MenuClick = function (a) {
+	return {ctor: 'MenuClick', _0: a};
+};
+var _narkisr$elm_ui$Users_Core$Adding = function (a) {
+	return {ctor: 'Adding', _0: a};
+};
+var _narkisr$elm_ui$Users_Core$Listing = function (a) {
+	return {ctor: 'Listing', _0: a};
+};
+var _narkisr$elm_ui$Users_Core$init = function () {
+	var _p7 = _narkisr$elm_ui$Users_Add$init;
+	var add = _p7._0;
+	var addMsgs = _p7._1;
+	var _p8 = _narkisr$elm_ui$Users_List$init;
+	var list = _p8._0;
+	var listMsgs = _p8._1;
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Users_Core$Listing, listMsgs),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Users_Core$Adding, addMsgs)
+		]);
+	return {
+		ctor: '_Tuple2',
+		_0: A3(_narkisr$elm_ui$Users_Core$Model, list, add, _elm_lang$core$Maybe$Nothing),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Users_Core$route = F2(
+	function (msg, _p9) {
+		var _p10 = _p9;
+		var _p14 = _p10;
+		var _p11 = msg;
+		switch (_p11.ctor) {
+			case 'Listing':
+				var _p12 = A2(_narkisr$elm_ui$Users_List$update, _p11._0, _p10.list);
+				var newList = _p12._0;
+				var msgs = _p12._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p14,
+						{list: newList}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Users_Core$Listing, msgs)
+				};
+			case 'Adding':
+				var _p13 = A2(_narkisr$elm_ui$Users_Add$update, _p11._0, _p10.add);
+				var newAdd = _p13._0;
+				var msgs = _p13._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p14,
+						{add: newAdd}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Users_Core$Adding, msgs)
+				};
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p14);
+		}
+	});
+var _narkisr$elm_ui$Users_Core$update = F2(
+	function (msg, model) {
+		return A2(
+			_narkisr$elm_ui$Users_Core$navigate,
+			msg,
+			A2(_narkisr$elm_ui$Users_Core$route, msg, model));
+	});
+var _narkisr$elm_ui$Users_Core$view = F2(
+	function (_p15, section) {
+		var _p16 = _p15;
+		var _p17 = section;
+		switch (_p17.ctor) {
+			case 'List':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Users_Core$Listing,
+					_narkisr$elm_ui$Users_List$view(_p16.list));
+			case 'Add':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Users_Core$Adding,
+					_narkisr$elm_ui$Users_Add$view(_p16.add));
+			default:
+				return _narkisr$elm_ui$Common_Components$notImplemented;
+		}
+	});
+
+var _narkisr$elm_ui$Templates_Persistency$encodeMachine = function (_p0) {
+	var _p1 = _p0;
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'hostname',
+				_1: _elm_lang$core$Json_Encode$string(_p1.hostname)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'domain',
+				_1: _elm_lang$core$Json_Encode$string(_p1.domain)
+			}
+			]));
+};
+var _narkisr$elm_ui$Templates_Persistency$encodeProvided = F2(
+	function (machine, admin) {
+		return _elm_lang$core$Json_Encode$object(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'owner',
+					_1: _elm_lang$core$Json_Encode$string(admin.owner)
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'env',
+					_1: _elm_lang$core$Json_Encode$string(admin.environment)
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'machine',
+					_1: _narkisr$elm_ui$Templates_Persistency$encodeMachine(machine)
+				}
+				]));
+	});
+var _narkisr$elm_ui$Templates_Persistency$persistModel = F2(
+	function (f, value) {
+		return f(
+			A2(_elm_lang$core$Json_Encode$encode, 0, value));
+	});
+var _narkisr$elm_ui$Templates_Persistency$persistProvided = F3(
+	function (f, machine, admin) {
+		return A2(
+			_narkisr$elm_ui$Templates_Persistency$persistModel,
+			f,
+			A2(_narkisr$elm_ui$Templates_Persistency$encodeProvided, machine, admin));
+	});
+var _narkisr$elm_ui$Templates_Persistency$partialEncoder = function (machine) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'ip',
+				_1: A2(_narkisr$elm_ui$Systems_Add_Encoders$optional, _elm_lang$core$Json_Encode$string, machine.ip)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'os',
+				_1: _elm_lang$core$Json_Encode$string(machine.os)
+			},
+				{
+				ctor: '_Tuple2',
+				_0: 'user',
+				_1: _elm_lang$core$Json_Encode$string(machine.user)
+			}
+			]));
+};
+var _narkisr$elm_ui$Templates_Persistency$openstackDefaultsEncoder = function (openstack) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				{
+				ctor: '_Tuple2',
+				_0: 'networks',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(
+						_elm_lang$core$List$map,
+						_elm_lang$core$Json_Encode$string,
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							openstack.networks)))
+			}
+			]));
+};
+var _narkisr$elm_ui$Templates_Persistency$defaultsEncoder = F2(
+	function (_p2, hyp) {
+		var _p3 = _p2;
+		return _elm_lang$core$Native_Utils.eq(hyp, 'Openstack') ? _elm_lang$core$Json_Encode$object(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'openstack',
+					_1: _narkisr$elm_ui$Templates_Persistency$openstackDefaultsEncoder(
+						A2(_elm_lang$core$Maybe$withDefault, _narkisr$elm_ui$Templates_Model_Common$emptyOpenstackDefaults, _p3.openstack))
+				}
+				])) : _elm_lang$core$Json_Encode$null;
+	});
+var _narkisr$elm_ui$Templates_Persistency$defaultsDictEncoder = F2(
+	function (defaults, hyp) {
+		return _elm_lang$core$Json_Encode$object(
+			A2(
+				_elm_lang$core$List$map,
+				function (_p4) {
+					var _p5 = _p4;
+					return {
+						ctor: '_Tuple2',
+						_0: _p5._0,
+						_1: A2(_narkisr$elm_ui$Templates_Persistency$defaultsEncoder, _p5._1, hyp)
+					};
+				},
+				_elm_lang$core$Dict$toList(defaults)));
+	});
+var _narkisr$elm_ui$Templates_Persistency$encodeDefaults = F2(
+	function (defaults, hyp) {
+		return A2(
+			_elm_lang$core$Json_Encode$encode,
+			0,
+			A2(_narkisr$elm_ui$Templates_Persistency$defaultsDictEncoder, defaults, hyp));
+	});
+var _narkisr$elm_ui$Templates_Persistency$encode = F2(
+	function (_p6, hyp) {
+		var _p7 = _p6;
+		return _elm_lang$core$Json_Encode$object(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					{
+					ctor: '_Tuple2',
+					_0: 'type',
+					_1: _elm_lang$core$Json_Encode$string(_p7.type$)
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'name',
+					_1: _elm_lang$core$Json_Encode$string(_p7.name)
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'description',
+					_1: _elm_lang$core$Json_Encode$string(_p7.description)
+				},
+					A2(_narkisr$elm_ui$Systems_Add_Encoders$encoderOf, _p7, hyp),
+					{
+					ctor: '_Tuple2',
+					_0: 'machine',
+					_1: _narkisr$elm_ui$Templates_Persistency$partialEncoder(_p7.machine)
+				},
+					{
+					ctor: '_Tuple2',
+					_0: 'defaults',
+					_1: A2(
+						_narkisr$elm_ui$Templates_Persistency$defaultsDictEncoder,
+						A2(_elm_lang$core$Maybe$withDefault, _elm_lang$core$Dict$empty, _p7.defaults),
+						hyp)
+				}
+				]));
+	});
+var _narkisr$elm_ui$Templates_Persistency$persistTemplate = F3(
+	function (f, template, hyp) {
+		return A2(
+			_narkisr$elm_ui$Templates_Persistency$persistModel,
+			f,
+			A2(_narkisr$elm_ui$Templates_Persistency$encode, template, hyp));
+	});
+
+var _narkisr$elm_ui$Templates_Add$intoTemplate = F3(
+	function (_p1, _p0, hyp) {
+		var _p2 = _p1;
+		var _p3 = _p0;
+		var _p4 = _p3.machine;
+		var withHyp = _elm_lang$core$Native_Utils.update(
+			_p2.template,
+			{openstack: _p3.openstack, physical: _p3.physical, aws: _p3.aws, digital: _p3.digital, gce: _p3.gce});
+		var newTemplate = _elm_lang$core$Native_Utils.update(
+			withHyp,
+			{name: _p4.hostname, type$: _p3.type$, machine: _p4});
+		return _elm_lang$core$Native_Utils.update(
+			_p2,
+			{template: newTemplate, hyp: hyp});
+	});
+var _narkisr$elm_ui$Templates_Add$Model = F5(
+	function (a, b, c, d, e) {
+		return {template: a, hyp: b, editDefaults: c, saveErrors: d, environments: e};
+	});
+var _narkisr$elm_ui$Templates_Add$SaveResponse = function (a) {
+	return {message: a};
+};
+var _narkisr$elm_ui$Templates_Add$saveResponse = A2(
+	_elm_lang$core$Json_Decode$object1,
+	_narkisr$elm_ui$Templates_Add$SaveResponse,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'message', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Templates_Add$ErrorsView = function (a) {
+	return {ctor: 'ErrorsView', _0: a};
+};
+var _narkisr$elm_ui$Templates_Add$SetEnvironments = function (a) {
+	return {ctor: 'SetEnvironments', _0: a};
+};
+var _narkisr$elm_ui$Templates_Add$init = function () {
+	var errors = _narkisr$elm_ui$Common_Errors$init;
+	return {
+		ctor: '_Tuple2',
+		_0: A5(
+			_narkisr$elm_ui$Templates_Add$Model,
+			_narkisr$elm_ui$Templates_Model_Common$emptyTemplate,
+			'',
+			false,
+			errors,
+			_elm_lang$core$Native_List.fromArray(
+				[])),
+		_1: _narkisr$elm_ui$Environments_List$getEnvironments(_narkisr$elm_ui$Templates_Add$SetEnvironments)
+	};
+}();
+var _narkisr$elm_ui$Templates_Add$DefaultsInput = function (a) {
+	return {ctor: 'DefaultsInput', _0: a};
+};
+var _narkisr$elm_ui$Templates_Add$DescriptionInput = function (a) {
+	return {ctor: 'DescriptionInput', _0: a};
+};
+var _narkisr$elm_ui$Templates_Add$NameInput = function (a) {
+	return {ctor: 'NameInput', _0: a};
+};
+var _narkisr$elm_ui$Templates_Add$SetSystem = F2(
+	function (a, b) {
+		return {ctor: 'SetSystem', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Templates_Add$Saved = function (a) {
+	return {ctor: 'Saved', _0: a};
+};
+var _narkisr$elm_ui$Templates_Add$saveTemplate = function (json) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Templates_Add$Saved,
+		_elm_lang$core$Task$toResult(
+			A3(
+				_narkisr$elm_ui$Common_Http$postJson,
+				_evancz$elm_http$Http$string(json),
+				_narkisr$elm_ui$Templates_Add$saveResponse,
+				'/templates')));
+};
+var _narkisr$elm_ui$Templates_Add$SetDefaults = function (a) {
+	return {ctor: 'SetDefaults', _0: a};
+};
+var _narkisr$elm_ui$Templates_Add$LoadEditor = {ctor: 'LoadEditor'};
+var _narkisr$elm_ui$Templates_Add$editing = function (_p5) {
+	var _p6 = _p5;
+	var _p7 = _p6.template;
+	return _narkisr$elm_ui$Common_Components$panel(
+		_narkisr$elm_ui$Common_Components$panelContents(
+			A2(
+				_elm_lang$html$Html$form,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$div,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('form-horizontal'),
+								A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+							]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_narkisr$elm_ui$Common_Components$group$,
+								'Name',
+								A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Templates_Add$NameInput, ' ', _p7.name)),
+								A2(
+								_narkisr$elm_ui$Common_Components$group$,
+								'Description',
+								A3(_narkisr$elm_ui$Common_Components$inputText, _narkisr$elm_ui$Templates_Add$DescriptionInput, ' ', _p7.description)),
+								A2(
+								_narkisr$elm_ui$Common_Components$group$,
+								'Edit defaults',
+								A2(_narkisr$elm_ui$Common_Components$checkbox, _narkisr$elm_ui$Templates_Add$LoadEditor, _p6.editDefaults)),
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$id('jsoneditor'),
+										_elm_lang$html$Html_Attributes$style(
+										_elm_lang$core$Native_List.fromArray(
+											[
+												{ctor: '_Tuple2', _0: 'width', _1: '50%'},
+												{ctor: '_Tuple2', _0: 'height', _1: '400px'},
+												{ctor: '_Tuple2', _0: 'margin-left', _1: '25%'}
+											]))
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[]))
+							]))
+					]))));
+};
+var _narkisr$elm_ui$Templates_Add$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Templates_Add$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Templates_Add$update = F2(
+	function (msg, _p8) {
+		var _p9 = _p8;
+		var _p12 = _p9.template;
+		var _p11 = _p9;
+		var _p10 = msg;
+		switch (_p10.ctor) {
+			case 'Save':
+				return {
+					ctor: '_Tuple2',
+					_0: _p11,
+					_1: A3(_narkisr$elm_ui$Templates_Persistency$persistTemplate, _narkisr$elm_ui$Templates_Add$saveTemplate, _p12, _p9.hyp)
+				};
+			case 'SetSystem':
+				return _narkisr$elm_ui$Common_Utils$none(
+					A3(_narkisr$elm_ui$Templates_Add$intoTemplate, _p11, _p10._1, _p10._0));
+			case 'NameInput':
+				var newTemplate = _elm_lang$core$Native_Utils.update(
+					_p12,
+					{name: _p10._0});
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p11,
+						{template: newTemplate}));
+			case 'DescriptionInput':
+				var newTemplate = _elm_lang$core$Native_Utils.update(
+					_p12,
+					{description: _p10._0});
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p11,
+						{template: newTemplate}));
+			case 'SetDefaults':
+				var newTemplate = _elm_lang$core$Native_Utils.update(
+					_p12,
+					{
+						defaults: _elm_lang$core$Maybe$Just(
+							_narkisr$elm_ui$Templates_Model_Common$decodeDefaults(_p10._0))
+					});
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p11,
+						{template: newTemplate}));
+			case 'Saved':
+				return A3(_narkisr$elm_ui$Common_Errors$errorsHandler, _p10._0, _p11, _narkisr$elm_ui$Templates_Add$NoOp);
+			case 'SetEnvironments':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p10._0,
+					_p11,
+					_narkisr$elm_ui$Common_Utils$setEnvironments(_p11),
+					_narkisr$elm_ui$Templates_Add$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p11);
+		}
+	});
+var _narkisr$elm_ui$Templates_Add$Done = {ctor: 'Done'};
+var _narkisr$elm_ui$Templates_Add$Save = {ctor: 'Save'};
+var _narkisr$elm_ui$Templates_Add$view = function (_p13) {
+	var _p14 = _p13;
+	var _p15 = _p14.saveErrors;
+	var errorsView = A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Templates_Add$ErrorsView,
+		_narkisr$elm_ui$Common_Errors$view(_p15));
+	return _narkisr$elm_ui$Common_Errors$hasErrors(_p15) ? A4(
+		_narkisr$elm_ui$Common_Components$dangerCallout,
+		_narkisr$elm_ui$Common_Components$error('Failed to save template'),
+		_narkisr$elm_ui$Common_Components$panel(
+			_narkisr$elm_ui$Common_Components$panelContents(errorsView)),
+		_narkisr$elm_ui$Templates_Add$Cancel,
+		_narkisr$elm_ui$Templates_Add$Done) : A4(
+		_narkisr$elm_ui$Common_Components$infoCallout,
+		_narkisr$elm_ui$Common_Components$info('Save template'),
+		_narkisr$elm_ui$Templates_Add$editing(_p14),
+		_narkisr$elm_ui$Templates_Add$Cancel,
+		_narkisr$elm_ui$Templates_Add$Save);
+};
+
+var _narkisr$elm_ui$Templates_Launch$errorMessage = _elm_lang$core$Native_List.fromArray(
+	[
+		A2(
+		_elm_lang$html$Html$h4,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Error!')
+			])),
+		A2(
+		_elm_lang$html$Html$span,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text('Failed to save system')
+			]))
+	]);
+var _narkisr$elm_ui$Templates_Launch$machineView = function (form) {
+	var domain = A2(_narkisr$elm_ui$Form$getFieldAsString, 'machine.domain', form);
+	var hostname = A2(_narkisr$elm_ui$Form$getFieldAsString, 'machine.hostname', form);
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Hostname', _narkisr$elm_ui$Form_Input$textInput, hostname),
+				A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Domain', _narkisr$elm_ui$Form_Input$textInput, domain)
+			]));
+};
+var _narkisr$elm_ui$Templates_Launch$infoMessage = function (name) {
+	return _elm_lang$core$Native_List.fromArray(
+		[
+			A2(
+			_elm_lang$html$Html$h4,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text('Info')
+				])),
+			A2(
+			_elm_lang$html$Html$span,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text('Launch a new system from '),
+					A2(
+					_elm_lang$html$Html$strong,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html$text(name)
+						])),
+					_elm_lang$html$Html$text(' template ')
+				]))
+		]);
+};
+var _narkisr$elm_ui$Templates_Launch$PartialMachine = F2(
+	function (a, b) {
+		return {hostname: a, domain: b};
+	});
+var _narkisr$elm_ui$Templates_Launch$Provided = function (a) {
+	return {machine: a};
+};
+var _narkisr$elm_ui$Templates_Launch$validate = A2(
+	_narkisr$elm_ui$Form_Validate$form1,
+	_narkisr$elm_ui$Templates_Launch$Provided,
+	A2(
+		_narkisr$elm_ui$Form_Infix_ops[':='],
+		'machine',
+		A3(
+			_narkisr$elm_ui$Form_Validate$form2,
+			_narkisr$elm_ui$Templates_Launch$PartialMachine,
+			A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'hostname', _narkisr$elm_ui$Form_Validate$string),
+			A2(_narkisr$elm_ui$Form_Infix_ops[':='], 'domain', _narkisr$elm_ui$Form_Validate$string))));
+var _narkisr$elm_ui$Templates_Launch$Model = F4(
+	function (a, b, c, d) {
+		return {name: a, form: b, admin: c, saveErrors: d};
+	});
+var _narkisr$elm_ui$Templates_Launch$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Templates_Launch$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Templates_Launch$Done = {ctor: 'Done'};
+var _narkisr$elm_ui$Templates_Launch$Launch = {ctor: 'Launch'};
+var _narkisr$elm_ui$Templates_Launch$JobLaunched = function (a) {
+	return {ctor: 'JobLaunched', _0: a};
+};
+var _narkisr$elm_ui$Templates_Launch$stage = F2(
+	function (model, _p0) {
+		var _p1 = _p0;
+		var _p2 = _p1.id;
+		if (_p2.ctor === 'Just') {
+			return {
+				ctor: '_Tuple2',
+				_0: model,
+				_1: A3(
+					_narkisr$elm_ui$Jobs_Common$runJob,
+					_elm_lang$core$Basics$toString(_p2._0),
+					'stage',
+					_narkisr$elm_ui$Templates_Launch$JobLaunched)
+			};
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Templates_Launch$FormMsg = function (a) {
+	return {ctor: 'FormMsg', _0: a};
+};
+var _narkisr$elm_ui$Templates_Launch$Launched = function (a) {
+	return {ctor: 'Launched', _0: a};
+};
+var _narkisr$elm_ui$Templates_Launch$intoSystem = F2(
+	function (name, json) {
+		return A3(
+			_elm_lang$core$Task$perform,
+			_elm_community$basics_extra$Basics_Extra$never,
+			_narkisr$elm_ui$Templates_Launch$Launched,
+			_elm_lang$core$Task$toResult(
+				A3(
+					_narkisr$elm_ui$Common_Http$postJson,
+					_evancz$elm_http$Http$string(json),
+					_narkisr$elm_ui$Common_Http$saveResponse,
+					A2(_elm_lang$core$Basics_ops['++'], '/systems/template/', name))));
+	});
+var _narkisr$elm_ui$Templates_Launch$ErrorsView = function (a) {
+	return {ctor: 'ErrorsView', _0: a};
+};
+var _narkisr$elm_ui$Templates_Launch$AdminMsg = function (a) {
+	return {ctor: 'AdminMsg', _0: a};
+};
+var _narkisr$elm_ui$Templates_Launch$init = function () {
+	var errors = _narkisr$elm_ui$Common_Errors$init;
+	var _p3 = _narkisr$elm_ui$Admin_Core$init;
+	var admin = _p3._0;
+	var msgs = _p3._1;
+	return {
+		ctor: '_Tuple2',
+		_0: A4(
+			_narkisr$elm_ui$Templates_Launch$Model,
+			'',
+			A2(
+				_narkisr$elm_ui$Form$initial,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_narkisr$elm_ui$Templates_Launch$validate),
+			admin,
+			errors),
+		_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Launch$AdminMsg, msgs)
+	};
+}();
+var _narkisr$elm_ui$Templates_Launch$update = F2(
+	function (msg, _p4) {
+		var _p5 = _p4;
+		var _p11 = _p5;
+		var _p10 = _p5.admin;
+		var _p6 = msg;
+		switch (_p6.ctor) {
+			case 'FormMsg':
+				var newForm = A2(_narkisr$elm_ui$Form$update, _p6._0, _p5.form);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p11,
+						{
+							form: A2(_narkisr$elm_ui$Form$update, _narkisr$elm_ui$Form$Validate, newForm)
+						}));
+			case 'Launch':
+				var _p7 = A2(
+					_narkisr$elm_ui$Templates_Launch$update,
+					_narkisr$elm_ui$Templates_Launch$FormMsg(_narkisr$elm_ui$Form$Validate),
+					_p11);
+				var newModel = _p7._0;
+				if (_elm_lang$core$List$isEmpty(
+					_narkisr$elm_ui$Form$getErrors(newModel.form))) {
+					var _p8 = _narkisr$elm_ui$Form$getOutput(newModel.form);
+					if (_p8.ctor === 'Just') {
+						return {
+							ctor: '_Tuple2',
+							_0: newModel,
+							_1: A3(
+								_narkisr$elm_ui$Templates_Persistency$persistProvided,
+								_narkisr$elm_ui$Templates_Launch$intoSystem(_p5.name),
+								_p8._0.machine,
+								_p10)
+						};
+					} else {
+						return _narkisr$elm_ui$Common_Utils$none(newModel);
+					}
+				} else {
+					return _narkisr$elm_ui$Common_Utils$none(newModel);
+				}
+			case 'AdminMsg':
+				var _p9 = A2(_narkisr$elm_ui$Admin_Core$update, _p6._0, _p10);
+				var newAdmin = _p9._0;
+				var msgs = _p9._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p11,
+						{admin: newAdmin}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Launch$AdminMsg, msgs)
+				};
+			case 'Launched':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$errorsSuccessHandler,
+					_p6._0,
+					_p11,
+					_narkisr$elm_ui$Templates_Launch$stage(_p11),
+					_narkisr$elm_ui$Templates_Launch$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p11);
+		}
+	});
+var _narkisr$elm_ui$Templates_Launch$launchView = function (_p12) {
+	var _p13 = _p12;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('panel panel-default')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('panel-body')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$form,
+						_elm_lang$core$Native_List.fromArray(
+							[]),
+						_elm_lang$core$Native_List.fromArray(
+							[
+								A2(
+								_elm_lang$html$Html$div,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										_elm_lang$html$Html_Attributes$class('form-horizontal'),
+										A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+									]),
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(
+										_elm_lang$html$Html_App$map,
+										_narkisr$elm_ui$Templates_Launch$FormMsg,
+										_narkisr$elm_ui$Templates_Launch$machineView(_p13.form)),
+										A2(
+										_elm_lang$html$Html_App$map,
+										_narkisr$elm_ui$Templates_Launch$AdminMsg,
+										_narkisr$elm_ui$Admin_Core$view(_p13.admin))
+									]))
+							]))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Templates_Launch$view = function (_p14) {
+	var _p15 = _p14;
+	var _p16 = _p15.saveErrors;
+	var errorsView = A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Templates_Launch$ErrorsView,
+		_narkisr$elm_ui$Common_Errors$view(_p16));
+	return _narkisr$elm_ui$Common_Errors$hasErrors(_p16) ? A4(
+		_narkisr$elm_ui$Common_Components$dangerCallout,
+		_narkisr$elm_ui$Templates_Launch$errorMessage,
+		_narkisr$elm_ui$Common_Components$panel(
+			_narkisr$elm_ui$Common_Components$panelContents(errorsView)),
+		_narkisr$elm_ui$Templates_Launch$Cancel,
+		_narkisr$elm_ui$Templates_Launch$Done) : A4(
+		_narkisr$elm_ui$Common_Components$infoCallout,
+		_narkisr$elm_ui$Templates_Launch$infoMessage(_p15.name),
+		_narkisr$elm_ui$Templates_Launch$launchView(_p15),
+		_narkisr$elm_ui$Templates_Launch$Cancel,
+		_narkisr$elm_ui$Templates_Launch$Launch);
+};
+var _narkisr$elm_ui$Templates_Launch$SetupJob = function (a) {
+	return {ctor: 'SetupJob', _0: a};
+};
+
+var _narkisr$elm_ui$Templates_Delete$Model = F2(
+	function (a, b) {
+		return {name: a, errorMsg: b};
+	});
+var _narkisr$elm_ui$Templates_Delete$init = _narkisr$elm_ui$Common_Utils$none(
+	A2(_narkisr$elm_ui$Templates_Delete$Model, '', ''));
+var _narkisr$elm_ui$Templates_Delete$Error = function (a) {
+	return {ctor: 'Error', _0: a};
+};
+var _narkisr$elm_ui$Templates_Delete$Deleted = function (a) {
+	return {ctor: 'Deleted', _0: a};
+};
+var _narkisr$elm_ui$Templates_Delete$deleteTemplate = function (name) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_elm_community$basics_extra$Basics_Extra$never,
+		_narkisr$elm_ui$Templates_Delete$Deleted,
+		_elm_lang$core$Task$toResult(
+			A2(
+				_narkisr$elm_ui$Common_Http$delete,
+				_narkisr$elm_ui$Common_Delete$deleteResponse,
+				A2(_elm_lang$core$Basics_ops['++'], '/templates/', name))));
+};
+var _narkisr$elm_ui$Templates_Delete$succeeded = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_Utils.eq(
+			msg,
+			_narkisr$elm_ui$Templates_Delete$Deleted(
+				_elm_lang$core$Result$Ok(
+					{message: 'Template deleted'}))) ? true : false;
+	});
+var _narkisr$elm_ui$Templates_Delete$Done = {ctor: 'Done'};
+var _narkisr$elm_ui$Templates_Delete$Delete = {ctor: 'Delete'};
+var _narkisr$elm_ui$Templates_Delete$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Templates_Delete$view = function (model) {
+	return A5(_narkisr$elm_ui$Common_Delete$view, model, 'Template', _narkisr$elm_ui$Templates_Delete$Cancel, _narkisr$elm_ui$Templates_Delete$Delete, _narkisr$elm_ui$Templates_Delete$Done);
+};
+var _narkisr$elm_ui$Templates_Delete$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Templates_Delete$update = F2(
+	function (msg, _p2) {
+		var _p3 = _p2;
+		var _p7 = _p3;
+		var _p4 = msg;
+		switch (_p4.ctor) {
+			case 'Deleted':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$failHandler,
+					_p4._0,
+					_p7,
+					function (_p5) {
+						var _p6 = _p5;
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p7,
+								{
+									errorMsg: A2(_elm_lang$core$Maybe$withDefault, 'Failed to delete template', _p6.message)
+								}));
+					},
+					_narkisr$elm_ui$Templates_Delete$NoOp);
+			case 'Delete':
+				return {
+					ctor: '_Tuple2',
+					_0: _p7,
+					_1: _narkisr$elm_ui$Templates_Delete$deleteTemplate(_p3.name)
+				};
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+
+var _narkisr$elm_ui$Templates_Routing$Launch = function (a) {
+	return {ctor: 'Launch', _0: a};
+};
+var _narkisr$elm_ui$Templates_Routing$matcherLaunch = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Templates_Routing$Launch, '/launch/', _sporto$hop$Hop_Matchers$str);
+var _narkisr$elm_ui$Templates_Routing$Delete = function (a) {
+	return {ctor: 'Delete', _0: a};
+};
+var _narkisr$elm_ui$Templates_Routing$matcherDelete = A3(_sporto$hop$Hop_Matchers$match2, _narkisr$elm_ui$Templates_Routing$Delete, '/delete/', _sporto$hop$Hop_Matchers$str);
+var _narkisr$elm_ui$Templates_Routing$View = function (a) {
+	return {ctor: 'View', _0: a};
+};
+var _narkisr$elm_ui$Templates_Routing$List = {ctor: 'List'};
+var _narkisr$elm_ui$Templates_Routing$matcherList = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Templates_Routing$List, '/list');
+var _narkisr$elm_ui$Templates_Routing$Add = {ctor: 'Add'};
+var _narkisr$elm_ui$Templates_Routing$matcherAdd = A2(_sporto$hop$Hop_Matchers$match1, _narkisr$elm_ui$Templates_Routing$Add, '/add');
+var _narkisr$elm_ui$Templates_Routing$matchers = _elm_lang$core$Native_List.fromArray(
+	[_narkisr$elm_ui$Templates_Routing$matcherAdd, _narkisr$elm_ui$Templates_Routing$matcherList, _narkisr$elm_ui$Templates_Routing$matcherLaunch, _narkisr$elm_ui$Templates_Routing$matcherDelete]);
+
+var _narkisr$elm_ui$Templates_Core$setName = F2(
+	function (model, name) {
+		return _elm_lang$core$Native_Utils.update(
+			model,
+			{name: name});
+	});
+var _narkisr$elm_ui$Templates_Core$Model = F5(
+	function (a, b, c, d, e) {
+		return {add: a, list: b, launch: c, $delete: d, navChange: e};
+	});
+var _narkisr$elm_ui$Templates_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Templates_Core$SetupJob = function (a) {
+	return {ctor: 'SetupJob', _0: a};
+};
+var _narkisr$elm_ui$Templates_Core$TemplatesDelete = function (a) {
+	return {ctor: 'TemplatesDelete', _0: a};
+};
+var _narkisr$elm_ui$Templates_Core$TemplatesLaunch = function (a) {
+	return {ctor: 'TemplatesLaunch', _0: a};
+};
+var _narkisr$elm_ui$Templates_Core$TemplatesList = function (a) {
+	return {ctor: 'TemplatesList', _0: a};
+};
+var _narkisr$elm_ui$Templates_Core$refreshList = A2(_narkisr$elm_ui$Common_Delete$refresh, _narkisr$elm_ui$Templates_List$init, _narkisr$elm_ui$Templates_Core$TemplatesList);
+var _narkisr$elm_ui$Templates_Core$navigate = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p10 = _p1;
+		var _p9 = _p1._1;
+		var _p8 = _p1._0;
+		var _p2 = msg;
+		_v1_4:
+		do {
+			switch (_p2.ctor) {
+				case 'SetupJob':
+					if (_p2._0.ctor === '_Tuple2') {
+						var _p4 = _p2._0._1;
+						var _p3 = _p2._0._0;
+						switch (_p3) {
+							case 'launch':
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p8,
+										{
+											navChange: _elm_lang$core$Maybe$Just(
+												A2(_elm_lang$core$Basics_ops['++'], '/templates/launch/', _p4))
+										}),
+									_1: _p9
+								};
+							case 'clear':
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p8,
+										{
+											navChange: _elm_lang$core$Maybe$Just(
+												A2(_elm_lang$core$Basics_ops['++'], '/templates/delete/', _p4))
+										}),
+									_1: _p9
+								};
+							default:
+								return _p10;
+						}
+					} else {
+						break _v1_4;
+					}
+				case 'TemplatesAdd':
+					var _p5 = _p2._0;
+					_v3_3:
+					do {
+						switch (_p5.ctor) {
+							case 'Saved':
+								if (_p5._0.ctor === 'Ok') {
+									return {
+										ctor: '_Tuple2',
+										_0: _elm_lang$core$Native_Utils.update(
+											_p8,
+											{
+												navChange: _elm_lang$core$Maybe$Just('/templates/list')
+											}),
+										_1: _p9
+									};
+								} else {
+									break _v3_3;
+								}
+							case 'Cancel':
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p8,
+										{
+											navChange: _elm_lang$core$Maybe$Just('/templates/list')
+										}),
+									_1: _p9
+								};
+							case 'Done':
+								return {
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p8,
+										{
+											navChange: _elm_lang$core$Maybe$Just('/templates/list')
+										}),
+									_1: _p9
+								};
+							default:
+								break _v3_3;
+						}
+					} while(false);
+					return _p10;
+				case 'TemplatesLaunch':
+					var _p6 = _p2._0;
+					switch (_p6.ctor) {
+						case 'Cancel':
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p8,
+									{
+										navChange: _elm_lang$core$Maybe$Just('/templates/list')
+									}),
+								_1: _p9
+							};
+						case 'JobLaunched':
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p8,
+									{
+										navChange: _elm_lang$core$Maybe$Just('/jobs/list')
+									}),
+								_1: _p9
+							};
+						default:
+							return _p10;
+					}
+				case 'TemplatesDelete':
+					var _p7 = _p2._0;
+					switch (_p7.ctor) {
+						case 'Deleted':
+							return _elm_lang$core$Native_Utils.eq(_p1._0.$delete.errorMsg, '') ? {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p8,
+									{
+										navChange: _elm_lang$core$Maybe$Just('/templates/list')
+									}),
+								_1: _p9
+							} : _p10;
+						case 'Cancel':
+							return A2(
+								_narkisr$elm_ui$Templates_Core$refreshList,
+								true,
+								{
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p8,
+										{
+											navChange: _elm_lang$core$Maybe$Just('/templates/list')
+										}),
+									_1: _p9
+								});
+						case 'Done':
+							return A2(
+								_narkisr$elm_ui$Templates_Core$refreshList,
+								true,
+								{
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Native_Utils.update(
+										_p8,
+										{
+											navChange: _elm_lang$core$Maybe$Just('/templates/list')
+										}),
+									_1: _p9
+								});
+						default:
+							return _p10;
+					}
+				default:
+					break _v1_4;
+			}
+		} while(false);
+		return _p10;
+	});
+var _narkisr$elm_ui$Templates_Core$TemplatesAdd = function (a) {
+	return {ctor: 'TemplatesAdd', _0: a};
+};
+var _narkisr$elm_ui$Templates_Core$init = function () {
+	var _p11 = _narkisr$elm_ui$Templates_Delete$init;
+	var $delete = _p11._0;
+	var deleteEffects = _p11._1;
+	var _p12 = _narkisr$elm_ui$Templates_Launch$init;
+	var launch = _p12._0;
+	var launchEffects = _p12._1;
+	var _p13 = _narkisr$elm_ui$Templates_List$init;
+	var list = _p13._0;
+	var listEffects = _p13._1;
+	var _p14 = _narkisr$elm_ui$Templates_Add$init;
+	var add = _p14._0;
+	var addEffects = _p14._1;
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesAdd, addEffects),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesList, listEffects),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesLaunch, launchEffects),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesDelete, deleteEffects)
+		]);
+	return {
+		ctor: '_Tuple2',
+		_0: A5(_narkisr$elm_ui$Templates_Core$Model, add, list, launch, $delete, _elm_lang$core$Maybe$Nothing),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Templates_Core$route = F2(
+	function (msg, _p15) {
+		var _p16 = _p15;
+		var _p31 = _p16;
+		var _p30 = _p16.launch;
+		var _p29 = _p16.$delete;
+		var _p28 = _p16.add;
+		var _p17 = msg;
+		_v7_5:
+		do {
+			switch (_p17.ctor) {
+				case 'SetupJob':
+					if (_p17._0.ctor === '_Tuple2') {
+						var _p19 = _p17._0._1;
+						var _p18 = _p17._0._0;
+						switch (_p18) {
+							case 'launch':
+								return _narkisr$elm_ui$Common_Utils$none(
+									_elm_lang$core$Native_Utils.update(
+										_p31,
+										{
+											launch: A2(_narkisr$elm_ui$Templates_Core$setName, _p30, _p19)
+										}));
+							case 'clear':
+								return _narkisr$elm_ui$Common_Utils$none(
+									_elm_lang$core$Native_Utils.update(
+										_p31,
+										{
+											$delete: A2(_narkisr$elm_ui$Templates_Core$setName, _p29, _p19)
+										}));
+							default:
+								return _narkisr$elm_ui$Common_Utils$none(_p31);
+						}
+					} else {
+						break _v7_5;
+					}
+				case 'TemplatesAdd':
+					var _p23 = _p17._0;
+					var _p20 = _p23;
+					if (_p20.ctor === 'Saved') {
+						var _p21 = A2(_narkisr$elm_ui$Templates_Add$update, _p23, _p28);
+						var newAdd = _p21._0;
+						var msgs = _p21._1;
+						return A2(
+							_narkisr$elm_ui$Templates_Core$refreshList,
+							true,
+							{
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p31,
+									{add: newAdd}),
+								_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesAdd, msgs)
+							});
+					} else {
+						var _p22 = A2(_narkisr$elm_ui$Templates_Add$update, _p23, _p28);
+						var newAdd = _p22._0;
+						var msgs = _p22._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p31,
+								{add: newAdd}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesAdd, msgs)
+						};
+					}
+				case 'TemplatesList':
+					var _p24 = A2(_narkisr$elm_ui$Templates_List$update, _p17._0, _p16.list);
+					var newList = _p24._0;
+					var msgs = _p24._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p31,
+							{list: newList}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesList, msgs)
+					};
+				case 'TemplatesLaunch':
+					var _p25 = A2(_narkisr$elm_ui$Templates_Launch$update, _p17._0, _p30);
+					var newLaunch = _p25._0;
+					var msgs = _p25._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p31,
+							{launch: newLaunch}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesLaunch, msgs)
+					};
+				case 'TemplatesDelete':
+					var _p27 = _p17._0;
+					var success = A3(_narkisr$elm_ui$Common_Delete$succeeded, _p27, _narkisr$elm_ui$Templates_Delete$Deleted, 'Template deleted');
+					var _p26 = A2(_narkisr$elm_ui$Templates_Delete$update, _p27, _p29);
+					var newDelete = _p26._0;
+					var msgs = _p26._1;
+					return A2(
+						_narkisr$elm_ui$Templates_Core$refreshList,
+						success,
+						{
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p31,
+								{$delete: newDelete}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Templates_Core$TemplatesDelete, msgs)
+						});
+				default:
+					break _v7_5;
+			}
+		} while(false);
+		return _narkisr$elm_ui$Common_Utils$none(_p31);
+	});
+var _narkisr$elm_ui$Templates_Core$update = F2(
+	function (msg, _p32) {
+		var _p33 = _p32;
+		return A2(
+			_narkisr$elm_ui$Templates_Core$navigate,
+			msg,
+			A2(_narkisr$elm_ui$Templates_Core$route, msg, _p33));
+	});
+var _narkisr$elm_ui$Templates_Core$add = F2(
+	function (hyp, system) {
+		return _narkisr$elm_ui$Templates_Core$TemplatesAdd(
+			A2(_narkisr$elm_ui$Templates_Add$SetSystem, hyp, system));
+	});
+var _narkisr$elm_ui$Templates_Core$view = F2(
+	function (_p34, route) {
+		var _p35 = _p34;
+		var _p36 = route;
+		switch (_p36.ctor) {
+			case 'Add':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Templates_Core$TemplatesAdd,
+					_narkisr$elm_ui$Templates_Add$view(_p35.add));
+			case 'List':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Templates_Core$TemplatesList,
+					_narkisr$elm_ui$Templates_List$view(_p35.list));
+			case 'Launch':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Templates_Core$TemplatesLaunch,
+					_narkisr$elm_ui$Templates_Launch$view(_p35.launch));
+			case 'Delete':
+				return A2(
+					_elm_lang$html$Html_App$map,
+					_narkisr$elm_ui$Templates_Core$TemplatesDelete,
+					_narkisr$elm_ui$Templates_Delete$view(_p35.$delete));
+			default:
+				return _narkisr$elm_ui$Common_Components$notImplemented;
+		}
+	});
 
 var _narkisr$elm_ui$Nav_Header$dropdown = function (attrs) {
 	return A2(
@@ -15381,10 +33773,1085 @@ var _narkisr$elm_ui$Nav_Header$view = function (_p3) {
 			]));
 };
 
+var _narkisr$elm_ui$Nav_Side$sectionItem = F2(
+	function (resource, nested) {
+		return A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$a,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class(
+							A2(_elm_lang$core$Basics_ops['++'], resource, nested)),
+							_elm_lang$html$Html_Attributes$href(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'#/',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									resource,
+									A2(_elm_lang$core$Basics_ops['++'], '/', nested))))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html$i,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class('fa fa-circle-o')
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[])),
+							_elm_lang$html$Html$text(nested)
+						]))
+				]));
+	});
+var _narkisr$elm_ui$Nav_Side$drop = F3(
+	function (resource, msgs, icon) {
+		return A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('treeview')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$a,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class(
+							A2(_elm_lang$core$Basics_ops['++'], resource, 'Menu')),
+							_elm_lang$html$Html_Attributes$href('#')
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[
+							A2(
+							_elm_lang$html$Html$i,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class(icon)
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[])),
+							A2(
+							_elm_lang$html$Html$span,
+							_elm_lang$core$Native_List.fromArray(
+								[]),
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html$text(resource)
+								])),
+							A2(
+							_elm_lang$html$Html$i,
+							_elm_lang$core$Native_List.fromArray(
+								[
+									_elm_lang$html$Html_Attributes$class('fa fa-angle-left pull-right')
+								]),
+							_elm_lang$core$Native_List.fromArray(
+								[]))
+						])),
+					A2(
+					_elm_lang$html$Html$ul,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$class('treeview-menu')
+						]),
+					A2(
+						_elm_lang$core$List$map,
+						function (nested) {
+							return A2(_narkisr$elm_ui$Nav_Side$sectionItem, resource, nested);
+						},
+						msgs))
+				]));
+	});
+var _narkisr$elm_ui$Nav_Side$adminMenus = _elm_lang$core$Native_List.fromArray(
+	[
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'systems',
+		_elm_lang$core$Native_List.fromArray(
+			['list', 'add']),
+		'fa fa-server'),
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'templates',
+		_elm_lang$core$Native_List.fromArray(
+			['list']),
+		'fa fa-clone'),
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'types',
+		_elm_lang$core$Native_List.fromArray(
+			['list', 'add']),
+		'fa fa-archive'),
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'jobs',
+		_elm_lang$core$Native_List.fromArray(
+			['list', 'stats']),
+		'fa fa-tasks'),
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'users',
+		_elm_lang$core$Native_List.fromArray(
+			['list', 'add']),
+		'fa fa-users')
+	]);
+var _narkisr$elm_ui$Nav_Side$userMenus = _elm_lang$core$Native_List.fromArray(
+	[
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'systems',
+		_elm_lang$core$Native_List.fromArray(
+			['list', 'add']),
+		'fa fa-server'),
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'templates',
+		_elm_lang$core$Native_List.fromArray(
+			['list']),
+		'fa fa-clone'),
+		A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'jobs',
+		_elm_lang$core$Native_List.fromArray(
+			['list', 'stats']),
+		'fa fa-tasks')
+	]);
+var _narkisr$elm_ui$Nav_Side$view = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$html$Html$aside,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('main-sidebar')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$section,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('sidebar')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html$ul,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('sidebar-menu')
+							]),
+						_narkisr$elm_ui$Users_Session$isUser(_p1.session) ? _narkisr$elm_ui$Nav_Side$userMenus : _narkisr$elm_ui$Nav_Side$adminMenus)
+					]))
+			]));
+};
+var _narkisr$elm_ui$Nav_Side$update = F2(
+	function (msg, model) {
+		var _p2 = msg;
+		if (_p2.ctor === 'SetSession') {
+			return _narkisr$elm_ui$Common_Utils$none(
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{session: _p2._0}));
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Nav_Side$Model = function (a) {
+	return {session: a};
+};
+var _narkisr$elm_ui$Nav_Side$init = _narkisr$elm_ui$Nav_Side$Model(_narkisr$elm_ui$Users_Session$emptySession);
+var _narkisr$elm_ui$Nav_Side$SetSession = function (a) {
+	return {ctor: 'SetSession', _0: a};
+};
+var _narkisr$elm_ui$Nav_Side$NavigateTo = function (a) {
+	return {ctor: 'NavigateTo', _0: a};
+};
+
+var _narkisr$elm_ui$Nav_Core$setSession = F2(
+	function (_p0, session) {
+		var _p1 = _p0;
+		var _p2 = A2(
+			_narkisr$elm_ui$Nav_Header$update,
+			_narkisr$elm_ui$Nav_Header$SetSession(session),
+			_p1.header);
+		var newHeader = _p2._0;
+		var _p3 = A2(
+			_narkisr$elm_ui$Nav_Side$update,
+			_narkisr$elm_ui$Nav_Side$SetSession(session),
+			_p1.side);
+		var newSide = _p3._0;
+		return _narkisr$elm_ui$Common_Utils$none(
+			A2(
+				_elm_lang$core$Debug$log,
+				'',
+				_elm_lang$core$Native_Utils.update(
+					_p1,
+					{side: newSide, header: newHeader})));
+	});
+var _narkisr$elm_ui$Nav_Core$Model = F4(
+	function (a, b, c, d) {
+		return {side: a, header: b, active: c, section: d};
+	});
+var _narkisr$elm_ui$Nav_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Nav_Core$LoadSession = function (a) {
+	return {ctor: 'LoadSession', _0: a};
+};
+var _narkisr$elm_ui$Nav_Core$init = function () {
+	var _p4 = _narkisr$elm_ui$Nav_Header$init;
+	var header = _p4._0;
+	return {
+		ctor: '_Tuple2',
+		_0: A4(_narkisr$elm_ui$Nav_Core$Model, _narkisr$elm_ui$Nav_Side$init, header, _narkisr$elm_ui$Nav_Common$Systems, _narkisr$elm_ui$Nav_Common$List),
+		_1: _narkisr$elm_ui$Users_Session$getSession(_narkisr$elm_ui$Nav_Core$LoadSession)
+	};
+}();
+var _narkisr$elm_ui$Nav_Core$HeaderMsg = function (a) {
+	return {ctor: 'HeaderMsg', _0: a};
+};
+var _narkisr$elm_ui$Nav_Core$update = F2(
+	function (msg, _p5) {
+		var _p6 = _p5;
+		var _p10 = _p6;
+		var _p7 = msg;
+		switch (_p7.ctor) {
+			case 'SideMsg':
+				var _p8 = A2(_narkisr$elm_ui$Nav_Side$update, _p7._0, _p6.side);
+				var newSide = _p8._0;
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p10,
+						{side: newSide}));
+			case 'HeaderMsg':
+				var _p9 = A2(_narkisr$elm_ui$Nav_Header$update, _p7._0, _p6.header);
+				var newHeader = _p9._0;
+				var msgs = _p9._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p10,
+						{header: newHeader}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Nav_Core$HeaderMsg, msgs)
+				};
+			case 'LoadSession':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p7._0,
+					_p10,
+					_narkisr$elm_ui$Nav_Core$setSession(_p10),
+					_narkisr$elm_ui$Nav_Core$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p10);
+		}
+	});
+var _narkisr$elm_ui$Nav_Core$headerView = function (_p11) {
+	var _p12 = _p11;
+	return A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Nav_Core$HeaderMsg,
+		_narkisr$elm_ui$Nav_Header$view(_p12.header));
+};
+var _narkisr$elm_ui$Nav_Core$SideMsg = function (a) {
+	return {ctor: 'SideMsg', _0: a};
+};
+var _narkisr$elm_ui$Nav_Core$sideView = function (_p13) {
+	var _p14 = _p13;
+	return A2(
+		_elm_lang$html$Html_App$map,
+		_narkisr$elm_ui$Nav_Core$SideMsg,
+		_narkisr$elm_ui$Nav_Side$view(_p14.side));
+};
+
+var _sporto$hop$Hop_Location$queryKVtoTuple = function (kv) {
+	var splitted = A2(_elm_lang$core$String$split, '=', kv);
+	var first = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(splitted));
+	var firstDecoded = _evancz$elm_http$Http$uriDecode(first);
+	var second = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(
+			A2(_elm_lang$core$List$drop, 1, splitted)));
+	var secondDecoded = _evancz$elm_http$Http$uriDecode(second);
+	return {ctor: '_Tuple2', _0: firstDecoded, _1: secondDecoded};
+};
+var _sporto$hop$Hop_Location$extractQuery = function (route) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(
+			A2(
+				_elm_lang$core$List$drop,
+				1,
+				A2(_elm_lang$core$String$split, '?', route))));
+};
+var _sporto$hop$Hop_Location$parseQuery = function (route) {
+	return _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$map,
+			_sporto$hop$Hop_Location$queryKVtoTuple,
+			A2(
+				_elm_lang$core$List$filter,
+				function (_p0) {
+					return _elm_lang$core$Basics$not(
+						_elm_lang$core$String$isEmpty(_p0));
+				},
+				A2(
+					_elm_lang$core$String$split,
+					'&',
+					_sporto$hop$Hop_Location$extractQuery(route)))));
+};
+var _sporto$hop$Hop_Location$extractPath = function (route) {
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(
+			A2(
+				_elm_lang$core$String$split,
+				'?',
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					'',
+					_elm_lang$core$List$head(
+						_elm_lang$core$List$reverse(
+							A2(_elm_lang$core$String$split, '#', route)))))));
+};
+var _sporto$hop$Hop_Location$parsePath = function (route) {
+	return A2(
+		_elm_lang$core$List$filter,
+		function (segment) {
+			return _elm_lang$core$Basics$not(
+				_elm_lang$core$String$isEmpty(segment));
+		},
+		A2(
+			_elm_lang$core$String$split,
+			'/',
+			_sporto$hop$Hop_Location$extractPath(route)));
+};
+var _sporto$hop$Hop_Location$parse = function (route) {
+	return {
+		path: _sporto$hop$Hop_Location$parsePath(route),
+		query: _sporto$hop$Hop_Location$parseQuery(route)
+	};
+};
+var _sporto$hop$Hop_Location$fromUrlString = F2(
+	function (config, href) {
+		var withoutProtocol = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(
+				_elm_lang$core$List$reverse(
+					A2(_elm_lang$core$String$split, '//', href))));
+		var withoutDomain = A2(
+			_elm_lang$core$String$append,
+			'/',
+			A2(
+				_elm_lang$core$String$join,
+				'/',
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					_elm_lang$core$Native_List.fromArray(
+						[]),
+					_elm_lang$core$List$tail(
+						A2(_elm_lang$core$String$split, '/', withoutProtocol)))));
+		return config.hash ? A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(
+				A2(
+					_elm_lang$core$List$drop,
+					1,
+					A2(_elm_lang$core$String$split, '#', withoutDomain)))) : A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			_elm_lang$core$List$head(
+				A2(_elm_lang$core$String$split, '#', withoutDomain)));
+	});
+var _sporto$hop$Hop_Location$locationStringWithoutBase = F2(
+	function (config, locationString) {
+		var regex = _elm_lang$core$Regex$regex(config.basePath);
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$AtMost(1),
+			regex,
+			_elm_lang$core$Basics$always(''),
+			locationString);
+	});
+var _sporto$hop$Hop_Location$fromUrl = F2(
+	function (config, href) {
+		var relevantLocationString = A2(_sporto$hop$Hop_Location$fromUrlString, config, href);
+		return config.hash ? _sporto$hop$Hop_Location$parse(relevantLocationString) : _sporto$hop$Hop_Location$parse(
+			A2(_sporto$hop$Hop_Location$locationStringWithoutBase, config, relevantLocationString));
+	});
+var _sporto$hop$Hop_Location$queryFromLocation = function (location) {
+	return _elm_lang$core$Dict$isEmpty(location.query) ? '' : A2(
+		_elm_lang$core$String$append,
+		'?',
+		A2(
+			_elm_lang$core$String$join,
+			'&',
+			A2(
+				_elm_lang$core$List$map,
+				function (_p1) {
+					var _p2 = _p1;
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p2._0,
+						A2(_elm_lang$core$Basics_ops['++'], '=', _p2._1));
+				},
+				A2(
+					_elm_lang$core$List$map,
+					function (_p3) {
+						var _p4 = _p3;
+						return {
+							ctor: '_Tuple2',
+							_0: _evancz$elm_http$Http$uriEncode(_p4._0),
+							_1: _evancz$elm_http$Http$uriEncode(_p4._1)
+						};
+					},
+					_elm_lang$core$Dict$toList(location.query)))));
+};
+var _sporto$hop$Hop_Location$locationFromUser = function (route) {
+	var normalized = A2(_elm_lang$core$String$startsWith, '#', route) ? route : A2(_elm_lang$core$Basics_ops['++'], '#', route);
+	return _sporto$hop$Hop_Location$parse(normalized);
+};
+var _sporto$hop$Hop_Location$dedupSlash = A3(
+	_elm_lang$core$Regex$replace,
+	_elm_lang$core$Regex$All,
+	_elm_lang$core$Regex$regex('/+'),
+	function (_p5) {
+		return '/';
+	});
+var _sporto$hop$Hop_Location$locationToFullPath = F2(
+	function (config, location) {
+		var query = _sporto$hop$Hop_Location$queryFromLocation(location);
+		var joined = A2(_elm_lang$core$String$join, '/', location.path);
+		var url = config.hash ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			'#/',
+			A2(_elm_lang$core$Basics_ops['++'], joined, query)) : (_elm_lang$core$String$isEmpty(config.basePath) ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/',
+			A2(_elm_lang$core$Basics_ops['++'], joined, query)) : (_elm_lang$core$String$isEmpty(joined) ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/',
+			A2(_elm_lang$core$Basics_ops['++'], config.basePath, query)) : A2(
+			_elm_lang$core$Basics_ops['++'],
+			'/',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				config.basePath,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'/',
+					A2(_elm_lang$core$Basics_ops['++'], joined, query))))));
+		return _sporto$hop$Hop_Location$dedupSlash(url);
+	});
+
+var _sporto$hop$Hop_Matching$matchPathWithPathList = F3(
+	function (routeParsers, notFoundAction, path) {
+		matchPathWithPathList:
+		while (true) {
+			var _p0 = routeParsers;
+			if (_p0.ctor === '[]') {
+				return notFoundAction;
+			} else {
+				if (_p0._1.ctor === '[]') {
+					var _p1 = A2(_Bogdanp$elm_combine$Combine$parse, _p0._0.parser, path);
+					if (_p1._0.ctor === 'Ok') {
+						return _p1._0._0;
+					} else {
+						return notFoundAction;
+					}
+				} else {
+					var _p2 = A2(_Bogdanp$elm_combine$Combine$parse, _p0._0.parser, path);
+					if (_p2._0.ctor === 'Ok') {
+						return _p2._0._0;
+					} else {
+						var _v3 = _p0._1,
+							_v4 = notFoundAction,
+							_v5 = path;
+						routeParsers = _v3;
+						notFoundAction = _v4;
+						path = _v5;
+						continue matchPathWithPathList;
+					}
+				}
+			}
+		}
+	});
+var _sporto$hop$Hop_Matching$matchPath = F2(
+	function (config, path) {
+		return A3(_sporto$hop$Hop_Matching$matchPathWithPathList, config.matchers, config.notFound, path);
+	});
+var _sporto$hop$Hop_Matching$matchLocation = F2(
+	function (config, location) {
+		var pathString = A2(
+			_elm_lang$core$String$join,
+			'/',
+			A2(_elm_lang$core$List_ops['::'], '', location.path));
+		return A2(_sporto$hop$Hop_Matching$matchPath, config, pathString);
+	});
+
+var _sporto$hop$Hop$clearQuery = function (location) {
+	return _elm_lang$core$Native_Utils.update(
+		location,
+		{query: _elm_lang$core$Dict$empty});
+};
+var _sporto$hop$Hop$removeQuery = F2(
+	function (key, location) {
+		var updatedQuery = A2(_elm_lang$core$Dict$remove, key, location.query);
+		return _elm_lang$core$Native_Utils.update(
+			location,
+			{query: updatedQuery});
+	});
+var _sporto$hop$Hop$setQuery = F2(
+	function (query, location) {
+		return _elm_lang$core$Native_Utils.update(
+			location,
+			{query: query});
+	});
+var _sporto$hop$Hop$addQuery = F2(
+	function (query, location) {
+		var updatedQuery = A2(_elm_lang$core$Dict$union, query, location.query);
+		return _elm_lang$core$Native_Utils.update(
+			location,
+			{query: updatedQuery});
+	});
+var _sporto$hop$Hop$makeUrlFromLocation = F2(
+	function (config, location) {
+		var fullPath = A2(_sporto$hop$Hop_Location$locationToFullPath, config, location);
+		var path = _elm_lang$core$Native_Utils.eq(fullPath, '') ? '/' : fullPath;
+		return path;
+	});
+var _sporto$hop$Hop$makeUrl = F2(
+	function (config, route) {
+		return A2(
+			_sporto$hop$Hop$makeUrlFromLocation,
+			config,
+			_sporto$hop$Hop_Location$locationFromUser(route));
+	});
+var _sporto$hop$Hop$matcherToPath = F2(
+	function (matcher, inputs) {
+		var makeSegment = F2(
+			function (segment, input) {
+				return A2(_elm_lang$core$Basics_ops['++'], segment, input);
+			});
+		var inputs$ = A2(
+			_elm_lang$core$List$append,
+			inputs,
+			_elm_lang$core$Native_List.fromArray(
+				['']));
+		var path = A2(
+			_elm_lang$core$String$join,
+			'',
+			A3(_elm_lang$core$List$map2, makeSegment, matcher.segments, inputs$));
+		return path;
+	});
+var _sporto$hop$Hop$matchUrl = F2(
+	function (config, url) {
+		var location = A2(_sporto$hop$Hop_Location$fromUrl, config, url);
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_sporto$hop$Hop_Matching$matchLocation, config, location),
+			_1: location
+		};
+	});
+
+var _narkisr$elm_ui$Routing$notJobs = function (route) {
+	var _p0 = route;
+	if (_p0.ctor === 'JobsRoute') {
+		return false;
+	} else {
+		return true;
+	}
+};
+var _narkisr$elm_ui$Routing$NotFoundRoute = {ctor: 'NotFoundRoute'};
+var _narkisr$elm_ui$Routing$UsersRoute = function (a) {
+	return {ctor: 'UsersRoute', _0: a};
+};
+var _narkisr$elm_ui$Routing$matcherUsers = A3(_sporto$hop$Hop_Matchers$nested1, _narkisr$elm_ui$Routing$UsersRoute, '/users', _narkisr$elm_ui$Users_Routing$matchers);
+var _narkisr$elm_ui$Routing$TemplatesRoute = function (a) {
+	return {ctor: 'TemplatesRoute', _0: a};
+};
+var _narkisr$elm_ui$Routing$matcherTemplates = A3(_sporto$hop$Hop_Matchers$nested1, _narkisr$elm_ui$Routing$TemplatesRoute, '/templates', _narkisr$elm_ui$Templates_Routing$matchers);
+var _narkisr$elm_ui$Routing$JobsRoute = function (a) {
+	return {ctor: 'JobsRoute', _0: a};
+};
+var _narkisr$elm_ui$Routing$matcherJobs = A3(_sporto$hop$Hop_Matchers$nested1, _narkisr$elm_ui$Routing$JobsRoute, '/jobs', _narkisr$elm_ui$Jobs_Routing$matchers);
+var _narkisr$elm_ui$Routing$TypesRoute = function (a) {
+	return {ctor: 'TypesRoute', _0: a};
+};
+var _narkisr$elm_ui$Routing$matcherTypes = A3(_sporto$hop$Hop_Matchers$nested1, _narkisr$elm_ui$Routing$TypesRoute, '/types', _narkisr$elm_ui$Types_Routing$matchers);
+var _narkisr$elm_ui$Routing$SystemsRoute = function (a) {
+	return {ctor: 'SystemsRoute', _0: a};
+};
+var _narkisr$elm_ui$Routing$defaultRoute = _narkisr$elm_ui$Routing$SystemsRoute(_narkisr$elm_ui$Systems_Routing$List);
+var _narkisr$elm_ui$Routing$matcherSystems = A3(_sporto$hop$Hop_Matchers$nested1, _narkisr$elm_ui$Routing$SystemsRoute, '/systems', _narkisr$elm_ui$Systems_Routing$matchers);
+var _narkisr$elm_ui$Routing$matchers = _elm_lang$core$Native_List.fromArray(
+	[_narkisr$elm_ui$Routing$matcherSystems, _narkisr$elm_ui$Routing$matcherTypes, _narkisr$elm_ui$Routing$matcherTemplates, _narkisr$elm_ui$Routing$matcherJobs, _narkisr$elm_ui$Routing$matcherUsers]);
+var _narkisr$elm_ui$Routing$config = {basePath: '\\?\\#\\/', hash: true, matchers: _narkisr$elm_ui$Routing$matchers, notFound: _narkisr$elm_ui$Routing$NotFoundRoute};
+var _narkisr$elm_ui$Routing$urlParser = _elm_lang$navigation$Navigation$makeParser(
+	function (_p1) {
+		return A2(
+			_sporto$hop$Hop$matchUrl,
+			_narkisr$elm_ui$Routing$config,
+			function (_) {
+				return _.href;
+			}(_p1));
+	});
+
+var _narkisr$elm_ui$Application$urlUpdate = F2(
+	function (_p0, model) {
+		var _p1 = _p0;
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{route: _p1._0, location: _p1._1}));
+	});
+var _narkisr$elm_ui$Application$navigate = F2(
+	function (_p2, msg) {
+		var _p3 = _p2;
+		var _p6 = _p3._1;
+		var _p5 = _p3._0;
+		var _p4 = _p3._0.navChange;
+		if (_p4.ctor === 'Just') {
+			var withNavChange = _elm_lang$core$Native_List.fromArray(
+				[
+					A2(_elm_lang$core$Platform_Cmd$map, msg, _p6),
+					_elm_lang$navigation$Navigation$newUrl(
+					A2(_sporto$hop$Hop$makeUrl, _narkisr$elm_ui$Routing$config, _p4._0))
+				]);
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p5,
+					{navChange: _elm_lang$core$Maybe$Nothing}),
+				_1: _elm_lang$core$Platform_Cmd$batch(withNavChange)
+			};
+		} else {
+			return {
+				ctor: '_Tuple2',
+				_0: _p5,
+				_1: A2(_elm_lang$core$Platform_Cmd$map, msg, _p6)
+			};
+		}
+	});
+var _narkisr$elm_ui$Application$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {systems: a, stacks: b, jobs: c, types: d, templates: e, users: f, nav: g, route: h, location: i};
+	});
+var _narkisr$elm_ui$Application$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Application$UsersMsg = function (a) {
+	return {ctor: 'UsersMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$TemplatesMsg = function (a) {
+	return {ctor: 'TemplatesMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$TypesMsg = function (a) {
+	return {ctor: 'TypesMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$JobsMsg = function (a) {
+	return {ctor: 'JobsMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$StacksMsg = function (a) {
+	return {ctor: 'StacksMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$NavMsg = function (a) {
+	return {ctor: 'NavMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$SystemsMsg = function (a) {
+	return {ctor: 'SystemsMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$init = function (_p7) {
+	var _p8 = _p7;
+	var _p9 = _narkisr$elm_ui$Stacks_Core$init;
+	var stacks = _p9._0;
+	var stacksMsg = _p9._1;
+	var _p10 = _narkisr$elm_ui$Systems_Core$init;
+	var systems = _p10._0;
+	var systemsMsg = _p10._1;
+	var _p11 = _narkisr$elm_ui$Nav_Core$init;
+	var nav = _p11._0;
+	var navMsg = _p11._1;
+	var _p12 = _narkisr$elm_ui$Templates_Core$init;
+	var templates = _p12._0;
+	var templatesMsg = _p12._1;
+	var _p13 = _narkisr$elm_ui$Users_Core$init;
+	var users = _p13._0;
+	var usersMsg = _p13._1;
+	var _p14 = _narkisr$elm_ui$Types_Core$init;
+	var types = _p14._0;
+	var typesMsg = _p14._1;
+	var _p15 = _narkisr$elm_ui$Jobs_Core$init;
+	var jobs = _p15._0;
+	var jobsMsg = _p15._1;
+	var msgs = _elm_lang$core$Native_List.fromArray(
+		[
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$TemplatesMsg, templatesMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$TypesMsg, typesMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$UsersMsg, usersMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$SystemsMsg, systemsMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$StacksMsg, stacksMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$NavMsg, navMsg),
+			A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$JobsMsg, jobsMsg)
+		]);
+	return {
+		ctor: '_Tuple2',
+		_0: A9(_narkisr$elm_ui$Application$Model, systems, stacks, jobs, types, templates, users, nav, _p8._0, _p8._1),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+};
+var _narkisr$elm_ui$Application$activeView = function (_p16) {
+	var _p17 = _p16;
+	var _p19 = _p17.systems;
+	var _p18 = A2(_elm_lang$core$Debug$log, '', _p17.route);
+	switch (_p18.ctor) {
+		case 'SystemsRoute':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Application$SystemsMsg,
+				A2(_narkisr$elm_ui$Systems_Core$view, _p19, _p18._0));
+		case 'TypesRoute':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Application$TypesMsg,
+				A2(_narkisr$elm_ui$Types_Core$view, _p17.types, _p18._0));
+		case 'TemplatesRoute':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Application$TemplatesMsg,
+				A2(_narkisr$elm_ui$Templates_Core$view, _p17.templates, _p18._0));
+		case 'JobsRoute':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Application$JobsMsg,
+				A2(_narkisr$elm_ui$Jobs_Core$view, _p17.jobs, _p18._0));
+		case 'UsersRoute':
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Application$UsersMsg,
+				A2(_narkisr$elm_ui$Users_Core$view, _p17.users, _p18._0));
+		default:
+			return A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Application$SystemsMsg,
+				A2(_narkisr$elm_ui$Systems_Core$view, _p19, _narkisr$elm_ui$Systems_Routing$List));
+	}
+};
+var _narkisr$elm_ui$Application$view = function (_p20) {
+	var _p21 = _p20;
+	var _p22 = _p21.nav;
+	return A2(
+		_elm_lang$html$Html$div,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('wrapper')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$div,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('content-wrapper')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(
+						_elm_lang$html$Html_App$map,
+						_narkisr$elm_ui$Application$NavMsg,
+						_narkisr$elm_ui$Nav_Core$headerView(_p22)),
+						A2(
+						_elm_lang$html$Html$section,
+						_elm_lang$core$Native_List.fromArray(
+							[
+								_elm_lang$html$Html_Attributes$class('content')
+							]),
+						_narkisr$elm_ui$Common_Components$asList(
+							_narkisr$elm_ui$Application$activeView(_p21))),
+						A2(
+						_elm_lang$html$Html_App$map,
+						_narkisr$elm_ui$Application$NavMsg,
+						_narkisr$elm_ui$Nav_Core$sideView(_p22))
+					]))
+			]));
+};
+var _narkisr$elm_ui$Application$NavigateTo = function (a) {
+	return {ctor: 'NavigateTo', _0: a};
+};
+var _narkisr$elm_ui$Application$EditMsg = function (a) {
+	return {ctor: 'EditMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$MenuMsg = function (a) {
+	return {ctor: 'MenuMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$HopMsg = function (a) {
+	return {ctor: 'HopMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$route = F2(
+	function (msg, _p23) {
+		var _p24 = _p23;
+		var _p36 = _p24;
+		var _p25 = msg;
+		_v8_9:
+		do {
+			switch (_p25.ctor) {
+				case 'JobsMsg':
+					var _p27 = _p25._0;
+					if (_narkisr$elm_ui$Jobs_Core$isPolling(_p27) && _narkisr$elm_ui$Routing$notJobs(_p24.route)) {
+						return _narkisr$elm_ui$Common_Utils$none(_p36);
+					} else {
+						var _p26 = A2(_narkisr$elm_ui$Jobs_Core$update, _p27, _p24.jobs);
+						var newJob = _p26._0;
+						var msgs = _p26._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p36,
+								{jobs: newJob}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$JobsMsg, msgs)
+						};
+					}
+				case 'TypesMsg':
+					var _p28 = A2(
+						_narkisr$elm_ui$Application$navigate,
+						A2(_narkisr$elm_ui$Types_Core$update, _p25._0, _p24.types),
+						_narkisr$elm_ui$Application$TypesMsg);
+					var newTypes = _p28._0;
+					var msgs = _p28._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p36,
+							{types: newTypes}),
+						_1: msgs
+					};
+				case 'NavMsg':
+					var _p29 = A2(_narkisr$elm_ui$Nav_Core$update, _p25._0, _p24.nav);
+					var newNav = _p29._0;
+					var msgs = _p29._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p36,
+							{nav: newNav}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$NavMsg, msgs)
+					};
+				case 'UsersMsg':
+					var _p30 = A2(
+						_narkisr$elm_ui$Application$navigate,
+						A2(_narkisr$elm_ui$Users_Core$update, _p25._0, _p24.users),
+						_narkisr$elm_ui$Application$UsersMsg);
+					var newUsers = _p30._0;
+					var msgs = _p30._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p36,
+							{users: newUsers}),
+						_1: msgs
+					};
+				case 'StacksMsg':
+					var _p31 = A2(_narkisr$elm_ui$Stacks_Core$update, _p25._0, _p24.stacks);
+					var newStacks = _p31._0;
+					var msgs = _p31._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p36,
+							{stacks: newStacks}),
+						_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$StacksMsg, msgs)
+					};
+				case 'TemplatesMsg':
+					var _p32 = A2(
+						_narkisr$elm_ui$Application$navigate,
+						A2(_narkisr$elm_ui$Templates_Core$update, _p25._0, _p24.templates),
+						_narkisr$elm_ui$Application$TemplatesMsg);
+					var newTemplates = _p32._0;
+					var msgs = _p32._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p36,
+							{templates: newTemplates}),
+						_1: msgs
+					};
+				case 'SystemsMsg':
+					var _p33 = A2(
+						_narkisr$elm_ui$Application$navigate,
+						A2(_narkisr$elm_ui$Systems_Core$update, _p25._0, _p24.systems),
+						_narkisr$elm_ui$Application$SystemsMsg);
+					var newSystems = _p33._0;
+					var msgs = _p33._1;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p36,
+							{systems: newSystems}),
+						_1: msgs
+					};
+				case 'ApplyRoute':
+					if (_p25._0.ctor === '_Tuple2') {
+						var _p35 = _p25._0._0;
+						var _p34 = _p35;
+						if (_p34.ctor === 'NotFoundRoute') {
+							return {
+								ctor: '_Tuple2',
+								_0: _p36,
+								_1: A2(
+									_elm_lang$core$Platform_Cmd$map,
+									_narkisr$elm_ui$Application$HopMsg,
+									_elm_lang$navigation$Navigation$modifyUrl('systems/list'))
+							};
+						} else {
+							return _narkisr$elm_ui$Common_Utils$none(
+								_elm_lang$core$Native_Utils.update(
+									_p36,
+									{route: _p35, location: _p25._0._1}));
+						}
+					} else {
+						break _v8_9;
+					}
+				case 'HopMsg':
+					if (_p25._0.ctor === '_Tuple0') {
+						return _narkisr$elm_ui$Common_Utils$none(_p36);
+					} else {
+						break _v8_9;
+					}
+				default:
+					break _v8_9;
+			}
+		} while(false);
+		return _narkisr$elm_ui$Common_Utils$none(_p36);
+	});
+var _narkisr$elm_ui$Application$update = F2(
+	function (msg, model) {
+		return A2(_narkisr$elm_ui$Application$route, msg, model);
+	});
+var _narkisr$elm_ui$Application$ApplyRoute = function (a) {
+	return {ctor: 'ApplyRoute', _0: a};
+};
+
+var _narkisr$elm_ui$Common_EditSub$editorValue = function (p) {
+	var _p0 = p;
+	if (((_p0.ctor === 'EditMsg') && (_p0._0.ctor === 'Load')) && (_p0._0._0.ctor === '_Tuple2')) {
+		var _p2 = _p0._0._0._1;
+		var _p1 = _p0._0._0._0;
+		switch (_p1) {
+			case 'templates':
+				return _narkisr$elm_ui$Application$TemplatesMsg(
+					_narkisr$elm_ui$Templates_Core$TemplatesAdd(
+						_narkisr$elm_ui$Templates_Add$SetDefaults(_p2)));
+			case 'typesAdd':
+				return _narkisr$elm_ui$Application$TypesMsg(
+					_narkisr$elm_ui$Types_Core$Adding(
+						_narkisr$elm_ui$Types_Add$SetClasses(_p2)));
+			case 'typesEdit':
+				return _narkisr$elm_ui$Application$TypesMsg(
+					_narkisr$elm_ui$Types_Core$Editing(
+						_narkisr$elm_ui$Types_Edit$AddMsg(
+							_narkisr$elm_ui$Types_Add$SetClasses(_p2))));
+			default:
+				return _narkisr$elm_ui$Application$NoOp;
+		}
+	} else {
+		return _narkisr$elm_ui$Application$NoOp;
+	}
+};
+
+var _narkisr$elm_ui$Common_Menu$intoMsg = function (msg) {
+	var _p0 = msg;
+	if ((_p0.ctor === 'MenuMsg') && (_p0._0.ctor === '_Tuple3')) {
+		var _p3 = _p0._0._2;
+		var _p2 = _p0._0._1;
+		var _p1 = _p0._0._0;
+		switch (_p1) {
+			case 'Systems':
+				return _narkisr$elm_ui$Application$SystemsMsg(
+					_narkisr$elm_ui$Systems_Core$SystemsLaunch(
+						_narkisr$elm_ui$Systems_Launch$SetupJob(_p2)));
+			case 'Templates':
+				return _narkisr$elm_ui$Application$TemplatesMsg(
+					_narkisr$elm_ui$Templates_Core$SetupJob(
+						{ctor: '_Tuple2', _0: _p2, _1: _p3}));
+			case 'Types':
+				return _narkisr$elm_ui$Application$TypesMsg(
+					_narkisr$elm_ui$Types_Core$MenuClick(
+						{ctor: '_Tuple2', _0: _p2, _1: _p3}));
+			case 'Users':
+				return _narkisr$elm_ui$Application$UsersMsg(
+					_narkisr$elm_ui$Users_Core$MenuClick(
+						{ctor: '_Tuple2', _0: _p2, _1: _p3}));
+			default:
+				return _narkisr$elm_ui$Application$NoOp;
+		}
+	} else {
+		return msg;
+	}
+};
+var _narkisr$elm_ui$Common_Menu$menuPort = _elm_lang$core$Native_Platform.incomingPort(
+	'menuPort',
+	A4(
+		_elm_lang$core$Json_Decode$tuple3,
+		F3(
+			function (x1, x2, x3) {
+				return {ctor: '_Tuple3', _0: x1, _1: x2, _2: x3};
+			}),
+		_elm_lang$core$Json_Decode$string,
+		_elm_lang$core$Json_Decode$string,
+		_elm_lang$core$Json_Decode$string));
+
+var _narkisr$elm_ui$Main$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				_narkisr$elm_ui$Common_EditSub$editorValue,
+				_narkisr$elm_ui$Common_Editor$editorInPort(
+					function (_p0) {
+						return _narkisr$elm_ui$Application$EditMsg(
+							_narkisr$elm_ui$Common_Editor$Load(_p0));
+					})),
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				function (v) {
+					return _narkisr$elm_ui$Common_Menu$intoMsg(v);
+				},
+				_narkisr$elm_ui$Common_Menu$menuPort(_narkisr$elm_ui$Application$MenuMsg)),
+				A2(
+				_elm_lang$core$Time$every,
+				_elm_lang$core$Time$second,
+				function (_p1) {
+					return _narkisr$elm_ui$Application$JobsMsg(
+						_narkisr$elm_ui$Jobs_Core$JobsListing(_narkisr$elm_ui$Jobs_List$Polling));
+				})
+			]));
+};
+var _narkisr$elm_ui$Main$main = {
+	main: A2(
+		_elm_lang$navigation$Navigation$program,
+		_narkisr$elm_ui$Routing$urlParser,
+		{init: _narkisr$elm_ui$Application$init, view: _narkisr$elm_ui$Application$view, update: _narkisr$elm_ui$Application$update, urlUpdate: _narkisr$elm_ui$Application$urlUpdate, subscriptions: _narkisr$elm_ui$Main$subscriptions})
+};
+var _narkisr$elm_ui$Main$parser = _elm_lang$core$Native_Platform.outgoingPort(
+	'parser',
+	function (v) {
+		return v;
+	});
+
 var Elm = {};
-Elm['Nav'] = Elm['Nav'] || {};
-Elm['Nav']['Header'] = Elm['Nav']['Header'] || {};
-_elm_lang$core$Native_Platform.addPublicModule(Elm['Nav']['Header'], 'Nav.Header', typeof _narkisr$elm_ui$Nav_Header$main === 'undefined' ? null : _narkisr$elm_ui$Nav_Header$main);
+Elm['Main'] = Elm['Main'] || {};
+_elm_lang$core$Native_Platform.addPublicModule(Elm['Main'], 'Main', typeof _narkisr$elm_ui$Main$main === 'undefined' ? null : _narkisr$elm_ui$Main$main);
 
 if (typeof define === "function" && define['amd'])
 {

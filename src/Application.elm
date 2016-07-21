@@ -80,7 +80,7 @@ type Msg =
     | NoOp
 
 route : Msg ->  Model -> (Model , Cmd Msg)
-route msg ({route, types, users, jobs, systems, templates, stacks} as model) =
+route msg ({route, types, users, jobs, systems, templates, stacks, nav} as model) =
   case msg of
     JobsMsg msg ->
       if Jobs.isPolling msg &&  BaseRoute.notJobs route then
@@ -96,6 +96,13 @@ route msg ({route, types, users, jobs, systems, templates, stacks} as model) =
        (newTypes, msgs) = navigate (Types.update msg types) TypesMsg
       in
        ({ model | types = newTypes}, msgs)
+
+    NavMsg msg ->
+      let
+       (newNav, msgs) = (Nav.update msg nav)
+      in
+       ({ model | nav = newNav}, Cmd.map NavMsg msgs)
+
 
 
     UsersMsg msg ->
