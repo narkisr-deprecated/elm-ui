@@ -164,7 +164,8 @@ handler result model success fail noop =
        -- BadResponse 400 m resp ->
        --    (fail (decodeError resp))
        --
-       _ -> Debug.log (toString e) (model , Cmd.none)
+       _ -> 
+         Debug.log (toString e) (model , Cmd.none)
 
 successHandler result model success noop =
   handler result model success (identityFail model) noop
