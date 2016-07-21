@@ -29755,7 +29755,7 @@ var _narkisr$elm_ui$Types_View$moduleSection = F2(
 		var os = _narkisr$elm_ui$Types_View$optionsList(_p3.options);
 		var cs = A2(
 			_elm_lang$core$String$join,
-			'',
+			' ',
 			_elm_lang$core$Dict$keys(_p2.classes));
 		return _elm_lang$core$Native_List.fromArray(
 			[

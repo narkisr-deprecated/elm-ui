@@ -66,7 +66,7 @@ optionsList options =
 
 moduleSection env {args, module', classes} =
   let
-    cs = String.join "" (Dict.keys classes)
+    cs = String.join " " (Dict.keys classes)
     os = optionsList module'.options
     args' = String.join ", " args
   in
