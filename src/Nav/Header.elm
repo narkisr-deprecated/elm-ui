@@ -71,8 +71,8 @@ gearsButton session =
     div [class "dropdown pull-right"] [
         i (dropdown [ class "fa fa-gears", style [("color", "black")]]) []
       , ul [ class "dropdown-menu" ] [
-          li [] [ a [href "#", onClick (Goto Users List)] [text "Users" ] ]
-        , li [] [ a [href "#", onClick LoadSwagger] [text "Swagger"] ]
+          li [] [ a [href "#/users/list"] [text "Users" ] ]
+        , li [] [ a [href "swagger/index.html"] [text "Swagger"] ]
         ]
       ]
 
