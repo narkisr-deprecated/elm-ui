@@ -61,6 +61,7 @@ reinit env type' =
   Model (Form.initial (editDefaults env type') validate)
 
 
+
 view ({form} as model) =
  let
     name = (Form.getFieldAsString "name" form)
@@ -75,9 +76,5 @@ view ({form} as model) =
       , formControl "Source" Input.textInput source
       , formGroup "Unsecure" Input.checkboxInput unsecure []
       , formControl "Arguments" Input.textInput arguments
-      , formControl "Edit classes" Input.checkboxInput editor
-      , div [ id "jsoneditor"
-          , style [("width", "50%"), ("height", "400px"), ("margin-left", "25%")]] []
-
       ]
-   ])
+     ])

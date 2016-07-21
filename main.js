@@ -29886,6 +29886,33 @@ var _narkisr$elm_ui$Types_View$ViewType = function (a) {
 	return {ctor: 'ViewType', _0: a};
 };
 
+var _narkisr$elm_ui$Common_Editor$editorInPort = _elm_lang$core$Native_Platform.incomingPort(
+	'editorInPort',
+	A3(
+		_elm_lang$core$Json_Decode$tuple2,
+		F2(
+			function (x1, x2) {
+				return {ctor: '_Tuple2', _0: x1, _1: x2};
+			}),
+		_elm_lang$core$Json_Decode$string,
+		_elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Common_Editor$editorOutPort = _elm_lang$core$Native_Platform.outgoingPort(
+	'editorOutPort',
+	function (v) {
+		return [v._0, v._1];
+	});
+var _narkisr$elm_ui$Common_Editor$unloadEditor = _narkisr$elm_ui$Common_Editor$editorOutPort(
+	{ctor: '_Tuple2', _0: 'unload', _1: ''});
+var _narkisr$elm_ui$Common_Editor$loadEditor = F2(
+	function (target, json) {
+		return _narkisr$elm_ui$Common_Editor$editorOutPort(
+			{ctor: '_Tuple2', _0: json, _1: target});
+	});
+var _narkisr$elm_ui$Common_Editor$Load = function (a) {
+	return {ctor: 'Load', _0: a};
+};
+var _narkisr$elm_ui$Common_Editor$NoOp = {ctor: 'NoOp'};
+
 var _narkisr$elm_ui$Types_Add_Common$Puppet = F4(
 	function (a, b, c, d) {
 		return {ctor: 'Puppet', _0: a, _1: b, _2: c, _3: d};
@@ -30033,23 +30060,7 @@ var _narkisr$elm_ui$Types_Add_Puppet$view = function (_p0) {
 						unsecure,
 						_elm_lang$core$Native_List.fromArray(
 							[])),
-						A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Arguments', _narkisr$elm_ui$Form_Input$textInput, $arguments),
-						A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Edit classes', _narkisr$elm_ui$Form_Input$checkboxInput, editor),
-						A2(
-						_elm_lang$html$Html$div,
-						_elm_lang$core$Native_List.fromArray(
-							[
-								_elm_lang$html$Html_Attributes$id('jsoneditor'),
-								_elm_lang$html$Html_Attributes$style(
-								_elm_lang$core$Native_List.fromArray(
-									[
-										{ctor: '_Tuple2', _0: 'width', _1: '50%'},
-										{ctor: '_Tuple2', _0: 'height', _1: '400px'},
-										{ctor: '_Tuple2', _0: 'margin-left', _1: '25%'}
-									]))
-							]),
-						_elm_lang$core$Native_List.fromArray(
-							[]))
+						A3(_narkisr$elm_ui$Common_FormComponents$formControl, 'Arguments', _narkisr$elm_ui$Form_Input$textInput, $arguments)
 					]))
 			]));
 };
@@ -30250,6 +30261,36 @@ var _narkisr$elm_ui$Types_Add$rows = F2(
 					_circuithub$elm_bootstrap_html$Bootstrap_Html$row_(buttons)
 				]));
 	});
+var _narkisr$elm_ui$Types_Add$editor = F2(
+	function (check, puppet) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$class('form-horizontal'),
+					A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;')
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					puppet,
+					A2(_narkisr$elm_ui$Common_Components$group$, 'Edit classes', check),
+					A2(
+					_elm_lang$html$Html$div,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$id('jsoneditor'),
+							_elm_lang$html$Html_Attributes$style(
+							_elm_lang$core$Native_List.fromArray(
+								[
+									{ctor: '_Tuple2', _0: 'width', _1: '50%'},
+									{ctor: '_Tuple2', _0: 'height', _1: '400px'},
+									{ctor: '_Tuple2', _0: 'margin-left', _1: '25%'}
+								]))
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				]));
+	});
 var _narkisr$elm_ui$Types_Add$merge = F3(
 	function (classes, _p0, acc) {
 		var _p1 = _p0;
@@ -30348,57 +30389,6 @@ var _narkisr$elm_ui$Types_Add$setEnvironment = F2(
 				}));
 	});
 var _narkisr$elm_ui$Types_Add$NoOp = {ctor: 'NoOp'};
-var _narkisr$elm_ui$Types_Add$update = F2(
-	function (msg, _p10) {
-		var _p11 = _p10;
-		var _p14 = _p11.wizard;
-		var _p13 = _p11;
-		var _p12 = msg;
-		switch (_p12.ctor) {
-			case 'WizardMsg':
-				var newWizard = A2(_narkisr$elm_ui$Common_FormWizard$update, _p12._0, _p14);
-				return _narkisr$elm_ui$Common_Utils$none(
-					_elm_lang$core$Native_Utils.update(
-						_p13,
-						{wizard: newWizard}));
-			case 'FormMsg':
-				var newWizard = A2(
-					_narkisr$elm_ui$Common_FormWizard$update,
-					_narkisr$elm_ui$Common_FormWizard$FormMsg(_p12._0),
-					_p14);
-				return _narkisr$elm_ui$Common_Utils$none(
-					_elm_lang$core$Native_Utils.update(
-						_p13,
-						{wizard: newWizard}));
-			case 'SetEnvironments':
-				return A4(
-					_narkisr$elm_ui$Common_Errors$successHandler,
-					_p12._0,
-					_p13,
-					_narkisr$elm_ui$Types_Add$setEnvironment(_p13),
-					_narkisr$elm_ui$Types_Add$NoOp);
-			case 'SetClasses':
-				return _narkisr$elm_ui$Common_Utils$none(
-					_elm_lang$core$Native_Utils.update(
-						_p13,
-						{
-							classes: _narkisr$elm_ui$Types_Model$decodeClasses(_p12._0)
-						}));
-			case 'Save':
-				return {
-					ctor: '_Tuple2',
-					_0: _p13,
-					_1: A2(
-						_narkisr$elm_ui$Types_Persistency$persistType,
-						_p12._0,
-						_narkisr$elm_ui$Types_Add$merged(_p13))
-				};
-			case 'Saved':
-				return A3(_narkisr$elm_ui$Common_Errors$errorsHandler, _p12._0, _p13, _narkisr$elm_ui$Types_Add$NoOp);
-			default:
-				return _narkisr$elm_ui$Common_Utils$none(_p13);
-		}
-	});
 var _narkisr$elm_ui$Types_Add$Saved = function (a) {
 	return {ctor: 'Saved', _0: a};
 };
@@ -30468,6 +30458,9 @@ var _narkisr$elm_ui$Types_Add$Reset = {ctor: 'Reset'};
 var _narkisr$elm_ui$Types_Add$SetClasses = function (a) {
 	return {ctor: 'SetClasses', _0: a};
 };
+var _narkisr$elm_ui$Types_Add$LoadEditor = function (a) {
+	return {ctor: 'LoadEditor', _0: a};
+};
 var _narkisr$elm_ui$Types_Add$SetEnvironments = function (a) {
 	return {ctor: 'SetEnvironments', _0: a};
 };
@@ -30499,19 +30492,19 @@ var _narkisr$elm_ui$Types_Add$init = function () {
 var _narkisr$elm_ui$Types_Add$FormMsg = function (a) {
 	return {ctor: 'FormMsg', _0: a};
 };
-var _narkisr$elm_ui$Types_Add$currentView = function (_p15) {
-	var _p16 = _p15;
+var _narkisr$elm_ui$Types_Add$currentView = function (_p10) {
+	var _p11 = _p10;
 	var environmentList = A2(
 		_elm_lang$core$List$map,
 		function (e) {
 			return {ctor: '_Tuple2', _0: e, _1: e};
 		},
-		_p16.environments);
-	var _p17 = _p16.wizard.step;
-	if (_p17.ctor === 'Just') {
-		var _p19 = _p17._0;
-		var _p18 = _p17._0.value;
-		if (_p18.ctor === 'Main') {
+		_p11.environments);
+	var _p12 = _p11.wizard.step;
+	if (_p12.ctor === 'Just') {
+		var _p14 = _p12._0;
+		var _p13 = _p12._0.value;
+		if (_p13.ctor === 'Main') {
 			return A3(
 				_narkisr$elm_ui$Common_Components$dialogPanel,
 				'info',
@@ -30521,18 +30514,23 @@ var _narkisr$elm_ui$Types_Add$currentView = function (_p15) {
 						A2(
 							_elm_lang$html$Html_App$map,
 							_narkisr$elm_ui$Types_Add$FormMsg,
-							A2(_narkisr$elm_ui$Types_Add_Main$view, environmentList, _p19)))));
+							A2(_narkisr$elm_ui$Types_Add_Main$view, environmentList, _p14)))));
 		} else {
+			var puppet = A2(
+				_elm_lang$html$Html_App$map,
+				_narkisr$elm_ui$Types_Add$FormMsg,
+				_narkisr$elm_ui$Types_Add_Puppet$view(_p14));
+			var check = A2(
+				_narkisr$elm_ui$Common_Components$checkbox,
+				_narkisr$elm_ui$Types_Add$LoadEditor('typesAdd'),
+				_p11.editClasses);
 			return A3(
 				_narkisr$elm_ui$Common_Components$dialogPanel,
 				'info',
 				_narkisr$elm_ui$Common_Components$info('Module properties'),
 				_narkisr$elm_ui$Common_Components$panel(
 					_narkisr$elm_ui$Common_Components$fixedPanel(
-						A2(
-							_elm_lang$html$Html_App$map,
-							_narkisr$elm_ui$Types_Add$FormMsg,
-							_narkisr$elm_ui$Types_Add_Puppet$view(_p19)))));
+						A2(_narkisr$elm_ui$Types_Add$editor, check, puppet))));
 		}
 	} else {
 		return A3(
@@ -30543,25 +30541,129 @@ var _narkisr$elm_ui$Types_Add$currentView = function (_p15) {
 				_narkisr$elm_ui$Common_Components$fixedPanel(
 					A2(
 						_elm_lang$html$Html_App$map,
-						function (_p20) {
+						function (_p15) {
 							return _narkisr$elm_ui$Types_Add$NoOp;
 						},
 						_narkisr$elm_ui$Types_View$summarize(
-							_narkisr$elm_ui$Types_Add$merged(_p16))))));
+							_narkisr$elm_ui$Types_Add$merged(_p11))))));
 	}
 };
 var _narkisr$elm_ui$Types_Add$WizardMsg = function (a) {
 	return {ctor: 'WizardMsg', _0: a};
 };
+var _narkisr$elm_ui$Types_Add$update = F2(
+	function (msg, _p16) {
+		var _p17 = _p16;
+		var _p23 = _p17.wizard;
+		var _p22 = _p17;
+		var _p18 = msg;
+		switch (_p18.ctor) {
+			case 'Next':
+				var _p19 = A2(
+					_narkisr$elm_ui$Types_Add$update,
+					_narkisr$elm_ui$Types_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Next),
+					_p22);
+				var next = _p19._0;
+				var msgs = _p19._1;
+				return {
+					ctor: '_Tuple2',
+					_0: next,
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						_elm_lang$core$Native_List.fromArray(
+							[msgs, _narkisr$elm_ui$Common_Editor$unloadEditor]))
+				};
+			case 'Back':
+				var _p20 = A2(
+					_narkisr$elm_ui$Types_Add$update,
+					_narkisr$elm_ui$Types_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Back),
+					_p22);
+				var back = _p20._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						back,
+						{editClasses: false}),
+					_1: _narkisr$elm_ui$Common_Editor$unloadEditor
+				};
+			case 'Reset':
+				var _p21 = A2(
+					_narkisr$elm_ui$Types_Add$update,
+					_narkisr$elm_ui$Types_Add$WizardMsg(_narkisr$elm_ui$Common_FormWizard$Back),
+					_p22);
+				var back = _p21._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						back,
+						{editClasses: false, saveErrors: _narkisr$elm_ui$Common_Errors$init}),
+					_1: _narkisr$elm_ui$Common_Editor$unloadEditor
+				};
+			case 'WizardMsg':
+				var newWizard = A2(_narkisr$elm_ui$Common_FormWizard$update, _p18._0, _p23);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p22,
+						{wizard: newWizard}));
+			case 'FormMsg':
+				var newWizard = A2(
+					_narkisr$elm_ui$Common_FormWizard$update,
+					_narkisr$elm_ui$Common_FormWizard$FormMsg(_p18._0),
+					_p23);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p22,
+						{wizard: newWizard}));
+			case 'SetEnvironments':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p18._0,
+					_p22,
+					_narkisr$elm_ui$Types_Add$setEnvironment(_p22),
+					_narkisr$elm_ui$Types_Add$NoOp);
+			case 'LoadEditor':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p22,
+						{
+							editClasses: _elm_lang$core$Basics$not(_p17.editClasses)
+						}),
+					_1: A2(
+						_narkisr$elm_ui$Common_Editor$loadEditor,
+						_p18._0,
+						_narkisr$elm_ui$Types_Persistency$encodeClasses(_p17.classes))
+				};
+			case 'SetClasses':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p22,
+						{
+							classes: _narkisr$elm_ui$Types_Model$decodeClasses(_p18._0)
+						}));
+			case 'Save':
+				return {
+					ctor: '_Tuple2',
+					_0: _p22,
+					_1: A2(
+						_narkisr$elm_ui$Types_Persistency$persistType,
+						_p18._0,
+						_narkisr$elm_ui$Types_Add$merged(_p22))
+				};
+			case 'Saved':
+				return A3(_narkisr$elm_ui$Common_Errors$errorsHandler, _p18._0, _p22, _narkisr$elm_ui$Types_Add$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p22);
+		}
+	});
 var _narkisr$elm_ui$Types_Add$ErrorsView = function (a) {
 	return {ctor: 'ErrorsView', _0: a};
 };
-var _narkisr$elm_ui$Types_Add$errorsView = function (_p21) {
-	var _p22 = _p21;
+var _narkisr$elm_ui$Types_Add$errorsView = function (_p24) {
+	var _p25 = _p24;
 	var body = A2(
 		_elm_lang$html$Html_App$map,
 		_narkisr$elm_ui$Types_Add$ErrorsView,
-		_narkisr$elm_ui$Common_Errors$view(_p22.saveErrors));
+		_narkisr$elm_ui$Common_Errors$view(_p25.saveErrors));
 	return A3(
 		_narkisr$elm_ui$Common_Components$dialogPanel,
 		'danger',
@@ -30569,22 +30671,22 @@ var _narkisr$elm_ui$Types_Add$errorsView = function (_p21) {
 		_narkisr$elm_ui$Common_Components$panel(
 			_narkisr$elm_ui$Common_Components$panelContents(body)));
 };
-var _narkisr$elm_ui$Types_Add$view = function (_p23) {
-	var _p24 = _p23;
-	var _p25 = _p24;
+var _narkisr$elm_ui$Types_Add$view = function (_p26) {
+	var _p27 = _p26;
+	var _p28 = _p27;
 	var buttons$ = _narkisr$elm_ui$Common_Components$buttons(
 		_elm_lang$core$Native_Utils.update(
-			_p25,
+			_p28,
 			{
-				hasNext: _narkisr$elm_ui$Common_FormWizard$notDone(_p25)
+				hasNext: _narkisr$elm_ui$Common_FormWizard$notDone(_p28)
 			}));
-	return _narkisr$elm_ui$Common_Errors$hasErrors(_p24.saveErrors) ? A2(
+	return _narkisr$elm_ui$Common_Errors$hasErrors(_p27.saveErrors) ? A2(
 		_narkisr$elm_ui$Types_Add$rows,
 		A2(
 			_elm_lang$html$Html$div,
 			_elm_lang$core$Native_List.fromArray(
 				[]),
-			_narkisr$elm_ui$Types_Add$errorsView(_p25)),
+			_narkisr$elm_ui$Types_Add$errorsView(_p28)),
 		A3(buttons$, _narkisr$elm_ui$Types_Add$Done, _narkisr$elm_ui$Types_Add$Reset, _narkisr$elm_ui$Types_Add$doneButton)) : A2(
 		_narkisr$elm_ui$Types_Add$rows,
 		A2(
@@ -30593,7 +30695,7 @@ var _narkisr$elm_ui$Types_Add$view = function (_p23) {
 				[
 					_elm_lang$html$Html_Attributes$class('col-md-offset-2 col-md-8')
 				]),
-			_narkisr$elm_ui$Types_Add$currentView(_p25)),
+			_narkisr$elm_ui$Types_Add$currentView(_p28)),
 		A3(buttons$, _narkisr$elm_ui$Types_Add$Next, _narkisr$elm_ui$Types_Add$Back, _narkisr$elm_ui$Types_Add$saveButton));
 };
 
@@ -33970,26 +34072,6 @@ var _narkisr$elm_ui$Nav_Core$sideView = function (_p13) {
 		_narkisr$elm_ui$Nav_Side$view(_p14.side));
 };
 
-var _narkisr$elm_ui$Common_Editor$editorInPort = _elm_lang$core$Native_Platform.incomingPort(
-	'editorInPort',
-	A3(
-		_elm_lang$core$Json_Decode$tuple2,
-		F2(
-			function (x1, x2) {
-				return {ctor: '_Tuple2', _0: x1, _1: x2};
-			}),
-		_elm_lang$core$Json_Decode$string,
-		_elm_lang$core$Json_Decode$string));
-var _narkisr$elm_ui$Common_Editor$editorOutPort = _elm_lang$core$Native_Platform.outgoingPort(
-	'editorOutPort',
-	function (v) {
-		return [v._0, v._1];
-	});
-var _narkisr$elm_ui$Common_Editor$Load = function (a) {
-	return {ctor: 'Load', _0: a};
-};
-var _narkisr$elm_ui$Common_Editor$NoOp = {ctor: 'NoOp'};
-
 var _sporto$hop$Hop_Location$queryKVtoTuple = function (kv) {
 	var splitted = A2(_elm_lang$core$String$split, '=', kv);
 	var first = A2(
@@ -34652,6 +34734,33 @@ var _narkisr$elm_ui$Application$ApplyRoute = function (a) {
 	return {ctor: 'ApplyRoute', _0: a};
 };
 
+var _narkisr$elm_ui$Common_EditSub$editorValue = function (p) {
+	var _p0 = p;
+	if (((_p0.ctor === 'EditMsg') && (_p0._0.ctor === 'Load')) && (_p0._0._0.ctor === '_Tuple2')) {
+		var _p2 = _p0._0._0._1;
+		var _p1 = _p0._0._0._0;
+		switch (_p1) {
+			case 'templates':
+				return _narkisr$elm_ui$Application$TemplatesMsg(
+					_narkisr$elm_ui$Templates_Core$TemplatesAdd(
+						_narkisr$elm_ui$Templates_Add$SetDefaults(_p2)));
+			case 'typesAdd':
+				return _narkisr$elm_ui$Application$TypesMsg(
+					_narkisr$elm_ui$Types_Core$Adding(
+						_narkisr$elm_ui$Types_Add$SetClasses(_p2)));
+			case 'typesEdit':
+				return _narkisr$elm_ui$Application$TypesMsg(
+					_narkisr$elm_ui$Types_Core$Editing(
+						_narkisr$elm_ui$Types_Edit$AddMsg(
+							_narkisr$elm_ui$Types_Add$SetClasses(_p2))));
+			default:
+				return _narkisr$elm_ui$Application$NoOp;
+		}
+	} else {
+		return _narkisr$elm_ui$Application$NoOp;
+	}
+};
+
 var _narkisr$elm_ui$Common_Menu$intoMsg = function (msg) {
 	var _p0 = msg;
 	if ((_p0.ctor === 'MenuMsg') && (_p0._0.ctor === '_Tuple3')) {
@@ -34698,11 +34807,14 @@ var _narkisr$elm_ui$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		_elm_lang$core$Native_List.fromArray(
 			[
+				A2(
+				_elm_lang$core$Platform_Sub$map,
+				_narkisr$elm_ui$Common_EditSub$editorValue,
 				_narkisr$elm_ui$Common_Editor$editorInPort(
-				function (_p0) {
-					return _narkisr$elm_ui$Application$EditMsg(
-						_narkisr$elm_ui$Common_Editor$Load(_p0));
-				}),
+					function (_p0) {
+						return _narkisr$elm_ui$Application$EditMsg(
+							_narkisr$elm_ui$Common_Editor$Load(_p0));
+					})),
 				A2(
 				_elm_lang$core$Platform_Sub$map,
 				function (v) {

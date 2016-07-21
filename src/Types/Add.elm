@@ -23,6 +23,7 @@ import Task exposing (Task)
 import Types.Persistency exposing (persistType, encodeClasses)
 import Types.View exposing (summarize)
 import Common.Model exposing (Options)
+import Common.Editor exposing (unloadEditor, loadEditor)
 
 import Types.Model exposing (Type, emptyType, emptyPuppet)
 import Types.Add.Common as TypeCommon
@@ -75,6 +76,7 @@ type Msg =
     | WizardMsg Wizard.Msg
     | FormMsg Form.Msg
     | SetEnvironments (Result Http.Error Environments)
+    | LoadEditor String
     | SetClasses String
     | Reset
     | Done
@@ -114,24 +116,24 @@ merged {wizard, classes} =
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({wizard, editClasses, classes} as model) =
   case msg of
-    -- Next ->
-    --   let
-    --    (next, msgs) = update (WizardMsg Wizard.Next) model
-    --   in
-    --    (next, Cmd.batch [msgs , unloadEditor NoOp])
-    --
-    -- Back ->
-    --   let
-    --     (back, _) = (update (WizardMsg Wizard.Back) model)
-    --   in
-    --    ({ back | editClasses = False}, unloadEditor NoOp)
-    --
-    -- Reset ->
-    --   let
-    --     (back,_) = (update (WizardMsg Wizard.Back) model)
-    --   in
-    --    ({ back | editClasses = False, saveErrors = Errors.init }, unloadEditor NoOp)
-    --
+    Next ->
+      let
+       (next, msgs) = update (WizardMsg Wizard.Next) model
+      in
+       (next, Cmd.batch [msgs , unloadEditor])
+
+    Back ->
+      let
+         (back, _) = (update (WizardMsg Wizard.Back) model)
+      in
+        ({ back | editClasses = False}, unloadEditor)
+
+    Reset ->
+      let
+        (back,_) = (update (WizardMsg Wizard.Back) model)
+      in
+       ({ back | editClasses = False, saveErrors = Errors.init }, unloadEditor)
+
 
     WizardMsg wizardMsg ->
       let
@@ -148,9 +150,9 @@ update msg ({wizard, editClasses, classes} as model) =
     SetEnvironments result ->
        (successHandler result model (setEnvironment model) NoOp)
 
-    -- LoadEditor dest ->
-    --   ({ model | editClasses = not editClasses}, loadEditor dest NoOp (encodeClasses classes))
-    --
+    LoadEditor dest ->
+       ({ model | editClasses = not editClasses}, loadEditor dest (encodeClasses classes))
+
     SetClasses json ->
         none { model | classes = decodeClasses json }
 
@@ -162,6 +164,18 @@ update msg ({wizard, editClasses, classes} as model) =
 
     _ ->
       (none model)
+
+
+editor check puppet =
+  div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
+        puppet
+      , group' "Edit classes" check
+      , div [
+          id "jsoneditor"
+        , style [("width", "50%"), ("height", "400px"), ("margin-left", "25%")]
+        ] []
+       ]
+
 
 currentView : Model -> List (Html Msg)
 currentView ({wizard, environments, editClasses, classes} as model) =
@@ -176,8 +190,12 @@ currentView ({wizard, environments, editClasses, classes} as model) =
             (panel (fixedPanel (App.map FormMsg (Main.view environmentList current))))
 
           Puppet ->
-             dialogPanel "info" (info "Module properties")
-               (panel (fixedPanel (App.map FormMsg (Puppet.view current))))
+            let
+              check = (checkbox (LoadEditor "typesAdd") editClasses)
+              puppet = (App.map FormMsg (Puppet.view current))
+            in
+              dialogPanel "info" (info "Module properties")
+                (panel (fixedPanel (editor check puppet)))
 
       Nothing ->
         dialogPanel "info" (info "Save new type")

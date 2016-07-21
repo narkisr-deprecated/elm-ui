@@ -20,6 +20,7 @@ import Jobs.Core as Jobs
 
 -- Common
 import Common.Menu exposing (menuPort, intoMsg)
+import Common.EditSub exposing (editorValue)
 import Common.Editor exposing (editorOutPort, editorInPort, Msg(Load))
 
 -- Navigation
@@ -40,8 +41,8 @@ main =
 subscriptions : Model -> Sub App.Msg
 subscriptions model =
     Sub.batch [
-        editorInPort (EditMsg << Load)
-     ,  Sub.map (\v -> (intoMsg v)) (menuPort MenuMsg)
+       Sub.map editorValue (editorInPort (EditMsg << Load))
+     , Sub.map (\v -> (intoMsg v)) (menuPort MenuMsg)
      , Time.every second (\_ -> (App.JobsMsg (Jobs.JobsListing Polling)))
      ]
 
