@@ -33988,12 +33988,9 @@ var _narkisr$elm_ui$Nav_Core$setSession = F2(
 			_p1.side);
 		var newSide = _p3._0;
 		return _narkisr$elm_ui$Common_Utils$none(
-			A2(
-				_elm_lang$core$Debug$log,
-				'',
-				_elm_lang$core$Native_Utils.update(
-					_p1,
-					{side: newSide, header: newHeader})));
+			_elm_lang$core$Native_Utils.update(
+				_p1,
+				{side: newSide, header: newHeader}));
 	});
 var _narkisr$elm_ui$Nav_Core$Model = F4(
 	function (a, b, c, d) {

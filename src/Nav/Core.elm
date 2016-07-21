@@ -39,7 +39,7 @@ setSession ({side, header} as model) session =
     (newSide, _) = Side.update (Side.SetSession session) side
     (newHeader, _) = Header.update (Header.SetSession session) header
   in
-    none  (Debug.log "" { model | side = newSide, header = newHeader })
+    none { model | side = newSide, header = newHeader }
 
 update : Msg ->  Model -> (Model , Cmd Msg)
 update msg ({side, header} as model) =
