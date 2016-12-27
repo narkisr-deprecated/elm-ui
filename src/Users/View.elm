@@ -1,12 +1,10 @@
 module Users.View exposing (..)
 
-
 import Html exposing (..)
 import Users.Model as Model exposing (User, emptyUser)
 import Common.Model exposing (valueOf)
 import Common.Utils exposing (partition, withDefaultProp)
-import Bootstrap.Html exposing (..)
-import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type', style)
+import Html.Attributes exposing (class, id, for, rows, placeholder, attribute, type_, style)
 import Common.Summary exposing (..)
 import Common.Components exposing (asList)
 import Maybe exposing (withDefault)
@@ -20,51 +18,60 @@ import String
 import Common.Utils exposing (none)
 import Basics.Extra exposing (never)
 
-type alias Model =
-  {
-   user : User
-  }
 
-init : (Model , Cmd Msg)
+type alias Model =
+    { user : User
+    }
+
+
+init : ( Model, Cmd Msg )
 init =
-  none (Model emptyUser)
+    none (Model emptyUser)
+
+
 
 -- Update
 
-type Msg =
-  ViewUser String
+
+type Msg
+    = ViewUser String
     | SetUser (Result Http.Error User)
     | NoOp
 
-setUser: Model -> User -> (Model , Cmd Msg)
+
+setUser : Model -> User -> ( Model, Cmd Msg )
 setUser model user =
-  none {model | user = user}
+    none { model | user = user }
 
 
-update : Msg ->  Model -> (Model , Cmd Msg)
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  case msg of
-   ViewUser id ->
-     (model, getUser id SetUser)
+    case msg of
+        ViewUser id ->
+            ( model, getUser id SetUser )
 
-   SetUser result ->
-      successHandler result model (setUser model) NoOp
+        SetUser result ->
+            successHandler result model (setUser model) NoOp
 
-   NoOp ->
-     none model
+        NoOp ->
+            none model
+
+
 
 -- View
 
-summarize: User -> Html Msg
+
+summarize : User -> Html Msg
 summarize model =
-   div [style [("line-height", "1.8"), ("list-style-type","none")]] []
+    div [ style [ ( "line-height", "1.8" ), ( "list-style-type", "none" ) ] ] []
+
 
 view : Model -> List (Html Msg)
-view {user} =
-  asList (div [] [h4 [] [(text "User")], (summarize user)])
+view { user } =
+    asList (div [] [ h4 [] [ (text "User") ], (summarize user) ])
+
 
 getUser name msg =
-  getJson Model.user ("/users/" ++ name)
-    |> Task.toResult
-    |> Task.perform never msg
-
+    getJson Model.user ("/users/" ++ name)
+        |> Task.toResult
+        |> Task.perform never msg

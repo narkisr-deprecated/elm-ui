@@ -1,8 +1,11 @@
 module Now exposing (..)
 
 
-type Foo =
-  None
+type Foo
+    = None
+
+
+
 -- import Native.Now
 --
 -- loadTime : Float

@@ -3,75 +3,90 @@ module Jobs.Stats exposing (..)
 import Users.Session exposing (getSession, Session)
 import Common.Utils exposing (none)
 
+
 -- model
-import Time exposing (Time,second)
+
+import Time exposing (Time, second)
 import Maybe exposing (withDefault)
 import Date.Format exposing (format)
 import Common.Errors exposing (successHandler)
 import Common.Http exposing (getJson)
 import Date
+
+
 -- import Now
+
 import String
+
 
 -- charting
 -- import Chartjs.Line as Line exposing (..)
+
 import Color exposing (..)
 
+
 -- view
+
 import Element exposing (toHtml)
 import Html exposing (..)
 import Basics.Extra exposing (never)
-import Html.Attributes exposing (type', class, id, style, attribute, href)
-import Bootstrap.Html exposing (..)
+import Html.Attributes exposing (type_, class, id, style, attribute, href)
+
 
 -- remoting
+
 import Json.Decode as Json exposing (..)
 import Task
 import Platform.Cmd exposing (map, batch)
 import Http exposing (Error(BadResponse))
 import Debug
-
 import Common.Redirect exposing (redirect)
 import Common.Utils exposing (partition)
 
+
 type alias Timer =
-  {
-    max : Float
-  , min : Float
-  , mean : Float
-  }
+    { max : Float
+    , min : Float
+    , mean : Float
+    }
+
 
 type alias Metrics =
-  {
-    startTimer : Timer
-  , stopTimer : Timer
-  , provisionTimer : Timer
-  , reloadTimer : Timer
-  }
+    { startTimer : Timer
+    , stopTimer : Timer
+    , provisionTimer : Timer
+    , reloadTimer : Timer
+    }
+
 
 type alias Model =
-  {
-    polls : List (Time, Metrics)
-  -- , charts : List (String,Config)
-  , charts : List (String)
-  -- , lastPoll : Time
-  , interval : Float
-  , enabled : Bool
-  }
+    { polls :
+        List ( Time, Metrics )
+        -- , charts : List (String,Config)
+    , charts :
+        List String
+        -- , lastPoll : Time
+    , interval : Float
+    , enabled : Bool
+    }
 
-type Msg =
-  PollMetrics Time
+
+type Msg
+    = PollMetrics Time
     | Load (Result Http.Error Metrics)
     | LoadSession (Result Http.Error Session)
     | NoOp
 
+
 emptyTimer : Timer
 emptyTimer =
-  {min = 0, max = 0, mean = 0}
+    { min = 0, max = 0, mean = 0 }
 
-init : (Model , Cmd Msg)
+
+init : ( Model, Cmd Msg )
 init =
-   (Model [] [] 15 False, getSession LoadSession)
+    ( Model [] [] 15 False, getSession LoadSession )
+
 
 
 -- init : (Model , Cmd Msg)
@@ -79,11 +94,9 @@ init =
 --    (Model [] [] Now.loadTime 15 False, getSession LoadSession)
 --
 -- Update
-
 -- timerConfig : List String -> List (List Float) -> List String -> List (Float -> Color)-> Config
 -- timerConfig xs ysList titles styles =
 --  (xs , List.map3 (\ys title style -> (title , defStyle style, ys)) ysList titles styles)
-
 -- timerChart : List (Time, Timer) -> List (Timer -> Float) -> List String -> List (Float -> Color) -> Config
 -- timerChart timers selectors titles styles=
 --   let
@@ -207,7 +220,6 @@ init =
 --     (at ["default.default.reload-time"] timer )
 --
 -- Effects
-
 -- getMetrics : Cmd Msg
 -- getMetrics =
 --   getJson metricsDecoder "/metrics"

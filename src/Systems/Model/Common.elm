@@ -8,41 +8,46 @@ import Systems.Model.Physical exposing (Physical)
 import Systems.Model.KVM exposing (KVM)
 import Dict exposing (Dict)
 
+
 type alias Machine =
-  { user : String
-  , hostname : String
-  , domain : String
-  , ip : Maybe String
-  , os : String
-  , ram : Maybe Int
-  , cpu : Maybe Int
-  }
+    { user : String
+    , hostname : String
+    , domain : String
+    , ip : Maybe String
+    , os : String
+    , ram : Maybe Int
+    , cpu : Maybe Int
+    }
+
 
 type alias System =
-  { owner : String
-  , env : String
-  , type' : String
-  , machine: Machine
-  , aws : Maybe AWS
-  , gce : Maybe GCE
-  , digital : Maybe Digital
-  , openstack : Maybe Openstack
-  , physical : Maybe Physical
-  , kvm : Maybe KVM
-  }
+    { owner : String
+    , env : String
+    , type_ : String
+    , machine : Machine
+    , aws : Maybe AWS
+    , gce : Maybe GCE
+    , digital : Maybe Digital
+    , openstack : Maybe Openstack
+    , physical : Maybe Physical
+    , kvm : Maybe KVM
+    }
+
 
 emptyMachine : Machine
 emptyMachine =
-  Machine "" "" "" Nothing "" Nothing Nothing
+    Machine "" "" "" Nothing "" Nothing Nothing
+
 
 resourcedMachine : Int -> Int -> Machine
 resourcedMachine cpu ram =
-  Machine "" "" "" (Just "") "" (Just ram) (Just cpu)
+    Machine "" "" "" (Just "") "" (Just ram) (Just cpu)
 
 
 emptySystem : System
 emptySystem =
-  let
-   base = System "" "" ""
-  in
-   base emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing
+    let
+        base =
+            System "" "" ""
+    in
+        base emptyMachine Nothing Nothing Nothing Nothing Nothing Nothing

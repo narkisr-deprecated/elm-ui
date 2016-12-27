@@ -6,68 +6,81 @@ import Nav.Side as Side exposing (Msg(SetSession))
 import Users.Session exposing (getSession, Session)
 import Http exposing (Error(BadResponse))
 import Common.Errors exposing (successHandler)
-
 import Html exposing (..)
-import Html.App as App
+import Html
 import Common.Utils exposing (none)
 
-type alias Model =
-  {
-    side : Side.Model
-  , header : Header.Model
-  , active : Active
-  , section : Section
-  }
 
-init : (Model , Cmd Msg)
+type alias Model =
+    { side : Side.Model
+    , header : Header.Model
+    , active : Active
+    , section : Section
+    }
+
+
+init : ( Model, Cmd Msg )
 init =
-  let
-    (header, _) = Header.init
-  in
-    (Model Side.init header Systems List , getSession LoadSession)
+    let
+        ( header, _ ) =
+            Header.init
+    in
+        ( Model Side.init header Systems List, getSession LoadSession )
+
+
 
 -- Update
 
-type Msg =
-  SideMsg Side.Msg
-   | HeaderMsg Header.Msg
-   | LoadSession (Result Http.Error Session)
-   | NoOp
 
-setSession ({side, header} as model) session =
-  let
-    (newSide, _) = Side.update (Side.SetSession session) side
-    (newHeader, _) = Header.update (Header.SetSession session) header
-  in
-    none { model | side = newSide, header = newHeader }
+type Msg
+    = SideMsg Side.Msg
+    | HeaderMsg Header.Msg
+    | LoadSession (Result Http.Error Session)
+    | NoOp
 
-update : Msg ->  Model -> (Model , Cmd Msg)
-update msg ({side, header} as model) =
-  case msg of
-    SideMsg navMsg ->
-       let
-         (newSide, _) = Side.update navMsg side
-       in
-         none { model | side = newSide }
 
-    HeaderMsg navMsg ->
-      let
-        (newHeader, msgs) = Header.update navMsg header
-      in
-       ({ model | header = newHeader}, Cmd.map HeaderMsg msgs)
+setSession ({ side, header } as model) session =
+    let
+        ( newSide, _ ) =
+            Side.update (Side.SetSession session) side
 
-    LoadSession result ->
-      (successHandler result model (setSession model) NoOp)
+        ( newHeader, _ ) =
+            Header.update (Header.SetSession session) header
+    in
+        none { model | side = newSide, header = newHeader }
 
-    _ ->
-      none model
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg ({ side, header } as model) =
+    case msg of
+        SideMsg navMsg ->
+            let
+                ( newSide, _ ) =
+                    Side.update navMsg side
+            in
+                none { model | side = newSide }
+
+        HeaderMsg navMsg ->
+            let
+                ( newHeader, msgs ) =
+                    Header.update navMsg header
+            in
+                ( { model | header = newHeader }, Cmd.map HeaderMsg msgs )
+
+        LoadSession result ->
+            (successHandler result model (setSession model) NoOp)
+
+        _ ->
+            none model
+
+
 
 -- View
 
-sideView {side} =
-  App.map SideMsg (Side.view side)
 
-headerView {header} =
-  App.map HeaderMsg (Header.view header)
+sideView { side } =
+    Html.map SideMsg (Side.view side)
 
 
+headerView { header } =
+    Html.map HeaderMsg (Header.view header)

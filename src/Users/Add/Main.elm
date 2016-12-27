@@ -1,8 +1,7 @@
 module Users.Add.Main exposing (..)
 
-
 import Html exposing (..)
-import Html.Attributes exposing (class, id, attribute, readonly, type')
+import Html.Attributes exposing (class, id, attribute, readonly, type_)
 import Common.FormComponents exposing (formControl, formGroup)
 import Maybe exposing (withDefault)
 import Form exposing (Form)
@@ -12,41 +11,49 @@ import Users.Model exposing (User, userBase)
 import Form.Field as Field exposing (Field)
 import Form.Infix exposing (..)
 
+
 type alias Model =
-  {
-    form : Form () User
-  }
+    { form : Form () User
+    }
+
 
 validate : Validation () User
 validate =
-  form3 userBase
-     ("username" := string)
-     ("password" := string)
-     ("role" := string)
+    form3 userBase
+        ("username" := string)
+        ("password" := string)
+        ("role" := string)
 
-defaults : String ->  List (String, Field)
+
+defaults : String -> List ( String, Field )
 defaults role =
-  [ ("role", Field.Text role) ]
+    [ ( "role", Field.Text role ) ]
+
 
 init role =
-  Model (Form.initial (defaults role) validate)
+    Model (Form.initial (defaults role) validate)
+
+
 
 -- View
 
-view roles ({form} as model) =
-  let
-    role = (Form.getFieldAsString "role" form)
-    name = (Form.getFieldAsString "username" form)
-    password = (Form.getFieldAsString "password" form)
-  in
-   (Html.form [] [
-      div [class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ] [
-        formControl "Name" Input.textInput name
-      , formControl "Password" Input.passwordInput password
-      , formControl "Roles"  (Input.selectInput roles) role
-      ]
-    ])
 
+view roles ({ form } as model) =
+    let
+        role =
+            (Form.getFieldAsString "role" form)
 
+        name =
+            (Form.getFieldAsString "username" form)
 
-
+        password =
+            (Form.getFieldAsString "password" form)
+    in
+        (Html.form []
+            [ div [ class "form-horizontal", attribute "onkeypress" "return event.keyCode != 13;" ]
+                [ formControl "Name" Input.textInput name
+                , formControl "Password" Input.passwordInput password
+                , formControl "Roles" (Input.selectInput roles) role
+                ]
+            ]
+        )

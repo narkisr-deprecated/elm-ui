@@ -1,5 +1,4 @@
-
 port module Common.NewTab exposing (..)
 
-port newtab : String -> Cmd msg
 
+port newtab : String -> Cmd msg

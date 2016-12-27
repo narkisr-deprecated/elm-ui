@@ -1,23 +1,22 @@
 module Nav.Common exposing (..)
 
-
 import Html exposing (..)
 
-type Active =
-  Systems
+
+type Active
+    = Systems
     | Types
     | Jobs
     | Templates
     | Stacks
     | Users
 
-type Section =
-  Add
+
+type Section
+    = Add
     | Launch
     | Delete
     | Edit
     | List
     | View
     | Stats
-
-
