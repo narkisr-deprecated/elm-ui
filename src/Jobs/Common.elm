@@ -12,10 +12,10 @@ type alias JobResponse =
 
 jobResponse : Decoder JobResponse
 jobResponse =
-    object3 JobResponse
-        ("message" := Json.string)
-        ("id" := Json.string)
-        ("job" := Json.string)
+    map3 JobResponse
+        ("message" field Json.string)
+        ("id" field Json.string)
+        ("job" field Json.string)
 
 
 runJob : String -> String -> (Result Error JobResponse -> a) -> Cmd a

@@ -13,19 +13,6 @@ import Common.Editor as Editor
 import Debug
 
 
--- Hop
-
-import Hop
-import Hop.Types exposing (Location, Query, newLocation)
-import Navigation exposing (modifyUrl)
-
-
--- Routing
-
-import Routing as BaseRoute exposing (config, Route(..), defaultRoute)
-import Systems.Routing exposing (Route(List))
-
-
 init : ( BaseRoute.Route, Location ) -> ( Model, Cmd Msg )
 init ( route, location ) =
     let
@@ -78,7 +65,6 @@ type alias Model =
 
 type Msg
     = ApplyRoute ( BaseRoute.Route, Location )
-    | HopMsg ()
     | MenuMsg ( String, String, String )
     | EditMsg Editor.Msg
     | NavigateTo String
@@ -146,17 +132,6 @@ route msg ({ route, types, users, jobs, systems, templates, stacks, nav } as mod
                     navigate (Systems.update msg systems) SystemsMsg
             in
                 ( { model | systems = newSystems }, msgs )
-
-        ApplyRoute ( route, location ) ->
-            case route of
-                NotFoundRoute ->
-                    ( model, Cmd.map HopMsg (modifyUrl "systems/list") )
-
-                _ ->
-                    none { model | route = route, location = location }
-
-        HopMsg () ->
-            none model
 
         _ ->
             none model

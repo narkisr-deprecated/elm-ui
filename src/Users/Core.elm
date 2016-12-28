@@ -2,15 +2,8 @@ module Users.Core exposing (..)
 
 import Html exposing (..)
 import Html
-import Users.List as List exposing (Msg)
-import Users.Add as Add exposing (Msg)
 import Common.Utils exposing (none)
 import Common.Components exposing (notImplemented, asList)
-
-
--- Routing
-
-import Users.Routing as Routing exposing (Route)
 
 
 type alias Model =
@@ -42,10 +35,7 @@ init =
 
 
 type Msg
-    = Listing List.Msg
-    | Adding Add.Msg
-    | MenuClick ( String, String )
-    | NoOp
+    = NoOp
 
 
 navigate : Msg -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )

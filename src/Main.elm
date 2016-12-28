@@ -8,13 +8,6 @@ import Html
 import Task
 import Application as App exposing (init, view, update, Msg(EditMsg, MenuMsg), Model, urlUpdate)
 import Json.Encode as E exposing (list, string)
-
-
--- Routing
-
-import Hop
-import Hop.Types exposing (Router)
-import Routing exposing (..)
 import Task exposing (Task)
 
 
@@ -28,7 +21,6 @@ import Jobs.Core as Jobs
 -- Common
 
 import Common.Menu exposing (menuPort, intoMsg)
-import Common.EditSub exposing (editorValue)
 import Common.Editor exposing (editorOutPort, editorInPort, Msg(Load))
 
 
@@ -52,8 +44,7 @@ main =
 subscriptions : Model -> Sub App.Msg
 subscriptions model =
     Sub.batch
-        [ Sub.map editorValue (editorInPort (EditMsg << Load))
-        , Sub.map (\v -> (intoMsg v)) (menuPort MenuMsg)
+        [ Sub.map (\v -> (intoMsg v)) (menuPort MenuMsg)
         , Time.every second (\_ -> (App.JobsMsg (Jobs.JobsListing Polling)))
         ]
 

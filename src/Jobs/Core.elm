@@ -2,7 +2,6 @@ module Jobs.Core exposing (..)
 
 import Html exposing (..)
 import Html
-import Jobs.Routing as Routing exposing (Route)
 import Common.Utils exposing (none)
 import Common.Components exposing (notImplemented)
 import Jobs.List as List exposing (Msg(Polling))
@@ -78,16 +77,6 @@ update msg ({ list, stats } as model) =
 -- View
 
 
-view : Model -> Route -> Html Msg
-view { list, stats } route =
-    case route of
-        Routing.List ->
-            Html.map JobsListing (List.view list)
-
-        _ ->
-            notImplemented
-
-
-
--- Routing.Stats ->
--- Html.map JobsStats (Stats.view stats)
+view : Model -> Html Msg
+view { list, stats } =
+    Html.map JobsListing (List.view list)
