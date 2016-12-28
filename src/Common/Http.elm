@@ -1,32 +1,34 @@
 module Common.Http exposing (..)
 
-import Task exposing (Task)
-import Http exposing (Error(BadResponse))
+import Http exposing (expectJson, header)
 import Json.Decode as Json exposing (..)
 
 
-httpJson : String -> Http.Body -> Decoder value -> String -> Task Http.Error value
-httpJson verb body decoder url =
+httpJson : String -> Http.Body -> Decoder value -> String -> (Result Http.Error value -> msg) -> Cmd msg
+httpJson method body decoder url msg =
     let
-        request =
-            { verb = verb
+        payload =
+            { method = method
             , headers =
-                [ ( "Content-Type", "application/json;charset=UTF-8" )
-                , ( "Accept", "application/json, text/plain, */*" )
+                [ header "Content-Type" "application/json;charset=UTF-8"
+                , header "Accept" "application/json, text/plain, */*"
                 ]
             , url = url
             , body = body
+            , expect = expectJson decoder
+            , timeout = Nothing
+            , withCredentials = False
             }
     in
-        Http.fromJson decoder (Http.send Http.defaultSettings request)
+        Http.send msg (Http.request payload)
 
 
 delete =
-    httpJson "DELETE" Http.empty
+    httpJson "DELETE" Http.emptyBody
 
 
 getJson =
-    httpJson "GET" Http.empty
+    httpJson "GET" Http.emptyBody
 
 
 postJson =
@@ -39,17 +41,4 @@ putJson =
 
 apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
 apply func value =
-    Json.object2 (<|) func value
-
-
-type alias SaveResponse =
-    { message : String
-    , id : Maybe Int
-    }
-
-
-saveResponse : Decoder SaveResponse
-saveResponse =
-    object2 SaveResponse
-        ("message" := string)
-        (maybe ("id" := int))
+    Json.map2 (<|) func value

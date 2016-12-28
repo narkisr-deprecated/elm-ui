@@ -4181,6 +4181,402 @@ var _elm_lang$core$Array$repeat = F2(
 	});
 var _elm_lang$core$Array$Array = {ctor: 'Array'};
 
+var _elm_lang$core$Color$fmod = F2(
+	function (f, n) {
+		var integer = _elm_lang$core$Basics$floor(f);
+		return (_elm_lang$core$Basics$toFloat(
+			A2(_elm_lang$core$Basics_ops['%'], integer, n)) + f) - _elm_lang$core$Basics$toFloat(integer);
+	});
+var _elm_lang$core$Color$rgbToHsl = F3(
+	function (red, green, blue) {
+		var b = _elm_lang$core$Basics$toFloat(blue) / 255;
+		var g = _elm_lang$core$Basics$toFloat(green) / 255;
+		var r = _elm_lang$core$Basics$toFloat(red) / 255;
+		var cMax = A2(
+			_elm_lang$core$Basics$max,
+			A2(_elm_lang$core$Basics$max, r, g),
+			b);
+		var cMin = A2(
+			_elm_lang$core$Basics$min,
+			A2(_elm_lang$core$Basics$min, r, g),
+			b);
+		var c = cMax - cMin;
+		var lightness = (cMax + cMin) / 2;
+		var saturation = _elm_lang$core$Native_Utils.eq(lightness, 0) ? 0 : (c / (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)));
+		var hue = _elm_lang$core$Basics$degrees(60) * (_elm_lang$core$Native_Utils.eq(cMax, r) ? A2(_elm_lang$core$Color$fmod, (g - b) / c, 6) : (_elm_lang$core$Native_Utils.eq(cMax, g) ? (((b - r) / c) + 2) : (((r - g) / c) + 4)));
+		return {ctor: '_Tuple3', _0: hue, _1: saturation, _2: lightness};
+	});
+var _elm_lang$core$Color$hslToRgb = F3(
+	function (hue, saturation, lightness) {
+		var normHue = hue / _elm_lang$core$Basics$degrees(60);
+		var chroma = (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)) * saturation;
+		var x = chroma * (1 - _elm_lang$core$Basics$abs(
+			A2(_elm_lang$core$Color$fmod, normHue, 2) - 1));
+		var _p0 = (_elm_lang$core$Native_Utils.cmp(normHue, 0) < 0) ? {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 1) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: x, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 2) < 0) ? {ctor: '_Tuple3', _0: x, _1: chroma, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 3) < 0) ? {ctor: '_Tuple3', _0: 0, _1: chroma, _2: x} : ((_elm_lang$core$Native_Utils.cmp(normHue, 4) < 0) ? {ctor: '_Tuple3', _0: 0, _1: x, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(normHue, 5) < 0) ? {ctor: '_Tuple3', _0: x, _1: 0, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(normHue, 6) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: 0, _2: x} : {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0}))))));
+		var r = _p0._0;
+		var g = _p0._1;
+		var b = _p0._2;
+		var m = lightness - (chroma / 2);
+		return {ctor: '_Tuple3', _0: r + m, _1: g + m, _2: b + m};
+	});
+var _elm_lang$core$Color$toRgb = function (color) {
+	var _p1 = color;
+	if (_p1.ctor === 'RGBA') {
+		return {red: _p1._0, green: _p1._1, blue: _p1._2, alpha: _p1._3};
+	} else {
+		var _p2 = A3(_elm_lang$core$Color$hslToRgb, _p1._0, _p1._1, _p1._2);
+		var r = _p2._0;
+		var g = _p2._1;
+		var b = _p2._2;
+		return {
+			red: _elm_lang$core$Basics$round(255 * r),
+			green: _elm_lang$core$Basics$round(255 * g),
+			blue: _elm_lang$core$Basics$round(255 * b),
+			alpha: _p1._3
+		};
+	}
+};
+var _elm_lang$core$Color$toHsl = function (color) {
+	var _p3 = color;
+	if (_p3.ctor === 'HSLA') {
+		return {hue: _p3._0, saturation: _p3._1, lightness: _p3._2, alpha: _p3._3};
+	} else {
+		var _p4 = A3(_elm_lang$core$Color$rgbToHsl, _p3._0, _p3._1, _p3._2);
+		var h = _p4._0;
+		var s = _p4._1;
+		var l = _p4._2;
+		return {hue: h, saturation: s, lightness: l, alpha: _p3._3};
+	}
+};
+var _elm_lang$core$Color$HSLA = F4(
+	function (a, b, c, d) {
+		return {ctor: 'HSLA', _0: a, _1: b, _2: c, _3: d};
+	});
+var _elm_lang$core$Color$hsla = F4(
+	function (hue, saturation, lightness, alpha) {
+		return A4(
+			_elm_lang$core$Color$HSLA,
+			hue - _elm_lang$core$Basics$turns(
+				_elm_lang$core$Basics$toFloat(
+					_elm_lang$core$Basics$floor(hue / (2 * _elm_lang$core$Basics$pi)))),
+			saturation,
+			lightness,
+			alpha);
+	});
+var _elm_lang$core$Color$hsl = F3(
+	function (hue, saturation, lightness) {
+		return A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, 1);
+	});
+var _elm_lang$core$Color$complement = function (color) {
+	var _p5 = color;
+	if (_p5.ctor === 'HSLA') {
+		return A4(
+			_elm_lang$core$Color$hsla,
+			_p5._0 + _elm_lang$core$Basics$degrees(180),
+			_p5._1,
+			_p5._2,
+			_p5._3);
+	} else {
+		var _p6 = A3(_elm_lang$core$Color$rgbToHsl, _p5._0, _p5._1, _p5._2);
+		var h = _p6._0;
+		var s = _p6._1;
+		var l = _p6._2;
+		return A4(
+			_elm_lang$core$Color$hsla,
+			h + _elm_lang$core$Basics$degrees(180),
+			s,
+			l,
+			_p5._3);
+	}
+};
+var _elm_lang$core$Color$grayscale = function (p) {
+	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
+};
+var _elm_lang$core$Color$greyscale = function (p) {
+	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
+};
+var _elm_lang$core$Color$RGBA = F4(
+	function (a, b, c, d) {
+		return {ctor: 'RGBA', _0: a, _1: b, _2: c, _3: d};
+	});
+var _elm_lang$core$Color$rgba = _elm_lang$core$Color$RGBA;
+var _elm_lang$core$Color$rgb = F3(
+	function (r, g, b) {
+		return A4(_elm_lang$core$Color$RGBA, r, g, b, 1);
+	});
+var _elm_lang$core$Color$lightRed = A4(_elm_lang$core$Color$RGBA, 239, 41, 41, 1);
+var _elm_lang$core$Color$red = A4(_elm_lang$core$Color$RGBA, 204, 0, 0, 1);
+var _elm_lang$core$Color$darkRed = A4(_elm_lang$core$Color$RGBA, 164, 0, 0, 1);
+var _elm_lang$core$Color$lightOrange = A4(_elm_lang$core$Color$RGBA, 252, 175, 62, 1);
+var _elm_lang$core$Color$orange = A4(_elm_lang$core$Color$RGBA, 245, 121, 0, 1);
+var _elm_lang$core$Color$darkOrange = A4(_elm_lang$core$Color$RGBA, 206, 92, 0, 1);
+var _elm_lang$core$Color$lightYellow = A4(_elm_lang$core$Color$RGBA, 255, 233, 79, 1);
+var _elm_lang$core$Color$yellow = A4(_elm_lang$core$Color$RGBA, 237, 212, 0, 1);
+var _elm_lang$core$Color$darkYellow = A4(_elm_lang$core$Color$RGBA, 196, 160, 0, 1);
+var _elm_lang$core$Color$lightGreen = A4(_elm_lang$core$Color$RGBA, 138, 226, 52, 1);
+var _elm_lang$core$Color$green = A4(_elm_lang$core$Color$RGBA, 115, 210, 22, 1);
+var _elm_lang$core$Color$darkGreen = A4(_elm_lang$core$Color$RGBA, 78, 154, 6, 1);
+var _elm_lang$core$Color$lightBlue = A4(_elm_lang$core$Color$RGBA, 114, 159, 207, 1);
+var _elm_lang$core$Color$blue = A4(_elm_lang$core$Color$RGBA, 52, 101, 164, 1);
+var _elm_lang$core$Color$darkBlue = A4(_elm_lang$core$Color$RGBA, 32, 74, 135, 1);
+var _elm_lang$core$Color$lightPurple = A4(_elm_lang$core$Color$RGBA, 173, 127, 168, 1);
+var _elm_lang$core$Color$purple = A4(_elm_lang$core$Color$RGBA, 117, 80, 123, 1);
+var _elm_lang$core$Color$darkPurple = A4(_elm_lang$core$Color$RGBA, 92, 53, 102, 1);
+var _elm_lang$core$Color$lightBrown = A4(_elm_lang$core$Color$RGBA, 233, 185, 110, 1);
+var _elm_lang$core$Color$brown = A4(_elm_lang$core$Color$RGBA, 193, 125, 17, 1);
+var _elm_lang$core$Color$darkBrown = A4(_elm_lang$core$Color$RGBA, 143, 89, 2, 1);
+var _elm_lang$core$Color$black = A4(_elm_lang$core$Color$RGBA, 0, 0, 0, 1);
+var _elm_lang$core$Color$white = A4(_elm_lang$core$Color$RGBA, 255, 255, 255, 1);
+var _elm_lang$core$Color$lightGrey = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
+var _elm_lang$core$Color$grey = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
+var _elm_lang$core$Color$darkGrey = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
+var _elm_lang$core$Color$lightGray = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
+var _elm_lang$core$Color$gray = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
+var _elm_lang$core$Color$darkGray = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
+var _elm_lang$core$Color$lightCharcoal = A4(_elm_lang$core$Color$RGBA, 136, 138, 133, 1);
+var _elm_lang$core$Color$charcoal = A4(_elm_lang$core$Color$RGBA, 85, 87, 83, 1);
+var _elm_lang$core$Color$darkCharcoal = A4(_elm_lang$core$Color$RGBA, 46, 52, 54, 1);
+var _elm_lang$core$Color$Radial = F5(
+	function (a, b, c, d, e) {
+		return {ctor: 'Radial', _0: a, _1: b, _2: c, _3: d, _4: e};
+	});
+var _elm_lang$core$Color$radial = _elm_lang$core$Color$Radial;
+var _elm_lang$core$Color$Linear = F3(
+	function (a, b, c) {
+		return {ctor: 'Linear', _0: a, _1: b, _2: c};
+	});
+var _elm_lang$core$Color$linear = _elm_lang$core$Color$Linear;
+
+//import Result //
+
+var _elm_lang$core$Native_Date = function() {
+
+function fromString(str)
+{
+	var date = new Date(str);
+	return isNaN(date.getTime())
+		? _elm_lang$core$Result$Err('Unable to parse \'' + str + '\' as a date. Dates must be in the ISO 8601 format.')
+		: _elm_lang$core$Result$Ok(date);
+}
+
+var dayTable = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+var monthTable =
+	['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+	 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+
+return {
+	fromString: fromString,
+	year: function(d) { return d.getFullYear(); },
+	month: function(d) { return { ctor: monthTable[d.getMonth()] }; },
+	day: function(d) { return d.getDate(); },
+	hour: function(d) { return d.getHours(); },
+	minute: function(d) { return d.getMinutes(); },
+	second: function(d) { return d.getSeconds(); },
+	millisecond: function(d) { return d.getMilliseconds(); },
+	toTime: function(d) { return d.getTime(); },
+	fromTime: function(t) { return new Date(t); },
+	dayOfWeek: function(d) { return { ctor: dayTable[d.getDay()] }; }
+};
+
+}();
+var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
+var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
+var _elm_lang$core$Task$spawnCmd = F2(
+	function (router, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_Scheduler.spawn(
+			A2(
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Platform$sendToApp(router),
+				_p1._0));
+	});
+var _elm_lang$core$Task$fail = _elm_lang$core$Native_Scheduler.fail;
+var _elm_lang$core$Task$mapError = F2(
+	function (convert, task) {
+		return A2(
+			_elm_lang$core$Task$onError,
+			function (_p2) {
+				return _elm_lang$core$Task$fail(
+					convert(_p2));
+			},
+			task);
+	});
+var _elm_lang$core$Task$succeed = _elm_lang$core$Native_Scheduler.succeed;
+var _elm_lang$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return _elm_lang$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return _elm_lang$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map3 = F4(
+	function (func, taskA, taskB, taskC) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return _elm_lang$core$Task$succeed(
+									A3(func, a, b, c));
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map4 = F5(
+	function (func, taskA, taskB, taskC, taskD) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return _elm_lang$core$Task$succeed(
+											A4(func, a, b, c, d));
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map5 = F6(
+	function (func, taskA, taskB, taskC, taskD, taskE) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return A2(
+											_elm_lang$core$Task$andThen,
+											function (e) {
+												return _elm_lang$core$Task$succeed(
+													A5(func, a, b, c, d, e));
+											},
+											taskE);
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$sequence = function (tasks) {
+	var _p3 = tasks;
+	if (_p3.ctor === '[]') {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '[]'});
+	} else {
+		return A3(
+			_elm_lang$core$Task$map2,
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			_p3._0,
+			_elm_lang$core$Task$sequence(_p3._1));
+	}
+};
+var _elm_lang$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			_elm_lang$core$Task$map,
+			function (_p4) {
+				return {ctor: '_Tuple0'};
+			},
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Task$spawnCmd(router),
+					commands)));
+	});
+var _elm_lang$core$Task$init = _elm_lang$core$Task$succeed(
+	{ctor: '_Tuple0'});
+var _elm_lang$core$Task$onSelfMsg = F3(
+	function (_p7, _p6, _p5) {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '_Tuple0'});
+	});
+var _elm_lang$core$Task$command = _elm_lang$core$Native_Platform.leaf('Task');
+var _elm_lang$core$Task$Perform = function (a) {
+	return {ctor: 'Perform', _0: a};
+};
+var _elm_lang$core$Task$perform = F2(
+	function (toMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(_elm_lang$core$Task$map, toMessage, task)));
+	});
+var _elm_lang$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(
+					_elm_lang$core$Task$onError,
+					function (_p8) {
+						return _elm_lang$core$Task$succeed(
+							resultToMessage(
+								_elm_lang$core$Result$Err(_p8)));
+					},
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (_p9) {
+							return _elm_lang$core$Task$succeed(
+								resultToMessage(
+									_elm_lang$core$Result$Ok(_p9)));
+						},
+						task))));
+	});
+var _elm_lang$core$Task$cmdMap = F2(
+	function (tagger, _p10) {
+		var _p11 = _p10;
+		return _elm_lang$core$Task$Perform(
+			A2(_elm_lang$core$Task$map, tagger, _p11._0));
+	});
+_elm_lang$core$Native_Platform.effectManagers['Task'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Task$init, onEffects: _elm_lang$core$Task$onEffects, onSelfMsg: _elm_lang$core$Task$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Task$cmdMap};
+
 var _elm_lang$core$Dict$foldr = F3(
 	function (f, acc, t) {
 		foldr:
@@ -5098,6 +5494,254 @@ var _elm_lang$core$Dict$diff = F2(
 			t2);
 	});
 
+//import Native.Scheduler //
+
+var _elm_lang$core$Native_Time = function() {
+
+var now = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+{
+	callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
+});
+
+function setInterval_(interval, task)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var id = setInterval(function() {
+			_elm_lang$core$Native_Scheduler.rawSpawn(task);
+		}, interval);
+
+		return function() { clearInterval(id); };
+	});
+}
+
+return {
+	now: now,
+	setInterval_: F2(setInterval_)
+};
+
+}();
+var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
+var _elm_lang$core$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		var _p0 = intervals;
+		if (_p0.ctor === '[]') {
+			return _elm_lang$core$Task$succeed(processes);
+		} else {
+			var _p1 = _p0._0;
+			var spawnRest = function (id) {
+				return A3(
+					_elm_lang$core$Time$spawnHelp,
+					router,
+					_p0._1,
+					A3(_elm_lang$core$Dict$insert, _p1, id, processes));
+			};
+			var spawnTimer = _elm_lang$core$Native_Scheduler.spawn(
+				A2(
+					_elm_lang$core$Time$setInterval,
+					_p1,
+					A2(_elm_lang$core$Platform$sendToSelf, router, _p1)));
+			return A2(_elm_lang$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var _elm_lang$core$Time$addMySub = F2(
+	function (_p2, state) {
+		var _p3 = _p2;
+		var _p6 = _p3._1;
+		var _p5 = _p3._0;
+		var _p4 = A2(_elm_lang$core$Dict$get, _p5, state);
+		if (_p4.ctor === 'Nothing') {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{
+					ctor: '::',
+					_0: _p6,
+					_1: {ctor: '[]'}
+				},
+				state);
+		} else {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{ctor: '::', _0: _p6, _1: _p4._0},
+				state);
+		}
+	});
+var _elm_lang$core$Time$inMilliseconds = function (t) {
+	return t;
+};
+var _elm_lang$core$Time$millisecond = 1;
+var _elm_lang$core$Time$second = 1000 * _elm_lang$core$Time$millisecond;
+var _elm_lang$core$Time$minute = 60 * _elm_lang$core$Time$second;
+var _elm_lang$core$Time$hour = 60 * _elm_lang$core$Time$minute;
+var _elm_lang$core$Time$inHours = function (t) {
+	return t / _elm_lang$core$Time$hour;
+};
+var _elm_lang$core$Time$inMinutes = function (t) {
+	return t / _elm_lang$core$Time$minute;
+};
+var _elm_lang$core$Time$inSeconds = function (t) {
+	return t / _elm_lang$core$Time$second;
+};
+var _elm_lang$core$Time$now = _elm_lang$core$Native_Time.now;
+var _elm_lang$core$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _p7 = A2(_elm_lang$core$Dict$get, interval, state.taggers);
+		if (_p7.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var tellTaggers = function (time) {
+				return _elm_lang$core$Task$sequence(
+					A2(
+						_elm_lang$core$List$map,
+						function (tagger) {
+							return A2(
+								_elm_lang$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						_p7._0));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p8) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				A2(_elm_lang$core$Task$andThen, tellTaggers, _elm_lang$core$Time$now));
+		}
+	});
+var _elm_lang$core$Time$subscription = _elm_lang$core$Native_Platform.leaf('Time');
+var _elm_lang$core$Time$State = F2(
+	function (a, b) {
+		return {taggers: a, processes: b};
+	});
+var _elm_lang$core$Time$init = _elm_lang$core$Task$succeed(
+	A2(_elm_lang$core$Time$State, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty));
+var _elm_lang$core$Time$onEffects = F3(
+	function (router, subs, _p9) {
+		var _p10 = _p9;
+		var rightStep = F3(
+			function (_p12, id, _p11) {
+				var _p13 = _p11;
+				return {
+					ctor: '_Tuple3',
+					_0: _p13._0,
+					_1: _p13._1,
+					_2: A2(
+						_elm_lang$core$Task$andThen,
+						function (_p14) {
+							return _p13._2;
+						},
+						_elm_lang$core$Native_Scheduler.kill(id))
+				};
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _p15) {
+				var _p16 = _p15;
+				return {
+					ctor: '_Tuple3',
+					_0: _p16._0,
+					_1: A3(_elm_lang$core$Dict$insert, interval, id, _p16._1),
+					_2: _p16._2
+				};
+			});
+		var leftStep = F3(
+			function (interval, taggers, _p17) {
+				var _p18 = _p17;
+				return {
+					ctor: '_Tuple3',
+					_0: {ctor: '::', _0: interval, _1: _p18._0},
+					_1: _p18._1,
+					_2: _p18._2
+				};
+			});
+		var newTaggers = A3(_elm_lang$core$List$foldl, _elm_lang$core$Time$addMySub, _elm_lang$core$Dict$empty, subs);
+		var _p19 = A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			_p10.processes,
+			{
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _elm_lang$core$Dict$empty,
+				_2: _elm_lang$core$Task$succeed(
+					{ctor: '_Tuple0'})
+			});
+		var spawnList = _p19._0;
+		var existingDict = _p19._1;
+		var killTask = _p19._2;
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (newProcesses) {
+				return _elm_lang$core$Task$succeed(
+					A2(_elm_lang$core$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (_p20) {
+					return A3(_elm_lang$core$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var _elm_lang$core$Time$Every = F2(
+	function (a, b) {
+		return {ctor: 'Every', _0: a, _1: b};
+	});
+var _elm_lang$core$Time$every = F2(
+	function (interval, tagger) {
+		return _elm_lang$core$Time$subscription(
+			A2(_elm_lang$core$Time$Every, interval, tagger));
+	});
+var _elm_lang$core$Time$subMap = F2(
+	function (f, _p21) {
+		var _p22 = _p21;
+		return A2(
+			_elm_lang$core$Time$Every,
+			_p22._0,
+			function (_p23) {
+				return f(
+					_p22._1(_p23));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
+
+var _elm_lang$core$Date$millisecond = _elm_lang$core$Native_Date.millisecond;
+var _elm_lang$core$Date$second = _elm_lang$core$Native_Date.second;
+var _elm_lang$core$Date$minute = _elm_lang$core$Native_Date.minute;
+var _elm_lang$core$Date$hour = _elm_lang$core$Native_Date.hour;
+var _elm_lang$core$Date$dayOfWeek = _elm_lang$core$Native_Date.dayOfWeek;
+var _elm_lang$core$Date$day = _elm_lang$core$Native_Date.day;
+var _elm_lang$core$Date$month = _elm_lang$core$Native_Date.month;
+var _elm_lang$core$Date$year = _elm_lang$core$Native_Date.year;
+var _elm_lang$core$Date$fromTime = _elm_lang$core$Native_Date.fromTime;
+var _elm_lang$core$Date$toTime = _elm_lang$core$Native_Date.toTime;
+var _elm_lang$core$Date$fromString = _elm_lang$core$Native_Date.fromString;
+var _elm_lang$core$Date$now = A2(_elm_lang$core$Task$map, _elm_lang$core$Date$fromTime, _elm_lang$core$Time$now);
+var _elm_lang$core$Date$Date = {ctor: 'Date'};
+var _elm_lang$core$Date$Sun = {ctor: 'Sun'};
+var _elm_lang$core$Date$Sat = {ctor: 'Sat'};
+var _elm_lang$core$Date$Fri = {ctor: 'Fri'};
+var _elm_lang$core$Date$Thu = {ctor: 'Thu'};
+var _elm_lang$core$Date$Wed = {ctor: 'Wed'};
+var _elm_lang$core$Date$Tue = {ctor: 'Tue'};
+var _elm_lang$core$Date$Mon = {ctor: 'Mon'};
+var _elm_lang$core$Date$Dec = {ctor: 'Dec'};
+var _elm_lang$core$Date$Nov = {ctor: 'Nov'};
+var _elm_lang$core$Date$Oct = {ctor: 'Oct'};
+var _elm_lang$core$Date$Sep = {ctor: 'Sep'};
+var _elm_lang$core$Date$Aug = {ctor: 'Aug'};
+var _elm_lang$core$Date$Jul = {ctor: 'Jul'};
+var _elm_lang$core$Date$Jun = {ctor: 'Jun'};
+var _elm_lang$core$Date$May = {ctor: 'May'};
+var _elm_lang$core$Date$Apr = {ctor: 'Apr'};
+var _elm_lang$core$Date$Mar = {ctor: 'Mar'};
+var _elm_lang$core$Date$Feb = {ctor: 'Feb'};
+var _elm_lang$core$Date$Jan = {ctor: 'Jan'};
+
 //import Maybe, Native.Array, Native.List, Native.Utils, Result //
 
 var _elm_lang$core$Native_Json = function() {
@@ -5753,6 +6397,147 @@ var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
 
+//import Maybe, Native.List //
+
+var _elm_lang$core$Native_Regex = function() {
+
+function escape(str)
+{
+	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+function caseInsensitive(re)
+{
+	return new RegExp(re.source, 'gi');
+}
+function regex(raw)
+{
+	return new RegExp(raw, 'g');
+}
+
+function contains(re, string)
+{
+	return string.match(re) !== null;
+}
+
+function find(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex === re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		out.push({
+			match: result[0],
+			submatches: _elm_lang$core$Native_List.fromArray(subs),
+			index: result.index,
+			number: number
+		});
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+function replace(n, re, replacer, string)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		return replacer({
+			match: match,
+			submatches: _elm_lang$core$Native_List.fromArray(submatches),
+			index: arguments[arguments.length - 2],
+			number: count
+		});
+	}
+	return string.replace(re, jsReplacer);
+}
+
+function split(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	if (n === Infinity)
+	{
+		return _elm_lang$core$Native_List.fromArray(str.split(re));
+	}
+	var string = str;
+	var result;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		if (!(result = re.exec(string))) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+return {
+	regex: regex,
+	caseInsensitive: caseInsensitive,
+	escape: escape,
+
+	contains: F2(contains),
+	find: F3(find),
+	replace: F4(replace),
+	split: F3(split)
+};
+
+}();
+
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
+var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
+var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
+var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
+var _elm_lang$core$Regex$contains = _elm_lang$core$Native_Regex.contains;
+var _elm_lang$core$Regex$caseInsensitive = _elm_lang$core$Native_Regex.caseInsensitive;
+var _elm_lang$core$Regex$regex = _elm_lang$core$Native_Regex.regex;
+var _elm_lang$core$Regex$escape = _elm_lang$core$Native_Regex.escape;
+var _elm_lang$core$Regex$Match = F4(
+	function (a, b, c, d) {
+		return {match: a, submatches: b, index: c, number: d};
+	});
+var _elm_lang$core$Regex$Regex = {ctor: 'Regex'};
+var _elm_lang$core$Regex$AtMost = function (a) {
+	return {ctor: 'AtMost', _0: a};
+};
+var _elm_lang$core$Regex$All = {ctor: 'All'};
+
 var _elm_lang$core$Set$foldr = F3(
 	function (f, b, _p0) {
 		var _p1 = _p0;
@@ -5883,6 +6668,192 @@ var _elm_lang$core$Set$partition = F2(
 			_1: _elm_lang$core$Set$Set_elm_builtin(p2)
 		};
 	});
+
+var _elm_lang$dom$Native_Dom = function() {
+
+var fakeNode = {
+	addEventListener: function() {},
+	removeEventListener: function() {}
+};
+
+var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
+var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+var rAF = typeof requestAnimationFrame !== 'undefined'
+	? requestAnimationFrame
+	: function(callback) { callback(); };
+
+function withNode(id, doStuff)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		rAF(function()
+		{
+			var node = document.getElementById(id);
+			if (node === null)
+			{
+				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
+				return;
+			}
+			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
+		});
+	});
+}
+
+
+// FOCUS
+
+function focus(id)
+{
+	return withNode(id, function(node) {
+		node.focus();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function blur(id)
+{
+	return withNode(id, function(node) {
+		node.blur();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SCROLLING
+
+function getScrollTop(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollTop;
+	});
+}
+
+function setScrollTop(id, desiredScrollTop)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = desiredScrollTop;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toBottom(id)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = node.scrollHeight;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function getScrollLeft(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollLeft;
+	});
+}
+
+function setScrollLeft(id, desiredScrollLeft)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = desiredScrollLeft;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toRight(id)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = node.scrollWidth;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SIZE
+
+function width(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollWidth;
+			case 'VisibleContent':
+				return node.clientWidth;
+			case 'VisibleContentWithBorders':
+				return node.offsetWidth;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.right - rect.left;
+		}
+	});
+}
+
+function height(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollHeight;
+			case 'VisibleContent':
+				return node.clientHeight;
+			case 'VisibleContentWithBorders':
+				return node.offsetHeight;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.bottom - rect.top;
+		}
+	});
+}
+
+return {
+	onDocument: F3(onDocument),
+	onWindow: F3(onWindow),
+
+	focus: focus,
+	blur: blur,
+
+	getScrollTop: getScrollTop,
+	setScrollTop: F2(setScrollTop),
+	getScrollLeft: getScrollLeft,
+	setScrollLeft: F2(setScrollLeft),
+	toBottom: toBottom,
+	toRight: toRight,
+
+	height: F2(height),
+	width: F2(width)
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
 
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
@@ -8387,6 +9358,4322 @@ var _elm_lang$html$Html_Events$Options = F2(
 		return {stopPropagation: a, preventDefault: b};
 	});
 
+var _elm_lang$http$Native_Http = function() {
+
+
+// ENCODING AND DECODING
+
+function encodeUri(string)
+{
+	return encodeURIComponent(string);
+}
+
+function decodeUri(string)
+{
+	try
+	{
+		return _elm_lang$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch(e)
+	{
+		return _elm_lang$core$Maybe$Nothing;
+	}
+}
+
+
+// SEND REQUEST
+
+function toTask(request, maybeProgress)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var xhr = new XMLHttpRequest();
+
+		configureProgress(xhr, maybeProgress);
+
+		xhr.addEventListener('error', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NetworkError' }));
+		});
+		xhr.addEventListener('timeout', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'Timeout' }));
+		});
+		xhr.addEventListener('load', function() {
+			callback(handleResponse(xhr, request.expect.responseToResult));
+		});
+
+		try
+		{
+			xhr.open(request.method, request.url, true);
+		}
+		catch (e)
+		{
+			return callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'BadUrl', _0: request.url }));
+		}
+
+		configureRequest(xhr, request);
+		send(xhr, request.body);
+
+		return function() { xhr.abort(); };
+	});
+}
+
+function configureProgress(xhr, maybeProgress)
+{
+	if (maybeProgress.ctor === 'Nothing')
+	{
+		return;
+	}
+
+	xhr.addEventListener('progress', function(event) {
+		if (!event.lengthComputable)
+		{
+			return;
+		}
+		_elm_lang$core$Native_Scheduler.rawSpawn(maybeProgress._0({
+			bytes: event.loaded,
+			bytesExpected: event.total
+		}));
+	});
+}
+
+function configureRequest(xhr, request)
+{
+	function setHeader(pair)
+	{
+		xhr.setRequestHeader(pair._0, pair._1);
+	}
+
+	A2(_elm_lang$core$List$map, setHeader, request.headers);
+	xhr.responseType = request.expect.responseType;
+	xhr.withCredentials = request.withCredentials;
+
+	if (request.timeout.ctor === 'Just')
+	{
+		xhr.timeout = request.timeout._0;
+	}
+}
+
+function send(xhr, body)
+{
+	switch (body.ctor)
+	{
+		case 'EmptyBody':
+			xhr.send();
+			return;
+
+		case 'StringBody':
+			xhr.setRequestHeader('Content-Type', body._0);
+			xhr.send(body._1);
+			return;
+
+		case 'FormDataBody':
+			xhr.send(body._0);
+			return;
+	}
+}
+
+
+// RESPONSES
+
+function handleResponse(xhr, responseToResult)
+{
+	var response = toResponse(xhr);
+
+	if (xhr.status < 200 || 300 <= xhr.status)
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadStatus',
+			_0: response
+		});
+	}
+
+	var result = responseToResult(response);
+
+	if (result.ctor === 'Ok')
+	{
+		return _elm_lang$core$Native_Scheduler.succeed(result._0);
+	}
+	else
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadPayload',
+			_0: result._0,
+			_1: response
+		});
+	}
+}
+
+function toResponse(xhr)
+{
+	return {
+		status: { code: xhr.status, message: xhr.statusText },
+		headers: parseHeaders(xhr.getAllResponseHeaders()),
+		url: xhr.responseURL,
+		body: xhr.response
+	};
+}
+
+function parseHeaders(rawHeaders)
+{
+	var headers = _elm_lang$core$Dict$empty;
+
+	if (!rawHeaders)
+	{
+		return headers;
+	}
+
+	var headerPairs = rawHeaders.split('\u000d\u000a');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf('\u003a\u0020');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3(_elm_lang$core$Dict$update, key, function(oldValue) {
+				if (oldValue.ctor === 'Just')
+				{
+					return _elm_lang$core$Maybe$Just(value + ', ' + oldValue._0);
+				}
+				return _elm_lang$core$Maybe$Just(value);
+			}, headers);
+		}
+	}
+
+	return headers;
+}
+
+
+// EXPECTORS
+
+function expectStringResponse(responseToResult)
+{
+	return {
+		responseType: 'text',
+		responseToResult: responseToResult
+	};
+}
+
+function mapExpect(func, expect)
+{
+	return {
+		responseType: expect.responseType,
+		responseToResult: function(response) {
+			var convertedResponse = expect.responseToResult(response);
+			return A2(_elm_lang$core$Result$map, func, convertedResponse);
+		}
+	};
+}
+
+
+// BODY
+
+function multipart(parts)
+{
+	var formData = new FormData();
+
+	while (parts.ctor !== '[]')
+	{
+		var part = parts._0;
+		formData.append(part._0, part._1);
+		parts = parts._1;
+	}
+
+	return { ctor: 'FormDataBody', _0: formData };
+}
+
+return {
+	toTask: F2(toTask),
+	expectStringResponse: expectStringResponse,
+	mapExpect: F2(mapExpect),
+	multipart: multipart,
+	encodeUri: encodeUri,
+	decodeUri: decodeUri
+};
+
+}();
+
+var _elm_lang$http$Http_Internal$map = F2(
+	function (func, request) {
+		return _elm_lang$core$Native_Utils.update(
+			request,
+			{
+				expect: A2(_elm_lang$http$Native_Http.mapExpect, func, request.expect)
+			});
+	});
+var _elm_lang$http$Http_Internal$RawRequest = F7(
+	function (a, b, c, d, e, f, g) {
+		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g};
+	});
+var _elm_lang$http$Http_Internal$Request = function (a) {
+	return {ctor: 'Request', _0: a};
+};
+var _elm_lang$http$Http_Internal$Expect = {ctor: 'Expect'};
+var _elm_lang$http$Http_Internal$FormDataBody = {ctor: 'FormDataBody'};
+var _elm_lang$http$Http_Internal$StringBody = F2(
+	function (a, b) {
+		return {ctor: 'StringBody', _0: a, _1: b};
+	});
+var _elm_lang$http$Http_Internal$EmptyBody = {ctor: 'EmptyBody'};
+var _elm_lang$http$Http_Internal$Header = F2(
+	function (a, b) {
+		return {ctor: 'Header', _0: a, _1: b};
+	});
+
+var _elm_lang$http$Http$decodeUri = _elm_lang$http$Native_Http.decodeUri;
+var _elm_lang$http$Http$encodeUri = _elm_lang$http$Native_Http.encodeUri;
+var _elm_lang$http$Http$expectStringResponse = _elm_lang$http$Native_Http.expectStringResponse;
+var _elm_lang$http$Http$expectJson = function (decoder) {
+	return _elm_lang$http$Http$expectStringResponse(
+		function (response) {
+			return A2(_elm_lang$core$Json_Decode$decodeString, decoder, response.body);
+		});
+};
+var _elm_lang$http$Http$expectString = _elm_lang$http$Http$expectStringResponse(
+	function (response) {
+		return _elm_lang$core$Result$Ok(response.body);
+	});
+var _elm_lang$http$Http$multipartBody = _elm_lang$http$Native_Http.multipart;
+var _elm_lang$http$Http$stringBody = _elm_lang$http$Http_Internal$StringBody;
+var _elm_lang$http$Http$jsonBody = function (value) {
+	return A2(
+		_elm_lang$http$Http_Internal$StringBody,
+		'application/json',
+		A2(_elm_lang$core$Json_Encode$encode, 0, value));
+};
+var _elm_lang$http$Http$emptyBody = _elm_lang$http$Http_Internal$EmptyBody;
+var _elm_lang$http$Http$header = _elm_lang$http$Http_Internal$Header;
+var _elm_lang$http$Http$request = _elm_lang$http$Http_Internal$Request;
+var _elm_lang$http$Http$post = F3(
+	function (url, body, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'POST',
+				headers: {ctor: '[]'},
+				url: url,
+				body: body,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$get = F2(
+	function (url, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'GET',
+				headers: {ctor: '[]'},
+				url: url,
+				body: _elm_lang$http$Http$emptyBody,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$getString = function (url) {
+	return _elm_lang$http$Http$request(
+		{
+			method: 'GET',
+			headers: {ctor: '[]'},
+			url: url,
+			body: _elm_lang$http$Http$emptyBody,
+			expect: _elm_lang$http$Http$expectString,
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+};
+var _elm_lang$http$Http$toTask = function (_p0) {
+	var _p1 = _p0;
+	return A2(_elm_lang$http$Native_Http.toTask, _p1._0, _elm_lang$core$Maybe$Nothing);
+};
+var _elm_lang$http$Http$send = F2(
+	function (resultToMessage, request) {
+		return A2(
+			_elm_lang$core$Task$attempt,
+			resultToMessage,
+			_elm_lang$http$Http$toTask(request));
+	});
+var _elm_lang$http$Http$Response = F4(
+	function (a, b, c, d) {
+		return {url: a, status: b, headers: c, body: d};
+	});
+var _elm_lang$http$Http$BadPayload = F2(
+	function (a, b) {
+		return {ctor: 'BadPayload', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$BadStatus = function (a) {
+	return {ctor: 'BadStatus', _0: a};
+};
+var _elm_lang$http$Http$NetworkError = {ctor: 'NetworkError'};
+var _elm_lang$http$Http$Timeout = {ctor: 'Timeout'};
+var _elm_lang$http$Http$BadUrl = function (a) {
+	return {ctor: 'BadUrl', _0: a};
+};
+var _elm_lang$http$Http$StringPart = F2(
+	function (a, b) {
+		return {ctor: 'StringPart', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
+
+var _elm_lang$navigation$Native_Navigation = function() {
+
+function go(n)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		if (n !== 0)
+		{
+			history.go(n);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function pushState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.pushState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function replaceState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.replaceState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function getLocation()
+{
+	var location = document.location;
+
+	return {
+		href: location.href,
+		host: location.host,
+		hostname: location.hostname,
+		protocol: location.protocol,
+		origin: location.origin,
+		port_: location.port,
+		pathname: location.pathname,
+		search: location.search,
+		hash: location.hash,
+		username: location.username,
+		password: location.password
+	};
+}
+
+
+return {
+	go: go,
+	pushState: pushState,
+	replaceState: replaceState,
+	getLocation: getLocation
+};
+
+}();
+
+var _elm_lang$navigation$Navigation$replaceState = _elm_lang$navigation$Native_Navigation.replaceState;
+var _elm_lang$navigation$Navigation$pushState = _elm_lang$navigation$Native_Navigation.pushState;
+var _elm_lang$navigation$Navigation$go = _elm_lang$navigation$Native_Navigation.go;
+var _elm_lang$navigation$Navigation$spawnPopState = function (router) {
+	return _elm_lang$core$Process$spawn(
+		A3(
+			_elm_lang$dom$Dom_LowLevel$onWindow,
+			'popstate',
+			_elm_lang$core$Json_Decode$value,
+			function (_p0) {
+				return A2(
+					_elm_lang$core$Platform$sendToSelf,
+					router,
+					_elm_lang$navigation$Native_Navigation.getLocation(
+						{ctor: '_Tuple0'}));
+			}));
+};
+var _elm_lang$navigation$Navigation_ops = _elm_lang$navigation$Navigation_ops || {};
+_elm_lang$navigation$Navigation_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p1) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$navigation$Navigation$notify = F3(
+	function (router, subs, location) {
+		var send = function (_p2) {
+			var _p3 = _p2;
+			return A2(
+				_elm_lang$core$Platform$sendToApp,
+				router,
+				_p3._0(location));
+		};
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(_elm_lang$core$List$map, send, subs)),
+			_elm_lang$core$Task$succeed(
+				{ctor: '_Tuple0'}));
+	});
+var _elm_lang$navigation$Navigation$onSelfMsg = F3(
+	function (router, location, state) {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			A3(_elm_lang$navigation$Navigation$notify, router, state.subs, location),
+			_elm_lang$core$Task$succeed(state));
+	});
+var _elm_lang$navigation$Navigation$cmdHelp = F3(
+	function (router, subs, cmd) {
+		var _p4 = cmd;
+		switch (_p4.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$go(_p4._0);
+			case 'New':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$pushState(_p4._0));
+			default:
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$replaceState(_p4._0));
+		}
+	});
+var _elm_lang$navigation$Navigation$subscription = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$command = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$Location = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {href: a, host: b, hostname: c, protocol: d, origin: e, port_: f, pathname: g, search: h, hash: i, username: j, password: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _elm_lang$navigation$Navigation$State = F2(
+	function (a, b) {
+		return {subs: a, process: b};
+	});
+var _elm_lang$navigation$Navigation$init = _elm_lang$core$Task$succeed(
+	A2(
+		_elm_lang$navigation$Navigation$State,
+		{ctor: '[]'},
+		_elm_lang$core$Maybe$Nothing));
+var _elm_lang$navigation$Navigation$onEffects = F4(
+	function (router, cmds, subs, _p5) {
+		var _p6 = _p5;
+		var _p9 = _p6.process;
+		var stepState = function () {
+			var _p7 = {ctor: '_Tuple2', _0: subs, _1: _p9};
+			_v3_2:
+			do {
+				if (_p7._0.ctor === '[]') {
+					if (_p7._1.ctor === 'Just') {
+						return A2(
+							_elm_lang$navigation$Navigation_ops['&>'],
+							_elm_lang$core$Process$kill(_p7._1._0),
+							_elm_lang$core$Task$succeed(
+								A2(_elm_lang$navigation$Navigation$State, subs, _elm_lang$core$Maybe$Nothing)));
+					} else {
+						break _v3_2;
+					}
+				} else {
+					if (_p7._1.ctor === 'Nothing') {
+						return A2(
+							_elm_lang$core$Task$map,
+							function (_p8) {
+								return A2(
+									_elm_lang$navigation$Navigation$State,
+									subs,
+									_elm_lang$core$Maybe$Just(_p8));
+							},
+							_elm_lang$navigation$Navigation$spawnPopState(router));
+					} else {
+						break _v3_2;
+					}
+				}
+			} while(false);
+			return _elm_lang$core$Task$succeed(
+				A2(_elm_lang$navigation$Navigation$State, subs, _p9));
+		}();
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					A2(_elm_lang$navigation$Navigation$cmdHelp, router, subs),
+					cmds)),
+			stepState);
+	});
+var _elm_lang$navigation$Navigation$Modify = function (a) {
+	return {ctor: 'Modify', _0: a};
+};
+var _elm_lang$navigation$Navigation$modifyUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Modify(url));
+};
+var _elm_lang$navigation$Navigation$New = function (a) {
+	return {ctor: 'New', _0: a};
+};
+var _elm_lang$navigation$Navigation$newUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$New(url));
+};
+var _elm_lang$navigation$Navigation$Jump = function (a) {
+	return {ctor: 'Jump', _0: a};
+};
+var _elm_lang$navigation$Navigation$back = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(0 - n));
+};
+var _elm_lang$navigation$Navigation$forward = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(n));
+};
+var _elm_lang$navigation$Navigation$cmdMap = F2(
+	function (_p10, myCmd) {
+		var _p11 = myCmd;
+		switch (_p11.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$Jump(_p11._0);
+			case 'New':
+				return _elm_lang$navigation$Navigation$New(_p11._0);
+			default:
+				return _elm_lang$navigation$Navigation$Modify(_p11._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$Monitor = function (a) {
+	return {ctor: 'Monitor', _0: a};
+};
+var _elm_lang$navigation$Navigation$program = F2(
+	function (locationToMessage, stuff) {
+		var init = stuff.init(
+			_elm_lang$navigation$Native_Navigation.getLocation(
+				{ctor: '_Tuple0'}));
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$program(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$programWithFlags = F2(
+	function (locationToMessage, stuff) {
+		var init = function (flags) {
+			return A2(
+				stuff.init,
+				flags,
+				_elm_lang$navigation$Native_Navigation.getLocation(
+					{ctor: '_Tuple0'}));
+		};
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$programWithFlags(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$subMap = F2(
+	function (func, _p12) {
+		var _p13 = _p12;
+		return _elm_lang$navigation$Navigation$Monitor(
+			function (_p14) {
+				return func(
+					_p13._0(_p14));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
+
+var _evancz$elm_graphics$Native_Element = function()
+{
+
+
+// CREATION
+
+var createNode =
+	typeof document === 'undefined'
+		?
+			function(_)
+			{
+				return {
+					style: {},
+					appendChild: function() {}
+				};
+			}
+		:
+			function(elementType)
+			{
+				var node = document.createElement(elementType);
+				node.style.padding = '0';
+				node.style.margin = '0';
+				return node;
+			}
+		;
+
+
+function newElement(width, height, elementPrim)
+{
+	return {
+		ctor: 'Element_elm_builtin',
+		_0: {
+			element: elementPrim,
+			props: {
+				width: width,
+				height: height,
+				opacity: 1,
+				color: _elm_lang$core$Maybe$Nothing,
+				href: '',
+				tag: ''
+			}
+		}
+	};
+}
+
+
+// PROPERTIES
+
+function setProps(elem, node)
+{
+	var props = elem.props;
+
+	var element = elem.element;
+	var width = props.width - (element.adjustWidth || 0);
+	var height = props.height - (element.adjustHeight || 0);
+	node.style.width  = (width | 0) + 'px';
+	node.style.height = (height | 0) + 'px';
+
+	if (props.opacity !== 1)
+	{
+		node.style.opacity = props.opacity;
+	}
+
+	if (props.color.ctor === 'Just')
+	{
+		node.style.backgroundColor = _evancz$elm_graphics$Text$colorToCss(props.color._0);
+	}
+
+	if (props.tag !== '')
+	{
+		node.id = props.tag;
+	}
+
+	if (props.href !== '')
+	{
+		var anchor = createNode('a');
+		anchor.href = props.href;
+		anchor.style.display = 'block';
+		anchor.style.pointerEvents = 'auto';
+		anchor.appendChild(node);
+		node = anchor;
+	}
+
+	return node;
+}
+
+
+// IMAGES
+
+function image(props, img)
+{
+	switch (img._0.ctor)
+	{
+		case 'Plain':
+			return plainImage(img._3);
+
+		case 'Fitted':
+			return fittedImage(props.width, props.height, img._3);
+
+		case 'Cropped':
+			return croppedImage(img, props.width, props.height, img._3);
+
+		case 'Tiled':
+			return tiledImage(img._3);
+	}
+}
+
+function plainImage(src)
+{
+	var img = createNode('img');
+	img.src = src;
+	img.name = src;
+	img.style.display = 'block';
+	return img;
+}
+
+function tiledImage(src)
+{
+	var div = createNode('div');
+	div.style.backgroundImage = 'url(' + src + ')';
+	return div;
+}
+
+function fittedImage(w, h, src)
+{
+	var div = createNode('div');
+	div.style.background = 'url(' + src + ') no-repeat center';
+	div.style.webkitBackgroundSize = 'cover';
+	div.style.MozBackgroundSize = 'cover';
+	div.style.OBackgroundSize = 'cover';
+	div.style.backgroundSize = 'cover';
+	return div;
+}
+
+function croppedImage(elem, w, h, src)
+{
+	var pos = elem._0._0;
+	var e = createNode('div');
+	e.style.overflow = 'hidden';
+
+	var img = createNode('img');
+	img.onload = function() {
+		var sw = w / elem._1, sh = h / elem._2;
+		img.style.width = ((this.width * sw) | 0) + 'px';
+		img.style.height = ((this.height * sh) | 0) + 'px';
+		img.style.marginLeft = ((- pos._0 * sw) | 0) + 'px';
+		img.style.marginTop = ((- pos._1 * sh) | 0) + 'px';
+	};
+	img.src = src;
+	img.name = src;
+	e.appendChild(img);
+	return e;
+}
+
+
+// FLOW
+
+function goOut(node)
+{
+	node.style.position = 'absolute';
+	return node;
+}
+function goDown(node)
+{
+	return node;
+}
+function goRight(node)
+{
+	node.style.styleFloat = 'left';
+	node.style.cssFloat = 'left';
+	return node;
+}
+
+var directionTable = {
+	DUp: goDown,
+	DDown: goDown,
+	DLeft: goRight,
+	DRight: goRight,
+	DIn: goOut,
+	DOut: goOut
+};
+function needsReversal(dir)
+{
+	return dir === 'DUp' || dir === 'DLeft' || dir === 'DIn';
+}
+
+function flow(dir, elist)
+{
+	var array = _elm_lang$core$Native_List.toArray(elist);
+	var container = createNode('div');
+	var goDir = directionTable[dir];
+	if (goDir === goOut)
+	{
+		container.style.pointerEvents = 'none';
+	}
+	if (needsReversal(dir))
+	{
+		array.reverse();
+	}
+	var len = array.length;
+	for (var i = 0; i < len; ++i)
+	{
+		container.appendChild(goDir(render(array[i])));
+	}
+	return container;
+}
+
+
+// CONTAINER
+
+function toPos(pos)
+{
+	return pos.ctor === 'Absolute'
+		? pos._0 + 'px'
+		: (pos._0 * 100) + '%';
+}
+
+// must clear right, left, top, bottom, and transform
+// before calling this function
+function setPos(pos, wrappedElement, e)
+{
+	var elem = wrappedElement._0;
+	var element = elem.element;
+	var props = elem.props;
+	var w = props.width + (element.adjustWidth ? element.adjustWidth : 0);
+	var h = props.height + (element.adjustHeight ? element.adjustHeight : 0);
+
+	e.style.position = 'absolute';
+	e.style.margin = 'auto';
+	var transform = '';
+
+	switch (pos.horizontal.ctor)
+	{
+		case 'P':
+			e.style.right = toPos(pos.x);
+			e.style.removeProperty('left');
+			break;
+
+		case 'Z':
+			transform = 'translateX(' + ((-w / 2) | 0) + 'px) ';
+
+		case 'N':
+			e.style.left = toPos(pos.x);
+			e.style.removeProperty('right');
+			break;
+	}
+	switch (pos.vertical.ctor)
+	{
+		case 'N':
+			e.style.bottom = toPos(pos.y);
+			e.style.removeProperty('top');
+			break;
+
+		case 'Z':
+			transform += 'translateY(' + ((-h / 2) | 0) + 'px)';
+
+		case 'P':
+			e.style.top = toPos(pos.y);
+			e.style.removeProperty('bottom');
+			break;
+	}
+	if (transform !== '')
+	{
+		addTransform(e.style, transform);
+	}
+	return e;
+}
+
+function addTransform(style, transform)
+{
+	style.transform       = transform;
+	style.msTransform     = transform;
+	style.MozTransform    = transform;
+	style.webkitTransform = transform;
+	style.OTransform      = transform;
+}
+
+function container(pos, elem)
+{
+	var e = render(elem);
+	setPos(pos, elem, e);
+	var div = createNode('div');
+	div.style.position = 'relative';
+	div.style.overflow = 'hidden';
+	div.appendChild(e);
+	return div;
+}
+
+
+function rawHtml(elem)
+{
+	var html = elem.html;
+	var align = elem.align;
+
+	var div = createNode('div');
+	div.innerHTML = html;
+	div.style.visibility = 'hidden';
+	if (align)
+	{
+		div.style.textAlign = align;
+	}
+	div.style.visibility = 'visible';
+	div.style.pointerEvents = 'auto';
+	return div;
+}
+
+
+// TO HTML
+
+function toHtml(element)
+{
+	return _elm_lang$virtual_dom$Native_VirtualDom.custom(
+		_elm_lang$core$Native_List.Nil,
+		element,
+		implementation
+	);
+}
+
+
+// WIDGET IMPLEMENTATION
+
+var implementation = {
+	render: render,
+	diff: diff
+};
+
+function diff(a, b)
+{
+	var aModel = a.model;
+	var bModel = b.model;
+
+	if (aModel === bModel)
+	{
+		return null;
+	}
+
+	return {
+		applyPatch: applyPatch,
+		data: { a: aModel, b: bModel }
+	};
+}
+
+function applyPatch(domNode, data)
+{
+	return updateAndReplace(domNode, data.a, data.b);
+}
+
+
+// RENDER
+
+function render(wrappedElement)
+{
+	var elem = wrappedElement._0;
+	return setProps(elem, makeElement(elem));
+}
+
+function makeElement(e)
+{
+	var elem = e.element;
+	switch (elem.ctor)
+	{
+		case 'Image':
+			return image(e.props, elem);
+
+		case 'Flow':
+			return flow(elem._0.ctor, elem._1);
+
+		case 'Container':
+			return container(elem._0, elem._1);
+
+		case 'Spacer':
+			return createNode('div');
+
+		case 'RawHtml':
+			return rawHtml(elem);
+
+		case 'Custom':
+			return elem.render(elem.model);
+	}
+}
+
+function updateAndReplace(node, curr, next)
+{
+	var newNode = update(node, curr, next);
+	if (newNode !== node)
+	{
+		node.parentNode.replaceChild(newNode, node);
+	}
+	return newNode;
+}
+
+
+// UPDATE
+
+function update(node, wrappedCurrent, wrappedNext)
+{
+	var curr = wrappedCurrent._0;
+	var next = wrappedNext._0;
+	var rootNode = node;
+
+	if (curr === next)
+	{
+		return rootNode;
+	}
+
+	if (node.tagName === 'A')
+	{
+		node = node.firstChild;
+	}
+	if (curr.element.ctor !== next.element.ctor)
+	{
+		return render(wrappedNext);
+	}
+	var nextE = next.element;
+	var currE = curr.element;
+	switch (nextE.ctor)
+	{
+		case 'Spacer':
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'RawHtml':
+			if(currE.html.valueOf() !== nextE.html.valueOf())
+			{
+				node.innerHTML = nextE.html;
+			}
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Image':
+			if (nextE._0.ctor === 'Plain')
+			{
+				if (nextE._3 !== currE._3)
+				{
+					node.src = nextE._3;
+				}
+			}
+			else if (!_elm_lang$core$Native_Utils.eq(nextE, currE)
+				|| next.props.width !== curr.props.width
+				|| next.props.height !== curr.props.height)
+			{
+				return render(wrappedNext);
+			}
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Flow':
+			var arr = _elm_lang$core$Native_List.toArray(nextE._1);
+			for (var i = arr.length; i--; )
+			{
+				arr[i] = arr[i]._0.element.ctor;
+			}
+			if (nextE._0.ctor !== currE._0.ctor)
+			{
+				return render(wrappedNext);
+			}
+			var nexts = _elm_lang$core$Native_List.toArray(nextE._1);
+			var kids = node.childNodes;
+			if (nexts.length !== kids.length)
+			{
+				return render(wrappedNext);
+			}
+			var currs = _elm_lang$core$Native_List.toArray(currE._1);
+			var dir = nextE._0.ctor;
+			var goDir = directionTable[dir];
+			var toReverse = needsReversal(dir);
+			var len = kids.length;
+			for (var i = len; i--; )
+			{
+				var subNode = kids[toReverse ? len - i - 1 : i];
+				goDir(updateAndReplace(subNode, currs[i], nexts[i]));
+			}
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Container':
+			var subNode = node.firstChild;
+			var newSubNode = updateAndReplace(subNode, currE._1, nextE._1);
+			setPos(nextE._0, nextE._1, newSubNode);
+			updateProps(node, curr, next);
+			return rootNode;
+
+		case 'Custom':
+			if (currE.type === nextE.type)
+			{
+				var updatedNode = nextE.update(node, currE.model, nextE.model);
+				updateProps(updatedNode, curr, next);
+				return updatedNode;
+			}
+			return render(wrappedNext);
+	}
+}
+
+function updateProps(node, curr, next)
+{
+	var nextProps = next.props;
+	var currProps = curr.props;
+
+	var element = next.element;
+	var width = nextProps.width - (element.adjustWidth || 0);
+	var height = nextProps.height - (element.adjustHeight || 0);
+	if (width !== currProps.width)
+	{
+		node.style.width = (width | 0) + 'px';
+	}
+	if (height !== currProps.height)
+	{
+		node.style.height = (height | 0) + 'px';
+	}
+
+	if (nextProps.opacity !== currProps.opacity)
+	{
+		node.style.opacity = nextProps.opacity;
+	}
+
+	var nextColor = nextProps.color.ctor === 'Just'
+		? _evancz$elm_graphics$Text$colorToCss(nextProps.color._0)
+		: '';
+	if (node.style.backgroundColor !== nextColor)
+	{
+		node.style.backgroundColor = nextColor;
+	}
+
+	if (nextProps.tag !== currProps.tag)
+	{
+		node.id = nextProps.tag;
+	}
+
+	if (nextProps.href !== currProps.href)
+	{
+		if (currProps.href === '')
+		{
+			// add a surrounding href
+			var anchor = createNode('a');
+			anchor.href = nextProps.href;
+			anchor.style.display = 'block';
+			anchor.style.pointerEvents = 'auto';
+
+			node.parentNode.replaceChild(anchor, node);
+			anchor.appendChild(node);
+		}
+		else if (nextProps.href === '')
+		{
+			// remove the surrounding href
+			var anchor = node.parentNode;
+			anchor.parentNode.replaceChild(node, anchor);
+		}
+		else
+		{
+			// just update the link
+			node.parentNode.href = nextProps.href;
+		}
+	}
+}
+
+
+// TEXT
+
+function block(align)
+{
+	return function(text)
+	{
+		var raw = {
+			ctor: 'RawHtml',
+			html: _evancz$elm_graphics$Text$toHtmlString(text),
+			align: align
+		};
+		var pos = htmlHeight(0, raw);
+		return newElement(pos._0, pos._1, raw);
+	};
+}
+
+var htmlHeight =
+	typeof document !== 'undefined'
+		? realHtmlHeight
+		: function(a, b) { return _elm_lang$core$Native_Utils.Tuple2(0, 0); };
+
+function realHtmlHeight(width, rawHtml)
+{
+	// create dummy node
+	var temp = document.createElement('div');
+	temp.innerHTML = rawHtml.html;
+	if (width > 0)
+	{
+		temp.style.width = width + 'px';
+	}
+	temp.style.visibility = 'hidden';
+	temp.style.styleFloat = 'left';
+	temp.style.cssFloat = 'left';
+
+	document.body.appendChild(temp);
+
+	// get dimensions
+	var style = window.getComputedStyle(temp, null);
+	var w = Math.ceil(style.getPropertyValue('width').slice(0, -2) - 0);
+	var h = Math.ceil(style.getPropertyValue('height').slice(0, -2) - 0);
+	document.body.removeChild(temp);
+	return _elm_lang$core$Native_Utils.Tuple2(w, h);
+}
+
+
+return {
+	toHtml: toHtml,
+
+	render: render,
+	update: update,
+	createNode: createNode,
+	newElement: F3(newElement),
+	addTransform: addTransform,
+
+	block: block
+};
+
+}();
+
+
+var _evancz$elm_graphics$Text$wrap = F3(
+	function (maybeHref, styles, insides) {
+		var linkedInsides = function () {
+			var _p0 = maybeHref;
+			if (_p0.ctor === 'Nothing') {
+				return insides;
+			} else {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'<a href=\"',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p0._0,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'\">',
+							A2(_elm_lang$core$Basics_ops['++'], insides, '</a>'))));
+			}
+		}();
+		return _elm_lang$core$Native_Utils.eq(styles, '') ? linkedInsides : A2(
+			_elm_lang$core$Basics_ops['++'],
+			'<span style=\"',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				styles,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'\">',
+					A2(_elm_lang$core$Basics_ops['++'], linkedInsides, '</span>'))));
+	});
+var _evancz$elm_graphics$Text$replace = F3(
+	function (from, to, str) {
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_elm_lang$core$Regex$regex(from),
+			function (_p1) {
+				return to;
+			},
+			str);
+	});
+var _evancz$elm_graphics$Text$toHtmlString = function (text) {
+	return A3(_evancz$elm_graphics$Text$toHtmlStringHelp, _elm_lang$core$Maybe$Nothing, '', text);
+};
+var _evancz$elm_graphics$Text$toHtmlStringHelp = F3(
+	function (maybeHref, styles, text) {
+		toHtmlStringHelp:
+		while (true) {
+			var _p2 = text;
+			switch (_p2.ctor) {
+				case 'Str':
+					return A3(
+						_evancz$elm_graphics$Text$wrap,
+						maybeHref,
+						styles,
+						A2(
+							_elm_lang$core$String$join,
+							'<br>',
+							A2(
+								_elm_lang$core$List$map,
+								A2(_evancz$elm_graphics$Text$replace, ' ', '&nbsp;'),
+								_elm_lang$core$String$lines(
+									A3(
+										_evancz$elm_graphics$Text$replace,
+										'>',
+										'&#62;',
+										A3(
+											_evancz$elm_graphics$Text$replace,
+											'<',
+											'&#60;',
+											A3(
+												_evancz$elm_graphics$Text$replace,
+												'\'',
+												'&#39;',
+												A3(_evancz$elm_graphics$Text$replace, '\"', '&#34;', _p2._0))))))));
+				case 'Append':
+					return A3(
+						_evancz$elm_graphics$Text$wrap,
+						maybeHref,
+						styles,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_evancz$elm_graphics$Text$toHtmlString(_p2._0),
+							_evancz$elm_graphics$Text$toHtmlString(_p2._1)));
+				case 'Link':
+					var _v2 = _elm_lang$core$Maybe$Just(
+						A2(_elm_lang$core$Maybe$withDefault, _p2._0, maybeHref)),
+						_v3 = styles,
+						_v4 = _p2._1;
+					maybeHref = _v2;
+					styles = _v3;
+					text = _v4;
+					continue toHtmlStringHelp;
+				default:
+					var _v5 = maybeHref,
+						_v6 = A2(
+						_elm_lang$core$Basics_ops['++'],
+						styles,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p2._0,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								':',
+								A2(_elm_lang$core$Basics_ops['++'], _p2._1, ';')))),
+						_v7 = _p2._2;
+					maybeHref = _v5;
+					styles = _v6;
+					text = _v7;
+					continue toHtmlStringHelp;
+			}
+		}
+	});
+var _evancz$elm_graphics$Text$colorToCss = function (color) {
+	var _p3 = _elm_lang$core$Color$toRgb(color);
+	var red = _p3.red;
+	var green = _p3.green;
+	var blue = _p3.blue;
+	var alpha = _p3.alpha;
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'rgba(',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(red),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				', ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(green),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						', ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(blue),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(alpha),
+									')'))))))));
+};
+var _evancz$elm_graphics$Text$typefacesToString = function (faces) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'\'',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(_elm_lang$core$String$join, '\', \'', faces),
+			'\''));
+};
+var _evancz$elm_graphics$Text$maybeAdd = F3(
+	function (add, maybeValue, text) {
+		var _p4 = maybeValue;
+		if (_p4.ctor === 'Nothing') {
+			return text;
+		} else {
+			return A2(add, _p4._0, text);
+		}
+	});
+var _evancz$elm_graphics$Text$defaultStyle = {
+	typeface: {ctor: '[]'},
+	height: _elm_lang$core$Maybe$Nothing,
+	color: _elm_lang$core$Color$black,
+	bold: false,
+	italic: false,
+	line: _elm_lang$core$Maybe$Nothing
+};
+var _evancz$elm_graphics$Text$Style = F6(
+	function (a, b, c, d, e, f) {
+		return {typeface: a, height: b, color: c, bold: d, italic: e, line: f};
+	});
+var _evancz$elm_graphics$Text$Meta = F3(
+	function (a, b, c) {
+		return {ctor: 'Meta', _0: a, _1: b, _2: c};
+	});
+var _evancz$elm_graphics$Text$typeface = F2(
+	function (faces, text) {
+		var _p5 = faces;
+		if (_p5.ctor === '[]') {
+			return text;
+		} else {
+			return A3(
+				_evancz$elm_graphics$Text$Meta,
+				'font-family',
+				_evancz$elm_graphics$Text$typefacesToString(faces),
+				text);
+		}
+	});
+var _evancz$elm_graphics$Text$monospace = function (text) {
+	return A3(_evancz$elm_graphics$Text$Meta, 'font-family', 'monospace', text);
+};
+var _evancz$elm_graphics$Text$height = F2(
+	function (px, text) {
+		return A3(
+			_evancz$elm_graphics$Text$Meta,
+			'font-size',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(px),
+				'px'),
+			text);
+	});
+var _evancz$elm_graphics$Text$color = F2(
+	function (color, text) {
+		return A3(
+			_evancz$elm_graphics$Text$Meta,
+			'color',
+			_evancz$elm_graphics$Text$colorToCss(color),
+			text);
+	});
+var _evancz$elm_graphics$Text$bold = function (text) {
+	return A3(_evancz$elm_graphics$Text$Meta, 'font-weight', 'bold', text);
+};
+var _evancz$elm_graphics$Text$italic = function (text) {
+	return A3(_evancz$elm_graphics$Text$Meta, 'font-style', 'italic', text);
+};
+var _evancz$elm_graphics$Text$line = F2(
+	function (lineTag, text) {
+		var decoration = function () {
+			var _p6 = lineTag;
+			switch (_p6.ctor) {
+				case 'Under':
+					return 'underline';
+				case 'Over':
+					return 'overline';
+				default:
+					return 'line-through';
+			}
+		}();
+		return A3(_evancz$elm_graphics$Text$Meta, 'text-decoration', decoration, text);
+	});
+var _evancz$elm_graphics$Text$style = F2(
+	function (sty, text) {
+		return A3(
+			_evancz$elm_graphics$Text$maybeAdd,
+			_evancz$elm_graphics$Text$height,
+			sty.height,
+			A3(
+				_evancz$elm_graphics$Text$maybeAdd,
+				_evancz$elm_graphics$Text$line,
+				sty.line,
+				(sty.italic ? _evancz$elm_graphics$Text$italic : _elm_lang$core$Basics$identity)(
+					(sty.bold ? _evancz$elm_graphics$Text$bold : _elm_lang$core$Basics$identity)(
+						A2(
+							_evancz$elm_graphics$Text$typeface,
+							sty.typeface,
+							A2(_evancz$elm_graphics$Text$color, sty.color, text))))));
+	});
+var _evancz$elm_graphics$Text$Link = F2(
+	function (a, b) {
+		return {ctor: 'Link', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Text$link = _evancz$elm_graphics$Text$Link;
+var _evancz$elm_graphics$Text$Append = F2(
+	function (a, b) {
+		return {ctor: 'Append', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Text$append = _evancz$elm_graphics$Text$Append;
+var _evancz$elm_graphics$Text$Str = function (a) {
+	return {ctor: 'Str', _0: a};
+};
+var _evancz$elm_graphics$Text$fromString = _evancz$elm_graphics$Text$Str;
+var _evancz$elm_graphics$Text$empty = _evancz$elm_graphics$Text$fromString('');
+var _evancz$elm_graphics$Text$concat = function (texts) {
+	return A3(_elm_lang$core$List$foldr, _evancz$elm_graphics$Text$append, _evancz$elm_graphics$Text$empty, texts);
+};
+var _evancz$elm_graphics$Text$join = F2(
+	function (seperator, texts) {
+		return _evancz$elm_graphics$Text$concat(
+			A2(_elm_lang$core$List$intersperse, seperator, texts));
+	});
+var _evancz$elm_graphics$Text$Through = {ctor: 'Through'};
+var _evancz$elm_graphics$Text$Over = {ctor: 'Over'};
+var _evancz$elm_graphics$Text$Under = {ctor: 'Under'};
+
+var _evancz$elm_graphics$Element$justified = _evancz$elm_graphics$Native_Element.block('justify');
+var _evancz$elm_graphics$Element$centered = _evancz$elm_graphics$Native_Element.block('center');
+var _evancz$elm_graphics$Element$rightAligned = _evancz$elm_graphics$Native_Element.block('right');
+var _evancz$elm_graphics$Element$leftAligned = _evancz$elm_graphics$Native_Element.block('left');
+var _evancz$elm_graphics$Element$show = function (value) {
+	return _evancz$elm_graphics$Element$leftAligned(
+		_evancz$elm_graphics$Text$monospace(
+			_evancz$elm_graphics$Text$fromString(
+				_elm_lang$core$Basics$toString(value))));
+};
+var _evancz$elm_graphics$Element$newElement = _evancz$elm_graphics$Native_Element.newElement;
+var _evancz$elm_graphics$Element$sizeOf = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._0;
+	return {ctor: '_Tuple2', _0: _p2.props.width, _1: _p2.props.height};
+};
+var _evancz$elm_graphics$Element$heightOf = function (_p3) {
+	var _p4 = _p3;
+	return _p4._0.props.height;
+};
+var _evancz$elm_graphics$Element$widthOf = function (_p5) {
+	var _p6 = _p5;
+	return _p6._0.props.width;
+};
+var _evancz$elm_graphics$Element$toHtml = _evancz$elm_graphics$Native_Element.toHtml;
+var _evancz$elm_graphics$Element$Properties = F6(
+	function (a, b, c, d, e, f) {
+		return {width: a, height: b, opacity: c, color: d, href: e, tag: f};
+	});
+var _evancz$elm_graphics$Element$RawPosition = F4(
+	function (a, b, c, d) {
+		return {horizontal: a, vertical: b, x: c, y: d};
+	});
+var _evancz$elm_graphics$Element$Element_elm_builtin = function (a) {
+	return {ctor: 'Element_elm_builtin', _0: a};
+};
+var _evancz$elm_graphics$Element$width = F2(
+	function (newWidth, _p7) {
+		var _p8 = _p7;
+		var _p11 = _p8._0.props;
+		var _p10 = _p8._0.element;
+		var newHeight = function () {
+			var _p9 = _p10;
+			switch (_p9.ctor) {
+				case 'Image':
+					return _elm_lang$core$Basics$round(
+						(_elm_lang$core$Basics$toFloat(_p9._2) / _elm_lang$core$Basics$toFloat(_p9._1)) * _elm_lang$core$Basics$toFloat(newWidth));
+				case 'RawHtml':
+					return _elm_lang$core$Tuple$second(
+						A2(_evancz$elm_graphics$Native_Element.htmlHeight, newWidth, _p10));
+				default:
+					return _p11.height;
+			}
+		}();
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p10,
+				props: _elm_lang$core$Native_Utils.update(
+					_p11,
+					{width: newWidth, height: newHeight})
+			});
+	});
+var _evancz$elm_graphics$Element$height = F2(
+	function (newHeight, _p12) {
+		var _p13 = _p12;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p13._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p13._0.props,
+					{height: newHeight})
+			});
+	});
+var _evancz$elm_graphics$Element$size = F3(
+	function (w, h, e) {
+		return A2(
+			_evancz$elm_graphics$Element$height,
+			h,
+			A2(_evancz$elm_graphics$Element$width, w, e));
+	});
+var _evancz$elm_graphics$Element$opacity = F2(
+	function (givenOpacity, _p14) {
+		var _p15 = _p14;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p15._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p15._0.props,
+					{opacity: givenOpacity})
+			});
+	});
+var _evancz$elm_graphics$Element$color = F2(
+	function (clr, _p16) {
+		var _p17 = _p16;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p17._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p17._0.props,
+					{
+						color: _elm_lang$core$Maybe$Just(clr)
+					})
+			});
+	});
+var _evancz$elm_graphics$Element$tag = F2(
+	function (name, _p18) {
+		var _p19 = _p18;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p19._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p19._0.props,
+					{tag: name})
+			});
+	});
+var _evancz$elm_graphics$Element$link = F2(
+	function (href, _p20) {
+		var _p21 = _p20;
+		return _evancz$elm_graphics$Element$Element_elm_builtin(
+			{
+				element: _p21._0.element,
+				props: _elm_lang$core$Native_Utils.update(
+					_p21._0.props,
+					{href: href})
+			});
+	});
+var _evancz$elm_graphics$Element$Custom = {ctor: 'Custom'};
+var _evancz$elm_graphics$Element$RawHtml = {ctor: 'RawHtml'};
+var _evancz$elm_graphics$Element$Spacer = {ctor: 'Spacer'};
+var _evancz$elm_graphics$Element$spacer = F2(
+	function (w, h) {
+		return A3(_evancz$elm_graphics$Element$newElement, w, h, _evancz$elm_graphics$Element$Spacer);
+	});
+var _evancz$elm_graphics$Element$empty = A2(_evancz$elm_graphics$Element$spacer, 0, 0);
+var _evancz$elm_graphics$Element$Flow = F2(
+	function (a, b) {
+		return {ctor: 'Flow', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Element$flow = F2(
+	function (dir, es) {
+		var newFlow = F2(
+			function (w, h) {
+				return A3(
+					_evancz$elm_graphics$Element$newElement,
+					w,
+					h,
+					A2(_evancz$elm_graphics$Element$Flow, dir, es));
+			});
+		var maxOrZero = function (list) {
+			return A2(
+				_elm_lang$core$Maybe$withDefault,
+				0,
+				_elm_lang$core$List$maximum(list));
+		};
+		var hs = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$heightOf, es);
+		var ws = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$widthOf, es);
+		if (_elm_lang$core$Native_Utils.eq(
+			es,
+			{ctor: '[]'})) {
+			return _evancz$elm_graphics$Element$empty;
+		} else {
+			var _p22 = dir;
+			switch (_p22.ctor) {
+				case 'DUp':
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						_elm_lang$core$List$sum(hs));
+				case 'DDown':
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						_elm_lang$core$List$sum(hs));
+				case 'DLeft':
+					return A2(
+						newFlow,
+						_elm_lang$core$List$sum(ws),
+						maxOrZero(hs));
+				case 'DRight':
+					return A2(
+						newFlow,
+						_elm_lang$core$List$sum(ws),
+						maxOrZero(hs));
+				case 'DIn':
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						maxOrZero(hs));
+				default:
+					return A2(
+						newFlow,
+						maxOrZero(ws),
+						maxOrZero(hs));
+			}
+		}
+	});
+var _evancz$elm_graphics$Element$Container = F2(
+	function (a, b) {
+		return {ctor: 'Container', _0: a, _1: b};
+	});
+var _evancz$elm_graphics$Element$container = F4(
+	function (w, h, _p23, e) {
+		var _p24 = _p23;
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A2(_evancz$elm_graphics$Element$Container, _p24._0, e));
+	});
+var _evancz$elm_graphics$Element$Image = F4(
+	function (a, b, c, d) {
+		return {ctor: 'Image', _0: a, _1: b, _2: c, _3: d};
+	});
+var _evancz$elm_graphics$Element$Tiled = {ctor: 'Tiled'};
+var _evancz$elm_graphics$Element$tiledImage = F3(
+	function (w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(_evancz$elm_graphics$Element$Image, _evancz$elm_graphics$Element$Tiled, w, h, src));
+	});
+var _evancz$elm_graphics$Element$Cropped = function (a) {
+	return {ctor: 'Cropped', _0: a};
+};
+var _evancz$elm_graphics$Element$croppedImage = F4(
+	function (pos, w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(
+				_evancz$elm_graphics$Element$Image,
+				_evancz$elm_graphics$Element$Cropped(pos),
+				w,
+				h,
+				src));
+	});
+var _evancz$elm_graphics$Element$Fitted = {ctor: 'Fitted'};
+var _evancz$elm_graphics$Element$fittedImage = F3(
+	function (w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(_evancz$elm_graphics$Element$Image, _evancz$elm_graphics$Element$Fitted, w, h, src));
+	});
+var _evancz$elm_graphics$Element$Plain = {ctor: 'Plain'};
+var _evancz$elm_graphics$Element$image = F3(
+	function (w, h, src) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			w,
+			h,
+			A4(_evancz$elm_graphics$Element$Image, _evancz$elm_graphics$Element$Plain, w, h, src));
+	});
+var _evancz$elm_graphics$Element$N = {ctor: 'N'};
+var _evancz$elm_graphics$Element$Z = {ctor: 'Z'};
+var _evancz$elm_graphics$Element$P = {ctor: 'P'};
+var _evancz$elm_graphics$Element$Relative = function (a) {
+	return {ctor: 'Relative', _0: a};
+};
+var _evancz$elm_graphics$Element$relative = _evancz$elm_graphics$Element$Relative;
+var _evancz$elm_graphics$Element$Absolute = function (a) {
+	return {ctor: 'Absolute', _0: a};
+};
+var _evancz$elm_graphics$Element$absolute = _evancz$elm_graphics$Element$Absolute;
+var _evancz$elm_graphics$Element$Position = function (a) {
+	return {ctor: 'Position', _0: a};
+};
+var _evancz$elm_graphics$Element$middle = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$Z,
+		vertical: _evancz$elm_graphics$Element$Z,
+		x: _evancz$elm_graphics$Element$Relative(0.5),
+		y: _evancz$elm_graphics$Element$Relative(0.5)
+	});
+var _evancz$elm_graphics$Element$topLeft = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$N,
+		vertical: _evancz$elm_graphics$Element$P,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$topRight = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$P,
+		vertical: _evancz$elm_graphics$Element$P,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$bottomLeft = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$N,
+		vertical: _evancz$elm_graphics$Element$N,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$bottomRight = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$P,
+		vertical: _evancz$elm_graphics$Element$N,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$midLeft = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$N,
+		vertical: _evancz$elm_graphics$Element$Z,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Relative(0.5)
+	});
+var _evancz$elm_graphics$Element$midRight = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$P,
+		vertical: _evancz$elm_graphics$Element$Z,
+		x: _evancz$elm_graphics$Element$Absolute(0),
+		y: _evancz$elm_graphics$Element$Relative(0.5)
+	});
+var _evancz$elm_graphics$Element$midTop = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$Z,
+		vertical: _evancz$elm_graphics$Element$P,
+		x: _evancz$elm_graphics$Element$Relative(0.5),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$midBottom = _evancz$elm_graphics$Element$Position(
+	{
+		horizontal: _evancz$elm_graphics$Element$Z,
+		vertical: _evancz$elm_graphics$Element$N,
+		x: _evancz$elm_graphics$Element$Relative(0.5),
+		y: _evancz$elm_graphics$Element$Absolute(0)
+	});
+var _evancz$elm_graphics$Element$middleAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$Z, vertical: _evancz$elm_graphics$Element$Z, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$topLeftAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$N, vertical: _evancz$elm_graphics$Element$P, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$topRightAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$P, vertical: _evancz$elm_graphics$Element$P, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$bottomLeftAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$N, vertical: _evancz$elm_graphics$Element$N, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$bottomRightAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$P, vertical: _evancz$elm_graphics$Element$N, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midLeftAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$N, vertical: _evancz$elm_graphics$Element$Z, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midRightAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$P, vertical: _evancz$elm_graphics$Element$Z, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midTopAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$Z, vertical: _evancz$elm_graphics$Element$P, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$midBottomAt = F2(
+	function (x, y) {
+		return _evancz$elm_graphics$Element$Position(
+			{horizontal: _evancz$elm_graphics$Element$Z, vertical: _evancz$elm_graphics$Element$N, x: x, y: y});
+	});
+var _evancz$elm_graphics$Element$DOut = {ctor: 'DOut'};
+var _evancz$elm_graphics$Element$layers = function (es) {
+	var hs = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$heightOf, es);
+	var ws = A2(_elm_lang$core$List$map, _evancz$elm_graphics$Element$widthOf, es);
+	return A3(
+		_evancz$elm_graphics$Element$newElement,
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			_elm_lang$core$List$maximum(ws)),
+		A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			_elm_lang$core$List$maximum(hs)),
+		A2(_evancz$elm_graphics$Element$Flow, _evancz$elm_graphics$Element$DOut, es));
+};
+var _evancz$elm_graphics$Element$outward = _evancz$elm_graphics$Element$DOut;
+var _evancz$elm_graphics$Element$DIn = {ctor: 'DIn'};
+var _evancz$elm_graphics$Element$inward = _evancz$elm_graphics$Element$DIn;
+var _evancz$elm_graphics$Element$DRight = {ctor: 'DRight'};
+var _evancz$elm_graphics$Element$right = _evancz$elm_graphics$Element$DRight;
+var _evancz$elm_graphics$Element$beside = F2(
+	function (lft, rht) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			_evancz$elm_graphics$Element$widthOf(lft) + _evancz$elm_graphics$Element$widthOf(rht),
+			A2(
+				_elm_lang$core$Basics$max,
+				_evancz$elm_graphics$Element$heightOf(lft),
+				_evancz$elm_graphics$Element$heightOf(rht)),
+			A2(
+				_evancz$elm_graphics$Element$Flow,
+				_evancz$elm_graphics$Element$right,
+				{
+					ctor: '::',
+					_0: lft,
+					_1: {
+						ctor: '::',
+						_0: rht,
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _evancz$elm_graphics$Element$DLeft = {ctor: 'DLeft'};
+var _evancz$elm_graphics$Element$left = _evancz$elm_graphics$Element$DLeft;
+var _evancz$elm_graphics$Element$DDown = {ctor: 'DDown'};
+var _evancz$elm_graphics$Element$above = F2(
+	function (hi, lo) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			A2(
+				_elm_lang$core$Basics$max,
+				_evancz$elm_graphics$Element$widthOf(hi),
+				_evancz$elm_graphics$Element$widthOf(lo)),
+			_evancz$elm_graphics$Element$heightOf(hi) + _evancz$elm_graphics$Element$heightOf(lo),
+			A2(
+				_evancz$elm_graphics$Element$Flow,
+				_evancz$elm_graphics$Element$DDown,
+				{
+					ctor: '::',
+					_0: hi,
+					_1: {
+						ctor: '::',
+						_0: lo,
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _evancz$elm_graphics$Element$below = F2(
+	function (lo, hi) {
+		return A3(
+			_evancz$elm_graphics$Element$newElement,
+			A2(
+				_elm_lang$core$Basics$max,
+				_evancz$elm_graphics$Element$widthOf(hi),
+				_evancz$elm_graphics$Element$widthOf(lo)),
+			_evancz$elm_graphics$Element$heightOf(hi) + _evancz$elm_graphics$Element$heightOf(lo),
+			A2(
+				_evancz$elm_graphics$Element$Flow,
+				_evancz$elm_graphics$Element$DDown,
+				{
+					ctor: '::',
+					_0: hi,
+					_1: {
+						ctor: '::',
+						_0: lo,
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _evancz$elm_graphics$Element$down = _evancz$elm_graphics$Element$DDown;
+var _evancz$elm_graphics$Element$DUp = {ctor: 'DUp'};
+var _evancz$elm_graphics$Element$up = _evancz$elm_graphics$Element$DUp;
+
+var _evancz$url_parser$UrlParser$toKeyValuePair = function (segment) {
+	var _p0 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '[]')) {
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			_elm_lang$http$Http$decodeUri(_p0._0),
+			_elm_lang$http$Http$decodeUri(_p0._1._0));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _evancz$url_parser$UrlParser$parseParams = function (queryString) {
+	return _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$filterMap,
+			_evancz$url_parser$UrlParser$toKeyValuePair,
+			A2(
+				_elm_lang$core$String$split,
+				'&',
+				A2(_elm_lang$core$String$dropLeft, 1, queryString))));
+};
+var _evancz$url_parser$UrlParser$splitUrl = function (url) {
+	var _p1 = A2(_elm_lang$core$String$split, '/', url);
+	if ((_p1.ctor === '::') && (_p1._0 === '')) {
+		return _p1._1;
+	} else {
+		return _p1;
+	}
+};
+var _evancz$url_parser$UrlParser$parseHelp = function (states) {
+	parseHelp:
+	while (true) {
+		var _p2 = states;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p4 = _p2._0;
+			var _p3 = _p4.unvisited;
+			if (_p3.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p4.value);
+			} else {
+				if ((_p3._0 === '') && (_p3._1.ctor === '[]')) {
+					return _elm_lang$core$Maybe$Just(_p4.value);
+				} else {
+					var _v4 = _p2._1;
+					states = _v4;
+					continue parseHelp;
+				}
+			}
+		}
+	}
+};
+var _evancz$url_parser$UrlParser$parse = F3(
+	function (_p5, url, params) {
+		var _p6 = _p5;
+		return _evancz$url_parser$UrlParser$parseHelp(
+			_p6._0(
+				{
+					visited: {ctor: '[]'},
+					unvisited: _evancz$url_parser$UrlParser$splitUrl(url),
+					params: params,
+					value: _elm_lang$core$Basics$identity
+				}));
+	});
+var _evancz$url_parser$UrlParser$parseHash = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			A2(_elm_lang$core$String$dropLeft, 1, location.hash),
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$parsePath = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			location.pathname,
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$intParamHelp = function (maybeValue) {
+	var _p7 = maybeValue;
+	if (_p7.ctor === 'Nothing') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Result$toMaybe(
+			_elm_lang$core$String$toInt(_p7._0));
+	}
+};
+var _evancz$url_parser$UrlParser$mapHelp = F2(
+	function (func, _p8) {
+		var _p9 = _p8;
+		return {
+			visited: _p9.visited,
+			unvisited: _p9.unvisited,
+			params: _p9.params,
+			value: func(_p9.value)
+		};
+	});
+var _evancz$url_parser$UrlParser$State = F4(
+	function (a, b, c, d) {
+		return {visited: a, unvisited: b, params: c, value: d};
+	});
+var _evancz$url_parser$UrlParser$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _evancz$url_parser$UrlParser$s = function (str) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (_p10) {
+			var _p11 = _p10;
+			var _p12 = _p11.unvisited;
+			if (_p12.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				var _p13 = _p12._0;
+				return _elm_lang$core$Native_Utils.eq(_p13, str) ? {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						{ctor: '::', _0: _p13, _1: _p11.visited},
+						_p12._1,
+						_p11.params,
+						_p11.value),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'};
+			}
+		});
+};
+var _evancz$url_parser$UrlParser$custom = F2(
+	function (tipe, stringToSomething) {
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p14) {
+				var _p15 = _p14;
+				var _p16 = _p15.unvisited;
+				if (_p16.ctor === '[]') {
+					return {ctor: '[]'};
+				} else {
+					var _p18 = _p16._0;
+					var _p17 = stringToSomething(_p18);
+					if (_p17.ctor === 'Ok') {
+						return {
+							ctor: '::',
+							_0: A4(
+								_evancz$url_parser$UrlParser$State,
+								{ctor: '::', _0: _p18, _1: _p15.visited},
+								_p16._1,
+								_p15.params,
+								_p15.value(_p17._0)),
+							_1: {ctor: '[]'}
+						};
+					} else {
+						return {ctor: '[]'};
+					}
+				}
+			});
+	});
+var _evancz$url_parser$UrlParser$string = A2(_evancz$url_parser$UrlParser$custom, 'STRING', _elm_lang$core$Result$Ok);
+var _evancz$url_parser$UrlParser$int = A2(_evancz$url_parser$UrlParser$custom, 'NUMBER', _elm_lang$core$String$toInt);
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['</>'] = F2(
+	function (_p20, _p19) {
+		var _p21 = _p20;
+		var _p22 = _p19;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p22._0,
+					_p21._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$map = F2(
+	function (subValue, _p23) {
+		var _p24 = _p23;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p25) {
+				var _p26 = _p25;
+				return A2(
+					_elm_lang$core$List$map,
+					_evancz$url_parser$UrlParser$mapHelp(_p26.value),
+					_p24._0(
+						{visited: _p26.visited, unvisited: _p26.unvisited, params: _p26.params, value: subValue}));
+			});
+	});
+var _evancz$url_parser$UrlParser$oneOf = function (parsers) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (state) {
+			return A2(
+				_elm_lang$core$List$concatMap,
+				function (_p27) {
+					var _p28 = _p27;
+					return _p28._0(state);
+				},
+				parsers);
+		});
+};
+var _evancz$url_parser$UrlParser$top = _evancz$url_parser$UrlParser$Parser(
+	function (state) {
+		return {
+			ctor: '::',
+			_0: state,
+			_1: {ctor: '[]'}
+		};
+	});
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['<?>'] = F2(
+	function (_p30, _p29) {
+		var _p31 = _p30;
+		var _p32 = _p29;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p32._0,
+					_p31._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$QueryParser = function (a) {
+	return {ctor: 'QueryParser', _0: a};
+};
+var _evancz$url_parser$UrlParser$customParam = F2(
+	function (key, func) {
+		return _evancz$url_parser$UrlParser$QueryParser(
+			function (_p33) {
+				var _p34 = _p33;
+				var _p35 = _p34.params;
+				return {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						_p34.visited,
+						_p34.unvisited,
+						_p35,
+						_p34.value(
+							func(
+								A2(_elm_lang$core$Dict$get, key, _p35)))),
+					_1: {ctor: '[]'}
+				};
+			});
+	});
+var _evancz$url_parser$UrlParser$stringParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _elm_lang$core$Basics$identity);
+};
+var _evancz$url_parser$UrlParser$intParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
+};
+
+var _mgold$elm_date_format$Date_Format$padWith = function (c) {
+	return function (_p0) {
+		return A3(
+			_elm_lang$core$String$padLeft,
+			2,
+			c,
+			_elm_lang$core$Basics$toString(_p0));
+	};
+};
+var _mgold$elm_date_format$Date_Format$zero2twelve = function (n) {
+	return _elm_lang$core$Native_Utils.eq(n, 0) ? 12 : n;
+};
+var _mgold$elm_date_format$Date_Format$mod12 = function (h) {
+	return A2(_elm_lang$core$Basics_ops['%'], h, 12);
+};
+var _mgold$elm_date_format$Date_Format$fullDayOfWeek = function (dow) {
+	var _p1 = dow;
+	switch (_p1.ctor) {
+		case 'Mon':
+			return 'Monday';
+		case 'Tue':
+			return 'Tuesday';
+		case 'Wed':
+			return 'Wednesday';
+		case 'Thu':
+			return 'Thursday';
+		case 'Fri':
+			return 'Friday';
+		case 'Sat':
+			return 'Saturday';
+		default:
+			return 'Sunday';
+	}
+};
+var _mgold$elm_date_format$Date_Format$monthToFullName = function (m) {
+	var _p2 = m;
+	switch (_p2.ctor) {
+		case 'Jan':
+			return 'January';
+		case 'Feb':
+			return 'February';
+		case 'Mar':
+			return 'March';
+		case 'Apr':
+			return 'April';
+		case 'May':
+			return 'May';
+		case 'Jun':
+			return 'June';
+		case 'Jul':
+			return 'July';
+		case 'Aug':
+			return 'August';
+		case 'Sep':
+			return 'September';
+		case 'Oct':
+			return 'October';
+		case 'Nov':
+			return 'November';
+		default:
+			return 'December';
+	}
+};
+var _mgold$elm_date_format$Date_Format$monthToInt = function (m) {
+	var _p3 = m;
+	switch (_p3.ctor) {
+		case 'Jan':
+			return 1;
+		case 'Feb':
+			return 2;
+		case 'Mar':
+			return 3;
+		case 'Apr':
+			return 4;
+		case 'May':
+			return 5;
+		case 'Jun':
+			return 6;
+		case 'Jul':
+			return 7;
+		case 'Aug':
+			return 8;
+		case 'Sep':
+			return 9;
+		case 'Oct':
+			return 10;
+		case 'Nov':
+			return 11;
+		default:
+			return 12;
+	}
+};
+var _mgold$elm_date_format$Date_Format$formatToken = F2(
+	function (d, m) {
+		var symbol = function () {
+			var _p4 = m.submatches;
+			if (((_p4.ctor === '::') && (_p4._0.ctor === 'Just')) && (_p4._1.ctor === '[]')) {
+				return _p4._0._0;
+			} else {
+				return ' ';
+			}
+		}();
+		var _p5 = symbol;
+		switch (_p5) {
+			case '%':
+				return '%';
+			case 'Y':
+				return _elm_lang$core$Basics$toString(
+					_elm_lang$core$Date$year(d));
+			case 'y':
+				return A2(
+					_elm_lang$core$String$right,
+					2,
+					_elm_lang$core$Basics$toString(
+						_elm_lang$core$Date$year(d)));
+			case 'm':
+				return A3(
+					_elm_lang$core$String$padLeft,
+					2,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Basics$toString(
+						_mgold$elm_date_format$Date_Format$monthToInt(
+							_elm_lang$core$Date$month(d))));
+			case 'B':
+				return _mgold$elm_date_format$Date_Format$monthToFullName(
+					_elm_lang$core$Date$month(d));
+			case 'b':
+				return _elm_lang$core$Basics$toString(
+					_elm_lang$core$Date$month(d));
+			case 'd':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$day(d));
+			case 'e':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr(' '),
+					_elm_lang$core$Date$day(d));
+			case 'a':
+				return _elm_lang$core$Basics$toString(
+					_elm_lang$core$Date$dayOfWeek(d));
+			case 'A':
+				return _mgold$elm_date_format$Date_Format$fullDayOfWeek(
+					_elm_lang$core$Date$dayOfWeek(d));
+			case 'H':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$hour(d));
+			case 'k':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr(' '),
+					_elm_lang$core$Date$hour(d));
+			case 'I':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_mgold$elm_date_format$Date_Format$zero2twelve(
+						_mgold$elm_date_format$Date_Format$mod12(
+							_elm_lang$core$Date$hour(d))));
+			case 'l':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr(' '),
+					_mgold$elm_date_format$Date_Format$zero2twelve(
+						_mgold$elm_date_format$Date_Format$mod12(
+							_elm_lang$core$Date$hour(d))));
+			case 'p':
+				return (_elm_lang$core$Native_Utils.cmp(
+					_elm_lang$core$Date$hour(d),
+					12) < 0) ? 'AM' : 'PM';
+			case 'P':
+				return (_elm_lang$core$Native_Utils.cmp(
+					_elm_lang$core$Date$hour(d),
+					12) < 0) ? 'am' : 'pm';
+			case 'M':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$minute(d));
+			case 'S':
+				return A2(
+					_mgold$elm_date_format$Date_Format$padWith,
+					_elm_lang$core$Native_Utils.chr('0'),
+					_elm_lang$core$Date$second(d));
+			default:
+				return '';
+		}
+	});
+var _mgold$elm_date_format$Date_Format$re = _elm_lang$core$Regex$regex('%(%|Y|y|m|B|b|d|e|a|A|H|k|I|l|p|P|M|S)');
+var _mgold$elm_date_format$Date_Format$format = F2(
+	function (s, d) {
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_mgold$elm_date_format$Date_Format$re,
+			_mgold$elm_date_format$Date_Format$formatToken(d),
+			s);
+	});
+var _mgold$elm_date_format$Date_Format$formatISO8601 = _mgold$elm_date_format$Date_Format$format('%Y-%m-%dT%H:%M:%SZ');
+
+var _narkisr$elm_ui$Systems_Model_AWS$endpoints = _elm_lang$core$Dict$fromList(
+	{
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'us-east-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'US East (N. Virginia)',
+				_1: 'ec2.us-east-1.amazonaws.com',
+				_2: {
+					ctor: '::',
+					_0: 'a',
+					_1: {
+						ctor: '::',
+						_0: 'b',
+						_1: {
+							ctor: '::',
+							_0: 'd',
+							_1: {
+								ctor: '::',
+								_0: 'e',
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'us-west-1',
+				_1: {
+					ctor: '_Tuple3',
+					_0: 'US West (N. California)',
+					_1: 'ec2.us-west-1.amazonaws.com',
+					_2: {
+						ctor: '::',
+						_0: 'a',
+						_1: {
+							ctor: '::',
+							_0: 'b',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'us-west-2',
+					_1: {
+						ctor: '_Tuple3',
+						_0: 'US West (Oregon)',
+						_1: 'ec2.us-west-2.amazonaws.com',
+						_2: {
+							ctor: '::',
+							_0: 'a',
+							_1: {
+								ctor: '::',
+								_0: 'b',
+								_1: {
+									ctor: '::',
+									_0: 'c',
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'eu-west-1',
+						_1: {
+							ctor: '_Tuple3',
+							_0: 'EU (Ireland)',
+							_1: 'ec2.eu-west-1.amazonaws.com',
+							_2: {
+								ctor: '::',
+								_0: 'a',
+								_1: {
+									ctor: '::',
+									_0: 'b',
+									_1: {
+										ctor: '::',
+										_0: 'c',
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'eu-central-1',
+							_1: {
+								ctor: '_Tuple3',
+								_0: 'EU (Frankfurt)',
+								_1: 'ec2.eu-central-1.amazonaws.com',
+								_2: {
+									ctor: '::',
+									_0: 'a',
+									_1: {
+										ctor: '::',
+										_0: 'b',
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'ap-southeast-1',
+								_1: {
+									ctor: '_Tuple3',
+									_0: 'Asia Pacific (Singapore)',
+									_1: 'ec2.ap-southeast-1.amazonaws.com',
+									_2: {
+										ctor: '::',
+										_0: 'a',
+										_1: {
+											ctor: '::',
+											_0: 'b',
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'ap-southeast-2',
+									_1: {
+										ctor: '_Tuple3',
+										_0: 'Asia Pacific (Sydney)',
+										_1: 'ec2.ap-southeast-2.amazonaws.com',
+										_2: {
+											ctor: '::',
+											_0: 'a',
+											_1: {
+												ctor: '::',
+												_0: 'b',
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'ap-northeast-1',
+										_1: {
+											ctor: '_Tuple3',
+											_0: 'Asia Pacific (Tokyo)',
+											_1: 'ec2.ap-northeast-1.amazonaws.com',
+											_2: {
+												ctor: '::',
+												_0: 'a',
+												_1: {
+													ctor: '::',
+													_0: 'c',
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'sa-east-1',
+											_1: {
+												ctor: '_Tuple3',
+												_0: 'South America (Sao Paulo)',
+												_1: 'ec2.sa-east-1.amazonaws.com',
+												_2: {
+													ctor: '::',
+													_0: 'a',
+													_1: {
+														ctor: '::',
+														_0: 'b',
+														_1: {
+															ctor: '::',
+															_0: 'c',
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$instanceTypes = {
+	ctor: '::',
+	_0: 't1.micro',
+	_1: {
+		ctor: '::',
+		_0: 'm1.small',
+		_1: {
+			ctor: '::',
+			_0: 'm1.medium',
+			_1: {
+				ctor: '::',
+				_0: 'm1.large',
+				_1: {
+					ctor: '::',
+					_0: 'm1.xlarge',
+					_1: {
+						ctor: '::',
+						_0: 'm3.medium',
+						_1: {
+							ctor: '::',
+							_0: 'm3.large',
+							_1: {
+								ctor: '::',
+								_0: 'm3.xlarge',
+								_1: {
+									ctor: '::',
+									_0: 'm3.2xlarge',
+									_1: {
+										ctor: '::',
+										_0: 'c1.medium',
+										_1: {
+											ctor: '::',
+											_0: 'c1.xlarge',
+											_1: {
+												ctor: '::',
+												_0: 'c1.xlarge',
+												_1: {
+													ctor: '::',
+													_0: 'cc2.8xlarge',
+													_1: {
+														ctor: '::',
+														_0: 'c3.large',
+														_1: {
+															ctor: '::',
+															_0: 'c3.xlarge',
+															_1: {
+																ctor: '::',
+																_0: 'c3.2xlarge',
+																_1: {
+																	ctor: '::',
+																	_0: 'c3.4xlarge',
+																	_1: {
+																		ctor: '::',
+																		_0: 'c3.8xlarge',
+																		_1: {
+																			ctor: '::',
+																			_0: 'r3.large',
+																			_1: {
+																				ctor: '::',
+																				_0: 'r3.xlarge',
+																				_1: {
+																					ctor: '::',
+																					_0: 'r3.2xlarge',
+																					_1: {
+																						ctor: '::',
+																						_0: 'r3.4xlarge',
+																						_1: {
+																							ctor: '::',
+																							_0: 'r3.8xlarge',
+																							_1: {
+																								ctor: '::',
+																								_0: 'm2.xlarge',
+																								_1: {
+																									ctor: '::',
+																									_0: 'm2.2xlarge',
+																									_1: {
+																										ctor: '::',
+																										_0: 'm2.4xlarge',
+																										_1: {
+																											ctor: '::',
+																											_0: 'cr1.8xlarge',
+																											_1: {
+																												ctor: '::',
+																												_0: 'hi1.4xlarge',
+																												_1: {
+																													ctor: '::',
+																													_0: 'cg1.4xlarge',
+																													_1: {ctor: '[]'}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_AWS$Volume = F5(
+	function (a, b, c, d, e) {
+		return {type_: a, size: b, iops: c, device: d, clear: e};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyVolume = A5(_narkisr$elm_ui$Systems_Model_AWS$Volume, 'Magnetic', 50, _elm_lang$core$Maybe$Nothing, '', false);
+var _narkisr$elm_ui$Systems_Model_AWS$Block = F2(
+	function (a, b) {
+		return {volume: a, device: b};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyBlock = A2(_narkisr$elm_ui$Systems_Model_AWS$Block, '', '');
+var _narkisr$elm_ui$Systems_Model_AWS$VPC = F3(
+	function (a, b, c) {
+		return {subnetId: a, vpcId: b, assignPublic: c};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyVpc = A3(_narkisr$elm_ui$Systems_Model_AWS$VPC, '', '', false);
+var _narkisr$elm_ui$Systems_Model_AWS$AWS = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {instanceType: a, instanceId: b, keyName: c, endpoint: d, availabilityZone: e, securityGroups: f, ebsOptimized: g, volumes: h, blockDevices: i, vpc: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Systems_Model_AWS$emptyAws = function () {
+	var instanceType = function () {
+		var _p0 = _elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_AWS$instanceTypes);
+		if (_p0.ctor === 'Just') {
+			return _p0._0;
+		} else {
+			return '';
+		}
+	}();
+	var _p1 = A2(
+		_elm_lang$core$Maybe$withDefault,
+		{
+			ctor: '_Tuple3',
+			_0: '',
+			_1: '',
+			_2: {ctor: '[]'}
+		},
+		A2(_elm_lang$core$Dict$get, 'us-east-1', _narkisr$elm_ui$Systems_Model_AWS$endpoints));
+	var url = _p1._1;
+	var justString = _elm_lang$core$Maybe$Just('');
+	return _narkisr$elm_ui$Systems_Model_AWS$AWS(instanceType)(_elm_lang$core$Maybe$Nothing)('')(url)(_elm_lang$core$Maybe$Nothing)(
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}))(
+		_elm_lang$core$Maybe$Just(false))(
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}))(
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}))(
+		_elm_lang$core$Maybe$Just(_narkisr$elm_ui$Systems_Model_AWS$emptyVpc));
+}();
+
+var _narkisr$elm_ui$Systems_Model_GCE$zones = {
+	ctor: '::',
+	_0: 'us-east1-b',
+	_1: {
+		ctor: '::',
+		_0: 'us-east1-c',
+		_1: {
+			ctor: '::',
+			_0: 'us-east1-d',
+			_1: {
+				ctor: '::',
+				_0: 'us-central1-a',
+				_1: {
+					ctor: '::',
+					_0: 'us-central1-b',
+					_1: {
+						ctor: '::',
+						_0: 'us-central1-c',
+						_1: {
+							ctor: '::',
+							_0: 'us-central1-f',
+							_1: {
+								ctor: '::',
+								_0: 'europe-west1-b',
+								_1: {
+									ctor: '::',
+									_0: 'europe-west1-c',
+									_1: {
+										ctor: '::',
+										_0: 'europe-west1-d',
+										_1: {
+											ctor: '::',
+											_0: 'asia-east1-a',
+											_1: {
+												ctor: '::',
+												_0: 'asia-east1-b',
+												_1: {
+													ctor: '::',
+													_0: 'asia-east1-c',
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_GCE$machineTypes = {
+	ctor: '::',
+	_0: 'n1-standard-1',
+	_1: {
+		ctor: '::',
+		_0: 'n1-standard-2',
+		_1: {
+			ctor: '::',
+			_0: 'n1-standard-4',
+			_1: {
+				ctor: '::',
+				_0: 'n1-standard-8',
+				_1: {
+					ctor: '::',
+					_0: 'n1-standard-16',
+					_1: {
+						ctor: '::',
+						_0: 'n1-standard-32',
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_GCE$GCE = F5(
+	function (a, b, c, d, e) {
+		return {machineType: a, zone: b, tags: c, projectId: d, staticIp: e};
+	});
+var _narkisr$elm_ui$Systems_Model_GCE$emptyGce = function () {
+	var zone = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$zones));
+	var type_ = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$machineTypes));
+	return A5(
+		_narkisr$elm_ui$Systems_Model_GCE$GCE,
+		type_,
+		zone,
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}),
+		'',
+		_elm_lang$core$Maybe$Just(''));
+}();
+
+var _narkisr$elm_ui$Systems_Model_Digital$regions = {
+	ctor: '::',
+	_0: 'lon1',
+	_1: {
+		ctor: '::',
+		_0: 'nyc1',
+		_1: {
+			ctor: '::',
+			_0: 'ams1',
+			_1: {
+				ctor: '::',
+				_0: 'sfo1',
+				_1: {
+					ctor: '::',
+					_0: 'nyc2',
+					_1: {
+						ctor: '::',
+						_0: 'ams2',
+						_1: {
+							ctor: '::',
+							_0: 'sgp1',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_Digital$sizes = {
+	ctor: '::',
+	_0: '512mb',
+	_1: {
+		ctor: '::',
+		_0: '1gb',
+		_1: {
+			ctor: '::',
+			_0: '2gb',
+			_1: {
+				ctor: '::',
+				_0: '4gb',
+				_1: {
+					ctor: '::',
+					_0: '8gb',
+					_1: {
+						ctor: '::',
+						_0: '16gb',
+						_1: {
+							ctor: '::',
+							_0: '32gb',
+							_1: {
+								ctor: '::',
+								_0: '48gb',
+								_1: {
+									ctor: '::',
+									_0: '64gb',
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_Digital$Digital = F3(
+	function (a, b, c) {
+		return {size: a, region: b, privateNetworking: c};
+	});
+var _narkisr$elm_ui$Systems_Model_Digital$emptyDigital = A3(
+	_narkisr$elm_ui$Systems_Model_Digital$Digital,
+	A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$sizes)),
+	A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$regions)),
+	false);
+
+var _narkisr$elm_ui$Systems_Model_Openstack$Volume = F3(
+	function (a, b, c) {
+		return {device: a, size: b, clear: c};
+	});
+var _narkisr$elm_ui$Systems_Model_Openstack$emptyVolume = A3(_narkisr$elm_ui$Systems_Model_Openstack$Volume, '', 0, false);
+var _narkisr$elm_ui$Systems_Model_Openstack$Openstack = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {flavor: a, tenant: b, keyName: c, floatingIp: d, floatingIpPool: e, securityGroups: f, networks: g, volumes: h};
+	});
+var _narkisr$elm_ui$Systems_Model_Openstack$emptyOpenstack = A8(
+	_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
+	'',
+	'',
+	'',
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Maybe$Nothing,
+	{ctor: '[]'},
+	_elm_lang$core$Maybe$Nothing);
+
+var _narkisr$elm_ui$Systems_Model_Physical$Physical = F2(
+	function (a, b) {
+		return {mac: a, broadcast: b};
+	});
+var _narkisr$elm_ui$Systems_Model_Physical$emptyPhysical = A2(_narkisr$elm_ui$Systems_Model_Physical$Physical, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+
+var _narkisr$elm_ui$Systems_Model_KVM$KVM = function (a) {
+	return {node: a};
+};
+var _narkisr$elm_ui$Systems_Model_KVM$emptyKVM = _narkisr$elm_ui$Systems_Model_KVM$KVM('');
+
+var _narkisr$elm_ui$Systems_Model_Common$Machine = F7(
+	function (a, b, c, d, e, f, g) {
+		return {user: a, hostname: b, domain: c, ip: d, os: e, ram: f, cpu: g};
+	});
+var _narkisr$elm_ui$Systems_Model_Common$emptyMachine = A7(_narkisr$elm_ui$Systems_Model_Common$Machine, '', '', '', _elm_lang$core$Maybe$Nothing, '', _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+var _narkisr$elm_ui$Systems_Model_Common$resourcedMachine = F2(
+	function (cpu, ram) {
+		return A7(
+			_narkisr$elm_ui$Systems_Model_Common$Machine,
+			'',
+			'',
+			'',
+			_elm_lang$core$Maybe$Just(''),
+			'',
+			_elm_lang$core$Maybe$Just(ram),
+			_elm_lang$core$Maybe$Just(cpu));
+	});
+var _narkisr$elm_ui$Systems_Model_Common$System = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {owner: a, env: b, type_: c, machine: d, aws: e, gce: f, digital: g, openstack: h, physical: i, kvm: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Systems_Model_Common$emptySystem = function () {
+	var base = A3(_narkisr$elm_ui$Systems_Model_Common$System, '', '', '');
+	return A7(base, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+}();
+
+var _narkisr$elm_ui$Common_Http$apply = F2(
+	function (func, value) {
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			func,
+			value);
+	});
+var _narkisr$elm_ui$Common_Http$httpJson = F5(
+	function (method, body, decoder, url, msg) {
+		var payload = {
+			method: method,
+			headers: {
+				ctor: '::',
+				_0: A2(_elm_lang$http$Http$header, 'Content-Type', 'application/json;charset=UTF-8'),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$http$Http$header, 'Accept', 'application/json, text/plain, */*'),
+					_1: {ctor: '[]'}
+				}
+			},
+			url: url,
+			body: body,
+			expect: _elm_lang$http$Http$expectJson(decoder),
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		};
+		return A2(
+			_elm_lang$http$Http$send,
+			msg,
+			_elm_lang$http$Http$request(payload));
+	});
+var _narkisr$elm_ui$Common_Http$delete = A2(_narkisr$elm_ui$Common_Http$httpJson, 'DELETE', _elm_lang$http$Http$emptyBody);
+var _narkisr$elm_ui$Common_Http$getJson = A2(_narkisr$elm_ui$Common_Http$httpJson, 'GET', _elm_lang$http$Http$emptyBody);
+var _narkisr$elm_ui$Common_Http$postJson = _narkisr$elm_ui$Common_Http$httpJson('POST');
+var _narkisr$elm_ui$Common_Http$putJson = _narkisr$elm_ui$Common_Http$httpJson('PUT');
+
+var _narkisr$elm_ui$Systems_Decoders$machineDecoder = A8(
+	_elm_lang$core$Json_Decode$map7,
+	_narkisr$elm_ui$Systems_Model_Common$Machine,
+	A2(_elm_lang$core$Json_Decode$field, 'user', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'hostname', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'domain', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'ip', _elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'os', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'ram', _elm_lang$core$Json_Decode$int)),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'cpu', _elm_lang$core$Json_Decode$int)));
+var _narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Systems_Model_Openstack$Volume,
+	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'clear', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$openstackDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_elm_lang$core$Json_Decode$map,
+								_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
+								A2(_elm_lang$core$Json_Decode$field, 'flavor', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'tenant', _elm_lang$core$Json_Decode$string)),
+						A2(_elm_lang$core$Json_Decode$field, 'key-name', _elm_lang$core$Json_Decode$string)),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(_elm_lang$core$Json_Decode$field, 'floating-ip', _elm_lang$core$Json_Decode$string))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode$field, 'floating-ip-pool', _elm_lang$core$Json_Decode$string))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'security-groups',
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'networks',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'volumes',
+			_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder))));
+var _narkisr$elm_ui$Systems_Decoders$kvmDecoder = A2(
+	_elm_lang$core$Json_Decode$map,
+	_narkisr$elm_ui$Systems_Model_KVM$KVM,
+	A2(_elm_lang$core$Json_Decode$field, 'node', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Systems_Decoders$physicalDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_narkisr$elm_ui$Systems_Model_Physical$Physical,
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'mac', _elm_lang$core$Json_Decode$string)),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'broadcast', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Systems_Decoders$digitalDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Systems_Model_Digital$Digital,
+	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'region', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'private-networking', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$gceDecoder = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_narkisr$elm_ui$Systems_Model_GCE$GCE,
+	A2(_elm_lang$core$Json_Decode$field, 'machine-type', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'zone', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'tags',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
+	A2(_elm_lang$core$Json_Decode$field, 'project-id', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'static-ip', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_narkisr$elm_ui$Systems_Model_AWS$Volume,
+	A2(_elm_lang$core$Json_Decode$field, 'volume-type', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$int),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'iops', _elm_lang$core$Json_Decode$int)),
+	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'clear', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$blockDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_narkisr$elm_ui$Systems_Model_AWS$Block,
+	A2(_elm_lang$core$Json_Decode$field, 'volume', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Systems_Decoders$vpcDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Systems_Model_AWS$VPC,
+	A2(_elm_lang$core$Json_Decode$field, 'subnetId', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'vpcId', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'assignIp', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$awsDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_narkisr$elm_ui$Common_Http$apply,
+								A2(
+									_narkisr$elm_ui$Common_Http$apply,
+									A2(
+										_elm_lang$core$Json_Decode$map,
+										_narkisr$elm_ui$Systems_Model_AWS$AWS,
+										A2(_elm_lang$core$Json_Decode$field, 'instance-type', _elm_lang$core$Json_Decode$string)),
+									_elm_lang$core$Json_Decode$maybe(
+										A2(_elm_lang$core$Json_Decode$field, 'instance-id', _elm_lang$core$Json_Decode$string))),
+								A2(_elm_lang$core$Json_Decode$field, 'key-name', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'endpoint', _elm_lang$core$Json_Decode$string)),
+						_elm_lang$core$Json_Decode$maybe(
+							A2(_elm_lang$core$Json_Decode$field, 'availability-zone', _elm_lang$core$Json_Decode$string))),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(
+							_elm_lang$core$Json_Decode$field,
+							'security-groups',
+							_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode$field, 'ebs-optimized', _elm_lang$core$Json_Decode$bool))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'volumes',
+					_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder)))),
+		_elm_lang$core$Json_Decode$maybe(
+			A2(
+				_elm_lang$core$Json_Decode$field,
+				'block-devices',
+				_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$blockDecoder)))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'vpc', _narkisr$elm_ui$Systems_Decoders$vpcDecoder)));
+var _narkisr$elm_ui$Systems_Decoders$systemDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_narkisr$elm_ui$Common_Http$apply,
+								A2(
+									_narkisr$elm_ui$Common_Http$apply,
+									A2(
+										_elm_lang$core$Json_Decode$map,
+										_narkisr$elm_ui$Systems_Model_Common$System,
+										A2(_elm_lang$core$Json_Decode$field, 'owner', _elm_lang$core$Json_Decode$string)),
+									A2(_elm_lang$core$Json_Decode$field, 'env', _elm_lang$core$Json_Decode$string)),
+								A2(_elm_lang$core$Json_Decode$field, 'type', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'machine', _narkisr$elm_ui$Systems_Decoders$machineDecoder)),
+						_elm_lang$core$Json_Decode$maybe(
+							A2(_elm_lang$core$Json_Decode$field, 'aws', _narkisr$elm_ui$Systems_Decoders$awsDecoder))),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(_elm_lang$core$Json_Decode$field, 'gce', _narkisr$elm_ui$Systems_Decoders$gceDecoder))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode$field, 'digital-ocean', _narkisr$elm_ui$Systems_Decoders$digitalDecoder))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(_elm_lang$core$Json_Decode$field, 'openstack', _narkisr$elm_ui$Systems_Decoders$openstackDecoder))),
+		_elm_lang$core$Json_Decode$maybe(
+			A2(_elm_lang$core$Json_Decode$field, 'physical', _narkisr$elm_ui$Systems_Decoders$physicalDecoder))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'kvm', _narkisr$elm_ui$Systems_Decoders$kvmDecoder)));
+
+var _narkisr$elm_ui$Common_Redirect$redirect = _elm_lang$core$Native_Platform.outgoingPort(
+	'redirect',
+	function (v) {
+		return v;
+	});
+
+var _narkisr$elm_ui$Common_Utils$capitalize = function (s) {
+	var _p0 = _elm_lang$core$String$uncons(s);
+	if (_p0.ctor === 'Just') {
+		return A2(
+			_elm_lang$core$String$cons,
+			_elm_lang$core$Char$toUpper(_p0._0._0),
+			_p0._0._1);
+	} else {
+		return s;
+	}
+};
+var _narkisr$elm_ui$Common_Utils$none = function (a) {
+	return {ctor: '_Tuple2', _0: a, _1: _elm_lang$core$Platform_Cmd$none};
+};
+var _narkisr$elm_ui$Common_Utils$setEnvironments = F2(
+	function (model, es) {
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{
+					environments: _elm_lang$core$Dict$keys(es)
+				}));
+	});
+var _narkisr$elm_ui$Common_Utils$setEnvironment = F2(
+	function (_p1, es) {
+		var _p2 = _p1;
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				_p2,
+				{
+					environment: A2(
+						_elm_lang$core$Maybe$withDefault,
+						'',
+						_elm_lang$core$List$head(
+							_elm_lang$core$Dict$keys(es)))
+				}));
+	});
+var _narkisr$elm_ui$Common_Utils$defaultEmpty = function (list) {
+	var _p3 = list;
+	if (_p3.ctor === 'Just') {
+		return _p3._0;
+	} else {
+		return {ctor: '[]'};
+	}
+};
+var _narkisr$elm_ui$Common_Utils$withDefaultProp = F3(
+	function (parent, $default, prop) {
+		var _p4 = parent;
+		if (_p4.ctor === 'Just') {
+			return prop(_p4._0);
+		} else {
+			return $default;
+		}
+	});
+var _narkisr$elm_ui$Common_Utils$partition = F2(
+	function (n, list) {
+		var $catch = A2(_elm_lang$core$List$take, n, list);
+		return _elm_lang$core$Native_Utils.eq(
+			n,
+			_elm_lang$core$List$length($catch)) ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: $catch,
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_narkisr$elm_ui$Common_Utils$partition,
+				n,
+				A2(_elm_lang$core$List$drop, n, list))) : {
+			ctor: '::',
+			_0: $catch,
+			_1: {ctor: '[]'}
+		};
+	});
+
+var _narkisr$elm_ui$Common_Components$callout = F2(
+	function (type_, message) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class(
+							A2(_elm_lang$core$Basics_ops['++'], 'callout callout-', type_)),
+						_1: {ctor: '[]'}
+					},
+					message),
+				_1: {ctor: '[]'}
+			});
+	});
+var _narkisr$elm_ui$Common_Components$message = F2(
+	function (title, content) {
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h4,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(title),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{ctor: '[]'},
+					content),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+var _narkisr$elm_ui$Common_Components$info = function (msg) {
+	return A2(
+		_narkisr$elm_ui$Common_Components$message,
+		'Info',
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(msg),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Common_Components$error = function (msg) {
+	return A2(
+		_narkisr$elm_ui$Common_Components$message,
+		'Error!',
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(msg),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Common_Components$asList = function (body) {
+	return {
+		ctor: '::',
+		_0: body,
+		_1: {ctor: '[]'}
+	};
+};
+var _narkisr$elm_ui$Common_Components$panel = function (body) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel panel-default'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: body,
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Common_Components$panelContents = function (body) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel-body'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: body,
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Common_Components$fixedSize = function (height) {
+	return _elm_lang$html$Html_Attributes$style(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'height', _1: 'auto !important'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'auto'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'min-height', _1: height},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'height', _1: height},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
+var _narkisr$elm_ui$Common_Components$fixedPanel = function (body) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel-body'),
+			_1: {
+				ctor: '::',
+				_0: _narkisr$elm_ui$Common_Components$fixedSize('550px'),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: body,
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Common_Components$notImplemented = A2(
+	_elm_lang$html$Html$div,
+	{ctor: '[]'},
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html$text('not implemented'),
+		_1: {ctor: '[]'}
+	});
+var _narkisr$elm_ui$Common_Components$panelDefault_ = function (html) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel panel-default'),
+			_1: {ctor: '[]'}
+		},
+		html);
+};
+var _narkisr$elm_ui$Common_Components$row_ = function (html) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('row'),
+			_1: {ctor: '[]'}
+		},
+		html);
+};
+var _narkisr$elm_ui$Common_Components$dialogButtons = F2(
+	function (cancel, ok) {
+		return _narkisr$elm_ui$Common_Components$row_(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('text-center'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('btn-group col-md-offset-5 col-md-10'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('btn btn-danger btn-sm col-md-1 col-md-offset-1'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(cancel),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											_elm_lang$core$Basics$toString(cancel)),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('btn btn-primary btn-sm col-md-1'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(ok),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												_elm_lang$core$Basics$toString(ok)),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _narkisr$elm_ui$Common_Components$withButtons = F3(
+	function (cancel, ok, panel) {
+		return A2(
+			_elm_lang$core$List$append,
+			panel,
+			_narkisr$elm_ui$Common_Components$asList(
+				A2(_narkisr$elm_ui$Common_Components$dialogButtons, cancel, ok)));
+	});
+var _narkisr$elm_ui$Common_Components$dialogPanel = F3(
+	function (type_, message, body) {
+		return {
+			ctor: '::',
+			_0: _narkisr$elm_ui$Common_Components$row_(
+				{
+					ctor: '::',
+					_0: A2(_narkisr$elm_ui$Common_Components$callout, type_, message),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _narkisr$elm_ui$Common_Components$row_(
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: body,
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+var _narkisr$elm_ui$Common_Components$infoCallout = F4(
+	function (message, body, cancel, ok) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A3(
+				_narkisr$elm_ui$Common_Components$withButtons,
+				cancel,
+				ok,
+				A3(_narkisr$elm_ui$Common_Components$dialogPanel, 'info', message, body)));
+	});
+var _narkisr$elm_ui$Common_Components$dangerCallout = F4(
+	function (message, body, cancel, ok) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A3(
+				_narkisr$elm_ui$Common_Components$withButtons,
+				cancel,
+				ok,
+				A3(_narkisr$elm_ui$Common_Components$dialogPanel, 'danger', message, body)));
+	});
+var _narkisr$elm_ui$Common_Components$warningCallout = F4(
+	function (message, body, cancel, ok) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A3(
+				_narkisr$elm_ui$Common_Components$withButtons,
+				cancel,
+				ok,
+				A3(_narkisr$elm_ui$Common_Components$dialogPanel, 'warning', message, body)));
+	});
+
+var _narkisr$elm_ui$Common_Errors$setErrors = F2(
+	function (_p0, es) {
+		var _p1 = _p0;
+		var newErrors = _elm_lang$core$Native_Utils.update(
+			_p1.saveErrors,
+			{errors: es});
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				_p1,
+				{saveErrors: newErrors}),
+			_1: _elm_lang$core$Platform_Cmd$none
+		};
+	});
+var _narkisr$elm_ui$Common_Errors$handler = F5(
+	function (result, model, success, fail, noop) {
+		var _p2 = result;
+		if (_p2.ctor === 'Ok') {
+			return success(_p2._0);
+		} else {
+			var _p4 = _p2._0;
+			var _p3 = _p4;
+			if (_p3.ctor === 'BadStatus') {
+				return A2(
+					_elm_lang$core$Debug$log,
+					_elm_lang$core$Basics$toString(_p4),
+					{
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _narkisr$elm_ui$Common_Redirect$redirect('login')
+					});
+			} else {
+				return A2(
+					_elm_lang$core$Debug$log,
+					_elm_lang$core$Basics$toString(_p4),
+					{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none});
+			}
+		}
+	});
+var _narkisr$elm_ui$Common_Errors$errorsSuccessHandler = F4(
+	function (result, model, success, noop) {
+		return A5(
+			_narkisr$elm_ui$Common_Errors$handler,
+			result,
+			model,
+			success,
+			_narkisr$elm_ui$Common_Errors$setErrors(model),
+			noop);
+	});
+var _narkisr$elm_ui$Common_Errors$identityFail = F2(
+	function (model, res) {
+		return A2(
+			_elm_lang$core$Debug$log,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'request failed ',
+				_elm_lang$core$Basics$toString(res)),
+			{ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none});
+	});
+var _narkisr$elm_ui$Common_Errors$successHandler = F4(
+	function (result, model, success, noop) {
+		return A5(
+			_narkisr$elm_ui$Common_Errors$handler,
+			result,
+			model,
+			success,
+			_narkisr$elm_ui$Common_Errors$identityFail(model),
+			noop);
+	});
+var _narkisr$elm_ui$Common_Errors$identitySuccess = F2(
+	function (model, res) {
+		return _narkisr$elm_ui$Common_Utils$none(model);
+	});
+var _narkisr$elm_ui$Common_Errors$failHandler = F4(
+	function (result, model, fail, noop) {
+		return A5(
+			_narkisr$elm_ui$Common_Errors$handler,
+			result,
+			model,
+			_narkisr$elm_ui$Common_Errors$identitySuccess(model),
+			fail,
+			noop);
+	});
+var _narkisr$elm_ui$Common_Errors$errorsHandler = F3(
+	function (result, model, noop) {
+		return A5(
+			_narkisr$elm_ui$Common_Errors$handler,
+			result,
+			model,
+			_narkisr$elm_ui$Common_Errors$identitySuccess(model),
+			_narkisr$elm_ui$Common_Errors$setErrors(model),
+			noop);
+	});
+var _narkisr$elm_ui$Common_Errors$errorsList = function (errors) {
+	return !_elm_lang$core$Native_Utils.eq(errors.keyValues, _elm_lang$core$Maybe$Nothing);
+};
+var _narkisr$elm_ui$Common_Errors$hasErrors = function (_p5) {
+	var _p6 = _p5;
+	var _p7 = _p6.errors;
+	return _narkisr$elm_ui$Common_Errors$errorsList(_p7) || (!_elm_lang$core$Native_Utils.eq(_p7.message, _elm_lang$core$Maybe$Nothing));
+};
+var _narkisr$elm_ui$Common_Errors$mapValues = F2(
+	function (f, d) {
+		return _elm_lang$core$Dict$values(
+			A2(_elm_lang$core$Dict$map, f, d));
+	});
+var _narkisr$elm_ui$Common_Errors$nestedSection = F2(
+	function (key, errors) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(key),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{ctor: '[]'},
+						A2(
+							_narkisr$elm_ui$Common_Errors$mapValues,
+							F2(
+								function (k, v) {
+									return A2(
+										_elm_lang$html$Html$li,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													k,
+													A2(_elm_lang$core$Basics_ops['++'], ': ', v))),
+											_1: {ctor: '[]'}
+										});
+								}),
+							errors)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _narkisr$elm_ui$Common_Errors$nestedList = F2(
+	function (prop, nested) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$map,
+				function (section) {
+					return A2(_narkisr$elm_ui$Common_Errors$nestedSection, prop, section);
+				},
+				nested));
+	});
+var _narkisr$elm_ui$Common_Errors$deepNestedList = F2(
+	function (prop, nested) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			_elm_lang$core$List$concat(
+				A2(
+					_elm_lang$core$List$map,
+					function (parent) {
+						return A2(
+							_narkisr$elm_ui$Common_Errors$mapValues,
+							F2(
+								function (key, errors) {
+									return A2(
+										_narkisr$elm_ui$Common_Errors$nestedSection,
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											prop,
+											A2(_elm_lang$core$Basics_ops['++'], '.', key)),
+										errors);
+								}),
+							parent);
+					},
+					nested)));
+	});
+var _narkisr$elm_ui$Common_Errors$toText = F2(
+	function (key, error) {
+		var _p8 = error;
+		switch (_p8.ctor) {
+			case 'Nested':
+				return A2(_narkisr$elm_ui$Common_Errors$nestedSection, key, _p8._0);
+			case 'DeepNestedList':
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					A2(
+						_narkisr$elm_ui$Common_Errors$mapValues,
+						F2(
+							function (prop, nested) {
+								return A2(
+									_narkisr$elm_ui$Common_Errors$deepNestedList,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										key,
+										A2(_elm_lang$core$Basics_ops['++'], '.', prop)),
+									nested);
+							}),
+						_p8._0));
+			case 'NestedList':
+				return A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					A2(
+						_narkisr$elm_ui$Common_Errors$mapValues,
+						F2(
+							function (prop, nested) {
+								return A2(
+									_narkisr$elm_ui$Common_Errors$nestedList,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										key,
+										A2(_elm_lang$core$Basics_ops['++'], '.', prop)),
+									nested);
+							}),
+						_p8._0));
+			default:
+				return _elm_lang$html$Html$text(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						key,
+						A2(_elm_lang$core$Basics_ops['++'], ': ', _p8._0)));
+		}
+	});
+var _narkisr$elm_ui$Common_Errors$errorsText = function (errors) {
+	return _narkisr$elm_ui$Common_Errors$errorsList(errors) ? A2(
+		_elm_lang$html$Html$ul,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'list-style-type', _1: 'none'},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		_elm_lang$core$Dict$values(
+			A2(
+				_elm_lang$core$Dict$map,
+				F2(
+					function (k, v) {
+						return A2(
+							_elm_lang$html$Html$li,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(_narkisr$elm_ui$Common_Errors$toText, k, v),
+								_1: {ctor: '[]'}
+							});
+					}),
+				A2(_elm_lang$core$Maybe$withDefault, _elm_lang$core$Dict$empty, errors.keyValues)))) : A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text(
+				A2(_elm_lang$core$Maybe$withDefault, '', errors.message)),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Common_Errors$view = function (_p9) {
+	var _p10 = _p9;
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel-body'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h4,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('The following errors found:'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _narkisr$elm_ui$Common_Errors$errorsText(_p10.errors),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _narkisr$elm_ui$Common_Errors$Errors = F3(
+	function (a, b, c) {
+		return {type_: a, keyValues: b, message: c};
+	});
+var _narkisr$elm_ui$Common_Errors$messageDecoder = A2(
+	_elm_lang$core$Json_Decode$map,
+	A2(_narkisr$elm_ui$Common_Errors$Errors, '', _elm_lang$core$Maybe$Nothing),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Common_Errors$Model = function (a) {
+	return {errors: a};
+};
+var _narkisr$elm_ui$Common_Errors$init = _narkisr$elm_ui$Common_Errors$Model(
+	A3(_narkisr$elm_ui$Common_Errors$Errors, '', _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing));
+var _narkisr$elm_ui$Common_Errors$Value = function (a) {
+	return {ctor: 'Value', _0: a};
+};
+var _narkisr$elm_ui$Common_Errors$NestedList = function (a) {
+	return {ctor: 'NestedList', _0: a};
+};
+var _narkisr$elm_ui$Common_Errors$DeepNestedList = function (a) {
+	return {ctor: 'DeepNestedList', _0: a};
+};
+var _narkisr$elm_ui$Common_Errors$Nested = function (a) {
+	return {ctor: 'Nested', _0: a};
+};
+var _narkisr$elm_ui$Common_Errors$NoOp = {ctor: 'NoOp'};
+
+var _narkisr$elm_ui$Pager$pageCount = function (model) {
+	return _elm_lang$core$Basics$ceiling(model.total / model.offset);
+};
+var _narkisr$elm_ui$Pager$update = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p8 = _p1.slice;
+		var _p7 = _p1.page;
+		var _p6 = _p1;
+		var _p5 = _p1.maxButtons;
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'NextPage':
+				var _p3 = _p2._0;
+				var newModel = _elm_lang$core$Native_Utils.update(
+					_p6,
+					{page: _p3});
+				var end = _p8 + _p5;
+				var start = _p8;
+				return ((_elm_lang$core$Native_Utils.cmp(start, _p3) < 0) && (_elm_lang$core$Native_Utils.cmp(_p3, end) < 0)) ? newModel : (((_elm_lang$core$Native_Utils.cmp(_p3, end) > -1) && (_elm_lang$core$Native_Utils.cmp(
+					_p3 + _p5,
+					_narkisr$elm_ui$Pager$pageCount(_p6)) > -1)) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: _p3 - _p5}) : ((_elm_lang$core$Native_Utils.cmp(_p3, end) > -1) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: _p3 - 1}) : (_elm_lang$core$Native_Utils.eq(_p3, 1) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: 0}) : ((_elm_lang$core$Native_Utils.cmp(_p3, start) < 1) ? _elm_lang$core$Native_Utils.update(
+					newModel,
+					{slice: _p3 - 1}) : newModel))));
+			case 'UpdateTotal':
+				var _p4 = _p2._0;
+				return (_elm_lang$core$Native_Utils.cmp(
+					_p4,
+					_elm_lang$core$Basics$toFloat(_p7)) < 0) ? _elm_lang$core$Native_Utils.update(
+					_p6,
+					{total: _p4, page: 1}) : _elm_lang$core$Native_Utils.update(
+					_p6,
+					{total: _p4, page: _p7});
+			default:
+				return _p6;
+		}
+	});
+var _narkisr$elm_ui$Pager$init = {total: 0, page: 1, offset: 10, maxButtons: 5, slice: 0};
+var _narkisr$elm_ui$Pager$Model = F5(
+	function (a, b, c, d, e) {
+		return {total: a, page: b, offset: c, maxButtons: d, slice: e};
+	});
+var _narkisr$elm_ui$Pager$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Pager$UpdateTotal = function (a) {
+	return {ctor: 'UpdateTotal', _0: a};
+};
+var _narkisr$elm_ui$Pager$NextPage = function (a) {
+	return {ctor: 'NextPage', _0: a};
+};
+var _narkisr$elm_ui$Pager$arrows = F2(
+	function (shapes, active) {
+		var _p9 = shapes;
+		var firstShape = _p9._0._0;
+		var firstPos = _p9._0._1;
+		var secondShape = _p9._1._0;
+		var secondPos = _p9._1._1;
+		var isActive = active ? '' : 'disabled';
+		var operation = function (p) {
+			return active ? _narkisr$elm_ui$Pager$NextPage(p) : _narkisr$elm_ui$Pager$NoOp;
+		};
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$li,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class(isActive),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								operation(firstPos)),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(firstShape),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$li,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class(isActive),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$a,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(
+									operation(secondPos)),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(secondShape),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+var _narkisr$elm_ui$Pager$pageLinks = function (_p10) {
+	var _p11 = _p10;
+	var _p14 = _p11.slice;
+	var _p13 = _p11;
+	var _p12 = _p11.maxButtons;
+	var last = A2(
+		_narkisr$elm_ui$Pager$arrows,
+		{
+			ctor: '_Tuple2',
+			_0: {ctor: '_Tuple2', _0: '<<', _1: 1},
+			_1: {ctor: '_Tuple2', _0: '<', _1: _p13.page - 1}
+		},
+		_elm_lang$core$Native_Utils.cmp(_p13.page, 1) > 0);
+	var next = A2(
+		_narkisr$elm_ui$Pager$arrows,
+		{
+			ctor: '_Tuple2',
+			_0: {ctor: '_Tuple2', _0: '>', _1: _p13.page + 1},
+			_1: {
+				ctor: '_Tuple2',
+				_0: '>>',
+				_1: _narkisr$elm_ui$Pager$pageCount(_p13)
+			}
+		},
+		_elm_lang$core$Native_Utils.cmp(
+			_p13.page,
+			_narkisr$elm_ui$Pager$pageCount(_p13)) < 0);
+	var isActive = function (page) {
+		return _elm_lang$core$Native_Utils.eq(_p13.page, page) ? 'active' : '';
+	};
+	var pageLink = function (page) {
+		return A2(
+			_elm_lang$html$Html$li,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class(
+					isActive(page)),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_narkisr$elm_ui$Pager$NextPage(page)),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							_elm_lang$core$Basics$toString(page)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	};
+	var links = A2(
+		_elm_lang$core$Array$map,
+		function (p) {
+			return pageLink(p + 1);
+		},
+		A2(
+			_elm_lang$core$Array$initialize,
+			_narkisr$elm_ui$Pager$pageCount(_p13),
+			_elm_lang$core$Basics$identity));
+	var sliced = A3(_elm_lang$core$Array$slice, _p14, _p14 + _p12, links);
+	var windowed = (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$Array$length(links),
+		_p12) > 0) ? sliced : links;
+	return _elm_lang$core$List$concat(
+		{
+			ctor: '::',
+			_0: last,
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$core$Array$toList(windowed),
+				_1: {
+					ctor: '::',
+					_0: next,
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _narkisr$elm_ui$Pager$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$p,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('text-center'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$nav,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('pagination'),
+							_1: {ctor: '[]'}
+						},
+						_narkisr$elm_ui$Pager$pageLinks(model)),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+
 var _narkisr$elm_ui$Table$withCaption = F3(
 	function (enabled, title, body) {
 		return enabled ? A2(
@@ -8569,10 +13856,3087 @@ var _narkisr$elm_ui$Table$view = function (model) {
 			}));
 };
 
+var _narkisr$elm_ui$Search$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'Result') {
+			if (_p0._0 === true) {
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{parsed: _p0._1.result, input: _p0._1.source, error: ''});
+			} else {
+				return _elm_lang$core$Native_Utils.update(
+					model,
+					{error: _p0._1.message, input: _p0._1.source});
+			}
+		} else {
+			return model;
+		}
+	});
+var _narkisr$elm_ui$Search$init = {input: '', parsed: '', error: ''};
+var _narkisr$elm_ui$Search$Model = F3(
+	function (a, b, c) {
+		return {input: a, parsed: b, error: c};
+	});
+var _narkisr$elm_ui$Search$ParseResult = F3(
+	function (a, b, c) {
+		return {message: a, source: b, result: c};
+	});
+var _narkisr$elm_ui$Search$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Search$Result = F2(
+	function (a, b) {
+		return {ctor: 'Result', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Search$Parse = function (a) {
+	return {ctor: 'Parse', _0: a};
+};
+var _narkisr$elm_ui$Search$searchForm = function (model) {
+	return A2(
+		_elm_lang$html$Html$form,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('form-horizontal'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('form-group'),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;'),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$label,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$for('systemSearch'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('col-sm-1 control-label'),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Filter:'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('col-sm-6'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('form-control'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$type_('search'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$id('systemSearch'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$placeholder(''),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onInput(_narkisr$elm_ui$Search$Parse),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Search$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('container-fluid'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _narkisr$elm_ui$Common_Components$row_(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col-md-8 col-md-offset-2'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _narkisr$elm_ui$Search$searchForm(model),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+
+var _narkisr$elm_ui$Systems_List$systemPair = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	_elm_lang$core$Json_Decode$string,
+	_narkisr$elm_ui$Systems_Decoders$systemDecoder);
+var _narkisr$elm_ui$Systems_List$systemPage = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'meta',
+		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$int)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'systems',
+		_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_List$systemPair)));
+var _narkisr$elm_ui$Systems_List$flash = function (model) {
+	var result = _elm_lang$html$Html$div(
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('callout callout-danger'),
+			_1: {ctor: '[]'}
+		});
+	var _p0 = model.error;
+	switch (_p0.ctor) {
+		case 'NoError':
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{ctor: '[]'});
+		case 'NoSystemSelected':
+			return A2(
+				_narkisr$elm_ui$Common_Components$callout,
+				'danger',
+				_narkisr$elm_ui$Common_Components$info('Please select a system first'));
+		default:
+			return A2(
+				_narkisr$elm_ui$Common_Components$callout,
+				'danger',
+				_narkisr$elm_ui$Common_Components$info(_p0._0));
+	}
+};
+var _narkisr$elm_ui$Systems_List$systemRow = F2(
+	function (id, _p1) {
+		var _p2 = _p1;
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(id),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							function (_) {
+								return _.hostname;
+							}(_p2.machine)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(_p2.type_),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p2.env),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p2.owner),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		};
+	});
+var _narkisr$elm_ui$Systems_List$setSystems = F2(
+	function (model, _p3) {
+		var _p4 = _p3;
+		var newTable = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(_p4._1),
+			model.table);
+		var total = A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			A2(_elm_lang$core$Dict$get, 'total', _p4._0));
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(total)),
+			model.pager);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{systems: _p4, pager: newPager, table: newTable}));
+	});
+var _narkisr$elm_ui$Systems_List$Model = F5(
+	function (a, b, c, d, e) {
+		return {error: a, systems: b, pager: c, table: d, search: e};
+	});
+var _narkisr$elm_ui$Systems_List$NoError = {ctor: 'NoError'};
+var _narkisr$elm_ui$Systems_List$SearchParseFailed = function (a) {
+	return {ctor: 'SearchParseFailed', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$NoSystemSelected = {ctor: 'NoSystemSelected'};
+var _narkisr$elm_ui$Systems_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_List$Searching = function (a) {
+	return {ctor: 'Searching', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$view = function (model) {
+	var _p5 = model.systems;
+	var meta = _p5._0;
+	var systems = _p5._1;
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _narkisr$elm_ui$Common_Components$row_(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$map,
+								_narkisr$elm_ui$Systems_List$Searching,
+								_narkisr$elm_ui$Search$view(model.search)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _narkisr$elm_ui$Common_Components$row_(
+					{
+						ctor: '::',
+						_0: _narkisr$elm_ui$Systems_List$flash(model),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _narkisr$elm_ui$Common_Components$panelDefault_(
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$map,
+												_narkisr$elm_ui$Systems_List$LoadPage,
+												_narkisr$elm_ui$Table$view(model.table)),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _narkisr$elm_ui$Common_Components$row_(
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$map,
+								_narkisr$elm_ui$Systems_List$GotoPage,
+								_narkisr$elm_ui$Pager$view(model.pager)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _narkisr$elm_ui$Systems_List$SetSystems = function (a) {
+	return {ctor: 'SetSystems', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$getSystems = F2(
+	function (page, offset) {
+		return A3(
+			_narkisr$elm_ui$Common_Http$getJson,
+			_narkisr$elm_ui$Systems_List$systemPage,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'/systems?page=',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(page),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'&offset=',
+						_elm_lang$core$Basics$toString(offset)))),
+			_narkisr$elm_ui$Systems_List$SetSystems);
+	});
+var _narkisr$elm_ui$Systems_List$init = function () {
+	var search = _narkisr$elm_ui$Search$init;
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'systemsListing',
+		true,
+		{
+			ctor: '::',
+			_0: '#',
+			_1: {
+				ctor: '::',
+				_0: 'Hostname',
+				_1: {
+					ctor: '::',
+					_0: 'Type',
+					_1: {
+						ctor: '::',
+						_0: 'Env',
+						_1: {
+							ctor: '::',
+							_0: 'Owner',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		},
+		_narkisr$elm_ui$Systems_List$systemRow,
+		'Systems');
+	var systems = {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Dict$empty,
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: '', _1: _narkisr$elm_ui$Systems_Model_Common$emptySystem},
+			_1: {ctor: '[]'}
+		}
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: A5(_narkisr$elm_ui$Systems_List$Model, _narkisr$elm_ui$Systems_List$NoError, systems, _narkisr$elm_ui$Pager$init, table, search),
+		_1: A2(_narkisr$elm_ui$Systems_List$getSystems, 1, 10)
+	};
+}();
+var _narkisr$elm_ui$Systems_List$getSystemsQuery = F3(
+	function (page, offset, query) {
+		return A3(
+			_narkisr$elm_ui$Common_Http$getJson,
+			_narkisr$elm_ui$Systems_List$systemPage,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'/systems/query?page=',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(page),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'&offset=',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(offset),
+							A2(_elm_lang$core$Basics_ops['++'], '&query=', query))))),
+			_narkisr$elm_ui$Systems_List$SetSystems);
+	});
+var _narkisr$elm_ui$Systems_List$update = F2(
+	function (msg, _p6) {
+		var _p7 = _p6;
+		var _p14 = _p7;
+		var _p8 = msg;
+		switch (_p8.ctor) {
+			case 'SetSystems':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p8._0,
+					_p14,
+					_narkisr$elm_ui$Systems_List$setSystems(_p14),
+					_narkisr$elm_ui$Systems_List$NoOp);
+			case 'GotoPage':
+				var _p11 = _p8._0;
+				var _p9 = _p11;
+				if (_p9.ctor === 'NextPage') {
+					var _p10 = _p9._0;
+					var newPager = A2(_narkisr$elm_ui$Pager$update, _p11, _p14.pager);
+					return _elm_lang$core$String$isEmpty(_p14.search.input) ? {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p14,
+							{pager: newPager}),
+						_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p10, 10)
+					} : {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p14,
+							{pager: newPager}),
+						_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p10, 10, _p14.search.parsed)
+					};
+				} else {
+					return _narkisr$elm_ui$Common_Utils$none(_p14);
+				}
+			case 'Searching':
+				var _p13 = _p8._0;
+				var newSearch = A2(_narkisr$elm_ui$Search$update, _p13, _p14.search);
+				var _p12 = _p13;
+				if (_p12.ctor === 'Result') {
+					if (_p12._0 === true) {
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p14,
+								{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
+							_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p14.pager.page, 10, newSearch.parsed)
+						};
+					} else {
+						return _elm_lang$core$String$isEmpty(newSearch.input) ? {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p14,
+								{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
+							_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p14.pager.page, 10)
+						} : _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p14,
+								{
+									search: newSearch,
+									error: _narkisr$elm_ui$Systems_List$SearchParseFailed(newSearch.error)
+								}));
+					}
+				} else {
+					return _narkisr$elm_ui$Common_Utils$none(_p14);
+				}
+			case 'LoadPage':
+				var newTable = A2(_narkisr$elm_ui$Table$update, _p8._0, _p14.table);
+				return (_elm_lang$core$Native_Utils.eq(_p7.error, _narkisr$elm_ui$Systems_List$NoSystemSelected) && (!_elm_lang$core$Native_Utils.eq(newTable.selected, _elm_lang$core$Set$empty))) ? _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p14,
+						{table: newTable, error: _narkisr$elm_ui$Systems_List$NoError})) : _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p14,
+						{table: newTable}));
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p14);
+		}
+	});
+
+var _narkisr$elm_ui$Jobs_Common$JobResponse = F3(
+	function (a, b, c) {
+		return {message: a, id: b, job: c};
+	});
+var _narkisr$elm_ui$Jobs_Common$jobResponse = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Jobs_Common$JobResponse,
+	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'job', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Jobs_Common$runJob = F3(
+	function (id, job, msg) {
+		return A2(
+			_elm_lang$http$Http$send,
+			msg,
+			A3(
+				_elm_lang$http$Http$post,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'/jobs/',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						job,
+						A2(_elm_lang$core$Basics_ops['++'], '/', id))),
+				_elm_lang$http$Http$emptyBody,
+				_narkisr$elm_ui$Jobs_Common$jobResponse));
+	});
+
+var _narkisr$elm_ui$Systems_Launch$message = function (job) {
+	return {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h4,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Notice!'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('A '),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$strong,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(job),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(' operation '),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('will be performed on the following systems:'),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _narkisr$elm_ui$Systems_Launch$systemRow = F2(
+	function (id, _p0) {
+		var _p1 = _p0;
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(id),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							function (_) {
+								return _.hostname;
+							}(_p1.machine)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(_p1.type_),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p1.env),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p1.owner),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		};
+	});
+var _narkisr$elm_ui$Systems_Launch$Model = F2(
+	function (a, b) {
+		return {job: a, table: b};
+	});
+var _narkisr$elm_ui$Systems_Launch$init = function () {
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'launchListing',
+		false,
+		{
+			ctor: '::',
+			_0: '#',
+			_1: {
+				ctor: '::',
+				_0: 'Hostname',
+				_1: {
+					ctor: '::',
+					_0: 'Type',
+					_1: {
+						ctor: '::',
+						_0: 'Env',
+						_1: {
+							ctor: '::',
+							_0: 'Owner',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		},
+		_narkisr$elm_ui$Systems_Launch$systemRow,
+		'Systems');
+	return _narkisr$elm_ui$Common_Utils$none(
+		A2(_narkisr$elm_ui$Systems_Launch$Model, '', table));
+}();
+var _narkisr$elm_ui$Systems_Launch$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Systems_Launch$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Launch$Run = {ctor: 'Run'};
+var _narkisr$elm_ui$Systems_Launch$JobLaunched = function (a) {
+	return {ctor: 'JobLaunched', _0: a};
+};
+var _narkisr$elm_ui$Systems_Launch$update = F2(
+	function (msg, _p2) {
+		var _p3 = _p2;
+		var _p7 = _p3;
+		var _p4 = msg;
+		switch (_p4.ctor) {
+			case 'JobLaunched':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p4._0,
+					_p7,
+					function (res) {
+						return _narkisr$elm_ui$Common_Utils$none(_p7);
+					},
+					_narkisr$elm_ui$Systems_Launch$NoOp);
+			case 'SetupJob':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{job: _p4._0}));
+			case 'LoadPage':
+				var newTable = A2(_narkisr$elm_ui$Table$update, _p4._0, _p7.table);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{table: newTable}));
+			case 'Run':
+				var runAll = _elm_lang$core$Platform_Cmd$batch(
+					A2(
+						_elm_lang$core$List$map,
+						function (id) {
+							return A3(_narkisr$elm_ui$Jobs_Common$runJob, id, _p3.job, _narkisr$elm_ui$Systems_Launch$JobLaunched);
+						},
+						A2(
+							_elm_lang$core$List$map,
+							function (_p5) {
+								var _p6 = _p5;
+								return _p6._0;
+							},
+							_p7.table.rows)));
+				return {ctor: '_Tuple2', _0: _p7, _1: runAll};
+			case 'Cancel':
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+var _narkisr$elm_ui$Systems_Launch$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_Launch$view = function (_p8) {
+	var _p9 = _p8;
+	var systemsTable = _narkisr$elm_ui$Common_Components$panelDefault_(
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$map,
+				_narkisr$elm_ui$Systems_Launch$LoadPage,
+				_narkisr$elm_ui$Table$view(_p9.table)),
+			_1: {ctor: '[]'}
+		});
+	return A4(
+		_narkisr$elm_ui$Common_Components$dangerCallout,
+		_narkisr$elm_ui$Systems_Launch$message(_p9.job),
+		systemsTable,
+		_narkisr$elm_ui$Systems_Launch$Cancel,
+		_narkisr$elm_ui$Systems_Launch$Run);
+};
+var _narkisr$elm_ui$Systems_Launch$SetupJob = function (a) {
+	return {ctor: 'SetupJob', _0: a};
+};
+
+var _narkisr$elm_ui$Nav_Common$Users = {ctor: 'Users'};
+var _narkisr$elm_ui$Nav_Common$Stacks = {ctor: 'Stacks'};
+var _narkisr$elm_ui$Nav_Common$Templates = {ctor: 'Templates'};
+var _narkisr$elm_ui$Nav_Common$Jobs = {ctor: 'Jobs'};
+var _narkisr$elm_ui$Nav_Common$Types = {ctor: 'Types'};
+var _narkisr$elm_ui$Nav_Common$Systems = {ctor: 'Systems'};
+var _narkisr$elm_ui$Nav_Common$Stats = {ctor: 'Stats'};
+var _narkisr$elm_ui$Nav_Common$View = {ctor: 'View'};
+var _narkisr$elm_ui$Nav_Common$List = {ctor: 'List'};
+var _narkisr$elm_ui$Nav_Common$Edit = {ctor: 'Edit'};
+var _narkisr$elm_ui$Nav_Common$Delete = {ctor: 'Delete'};
+var _narkisr$elm_ui$Nav_Common$Launch = {ctor: 'Launch'};
+var _narkisr$elm_ui$Nav_Common$Add = {ctor: 'Add'};
+
+var _narkisr$elm_ui$Systems_Core$Model = F3(
+	function (a, b, c) {
+		return {systemsList: a, systemsLaunch: b, navChange: c};
+	});
+var _narkisr$elm_ui$Systems_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Core$SystemsLaunch = function (a) {
+	return {ctor: 'SystemsLaunch', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$setupJob = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p7 = _p1.systemsList;
+		var _p6 = _p1;
+		var table = _p7.table;
+		var _p2 = _p7.systems;
+		var systems = _p2._1;
+		var selected = A2(
+			_elm_lang$core$List$filter,
+			function (_p3) {
+				var _p4 = _p3;
+				return A2(_elm_lang$core$Set$member, _p4._0, table.selected);
+			},
+			systems);
+		var selectedTable = _elm_lang$core$Native_Utils.update(
+			table,
+			{rows: selected, selected: _elm_lang$core$Set$empty, id: 'launchListing'});
+		var _p5 = A2(
+			_narkisr$elm_ui$Systems_Launch$update,
+			msg,
+			_elm_lang$core$Native_Utils.update(
+				_p1.systemsLaunch,
+				{table: selectedTable}));
+		var newLaunch = _p5._0;
+		var effect = _p5._1;
+		if (_elm_lang$core$List$isEmpty(selected)) {
+			return _narkisr$elm_ui$Common_Utils$none(
+				_elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						systemsList: _elm_lang$core$Native_Utils.update(
+							_p7,
+							{error: _narkisr$elm_ui$Systems_List$NoSystemSelected})
+					}));
+		} else {
+			var newList = _elm_lang$core$Native_Utils.update(
+				_p7,
+				{error: _narkisr$elm_ui$Systems_List$NoError});
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						systemsLaunch: newLaunch,
+						systemsList: newList,
+						navChange: _elm_lang$core$Maybe$Just('systems/launch')
+					}),
+				_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
+			};
+		}
+	});
+var _narkisr$elm_ui$Systems_Core$SystemsListing = function (a) {
+	return {ctor: 'SystemsListing', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$init = function () {
+	var _p8 = _narkisr$elm_ui$Systems_Launch$init;
+	var systemsLaunch = _p8._0;
+	var _p9 = _narkisr$elm_ui$Systems_List$init;
+	var systemsList = _p9._0;
+	var systemsListMsg = _p9._1;
+	return {
+		ctor: '_Tuple2',
+		_0: A3(_narkisr$elm_ui$Systems_Core$Model, systemsList, systemsLaunch, _elm_lang$core$Maybe$Nothing),
+		_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, systemsListMsg)
+	};
+}();
+var _narkisr$elm_ui$Systems_Core$update = F2(
+	function (msg, _p10) {
+		var _p11 = _p10;
+		var _p17 = _p11;
+		var _p12 = msg;
+		switch (_p12.ctor) {
+			case 'SystemsListing':
+				var _p13 = A2(_narkisr$elm_ui$Systems_List$update, _p12._0, _p11.systemsList);
+				var newSystems = _p13._0;
+				var effect = _p13._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p17,
+						{systemsList: newSystems}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, effect)
+				};
+			case 'SystemsLaunch':
+				var _p16 = _p12._0;
+				var _p14 = A2(_elm_lang$core$Debug$log, '', _p16);
+				switch (_p14.ctor) {
+					case 'Cancel':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p17,
+								{
+									navChange: _elm_lang$core$Maybe$Just('systems/list')
+								}));
+					case 'JobLaunched':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p17,
+								{
+									navChange: _elm_lang$core$Maybe$Just('jobs/list')
+								}));
+					case 'SetupJob':
+						return A2(_narkisr$elm_ui$Systems_Core$setupJob, _p16, _p17);
+					case 'Run':
+						var _p15 = A2(_narkisr$elm_ui$Systems_Launch$update, _p16, _p17.systemsLaunch);
+						var newLaunch = _p15._0;
+						var effect = _p15._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p17,
+								{systemsLaunch: newLaunch}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
+						};
+					default:
+						return _narkisr$elm_ui$Common_Utils$none(_p17);
+				}
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p17);
+		}
+	});
+var _narkisr$elm_ui$Systems_Core$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$map,
+		_narkisr$elm_ui$Systems_Core$SystemsListing,
+		_narkisr$elm_ui$Systems_List$view(model.systemsList));
+};
+
+var _narkisr$elm_ui$Common_NewTab$newtab = _elm_lang$core$Native_Platform.outgoingPort(
+	'newtab',
+	function (v) {
+		return v;
+	});
+
+var _narkisr$elm_ui$Jobs_List$apply = F2(
+	function (func, value) {
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			func,
+			value);
+	});
+var _narkisr$elm_ui$Jobs_List$accordionPanel = F3(
+	function (active, ident, body) {
+		var enabled = active ? ' in' : '';
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('panel panel-default'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('panel panel-heading'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id(
+								A2(_elm_lang$core$Basics_ops['++'], 'heading', ident)),
+							_1: {
+								ctor: '::',
+								_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'tab'),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h4,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('panel-title'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'button'),
+										_1: {
+											ctor: '::',
+											_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'collapse'),
+											_1: {
+												ctor: '::',
+												_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-parent', '#accordion'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$href(
+														A2(_elm_lang$core$Basics_ops['++'], '#collapse', ident)),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html_Attributes$attribute,
+															'aria-expanded',
+															_elm_lang$core$Basics$toString(active)),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html_Attributes$attribute,
+																'aria-controls',
+																A2(_elm_lang$core$Basics_ops['++'], 'collapse', ident)),
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(ident),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$id(
+								A2(_elm_lang$core$Basics_ops['++'], 'collapse', ident)),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class(
+									A2(_elm_lang$core$Basics_ops['++'], 'panel-collapse collapse', enabled)),
+								_1: {
+									ctor: '::',
+									_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'tabpanel'),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html_Attributes$attribute,
+											'aria-labelledby',
+											A2(_elm_lang$core$Basics_ops['++'], 'heading', ident)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('panel-body'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: body,
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _narkisr$elm_ui$Jobs_List$doneRow = F2(
+	function (tableid, _p0) {
+		var _p1 = _p0;
+		var _p3 = _p1.start;
+		var _p2 = _p1.end;
+		var pad = function (str) {
+			return _elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$String$length(str),
+				1) ? A2(_elm_lang$core$Basics_ops['++'], '0', str) : str;
+		};
+		var sec = _elm_lang$core$Basics$toString(
+			A2(
+				_elm_lang$core$Basics_ops['%'],
+				_elm_lang$core$Basics$round((_p2 - _p3) / 1000),
+				60));
+		var min = _elm_lang$core$Basics$toString(
+			(_elm_lang$core$Basics$round(_p2 - _p3) / (1000 * 60)) | 0);
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(_p1.identity),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							A2(
+								_mgold$elm_date_format$Date_Format$format,
+								'%d/%m/%Y %H:%M',
+								_elm_lang$core$Date$fromTime(_p3))),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(_p1.hostname),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p1.queue),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											pad(min),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												':',
+												pad(sec)))),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$td,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(_p1.status),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		};
+	});
+var _narkisr$elm_ui$Jobs_List$runningRow = F2(
+	function (tableId, _p4) {
+		var _p5 = _p4;
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(_p5.id),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(_p5.type_),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('progress progress-xs progress-striped active'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('progress-bar progress-bar-primary'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$id(_p5.status),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$style(
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'width', _1: '0%'},
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
+										},
+										{ctor: '[]'}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		};
+	});
+var _narkisr$elm_ui$Jobs_List$setDoneJobs = F2(
+	function (_p7, _p6) {
+		var _p8 = _p7;
+		var _p9 = _p6;
+		var jobsList = A2(
+			_elm_lang$core$List$map,
+			function (_p10) {
+				var _p11 = _p10;
+				return {ctor: '_Tuple2', _0: _p11.tid, _1: _p11};
+			},
+			_p9._1);
+		var newDone = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(jobsList),
+			_p8.done);
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(_p9._0)),
+			_p8.pager);
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				_p8,
+				{done: newDone, pager: newPager}),
+			_1: _elm_lang$core$Platform_Cmd$none
+		};
+	});
+var _narkisr$elm_ui$Jobs_List$setRunningJobs = F2(
+	function (_p12, res) {
+		var _p13 = _p12;
+		var jobsList = A2(
+			_elm_lang$core$List$map,
+			function (_p14) {
+				var _p15 = _p14;
+				return {ctor: '_Tuple2', _0: _p15.tid, _1: _p15};
+			},
+			res);
+		return {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Native_Utils.update(
+				_p13,
+				{
+					running: A2(
+						_narkisr$elm_ui$Table$update,
+						_narkisr$elm_ui$Table$UpdateRows(jobsList),
+						_p13.running)
+				}),
+			_1: _elm_lang$core$Platform_Cmd$none
+		};
+	});
+var _narkisr$elm_ui$Jobs_List$RunningJob = F7(
+	function (a, b, c, d, e, f, g) {
+		return {env: a, id: b, jid: c, status: d, tid: e, tid_link: f, type_: g};
+	});
+var _narkisr$elm_ui$Jobs_List$runningJob = A8(
+	_elm_lang$core$Json_Decode$map7,
+	_narkisr$elm_ui$Jobs_List$RunningJob,
+	A2(_elm_lang$core$Json_Decode$field, 'env', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'jid', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'status',
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$string,
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(''),
+					_1: {ctor: '[]'}
+				}
+			})),
+	A2(_elm_lang$core$Json_Decode$field, 'tid', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'tid-link',
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$string,
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(''),
+					_1: {ctor: '[]'}
+				}
+			})),
+	A2(_elm_lang$core$Json_Decode$field, 'type', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Jobs_List$runningList = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'jobs',
+		_1: {ctor: '[]'}
+	},
+	_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Jobs_List$runningJob));
+var _narkisr$elm_ui$Jobs_List$DoneJob = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {start: a, end: b, env: c, hostname: d, identity: e, queue: f, status: g, tid: h, tid_link: i};
+	});
+var _narkisr$elm_ui$Jobs_List$doneJob = A2(
+	_narkisr$elm_ui$Jobs_List$apply,
+	A2(
+		_narkisr$elm_ui$Jobs_List$apply,
+		A2(
+			_narkisr$elm_ui$Jobs_List$apply,
+			A2(
+				_narkisr$elm_ui$Jobs_List$apply,
+				A2(
+					_narkisr$elm_ui$Jobs_List$apply,
+					A2(
+						_narkisr$elm_ui$Jobs_List$apply,
+						A2(
+							_narkisr$elm_ui$Jobs_List$apply,
+							A2(
+								_narkisr$elm_ui$Jobs_List$apply,
+								A2(
+									_elm_lang$core$Json_Decode$map,
+									_narkisr$elm_ui$Jobs_List$DoneJob,
+									A2(_elm_lang$core$Json_Decode$field, 'start', _elm_lang$core$Json_Decode$float)),
+								A2(_elm_lang$core$Json_Decode$field, 'end', _elm_lang$core$Json_Decode$float)),
+							A2(_elm_lang$core$Json_Decode$field, 'env', _elm_lang$core$Json_Decode$string)),
+						A2(_elm_lang$core$Json_Decode$field, 'hostname', _elm_lang$core$Json_Decode$string)),
+					A2(_elm_lang$core$Json_Decode$field, 'identity', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'queue', _elm_lang$core$Json_Decode$string)),
+			A2(_elm_lang$core$Json_Decode$field, 'status', _elm_lang$core$Json_Decode$string)),
+		A2(_elm_lang$core$Json_Decode$field, 'tid', _elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'tid-link',
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$string,
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(''),
+					_1: {ctor: '[]'}
+				}
+			})));
+var _narkisr$elm_ui$Jobs_List$doneList = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	A2(_elm_lang$core$Json_Decode$field, 'total', _elm_lang$core$Json_Decode$int),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'jobs',
+		_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Jobs_List$doneJob)));
+var _narkisr$elm_ui$Jobs_List$Model = F3(
+	function (a, b, c) {
+		return {running: a, done: b, pager: c};
+	});
+var _narkisr$elm_ui$Jobs_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Jobs_List$LoadDone = function (a) {
+	return {ctor: 'LoadDone', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$LoadRunning = function (a) {
+	return {ctor: 'LoadRunning', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$view = function (_p16) {
+	var _p17 = _p16;
+	var _p19 = _p17.running;
+	var _p18 = _p17.done;
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('panel-group'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$id('accordion'),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'tablist'),
+					_1: {ctor: '[]'}
+				}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A3(
+				_narkisr$elm_ui$Jobs_List$accordionPanel,
+				!_elm_lang$core$List$isEmpty(_p19.rows),
+				'Running',
+				_narkisr$elm_ui$Common_Components$panelDefault_(
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$map,
+							_narkisr$elm_ui$Jobs_List$LoadRunning,
+							_narkisr$elm_ui$Table$view(_p19)),
+						_1: {ctor: '[]'}
+					})),
+			_1: {
+				ctor: '::',
+				_0: A3(
+					_narkisr$elm_ui$Jobs_List$accordionPanel,
+					!_elm_lang$core$List$isEmpty(_p18.rows),
+					'Done',
+					A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _narkisr$elm_ui$Common_Components$row_(
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _narkisr$elm_ui$Common_Components$panelDefault_(
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$map,
+														_narkisr$elm_ui$Jobs_List$LoadDone,
+														_narkisr$elm_ui$Table$view(_p18)),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: _narkisr$elm_ui$Common_Components$row_(
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$map,
+											_narkisr$elm_ui$Jobs_List$GotoPage,
+											_narkisr$elm_ui$Pager$view(_p17.pager)),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						})),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _narkisr$elm_ui$Jobs_List$Polling = {ctor: 'Polling'};
+var _narkisr$elm_ui$Jobs_List$SetDone = function (a) {
+	return {ctor: 'SetDone', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$getDone = F2(
+	function (page, offset) {
+		return A3(
+			_narkisr$elm_ui$Common_Http$getJson,
+			_narkisr$elm_ui$Jobs_List$doneList,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'/jobs/done?offset=',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(offset),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'&page=',
+						_elm_lang$core$Basics$toString(page)))),
+			_narkisr$elm_ui$Jobs_List$SetDone);
+	});
+var _narkisr$elm_ui$Jobs_List$SetRunning = function (a) {
+	return {ctor: 'SetRunning', _0: a};
+};
+var _narkisr$elm_ui$Jobs_List$getRunning = A3(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Jobs_List$runningList, '/jobs/running', _narkisr$elm_ui$Jobs_List$SetRunning);
+var _narkisr$elm_ui$Jobs_List$init = function () {
+	var done = A5(
+		_narkisr$elm_ui$Table$init,
+		'doneJobs',
+		false,
+		{
+			ctor: '::',
+			_0: '#',
+			_1: {
+				ctor: '::',
+				_0: 'Start',
+				_1: {
+					ctor: '::',
+					_0: 'Host',
+					_1: {
+						ctor: '::',
+						_0: 'Queue',
+						_1: {
+							ctor: '::',
+							_0: 'Runtime (min:sec)',
+							_1: {
+								ctor: '::',
+								_0: 'Status',
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		},
+		_narkisr$elm_ui$Jobs_List$doneRow,
+		'Done Jobs');
+	var running = A5(
+		_narkisr$elm_ui$Table$init,
+		'runningJobs',
+		false,
+		{
+			ctor: '::',
+			_0: '#',
+			_1: {
+				ctor: '::',
+				_0: 'Queue',
+				_1: {
+					ctor: '::',
+					_0: 'Status',
+					_1: {ctor: '[]'}
+				}
+			}
+		},
+		_narkisr$elm_ui$Jobs_List$runningRow,
+		'Running Jobs');
+	return {
+		ctor: '_Tuple2',
+		_0: A3(_narkisr$elm_ui$Jobs_List$Model, running, done, _narkisr$elm_ui$Pager$init),
+		_1: _elm_lang$core$Platform_Cmd$batch(
+			{
+				ctor: '::',
+				_0: _narkisr$elm_ui$Jobs_List$getRunning,
+				_1: {
+					ctor: '::',
+					_0: A2(_narkisr$elm_ui$Jobs_List$getDone, 1, 10),
+					_1: {ctor: '[]'}
+				}
+			})
+	};
+}();
+var _narkisr$elm_ui$Jobs_List$update = F2(
+	function (msg, _p20) {
+		var _p21 = _p20;
+		var _p33 = _p21;
+		var _p22 = msg;
+		_v9_6:
+		do {
+			switch (_p22.ctor) {
+				case 'Polling':
+					return {
+						ctor: '_Tuple2',
+						_0: _p33,
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: _narkisr$elm_ui$Jobs_List$getRunning,
+								_1: {
+									ctor: '::',
+									_0: A2(_narkisr$elm_ui$Jobs_List$getDone, _p21.pager.page, 10),
+									_1: {ctor: '[]'}
+								}
+							})
+					};
+				case 'SetRunning':
+					return A4(
+						_narkisr$elm_ui$Common_Errors$successHandler,
+						_p22._0,
+						_p33,
+						_narkisr$elm_ui$Jobs_List$setRunningJobs(_p33),
+						_narkisr$elm_ui$Jobs_List$NoOp);
+				case 'SetDone':
+					return A4(
+						_narkisr$elm_ui$Common_Errors$successHandler,
+						_p22._0,
+						_p33,
+						_narkisr$elm_ui$Jobs_List$setDoneJobs(_p33),
+						_narkisr$elm_ui$Jobs_List$NoOp);
+				case 'GotoPage':
+					var _p24 = _p22._0;
+					var _p23 = _p24;
+					if (_p23.ctor === 'NextPage') {
+						var newPager = A2(_narkisr$elm_ui$Pager$update, _p24, _p33.pager);
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p33,
+								{pager: newPager}),
+							_1: A2(_narkisr$elm_ui$Jobs_List$getDone, _p23._0, 10)
+						};
+					} else {
+						return {ctor: '_Tuple2', _0: _p33, _1: _elm_lang$core$Platform_Cmd$none};
+					}
+				case 'LoadDone':
+					if (_p22._0.ctor === 'Select') {
+						var _p28 = _p22._0._0;
+						var emptyRow = A9(_narkisr$elm_ui$Jobs_List$DoneJob, 0, 0, '', '', '', '', '', '', '');
+						var _p25 = A2(
+							_elm_lang$core$Maybe$withDefault,
+							{ctor: '_Tuple2', _0: _p28, _1: emptyRow},
+							_elm_lang$core$List$head(
+								A2(
+									_elm_lang$core$List$filter,
+									function (_p26) {
+										var _p27 = _p26;
+										return _elm_lang$core$Native_Utils.eq(_p27._1.tid, _p28);
+									},
+									_p21.done.rows)));
+						var job = _p25._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _p33,
+							_1: _narkisr$elm_ui$Common_NewTab$newtab(job.tid_link)
+						};
+					} else {
+						break _v9_6;
+					}
+				case 'LoadRunning':
+					if (_p22._0.ctor === 'Select') {
+						var _p32 = _p22._0._0;
+						var emptyRow = A7(_narkisr$elm_ui$Jobs_List$RunningJob, '', '', '', '', '', '', '');
+						var _p29 = A2(
+							_elm_lang$core$Maybe$withDefault,
+							{ctor: '_Tuple2', _0: _p32, _1: emptyRow},
+							_elm_lang$core$List$head(
+								A2(
+									_elm_lang$core$List$filter,
+									function (_p30) {
+										var _p31 = _p30;
+										return _elm_lang$core$Native_Utils.eq(_p31._1.tid, _p32);
+									},
+									_p21.running.rows)));
+						var job = _p29._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _p33,
+							_1: _narkisr$elm_ui$Common_NewTab$newtab(job.tid_link)
+						};
+					} else {
+						break _v9_6;
+					}
+				default:
+					break _v9_6;
+			}
+		} while(false);
+		return {ctor: '_Tuple2', _0: _p33, _1: _elm_lang$core$Platform_Cmd$none};
+	});
+
+var _narkisr$elm_ui$Users_Session$isUser = function (_p0) {
+	var _p1 = _p0;
+	return A2(_elm_lang$core$List$member, 'celestial.roles/user', _p1.roles);
+};
+var _narkisr$elm_ui$Users_Session$logout = function (msg) {
+	return A2(
+		_elm_lang$http$Http$send,
+		msg,
+		_elm_lang$http$Http$getString('/logout'));
+};
+var _narkisr$elm_ui$Users_Session$Session = F5(
+	function (a, b, c, d, e) {
+		return {envs: a, identity: b, operations: c, roles: d, username: e};
+	});
+var _narkisr$elm_ui$Users_Session$emptySession = A5(
+	_narkisr$elm_ui$Users_Session$Session,
+	{ctor: '[]'},
+	'',
+	{ctor: '[]'},
+	{ctor: '[]'},
+	'');
+var _narkisr$elm_ui$Users_Session$session = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_narkisr$elm_ui$Users_Session$Session,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'envs',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'identity', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'operations',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'roles',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'username', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Users_Session$getSession = function (msg) {
+	return A3(_narkisr$elm_ui$Common_Http$getJson, _narkisr$elm_ui$Users_Session$session, '/sessions', msg);
+};
+
+var _narkisr$elm_ui$Jobs_Stats$emptyTimer = {min: 0, max: 0, mean: 0};
+var _narkisr$elm_ui$Jobs_Stats$Timer = F3(
+	function (a, b, c) {
+		return {max: a, min: b, mean: c};
+	});
+var _narkisr$elm_ui$Jobs_Stats$Metrics = F4(
+	function (a, b, c, d) {
+		return {startTimer: a, stopTimer: b, provisionTimer: c, reloadTimer: d};
+	});
+var _narkisr$elm_ui$Jobs_Stats$Model = F4(
+	function (a, b, c, d) {
+		return {polls: a, charts: b, interval: c, enabled: d};
+	});
+var _narkisr$elm_ui$Jobs_Stats$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Jobs_Stats$LoadSession = function (a) {
+	return {ctor: 'LoadSession', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Stats$init = {
+	ctor: '_Tuple2',
+	_0: A4(
+		_narkisr$elm_ui$Jobs_Stats$Model,
+		{ctor: '[]'},
+		{ctor: '[]'},
+		15,
+		false),
+	_1: _narkisr$elm_ui$Users_Session$getSession(_narkisr$elm_ui$Jobs_Stats$LoadSession)
+};
+var _narkisr$elm_ui$Jobs_Stats$Load = function (a) {
+	return {ctor: 'Load', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Stats$PollMetrics = function (a) {
+	return {ctor: 'PollMetrics', _0: a};
+};
+
+var _narkisr$elm_ui$Jobs_Core$isPolling = function (msg) {
+	var _p0 = msg;
+	_v0_2:
+	do {
+		switch (_p0.ctor) {
+			case 'JobsListing':
+				if (_p0._0.ctor === 'Polling') {
+					return true;
+				} else {
+					break _v0_2;
+				}
+			case 'JobsStats':
+				if (_p0._0.ctor === 'PollMetrics') {
+					return true;
+				} else {
+					break _v0_2;
+				}
+			default:
+				break _v0_2;
+		}
+	} while(false);
+	return false;
+};
+var _narkisr$elm_ui$Jobs_Core$Model = F2(
+	function (a, b) {
+		return {list: a, stats: b};
+	});
+var _narkisr$elm_ui$Jobs_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Jobs_Core$JobsStats = function (a) {
+	return {ctor: 'JobsStats', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Core$JobsListing = function (a) {
+	return {ctor: 'JobsListing', _0: a};
+};
+var _narkisr$elm_ui$Jobs_Core$init = function () {
+	var _p1 = _narkisr$elm_ui$Jobs_List$init;
+	var list = _p1._0;
+	var listEffects = _p1._1;
+	var _p2 = _narkisr$elm_ui$Jobs_Stats$init;
+	var stats = _p2._0;
+	var statsEffects = _p2._1;
+	var msgs = {
+		ctor: '::',
+		_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Jobs_Core$JobsListing, listEffects),
+		_1: {
+			ctor: '::',
+			_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Jobs_Core$JobsStats, statsEffects),
+			_1: {ctor: '[]'}
+		}
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: A2(_narkisr$elm_ui$Jobs_Core$Model, list, stats),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+}();
+var _narkisr$elm_ui$Jobs_Core$update = F2(
+	function (msg, _p3) {
+		var _p4 = _p3;
+		var _p7 = _p4;
+		var _p5 = msg;
+		if (_p5.ctor === 'JobsListing') {
+			var _p6 = A2(_narkisr$elm_ui$Jobs_List$update, _p5._0, _p4.list);
+			var newListing = _p6._0;
+			var msgs = _p6._1;
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p7,
+					{list: newListing}),
+				_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Jobs_Core$JobsListing, msgs)
+			};
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+var _narkisr$elm_ui$Jobs_Core$view = function (_p8) {
+	var _p9 = _p8;
+	return A2(
+		_elm_lang$html$Html$map,
+		_narkisr$elm_ui$Jobs_Core$JobsListing,
+		_narkisr$elm_ui$Jobs_List$view(_p9.list));
+};
+
+var _narkisr$elm_ui$Users_Core$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{ctor: '[]'});
+};
+var _narkisr$elm_ui$Users_Core$update = F2(
+	function (msg, model) {
+		return _narkisr$elm_ui$Common_Utils$none(model);
+	});
+var _narkisr$elm_ui$Users_Core$Model = function (a) {
+	return {navChange: a};
+};
+var _narkisr$elm_ui$Users_Core$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Users_Core$Model(_elm_lang$core$Maybe$Nothing));
+var _narkisr$elm_ui$Users_Core$NoOp = {ctor: 'NoOp'};
+
+var _narkisr$elm_ui$Common_Editor$editorInPort = _elm_lang$core$Native_Platform.incomingPort(
+	'editorInPort',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (x0) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (x1) {
+					return _elm_lang$core$Json_Decode$succeed(
+						{ctor: '_Tuple2', _0: x0, _1: x1});
+				},
+				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
+		},
+		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Common_Editor$editorOutPort = _elm_lang$core$Native_Platform.outgoingPort(
+	'editorOutPort',
+	function (v) {
+		return [v._0, v._1];
+	});
+var _narkisr$elm_ui$Common_Editor$unloadEditor = _narkisr$elm_ui$Common_Editor$editorOutPort(
+	{ctor: '_Tuple2', _0: 'unload', _1: ''});
+var _narkisr$elm_ui$Common_Editor$loadEditor = F2(
+	function (target, json) {
+		return _narkisr$elm_ui$Common_Editor$editorOutPort(
+			{ctor: '_Tuple2', _0: json, _1: target});
+	});
+var _narkisr$elm_ui$Common_Editor$Load = function (a) {
+	return {ctor: 'Load', _0: a};
+};
+var _narkisr$elm_ui$Common_Editor$NoOp = {ctor: 'NoOp'};
+
+var _narkisr$elm_ui$Nav_Header$dropdown = function (attrs) {
+	return A2(
+		_elm_lang$core$List$append,
+		{
+			ctor: '::',
+			_0: A2(_elm_lang$html$Html_Attributes$attribute, 'aria-expanded', 'false'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('dropdown-toggle'),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'dropdown'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$href('#'),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		},
+		attrs);
+};
+var _narkisr$elm_ui$Nav_Header$gearsButton = function (session) {
+	return _narkisr$elm_ui$Users_Session$isUser(session) ? A2(
+		_elm_lang$html$Html$i,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('fa fa-gears'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'color', _1: 'gray'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'pointer-events', _1: 'none'},
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		},
+		{ctor: '[]'}) : A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('dropdown pull-right'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$i,
+				_narkisr$elm_ui$Nav_Header$dropdown(
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('fa fa-gears'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'color', _1: 'black'},
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$ul,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('dropdown-menu'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$li,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$href('#/users/list'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Users'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$li,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('swagger/index.html'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Swagger'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _narkisr$elm_ui$Nav_Header$navHeader = A2(
+	_elm_lang$html$Html$div,
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$class('navbar-header'),
+		_1: {ctor: '[]'}
+	},
+	{
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$img,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$src('assets/img/cropped.png'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$alt('Celestial'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$width(110),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$height(50),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			{ctor: '[]'}),
+		_1: {ctor: '[]'}
+	});
+var _narkisr$elm_ui$Nav_Header$setSession = F2(
+	function (model, session) {
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{session: session}));
+	});
+var _narkisr$elm_ui$Nav_Header$Model = function (a) {
+	return {session: a};
+};
+var _narkisr$elm_ui$Nav_Header$init = _narkisr$elm_ui$Common_Utils$none(
+	_narkisr$elm_ui$Nav_Header$Model(_narkisr$elm_ui$Users_Session$emptySession));
+var _narkisr$elm_ui$Nav_Header$Goto = F2(
+	function (a, b) {
+		return {ctor: 'Goto', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Nav_Header$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Nav_Header$LoadSwagger = {ctor: 'LoadSwagger'};
+var _narkisr$elm_ui$Nav_Header$Redirect = function (a) {
+	return {ctor: 'Redirect', _0: a};
+};
+var _narkisr$elm_ui$Nav_Header$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'SetSession':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{session: _p0._0}));
+			case 'SignOut':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _narkisr$elm_ui$Users_Session$logout(_narkisr$elm_ui$Nav_Header$Redirect)
+				};
+			case 'Redirect':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _narkisr$elm_ui$Common_Redirect$redirect('login')
+				};
+			case 'LoadSwagger':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _narkisr$elm_ui$Common_NewTab$newtab('swagger/index.html')
+				};
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Nav_Header$SetSession = function (a) {
+	return {ctor: 'SetSession', _0: a};
+};
+var _narkisr$elm_ui$Nav_Header$SignOut = {ctor: 'SignOut'};
+var _narkisr$elm_ui$Nav_Header$topNav = function (_p1) {
+	var _p2 = _p1;
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('navbar-custom-menu'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$ul,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('nav navbar-nav'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$li,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('dropdown user user-menu'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$a,
+								_narkisr$elm_ui$Nav_Header$dropdown(
+									{ctor: '[]'}),
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$span,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('hidden-xs'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(_p2.username),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$ul,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('dropdown-menu'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$li,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('user-header'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$p,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																'Environments you can access: ',
+																A2(_elm_lang$core$String$join, ' ', _p2.envs))),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$li,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('user-body'),
+													_1: {ctor: '[]'}
+												},
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$li,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('user-footer'),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$div,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('pull-left'),
+																_1: {ctor: '[]'}
+															},
+															{
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$a,
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('btn btn-default btn-flat'),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$href('#'),
+																			_1: {ctor: '[]'}
+																		}
+																	},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('Profile'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$div,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('pull-right'),
+																	_1: {ctor: '[]'}
+																},
+																{
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$a,
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$class('btn btn-default btn-flat'),
+																			_1: {
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$href('#'),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Nav_Header$SignOut),
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html$text('Sign out'),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$li,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'control-sidebar'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('#'),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _narkisr$elm_ui$Nav_Header$gearsButton(_p2),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Nav_Header$view = function (_p3) {
+	var _p4 = _p3;
+	return A2(
+		_elm_lang$html$Html$header,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('main-header'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$a,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$href('/index.html'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('logo'),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$span,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('logo-mini'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('CEL'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$span,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('logo-lg'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _narkisr$elm_ui$Nav_Header$navHeader,
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$nav,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('navbar navbar-static-top'),
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'navigation'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$a,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$href('#'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('sidebar-toggle'),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'offcanvas'),
+										_1: {
+											ctor: '::',
+											_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'button'),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$span,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('sr-only'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Toggle navigation'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _narkisr$elm_ui$Nav_Header$topNav(_p4.session),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+
+var _narkisr$elm_ui$Nav_Side$sectionItem = F2(
+	function (resource, nested) {
+		return A2(
+			_elm_lang$html$Html$li,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class(
+							A2(_elm_lang$core$Basics_ops['++'], resource, nested)),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href(
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'#/',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										resource,
+										A2(_elm_lang$core$Basics_ops['++'], '/', nested)))),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$i,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('fa fa-circle-o'),
+								_1: {ctor: '[]'}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(nested),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _narkisr$elm_ui$Nav_Side$drop = F3(
+	function (resource, msgs, icon) {
+		return A2(
+			_elm_lang$html$Html$li,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('treeview'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$a,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class(
+							A2(_elm_lang$core$Basics_ops['++'], resource, 'Menu')),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$href('#'),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$i,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class(icon),
+								_1: {ctor: '[]'}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$span,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(resource),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$i,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('fa fa-angle-left pull-right'),
+										_1: {ctor: '[]'}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('treeview-menu'),
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$List$map,
+							function (nested) {
+								return A2(_narkisr$elm_ui$Nav_Side$sectionItem, resource, nested);
+							},
+							msgs)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _narkisr$elm_ui$Nav_Side$adminMenus = {
+	ctor: '::',
+	_0: A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'systems',
+		{
+			ctor: '::',
+			_0: 'list',
+			_1: {
+				ctor: '::',
+				_0: 'add',
+				_1: {ctor: '[]'}
+			}
+		},
+		'fa fa-server'),
+	_1: {
+		ctor: '::',
+		_0: A3(
+			_narkisr$elm_ui$Nav_Side$drop,
+			'templates',
+			{
+				ctor: '::',
+				_0: 'list',
+				_1: {ctor: '[]'}
+			},
+			'fa fa-clone'),
+		_1: {
+			ctor: '::',
+			_0: A3(
+				_narkisr$elm_ui$Nav_Side$drop,
+				'types',
+				{
+					ctor: '::',
+					_0: 'list',
+					_1: {
+						ctor: '::',
+						_0: 'add',
+						_1: {ctor: '[]'}
+					}
+				},
+				'fa fa-archive'),
+			_1: {
+				ctor: '::',
+				_0: A3(
+					_narkisr$elm_ui$Nav_Side$drop,
+					'jobs',
+					{
+						ctor: '::',
+						_0: 'list',
+						_1: {
+							ctor: '::',
+							_0: 'stats',
+							_1: {ctor: '[]'}
+						}
+					},
+					'fa fa-tasks'),
+				_1: {
+					ctor: '::',
+					_0: A3(
+						_narkisr$elm_ui$Nav_Side$drop,
+						'users',
+						{
+							ctor: '::',
+							_0: 'list',
+							_1: {
+								ctor: '::',
+								_0: 'add',
+								_1: {ctor: '[]'}
+							}
+						},
+						'fa fa-users'),
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Nav_Side$userMenus = {
+	ctor: '::',
+	_0: A3(
+		_narkisr$elm_ui$Nav_Side$drop,
+		'systems',
+		{
+			ctor: '::',
+			_0: 'list',
+			_1: {
+				ctor: '::',
+				_0: 'add',
+				_1: {ctor: '[]'}
+			}
+		},
+		'fa fa-server'),
+	_1: {
+		ctor: '::',
+		_0: A3(
+			_narkisr$elm_ui$Nav_Side$drop,
+			'templates',
+			{
+				ctor: '::',
+				_0: 'list',
+				_1: {ctor: '[]'}
+			},
+			'fa fa-clone'),
+		_1: {
+			ctor: '::',
+			_0: A3(
+				_narkisr$elm_ui$Nav_Side$drop,
+				'jobs',
+				{
+					ctor: '::',
+					_0: 'list',
+					_1: {
+						ctor: '::',
+						_0: 'stats',
+						_1: {ctor: '[]'}
+					}
+				},
+				'fa fa-tasks'),
+			_1: {ctor: '[]'}
+		}
+	}
+};
+var _narkisr$elm_ui$Nav_Side$view = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$html$Html$aside,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('main-sidebar'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$section,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('sidebar'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('sidebar-menu'),
+							_1: {ctor: '[]'}
+						},
+						_narkisr$elm_ui$Users_Session$isUser(_p1.session) ? _narkisr$elm_ui$Nav_Side$userMenus : _narkisr$elm_ui$Nav_Side$adminMenus),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Nav_Side$update = F2(
+	function (msg, model) {
+		var _p2 = msg;
+		if (_p2.ctor === 'SetSession') {
+			return _narkisr$elm_ui$Common_Utils$none(
+				_elm_lang$core$Native_Utils.update(
+					model,
+					{session: _p2._0}));
+		} else {
+			return _narkisr$elm_ui$Common_Utils$none(model);
+		}
+	});
+var _narkisr$elm_ui$Nav_Side$Model = function (a) {
+	return {session: a};
+};
+var _narkisr$elm_ui$Nav_Side$init = _narkisr$elm_ui$Nav_Side$Model(_narkisr$elm_ui$Users_Session$emptySession);
+var _narkisr$elm_ui$Nav_Side$SetSession = function (a) {
+	return {ctor: 'SetSession', _0: a};
+};
+var _narkisr$elm_ui$Nav_Side$NavigateTo = function (a) {
+	return {ctor: 'NavigateTo', _0: a};
+};
+
+var _narkisr$elm_ui$Nav_Core$setSession = F2(
+	function (_p0, session) {
+		var _p1 = _p0;
+		var _p2 = A2(
+			_narkisr$elm_ui$Nav_Header$update,
+			_narkisr$elm_ui$Nav_Header$SetSession(session),
+			_p1.header);
+		var newHeader = _p2._0;
+		var _p3 = A2(
+			_narkisr$elm_ui$Nav_Side$update,
+			_narkisr$elm_ui$Nav_Side$SetSession(session),
+			_p1.side);
+		var newSide = _p3._0;
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				_p1,
+				{side: newSide, header: newHeader}));
+	});
+var _narkisr$elm_ui$Nav_Core$Model = F4(
+	function (a, b, c, d) {
+		return {side: a, header: b, active: c, section: d};
+	});
+var _narkisr$elm_ui$Nav_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Nav_Core$LoadSession = function (a) {
+	return {ctor: 'LoadSession', _0: a};
+};
+var _narkisr$elm_ui$Nav_Core$init = function () {
+	var _p4 = _narkisr$elm_ui$Nav_Header$init;
+	var header = _p4._0;
+	return {
+		ctor: '_Tuple2',
+		_0: A4(_narkisr$elm_ui$Nav_Core$Model, _narkisr$elm_ui$Nav_Side$init, header, _narkisr$elm_ui$Nav_Common$Systems, _narkisr$elm_ui$Nav_Common$List),
+		_1: _narkisr$elm_ui$Users_Session$getSession(_narkisr$elm_ui$Nav_Core$LoadSession)
+	};
+}();
+var _narkisr$elm_ui$Nav_Core$HeaderMsg = function (a) {
+	return {ctor: 'HeaderMsg', _0: a};
+};
+var _narkisr$elm_ui$Nav_Core$update = F2(
+	function (msg, _p5) {
+		var _p6 = _p5;
+		var _p10 = _p6;
+		var _p7 = msg;
+		switch (_p7.ctor) {
+			case 'SideMsg':
+				var _p8 = A2(_narkisr$elm_ui$Nav_Side$update, _p7._0, _p6.side);
+				var newSide = _p8._0;
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p10,
+						{side: newSide}));
+			case 'HeaderMsg':
+				var _p9 = A2(_narkisr$elm_ui$Nav_Header$update, _p7._0, _p6.header);
+				var newHeader = _p9._0;
+				var msgs = _p9._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p10,
+						{header: newHeader}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Nav_Core$HeaderMsg, msgs)
+				};
+			case 'LoadSession':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p7._0,
+					_p10,
+					_narkisr$elm_ui$Nav_Core$setSession(_p10),
+					_narkisr$elm_ui$Nav_Core$NoOp);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p10);
+		}
+	});
+var _narkisr$elm_ui$Nav_Core$headerView = function (_p11) {
+	var _p12 = _p11;
+	return A2(
+		_elm_lang$html$Html$map,
+		_narkisr$elm_ui$Nav_Core$HeaderMsg,
+		_narkisr$elm_ui$Nav_Header$view(_p12.header));
+};
+var _narkisr$elm_ui$Nav_Core$SideMsg = function (a) {
+	return {ctor: 'SideMsg', _0: a};
+};
+var _narkisr$elm_ui$Nav_Core$sideView = function (_p13) {
+	var _p14 = _p13;
+	return A2(
+		_elm_lang$html$Html$map,
+		_narkisr$elm_ui$Nav_Core$SideMsg,
+		_narkisr$elm_ui$Nav_Side$view(_p14.side));
+};
+
+var _narkisr$elm_ui$Application$Model = F5(
+	function (a, b, c, d, e) {
+		return {systems: a, jobs: b, users: c, nav: d, history: e};
+	});
+var _narkisr$elm_ui$Application$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Application$UrlChange = function (a) {
+	return {ctor: 'UrlChange', _0: a};
+};
+var _narkisr$elm_ui$Application$NewUrl = function (a) {
+	return {ctor: 'NewUrl', _0: a};
+};
+var _narkisr$elm_ui$Application$UsersMsg = function (a) {
+	return {ctor: 'UsersMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$NavMsg = function (a) {
+	return {ctor: 'NavMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$JobsMsg = function (a) {
+	return {ctor: 'JobsMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$SystemsMsg = function (a) {
+	return {ctor: 'SystemsMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$update = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p6 = _p1;
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'JobsMsg':
+				var _p3 = A2(_narkisr$elm_ui$Jobs_Core$update, _p2._0, _p1.jobs);
+				var newJob = _p3._0;
+				var msgs = _p3._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p6,
+						{jobs: newJob}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$JobsMsg, msgs)
+				};
+			case 'UsersMsg':
+				var _p4 = A2(_narkisr$elm_ui$Users_Core$update, _p2._0, _p1.users);
+				var newUsers = _p4._0;
+				var msgs = _p4._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p6,
+						{users: newUsers}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$UsersMsg, msgs)
+				};
+			case 'SystemsMsg':
+				var _p5 = A2(_narkisr$elm_ui$Systems_Core$update, _p2._0, _p1.systems);
+				var newSystems = _p5._0;
+				var msgs = _p5._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p6,
+						{systems: newSystems}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$SystemsMsg, msgs)
+				};
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p6);
+		}
+	});
+var _narkisr$elm_ui$Application$view = function (_p7) {
+	var _p8 = _p7;
+	var _p9 = _p8.nav;
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('wrapper'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('content-wrapper'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$map,
+						_narkisr$elm_ui$Application$NavMsg,
+						_narkisr$elm_ui$Nav_Core$headerView(_p9)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$section,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('content'),
+								_1: {ctor: '[]'}
+							},
+							_narkisr$elm_ui$Common_Components$asList(
+								A2(
+									_elm_lang$html$Html$map,
+									_narkisr$elm_ui$Application$SystemsMsg,
+									_narkisr$elm_ui$Systems_Core$view(_p8.systems)))),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$map,
+								_narkisr$elm_ui$Application$NavMsg,
+								_narkisr$elm_ui$Nav_Core$sideView(_p9)),
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Application$NavigateTo = function (a) {
+	return {ctor: 'NavigateTo', _0: a};
+};
+var _narkisr$elm_ui$Application$MenuMsg = function (a) {
+	return {ctor: 'MenuMsg', _0: a};
+};
+var _narkisr$elm_ui$Application$Launch = {ctor: 'Launch'};
+var _narkisr$elm_ui$Application$Systems = {ctor: 'Systems'};
+var _narkisr$elm_ui$Application$route = _evancz$url_parser$UrlParser$oneOf(
+	{
+		ctor: '::',
+		_0: A2(_evancz$url_parser$UrlParser$map, _narkisr$elm_ui$Application$Systems, _evancz$url_parser$UrlParser$top),
+		_1: {
+			ctor: '::',
+			_0: A2(_evancz$url_parser$UrlParser$map, _narkisr$elm_ui$Application$Launch, _evancz$url_parser$UrlParser$top),
+			_1: {ctor: '[]'}
+		}
+	});
+var _narkisr$elm_ui$Application$init = function (location) {
+	var history = {
+		ctor: '::',
+		_0: A2(_evancz$url_parser$UrlParser$parsePath, _narkisr$elm_ui$Application$route, location),
+		_1: {ctor: '[]'}
+	};
+	var _p10 = _narkisr$elm_ui$Systems_Core$init;
+	var systems = _p10._0;
+	var systemsMsg = _p10._1;
+	var _p11 = _narkisr$elm_ui$Users_Core$init;
+	var users = _p11._0;
+	var usersMsg = _p11._1;
+	var _p12 = _narkisr$elm_ui$Nav_Core$init;
+	var nav = _p12._0;
+	var navMsg = _p12._1;
+	var _p13 = _narkisr$elm_ui$Jobs_Core$init;
+	var jobs = _p13._0;
+	var jobsMsg = _p13._1;
+	var msgs = {
+		ctor: '::',
+		_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$UsersMsg, usersMsg),
+		_1: {
+			ctor: '::',
+			_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$SystemsMsg, systemsMsg),
+			_1: {
+				ctor: '::',
+				_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$JobsMsg, jobsMsg),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$NavMsg, navMsg),
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: A5(_narkisr$elm_ui$Application$Model, systems, jobs, users, nav, history),
+		_1: _elm_lang$core$Platform_Cmd$batch(msgs)
+	};
+};
+
+var _narkisr$elm_ui$Common_Menu$intoMsg = function (msg) {
+	var _p0 = msg;
+	if ((_p0.ctor === 'MenuMsg') && (_p0._0.ctor === '_Tuple3')) {
+		var _p1 = _p0._0._0;
+		if (_p1 === 'Systems') {
+			return _narkisr$elm_ui$Application$SystemsMsg(
+				_narkisr$elm_ui$Systems_Core$SystemsLaunch(
+					_narkisr$elm_ui$Systems_Launch$SetupJob(_p0._0._1)));
+		} else {
+			return _narkisr$elm_ui$Application$NoOp;
+		}
+	} else {
+		return msg;
+	}
+};
+var _narkisr$elm_ui$Common_Menu$menuPort = _elm_lang$core$Native_Platform.incomingPort(
+	'menuPort',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (x0) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (x1) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (x2) {
+							return _elm_lang$core$Json_Decode$succeed(
+								{ctor: '_Tuple3', _0: x0, _1: x1, _2: x2});
+						},
+						A2(_elm_lang$core$Json_Decode$index, 2, _elm_lang$core$Json_Decode$string));
+				},
+				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
+		},
+		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
+
+var _narkisr$elm_ui$Main$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$core$Platform_Sub$map,
+				function (v) {
+					return _narkisr$elm_ui$Common_Menu$intoMsg(v);
+				},
+				_narkisr$elm_ui$Common_Menu$menuPort(_narkisr$elm_ui$Application$MenuMsg)),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$core$Time$every,
+					_elm_lang$core$Time$second,
+					function (_p0) {
+						return _narkisr$elm_ui$Application$JobsMsg(
+							_narkisr$elm_ui$Jobs_Core$JobsListing(_narkisr$elm_ui$Jobs_List$Polling));
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _narkisr$elm_ui$Main$main = A2(
+	_elm_lang$navigation$Navigation$program,
+	_narkisr$elm_ui$Application$UrlChange,
+	{init: _narkisr$elm_ui$Application$init, view: _narkisr$elm_ui$Application$view, update: _narkisr$elm_ui$Application$update, subscriptions: _narkisr$elm_ui$Main$subscriptions})();
+var _narkisr$elm_ui$Main$parser = _elm_lang$core$Native_Platform.outgoingPort(
+	'parser',
+	function (v) {
+		return v;
+	});
+
 var Elm = {};
-Elm['Table'] = Elm['Table'] || {};
-if (typeof _narkisr$elm_ui$Table$main !== 'undefined') {
-    _narkisr$elm_ui$Table$main(Elm['Table'], 'Table', undefined);
+Elm['Main'] = Elm['Main'] || {};
+if (typeof _narkisr$elm_ui$Main$main !== 'undefined') {
+    _narkisr$elm_ui$Main$main(Elm['Main'], 'Main', undefined);
 }
 
 if (typeof define === "function" && define['amd'])

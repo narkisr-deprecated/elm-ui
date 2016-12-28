@@ -1,11 +1,9 @@
 module Systems.List exposing (..)
 
 import Platform.Cmd as Cmd
-import Basics.Extra exposing (never)
 import Html exposing (..)
-import Html
 import Html.Attributes exposing (type_, class, id, style, attribute)
-import Http exposing (Error(BadResponse))
+import Http
 import Json.Decode as Json exposing (..)
 import Task exposing (Task)
 import Dict exposing (Dict)
@@ -14,6 +12,7 @@ import Systems.Model.Common exposing (Machine, System, emptySystem)
 import Systems.Model.AWS exposing (emptyAws)
 import Systems.Decoders exposing (..)
 import Common.Errors exposing (successHandler)
+import Common.Components exposing (row_, panelDefault_)
 import Common.Http exposing (getJson)
 import Common.Utils exposing (none)
 import String exposing (isEmpty)
@@ -205,16 +204,16 @@ view model =
 
 systemPair : Decoder ( String, System )
 systemPair =
-    tuple2 (,)
+    map2 (,)
         string
         systemDecoder
 
 
 systemPage : Decoder ( Dict String Int, List ( String, System ) )
 systemPage =
-    object2 (,)
-        ("meta" := dict int)
-        ("systems" := list systemPair)
+    map2 (,)
+        (field "meta" (dict int))
+        (field "systems" (list systemPair))
 
 
 
@@ -223,13 +222,9 @@ systemPage =
 
 getSystems : Int -> Int -> Cmd Msg
 getSystems page offset =
-    getJson systemPage ("/systems?page=" ++ (toString page) ++ "&offset=" ++ (toString offset))
-        |> Task.toResult
-        |> Task.perform never SetSystems
+    getJson systemPage ("/systems?page=" ++ (toString page) ++ "&offset=" ++ (toString offset)) SetSystems
 
 
 getSystemsQuery : Int -> Int -> String -> Cmd Msg
 getSystemsQuery page offset query =
-    getJson systemPage ("/systems/query?page=" ++ (toString page) ++ "&offset=" ++ (toString offset) ++ "&query=" ++ query)
-        |> Task.toResult
-        |> Task.perform never SetSystems
+    getJson systemPage ("/systems/query?page=" ++ (toString page) ++ "&offset=" ++ (toString offset) ++ "&query=" ++ query) SetSystems

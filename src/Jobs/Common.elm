@@ -3,7 +3,6 @@ module Jobs.Common exposing (..)
 import Html exposing (..)
 import Json.Decode as Json exposing (..)
 import Http exposing (Error(BadStatus))
-import Task
 
 
 type alias JobResponse =
@@ -13,13 +12,12 @@ type alias JobResponse =
 jobResponse : Decoder JobResponse
 jobResponse =
     map3 JobResponse
-        ("message" field Json.string)
-        ("id" field Json.string)
-        ("job" field Json.string)
+        (field "message" Json.string)
+        (field "id" Json.string)
+        (field "job" Json.string)
 
 
-runJob : String -> String -> (Result Error JobResponse -> a) -> Cmd a
+runJob : String -> String -> (Result Http.Error JobResponse -> a) -> Cmd a
 runJob id job msg =
-    Http.post jobResponse ("/jobs/" ++ job ++ "/" ++ id) Http.empty
-        |> Task.toResult
-        |> Task.perform msg
+    Http.send msg
+        (Http.post ("/jobs/" ++ job ++ "/" ++ id) Http.emptyBody jobResponse)

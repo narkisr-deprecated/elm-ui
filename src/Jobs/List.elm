@@ -3,10 +3,8 @@ module Jobs.List exposing (..)
 -- view
 
 import Html exposing (..)
-import Html
 import Html.Attributes as Attr exposing (type_, class, id, attribute, href, style)
 import Common.Http exposing (getJson)
-import Basics.Extra exposing (never)
 
 
 -- remoting
@@ -14,7 +12,7 @@ import Basics.Extra exposing (never)
 import Json.Decode as Json exposing (..)
 import Task
 import Platform.Cmd exposing (map, batch)
-import Http exposing (Error(BadResponse))
+import Http
 import Debug
 import Date
 import Date.Format exposing (format)
@@ -25,6 +23,7 @@ import Date.Format exposing (format)
 import Dict exposing (Dict)
 import Common.Errors exposing (successHandler)
 import Common.NewTab exposing (newtab)
+import Common.Components exposing (panelDefault_, row_)
 import Table exposing (view, Msg(Select))
 import Pager exposing (..)
 import String
@@ -272,14 +271,14 @@ view ({ running, done, pager } as model) =
 
 runningJob : Decoder RunningJob
 runningJob =
-    object7 RunningJob
-        ("env" := string)
-        ("id" := string)
-        ("jid" := string)
-        ("status" := oneOf [ string, null "" ])
-        ("tid" := string)
-        ("tid-link" := oneOf [ string, null "" ])
-        ("type" := string)
+    map7 RunningJob
+        (field "env" string)
+        (field "id" string)
+        (field "jid" string)
+        (field "status" (oneOf [ string, null "" ]))
+        (field "tid" string)
+        (field "tid-link" (oneOf [ string, null "" ]))
+        (field "type" string)
 
 
 runningList : Decoder (List RunningJob)
@@ -289,7 +288,7 @@ runningList =
 
 apply : Json.Decoder (a -> b) -> Json.Decoder a -> Json.Decoder b
 apply func value =
-    Json.object2 (<|) func value
+    Json.map2 (<|) func value
 
 
 doneJob : Decoder DoneJob
@@ -302,31 +301,29 @@ doneJob =
                         (apply
                             (apply
                                 (apply
-                                    (Json.map DoneJob
-                                        ("start" := float)
-                                    )
-                                    ("end" := float)
+                                    (Json.map DoneJob (field "start" float))
+                                    (field "end" float)
                                 )
-                                ("env" := string)
+                                (field "env" string)
                             )
-                            ("hostname" := string)
+                            (field "hostname" string)
                         )
-                        ("identity" := string)
+                        (field "identity" string)
                     )
-                    ("queue" := string)
+                    (field "queue" string)
                 )
-                ("status" := string)
+                (field "status" string)
             )
-            ("tid" := string)
+            (field "tid" string)
         )
-        ("tid-link" := oneOf [ string, null "" ])
+        (field "tid-link" (oneOf [ string, null "" ]))
 
 
 doneList : Decoder ( Int, List DoneJob )
 doneList =
-    Json.object2 (,)
-        ("total" := int)
-        ("jobs" := (list doneJob))
+    Json.map2 (,)
+        (field "total" int)
+        (field "jobs" (list doneJob))
 
 
 
@@ -335,13 +332,9 @@ doneList =
 
 getRunning : Cmd Msg
 getRunning =
-    getJson runningList "/jobs/running"
-        |> Task.toResult
-        |> Task.perform never SetRunning
+    getJson runningList "/jobs/running" SetRunning
 
 
 getDone : Int -> Int -> Cmd Msg
 getDone page offset =
-    getJson doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page))
-        |> Task.toResult
-        |> Task.perform never SetDone
+    getJson doneList ("/jobs/done?offset=" ++ (toString offset) ++ "&page=" ++ (toString page)) SetDone

@@ -4,7 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (class, id, href, placeholder, attribute, type_, style)
 import Platform.Cmd exposing (batch)
 import Common.Redirect exposing (redirect)
-import Http exposing (Error(BadResponse))
+import Http exposing (Error(BadStatus))
 import Dict exposing (Dict)
 import Maybe exposing (withDefault)
 import Common.Components exposing (panelContents)
@@ -117,52 +117,11 @@ view { errors } =
         ]
 
 
-errorsDecoder : Decoder Errors
-errorsDecoder =
-    let
-        options =
-            [ map Value string
-            , map Nested (dict string)
-            , map DeepNestedList (dict (list (dict (dict string))))
-            , map NestedList (dict (list (dict string)))
-            ]
-    in
-        (object3 Errors
-            (at [ "object", "type" ] string)
-            (maybe (at [ "object", "errors" ] (dict (oneOf options))))
-            (maybe ("message" := string))
-        )
-
-
 messageDecoder : Decoder Errors
 messageDecoder =
-    (object1 (Errors "" Nothing)
-        (maybe ("message" := string))
+    (Json.map (Errors "" Nothing)
+        (maybe (field "message" string))
     )
-
-
-decodeError : Http.Value -> Errors
-decodeError error =
-    let
-        emptyErrors =
-            (Errors "" Nothing Nothing)
-    in
-        case error of
-            Http.Text value ->
-                case (decodeString errorsDecoder value) of
-                    Result.Ok errors ->
-                        errors
-
-                    Result.Err e ->
-                        case Debug.log (toString e) (decodeString messageDecoder value) of
-                            Result.Ok errors ->
-                                errors
-
-                            Result.Err e ->
-                                Debug.log e emptyErrors
-
-            _ ->
-                emptyErrors
 
 
 identitySuccess : m -> r -> ( m, Cmd a )
@@ -182,12 +141,9 @@ handler result model success fail noop =
 
         Result.Err e ->
             case e of
-                BadResponse 401 m ->
+                BadStatus { status } ->
                     Debug.log (toString e) ( model, (redirect "login") )
 
-                -- BadResponse 400 m resp ->
-                --    (fail (decodeError resp))
-                --
                 _ ->
                     Debug.log (toString e) ( model, Cmd.none )
 

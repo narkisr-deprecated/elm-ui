@@ -4,7 +4,7 @@ import Nav.Common as NavCommon exposing (Active(Stacks, Types, Systems, Jobs, Te
 import Nav.Header as Header exposing (Msg(SetSession))
 import Nav.Side as Side exposing (Msg(SetSession))
 import Users.Session exposing (getSession, Session)
-import Http exposing (Error(BadResponse))
+import Http
 import Common.Errors exposing (successHandler)
 import Html exposing (..)
 import Html

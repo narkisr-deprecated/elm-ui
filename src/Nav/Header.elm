@@ -6,7 +6,7 @@ import Users.Session exposing (getSession, Session, emptySession, logout)
 import Common.Redirect exposing (redirect)
 import Common.Errors exposing (successHandler)
 import Common.Utils exposing (none)
-import Http exposing (Error(BadResponse))
+import Http
 import Html.Events exposing (onClick)
 import Users.Session exposing (isUser)
 import Common.NewTab exposing (newtab)

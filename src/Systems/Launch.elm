@@ -1,7 +1,7 @@
 module Systems.Launch exposing (..)
 
 import Html
-import Http exposing (Error(BadResponse))
+import Http
 import Json.Decode as Json exposing (..)
 import Common.Errors exposing (successHandler)
 import Html exposing (..)
@@ -13,7 +13,7 @@ import Table exposing (view)
 import Debug
 import Systems.Model.Common exposing (System)
 import Jobs.Common exposing (runJob, JobResponse)
-import Common.Components exposing (dangerCallout)
+import Common.Components exposing (dangerCallout, panelDefault_)
 import Common.Utils exposing (none)
 import Set exposing (Set)
 

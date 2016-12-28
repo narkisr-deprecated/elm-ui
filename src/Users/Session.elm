@@ -1,9 +1,8 @@
 module Users.Session exposing (..)
 
 import Json.Decode as Json exposing (..)
-import Http exposing (Error(BadResponse))
+import Http
 import Common.Http exposing (getJson)
-import Basics.Extra exposing (never)
 import Task
 
 
@@ -23,24 +22,20 @@ emptySession =
 
 session : Decoder Session
 session =
-    object5 Session
-        ("envs" := list string)
-        ("identity" := string)
-        ("operations" := list string)
-        ("roles" := list string)
-        ("username" := string)
+    map5 Session
+        (field "envs" (list string))
+        (field "identity" string)
+        (field "operations" (list string))
+        (field "roles" (list string))
+        (field "username" string)
 
 
 getSession msg =
-    getJson session "/sessions"
-        |> Task.toResult
-        |> Task.perform never msg
+    getJson session "/sessions" msg
 
 
 logout msg =
-    Http.getString "/logout"
-        |> Task.toResult
-        |> Task.perform never msg
+    Http.send msg <| Http.getString "/logout"
 
 
 isUser : Session -> Bool

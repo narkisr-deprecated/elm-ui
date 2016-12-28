@@ -3,193 +3,120 @@ module Application exposing (..)
 import Html exposing (..)
 import Platform.Cmd exposing (batch, map)
 import Html.Attributes exposing (type_, class, id, href, attribute, height, width, alt, src)
-import Systems.Core as Systems
+import Systems.Core as Systems exposing (Msg(SystemsListing))
 import Jobs.Core as Jobs
 import Common.Utils exposing (none)
 import Common.Components exposing (asList)
 import Users.Core as Users
-import Nav.Core as Nav
 import Common.Editor as Editor
 import Debug
 
 
-init : ( BaseRoute.Route, Location ) -> ( Model, Cmd Msg )
-init ( route, location ) =
+-- Navigation
+
+import Navigation
+import UrlParser as Url exposing ((</>), (<?>), s, int, stringParam, top)
+import Nav.Core as Nav
+
+
+init : Navigation.Location -> ( Model, Cmd Msg )
+init location =
     let
         ( jobs, jobsMsg ) =
             Jobs.init
 
-        ( types, typesMsg ) =
-            Types.init
+        ( nav, navMsg ) =
+            Nav.init
 
         ( users, usersMsg ) =
             Users.init
 
-        ( templates, templatesMsg ) =
-            Templates.init
-
-        ( nav, navMsg ) =
-            Nav.init
-
         ( systems, systemsMsg ) =
             Systems.init
 
-        ( stacks, stacksMsg ) =
-            Stacks.init
+        history =
+            [ Url.parsePath route location ]
 
         msgs =
-            [ Cmd.map TemplatesMsg templatesMsg
-            , Cmd.map TypesMsg typesMsg
-            , Cmd.map UsersMsg usersMsg
+            [ Cmd.map UsersMsg usersMsg
             , Cmd.map SystemsMsg systemsMsg
-            , Cmd.map StacksMsg stacksMsg
-            , Cmd.map NavMsg navMsg
             , Cmd.map JobsMsg jobsMsg
+            , Cmd.map NavMsg navMsg
             ]
     in
-        ( Model systems stacks jobs types templates users nav route location, Cmd.batch msgs )
+        ( Model systems jobs users nav history, Cmd.batch msgs )
 
 
 type alias Model =
     { systems : Systems.Model
-    , stacks : Stacks.Model
     , jobs : Jobs.Model
-    , types : Types.Model
-    , templates : Templates.Model
     , users : Users.Model
     , nav : Nav.Model
-    , route : BaseRoute.Route
-    , location : Location
+    , history : List (Maybe Route)
     }
 
 
 type Msg
-    = ApplyRoute ( BaseRoute.Route, Location )
-    | MenuMsg ( String, String, String )
-    | EditMsg Editor.Msg
+    = MenuMsg ( String, String, String )
     | NavigateTo String
     | SystemsMsg Systems.Msg
-    | NavMsg Nav.Msg
-    | StacksMsg Stacks.Msg
     | JobsMsg Jobs.Msg
-    | TypesMsg Types.Msg
-    | TemplatesMsg Templates.Msg
+    | NavMsg Nav.Msg
     | UsersMsg Users.Msg
+    | NewUrl String
+    | UrlChange Navigation.Location
     | NoOp
 
 
-route : Msg -> Model -> ( Model, Cmd Msg )
-route msg ({ route, types, users, jobs, systems, templates, stacks, nav } as model) =
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg ({ users, jobs, systems, nav } as model) =
     case msg of
         JobsMsg msg ->
-            if Jobs.isPolling msg && BaseRoute.notJobs route then
-                none model
-            else
-                let
-                    ( newJob, msgs ) =
-                        Jobs.update msg jobs
-                in
-                    ( { model | jobs = newJob }, Cmd.map JobsMsg msgs )
-
-        TypesMsg msg ->
             let
-                ( newTypes, msgs ) =
-                    navigate (Types.update msg types) TypesMsg
+                ( newJob, msgs ) =
+                    Jobs.update msg jobs
             in
-                ( { model | types = newTypes }, msgs )
-
-        NavMsg msg ->
-            let
-                ( newNav, msgs ) =
-                    (Nav.update msg nav)
-            in
-                ( { model | nav = newNav }, Cmd.map NavMsg msgs )
+                ( { model | jobs = newJob }, Cmd.map JobsMsg msgs )
 
         UsersMsg msg ->
             let
                 ( newUsers, msgs ) =
-                    navigate (Users.update msg users) UsersMsg
+                    Users.update msg users
             in
-                ( { model | users = newUsers }, msgs )
-
-        StacksMsg msg ->
-            let
-                ( newStacks, msgs ) =
-                    Stacks.update msg stacks
-            in
-                ( { model | stacks = newStacks }, Cmd.map StacksMsg msgs )
-
-        TemplatesMsg msg ->
-            let
-                ( newTemplates, msgs ) =
-                    navigate (Templates.update msg templates) TemplatesMsg
-            in
-                ( { model | templates = newTemplates }, msgs )
+                ( { model | users = newUsers }, Cmd.map UsersMsg msgs )
 
         SystemsMsg msg ->
             let
                 ( newSystems, msgs ) =
-                    navigate (Systems.update msg systems) SystemsMsg
+                    Systems.update msg systems
             in
-                ( { model | systems = newSystems }, msgs )
+                ( { model | systems = newSystems }, Cmd.map SystemsMsg msgs )
 
         _ ->
             none model
 
 
-navigate ( { navChange } as model, msgs ) msg =
-    case navChange of
-        Just path ->
-            let
-                withNavChange =
-                    [ Cmd.map msg msgs
-                    , Hop.makeUrl config path |> Navigation.newUrl
-                    ]
-            in
-                ( { model | navChange = Nothing }, Cmd.batch withNavChange )
-
-        Nothing ->
-            ( model, Cmd.map msg msgs )
-
-
-urlUpdate : ( BaseRoute.Route, Location ) -> Model -> ( Model, Cmd Msg )
-urlUpdate ( route, location ) model =
-    none { model | route = route, location = location }
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    route msg model
-
-
-activeView : Model -> Html Msg
-activeView ({ jobs, route, systems, types, templates, stacks, users } as model) =
-    case (Debug.log "" route) of
-        SystemsRoute nested ->
-            Html.map SystemsMsg (Systems.view systems nested)
-
-        TypesRoute nested ->
-            Html.map TypesMsg (Types.view types nested)
-
-        TemplatesRoute nested ->
-            Html.map TemplatesMsg (Templates.view templates nested)
-
-        JobsRoute nested ->
-            Html.map JobsMsg (Jobs.view jobs nested)
-
-        UsersRoute nested ->
-            Html.map UsersMsg (Users.view users nested)
-
-        _ ->
-            Html.map SystemsMsg (Systems.view systems List)
-
-
 view : Model -> Html Msg
-view ({ nav } as model) =
+view ({ nav, systems } as model) =
     div [ class "wrapper" ]
         [ div [ class "content-wrapper" ]
             [ Html.map NavMsg (Nav.headerView nav)
-            , section [ class "content" ] (asList (activeView model))
+            , section [ class "content" ]
+                (asList (Html.map SystemsMsg (Systems.view systems)))
             , Html.map NavMsg (Nav.sideView nav)
             ]
         ]
+
+
+
+-- routing
+
+
+type Route
+    = Systems
+    | Launch
+
+
+route : Url.Parser (Route -> a) a
+route =
+    Url.oneOf [ Url.map Systems top, Url.map Launch top ]

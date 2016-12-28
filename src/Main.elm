@@ -6,7 +6,7 @@ import Html
 -- was StartA
 
 import Task
-import Application as App exposing (init, view, update, Msg(EditMsg, MenuMsg), Model, urlUpdate)
+import Application as App exposing (init, view, update, Msg(MenuMsg, UrlChange), Model)
 import Json.Encode as E exposing (list, string)
 import Task exposing (Task)
 
@@ -30,13 +30,11 @@ import Navigation
 import Platform.Sub as Subs
 
 
-main : Program Never
 main =
-    Navigation.program urlParser
+    Navigation.program UrlChange
         { init = init
         , view = view
         , update = update
-        , urlUpdate = urlUpdate
         , subscriptions = subscriptions
         }
 

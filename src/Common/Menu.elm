@@ -20,12 +20,6 @@ intoMsg msg =
                 "Systems" ->
                     App.SystemsMsg (SystemsCore.SystemsLaunch (SystemsLaunch.SetupJob job))
 
-                "Templates" ->
-                    App.TemplatesMsg (TemplatesCore.SetupJob ( job, target ))
-
-                "Users" ->
-                    App.UsersMsg (UsersCore.MenuClick ( job, target ))
-
                 _ ->
                     App.NoOp
 

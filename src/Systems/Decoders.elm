@@ -13,27 +13,27 @@ import Common.Http exposing (apply)
 
 vpcDecoder : Decoder VPC
 vpcDecoder =
-    object3 VPC
-        ("subnetId" := string)
-        ("vpcId" := string)
-        ("assignIp" := bool)
+    map3 VPC
+        (field "subnetId" string)
+        (field "vpcId" string)
+        (field "assignIp" bool)
 
 
 blockDecoder : Decoder Block
 blockDecoder =
-    object2 Block
-        ("volume" := string)
-        ("device" := string)
+    map2 Block
+        (field "volume" string)
+        (field "device" string)
 
 
 awsVolumeDecoder : Decoder AWS.Volume
 awsVolumeDecoder =
-    object5 AWS.Volume
-        ("volume-type" := string)
-        ("size" := int)
-        (maybe ("iops" := int))
-        ("device" := string)
-        ("clear" := bool)
+    map5 AWS.Volume
+        (field "volume-type" string)
+        (field "size" int)
+        (maybe (field "iops" int))
+        (field "device" string)
+        (field "clear" bool)
 
 
 awsDecoder : Decoder AWS
@@ -48,64 +48,64 @@ awsDecoder =
                                 (apply
                                     (apply
                                         (map AWS
-                                            ("instance-type" := string)
+                                            (field "instance-type" string)
                                         )
-                                        (maybe ("instance-id" := string))
+                                        (maybe (field "instance-id" string))
                                     )
-                                    ("key-name" := string)
+                                    (field "key-name" string)
                                 )
-                                ("endpoint" := string)
+                                (field "endpoint" string)
                             )
-                            (maybe ("availability-zone" := string))
+                            (maybe (field "availability-zone" string))
                         )
-                        (maybe ("security-groups" := list string))
+                        (maybe (field "security-groups" (list string)))
                     )
-                    (maybe ("ebs-optimized" := bool))
+                    (maybe (field "ebs-optimized" bool))
                 )
-                (maybe ("volumes" := list awsVolumeDecoder))
+                (maybe (field "volumes" (list awsVolumeDecoder)))
             )
-            (maybe ("block-devices" := list blockDecoder))
+            (maybe (field "block-devices" (list blockDecoder)))
         )
-        (maybe ("vpc" := vpcDecoder))
+        (maybe (field "vpc" vpcDecoder))
 
 
 gceDecoder : Decoder GCE
 gceDecoder =
-    object5 GCE
-        ("machine-type" := string)
-        ("zone" := string)
-        (maybe ("tags" := list string))
-        ("project-id" := string)
-        (maybe ("static-ip" := string))
+    map5 GCE
+        (field "machine-type" string)
+        (field "zone" string)
+        (maybe (field "tags" (list string)))
+        (field "project-id" string)
+        (maybe (field "static-ip" string))
 
 
 digitalDecoder : Decoder Digital
 digitalDecoder =
-    object3 Digital
-        ("size" := string)
-        ("region" := string)
-        ("private-networking" := bool)
+    map3 Digital
+        (field "size" string)
+        (field "region" string)
+        (field "private-networking" bool)
 
 
 physicalDecoder : Decoder Physical
 physicalDecoder =
-    object2 Physical
-        (maybe ("mac" := string))
-        (maybe ("broadcast" := string))
+    map2 Physical
+        (maybe (field "mac" string))
+        (maybe (field "broadcast" string))
 
 
 kvmDecoder : Decoder KVM
 kvmDecoder =
-    object1 KVM
-        ("node" := string)
+    map KVM
+        (field "node" string)
 
 
 openstackVolumeDecoder : Decoder Openstack.Volume
 openstackVolumeDecoder =
-    object3 Openstack.Volume
-        ("device" := string)
-        ("size" := int)
-        ("clear" := bool)
+    map3 Openstack.Volume
+        (field "device" string)
+        (field "size" int)
+        (field "clear" bool)
 
 
 openstackDecoder : Decoder Openstack
@@ -118,33 +118,33 @@ openstackDecoder =
                         (apply
                             (apply
                                 (map Openstack
-                                    ("flavor" := string)
+                                    (field "flavor" string)
                                 )
-                                ("tenant" := string)
+                                (field "tenant" string)
                             )
-                            ("key-name" := string)
+                            (field "key-name" string)
                         )
-                        (maybe ("floating-ip" := string))
+                        (maybe (field "floating-ip" string))
                     )
-                    (maybe ("floating-ip-pool" := string))
+                    (maybe (field "floating-ip-pool" string))
                 )
-                (maybe ("security-groups" := list string))
+                (maybe (field "security-groups" (list string)))
             )
-            ("networks" := list string)
+            (field "networks" (list string))
         )
-        (maybe ("volumes" := list openstackVolumeDecoder))
+        (maybe (field "volumes" (list openstackVolumeDecoder)))
 
 
 machineDecoder : Decoder Machine
 machineDecoder =
-    object7 Machine
-        ("user" := string)
-        ("hostname" := string)
-        ("domain" := string)
-        (maybe ("ip" := string))
-        ("os" := string)
-        (maybe ("ram" := int))
-        (maybe ("cpu" := int))
+    map7 Machine
+        (field "user" string)
+        (field "hostname" string)
+        (field "domain" string)
+        (maybe (field "ip" string))
+        (field "os" string)
+        (maybe (field "ram" int))
+        (maybe (field "cpu" int))
 
 
 systemDecoder : Decoder System
@@ -159,22 +159,22 @@ systemDecoder =
                                 (apply
                                     (apply
                                         (map System
-                                            ("owner" := string)
+                                            (field "owner" string)
                                         )
-                                        ("env" := string)
+                                        (field "env" string)
                                     )
-                                    ("type" := string)
+                                    (field "type" string)
                                 )
-                                ("machine" := machineDecoder)
+                                (field "machine" machineDecoder)
                             )
-                            (maybe ("aws" := awsDecoder))
+                            (maybe (field "aws" awsDecoder))
                         )
-                        (maybe ("gce" := gceDecoder))
+                        (maybe (field "gce" gceDecoder))
                     )
-                    (maybe ("digital-ocean" := digitalDecoder))
+                    (maybe (field "digital-ocean" digitalDecoder))
                 )
-                (maybe ("openstack" := openstackDecoder))
+                (maybe (field "openstack" openstackDecoder))
             )
-            (maybe ("physical" := physicalDecoder))
+            (maybe (field "physical" physicalDecoder))
         )
-        (maybe ("kvm" := kvmDecoder))
+        (maybe (field "kvm" kvmDecoder))

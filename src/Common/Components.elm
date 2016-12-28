@@ -11,8 +11,13 @@ import Dict exposing (Dict)
 
 
 row_ : List (Html msg) -> Html msg
-row_ =
-    div { class = "row" }
+row_ html =
+    div [ class "row" ] html
+
+
+panelDefault_ : List (Html msg) -> Html msg
+panelDefault_ html =
+    div [ class "panel panel-default" ] html
 
 
 notImplemented =
@@ -125,121 +130,3 @@ warningCallout message body cancel ok =
     dialogPanel "warning" message body
         |> withButtons cancel ok
         |> div []
-
-
-
--- Form groups
-
-
-withError : List Error -> String -> String
-withError errors class =
-    if List.isEmpty errors then
-        class
-    else
-        class ++ " has-error"
-
-
-toHtml : Error -> Html msg
-toHtml error =
-    case error of
-        Invalid message ->
-            span [ class "help-block" ] [ (text message) ]
-
-        None ->
-            span [ class "help-block" ] []
-
-
-withMessage : List Error -> Html msg
-withMessage errors =
-    if List.isEmpty errors then
-        div [] []
-    else
-        let
-            messages =
-                List.map toHtml errors
-        in
-            withDefault (div [] []) (List.head messages)
-
-
-group : String -> Html msg -> List Error -> Html msg
-group title widget errors =
-    div [ class (withError errors "form-group"), id title ]
-        [ label [ for title, class "col-sm-3 control-label" ] [ (text title) ]
-        , div [ class "col-sm-6" ] [ widget ]
-        , withMessage errors
-        ]
-
-
-group_ : String -> Html msg -> Html msg
-group_ title widget =
-    group title widget []
-
-
-selected : String -> String -> List (Attribute msg)
-selected value default =
-    if value == default then
-        [ attribute "selected" "true" ]
-    else
-        []
-
-
-onSelect : (String -> msg) -> Attribute msg
-onSelect msg =
-    Html.Events.on "change" (Json.map msg (at [ "target", "value" ] string))
-
-
-onMultiSelect : (String -> msg) -> Attribute msg
-onMultiSelect msg =
-    Html.Events.on "change" (Json.map msg (at [ "target" ] string))
-
-
-selector : (String -> msg) -> List String -> String -> Html msg
-selector msg options default =
-    select [ class "form-control", onSelect msg ]
-        (List.map (\opt -> option (selected opt default) [ text opt ]) options)
-
-
-typedInput : (String -> msg) -> String -> String -> String -> Html msg
-typedInput msg place currentValue typed =
-    input
-        [ class "form-control"
-        , type_ typed
-        , placeholder place
-        , value currentValue
-        , onInput msg
-        ]
-        []
-
-
-inputNumber : (String -> msg) -> String -> String -> Html msg
-inputNumber msg place currentValue =
-    typedInput msg place currentValue "number"
-
-
-inputText : (String -> msg) -> String -> String -> Html msg
-inputText msg place currentValue =
-    typedInput msg place currentValue "text"
-
-
-checkbox : msg -> Bool -> Html msg
-checkbox msg currentValue =
-    input [ type_ "checkbox", onClick msg, checked currentValue ] []
-
-
-withErrors : Dict String (List Error) -> String -> Html msg -> Html msg
-withErrors errors key widget =
-    group key widget (defaultEmpty (Dict.get key errors))
-
-
-buttons ({ hasNext } as model) next back last =
-    let
-        margin =
-            style [ ( "margin-left", "30%" ) ]
-    in
-        [ button [ id "Back", class "btn btn-primary", margin, onClick back ] [ text "<< Back" ]
-        , if hasNext then
-            div [ class "btn-group", margin ]
-                [ button [ id "Next", class "btn btn-primary", onClick next ] [ text "Next >>" ] ]
-          else
-            div [ class "btn-group", margin ] last
-        ]
