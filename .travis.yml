@@ -1,6 +1,6 @@
 language: node_js
 install:
-  - npm install -g elm@0.17.0
+  - npm install -g elm@0.18.0
   - npm install bower --save-dev
   - elm-package install -y
   - bower install
