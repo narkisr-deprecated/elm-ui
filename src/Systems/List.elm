@@ -205,8 +205,8 @@ view model =
 systemPair : Decoder ( String, System )
 systemPair =
     map2 (,)
-        string
-        systemDecoder
+        (index 0 string)
+        (index 1 systemDecoder)
 
 
 systemPage : Decoder ( Dict String Int, List ( String, System ) )

@@ -8,7 +8,6 @@ import Jobs.Core as Jobs
 import Common.Utils exposing (none)
 import Common.Components exposing (asList)
 import Users.Core as Users
-import Common.Editor as Editor
 import Debug
 
 
@@ -69,8 +68,8 @@ type Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg ({ users, jobs, systems, nav } as model) =
-    case msg of
+update msg ({ users, jobs, systems, nav, history } as model) =
+    case (Debug.log "" msg) of
         JobsMsg msg ->
             let
                 ( newJob, msgs ) =
@@ -92,31 +91,51 @@ update msg ({ users, jobs, systems, nav } as model) =
             in
                 ( { model | systems = newSystems }, Cmd.map SystemsMsg msgs )
 
+        UrlChange location ->
+             none { model | history = Url.parseHash route location :: model.history }
+
         _ ->
             none model
 
 
 view : Model -> Html Msg
-view ({ nav, systems } as model) =
+view ({nav} as model) =
     div [ class "wrapper" ]
         [ div [ class "content-wrapper" ]
             [ Html.map NavMsg (Nav.headerView nav)
-            , section [ class "content" ]
-                (asList (Html.map SystemsMsg (Systems.view systems)))
+            , section [ class "content" ] (routeView model)
             , Html.map NavMsg (Nav.sideView nav)
             ]
         ]
 
+
+routeView : Model -> List(Html Msg)
+routeView ({systems, jobs, history} as model) =
+  let 
+      last = Maybe.withDefault Nothing (List.head (Debug.log "" history))
+  in
+    case last of
+      Just (SystemsRoute "list") ->
+        (asList (Html.map SystemsMsg (Systems.view systems)))
+
+      Just (JobsRoute "list") ->
+        (asList (Html.map JobsMsg (Jobs.view jobs)))
+
+      _ -> 
+         asList(div [][text "non legal path"])
 
 
 -- routing
 
 
 type Route
-    = Systems
-    | Launch
+    = SystemsRoute String
+    | JobsRoute String
 
 
 route : Url.Parser (Route -> a) a
 route =
-    Url.oneOf [ Url.map Systems top, Url.map Launch top ]
+  Url.oneOf
+    [ Url.map SystemsRoute (Url.s "systems" </> Url.string)
+    , Url.map JobsRoute (Url.s "jobs" </> Url.string)
+    ]
