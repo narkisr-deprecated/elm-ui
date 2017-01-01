@@ -8,6 +8,8 @@ import Jobs.Core as Jobs
 import Common.Utils exposing (none)
 import Common.Components exposing (asList)
 import Users.Core as Users
+import Common.Redirect exposing (redirect)
+import Maybe exposing (withDefault)
 import Debug
 
 
@@ -16,7 +18,6 @@ import Debug
 import Navigation
 import UrlParser as Url exposing ((</>), (<?>), s, int, stringParam, top)
 import Nav.Core as Nav
-
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
@@ -33,8 +34,7 @@ init location =
         ( systems, systemsMsg ) =
             Systems.init
 
-        history =
-            [ Url.parsePath route location ]
+        history =[(Url.parsePath route location)]
 
         msgs =
             [ Cmd.map UsersMsg usersMsg
@@ -69,20 +69,13 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ users, jobs, systems, nav, history } as model) =
-    case (Debug.log "" msg) of
+    case msg of
         JobsMsg msg ->
             let
                 ( newJob, msgs ) =
                     Jobs.update msg jobs
             in
                 ( { model | jobs = newJob }, Cmd.map JobsMsg msgs )
-
-        UsersMsg msg ->
-            let
-                ( newUsers, msgs ) =
-                    Users.update msg users
-            in
-                ( { model | users = newUsers }, Cmd.map UsersMsg msgs )
 
         SystemsMsg msg ->
             let
@@ -92,7 +85,16 @@ update msg ({ users, jobs, systems, nav, history } as model) =
                 ( { model | systems = newSystems }, Cmd.map SystemsMsg msgs )
 
         UrlChange location ->
-             none { model | history = Url.parseHash route location :: model.history }
+           let
+             newLocation = Url.parseHash route location
+           in
+             if newLocation == (Just Home) then
+                (model, redirect "/systems/list")
+             else
+                none { model | history =  newLocation :: model.history }
+
+        NewUrl url -> 
+           ( model , Navigation.newUrl (Debug.log "" url))
 
         _ ->
             none model
@@ -114,12 +116,15 @@ routeView ({systems, jobs, history} as model) =
   let 
       last = Maybe.withDefault Nothing (List.head (Debug.log "" history))
   in
-    case last of
+    case (Debug.log "" last) of
       Just (SystemsRoute "list") ->
         (asList (Html.map SystemsMsg (Systems.view systems)))
 
       Just (JobsRoute "list") ->
         (asList (Html.map JobsMsg (Jobs.view jobs)))
+
+      Just Home ->
+        (asList (Html.map SystemsMsg (Systems.view systems)))
 
       _ -> 
          asList(div [][text "non legal path"])
@@ -131,11 +136,13 @@ routeView ({systems, jobs, history} as model) =
 type Route
     = SystemsRoute String
     | JobsRoute String
+    | Home
 
 
 route : Url.Parser (Route -> a) a
 route =
   Url.oneOf
-    [ Url.map SystemsRoute (Url.s "systems" </> Url.string)
+    [ Url.map Home top
+    , Url.map SystemsRoute (Url.s "systems" </> Url.string)
     , Url.map JobsRoute (Url.s "jobs" </> Url.string)
     ]

@@ -6,7 +6,7 @@ import Html.Attributes exposing (class, href, attribute)
 import Users.Session exposing (Session, emptySession)
 import Html.Events exposing (onClick)
 import Common.Utils exposing (none)
-import Nav.Common exposing (Active(Stacks, Types, Systems, Jobs, Templates, Users), Section(Stats, Launch, Add, List, View))
+import Nav.Common exposing (Active(Systems, Jobs), Section(Stats, Launch, List, View))
 
 
 type alias Model =
@@ -18,10 +18,7 @@ init : Model
 init =
     Model emptySession
 
-
-
 -- Update
-
 
 type Msg
     = NavigateTo String
@@ -37,10 +34,7 @@ update msg model =
         _ ->
             none model
 
-
-
 -- View
-
 
 sectionItem : String -> String -> Html Msg
 sectionItem resource nested =
@@ -68,17 +62,13 @@ drop resource msgs icon =
 adminMenus : List (Html Msg)
 adminMenus =
     [ drop "systems" [ "list", "add" ] "fa fa-server"
-    , drop "templates" [ "list" ] "fa fa-clone"
-    , drop "types" [ "list", "add" ] "fa fa-archive"
     , drop "jobs" [ "list", "stats" ] "fa fa-tasks"
-    , drop "users" [ "list", "add" ] "fa fa-users"
     ]
 
 
 userMenus : List (Html Msg)
 userMenus =
     [ drop "systems" [ "list", "add" ] "fa fa-server"
-    , drop "templates" [ "list" ] "fa fa-clone"
     , drop "jobs" [ "list", "stats" ] "fa fa-tasks"
     ]
 

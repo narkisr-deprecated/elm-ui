@@ -16406,62 +16406,18 @@ var _narkisr$elm_ui$Nav_Side$adminMenus = {
 		ctor: '::',
 		_0: A3(
 			_narkisr$elm_ui$Nav_Side$drop,
-			'templates',
+			'jobs',
 			{
 				ctor: '::',
 				_0: 'list',
-				_1: {ctor: '[]'}
-			},
-			'fa fa-clone'),
-		_1: {
-			ctor: '::',
-			_0: A3(
-				_narkisr$elm_ui$Nav_Side$drop,
-				'types',
-				{
-					ctor: '::',
-					_0: 'list',
-					_1: {
-						ctor: '::',
-						_0: 'add',
-						_1: {ctor: '[]'}
-					}
-				},
-				'fa fa-archive'),
-			_1: {
-				ctor: '::',
-				_0: A3(
-					_narkisr$elm_ui$Nav_Side$drop,
-					'jobs',
-					{
-						ctor: '::',
-						_0: 'list',
-						_1: {
-							ctor: '::',
-							_0: 'stats',
-							_1: {ctor: '[]'}
-						}
-					},
-					'fa fa-tasks'),
 				_1: {
 					ctor: '::',
-					_0: A3(
-						_narkisr$elm_ui$Nav_Side$drop,
-						'users',
-						{
-							ctor: '::',
-							_0: 'list',
-							_1: {
-								ctor: '::',
-								_0: 'add',
-								_1: {ctor: '[]'}
-							}
-						},
-						'fa fa-users'),
+					_0: 'stats',
 					_1: {ctor: '[]'}
 				}
-			}
-		}
+			},
+			'fa fa-tasks'),
+		_1: {ctor: '[]'}
 	}
 };
 var _narkisr$elm_ui$Nav_Side$userMenus = {
@@ -16483,30 +16439,18 @@ var _narkisr$elm_ui$Nav_Side$userMenus = {
 		ctor: '::',
 		_0: A3(
 			_narkisr$elm_ui$Nav_Side$drop,
-			'templates',
+			'jobs',
 			{
 				ctor: '::',
 				_0: 'list',
-				_1: {ctor: '[]'}
-			},
-			'fa fa-clone'),
-		_1: {
-			ctor: '::',
-			_0: A3(
-				_narkisr$elm_ui$Nav_Side$drop,
-				'jobs',
-				{
+				_1: {
 					ctor: '::',
-					_0: 'list',
-					_1: {
-						ctor: '::',
-						_0: 'stats',
-						_1: {ctor: '[]'}
-					}
-				},
-				'fa fa-tasks'),
-			_1: {ctor: '[]'}
-		}
+					_0: 'stats',
+					_1: {ctor: '[]'}
+				}
+			},
+			'fa fa-tasks'),
+		_1: {ctor: '[]'}
 	}
 };
 var _narkisr$elm_ui$Nav_Side$view = function (_p0) {
@@ -16681,38 +16625,46 @@ var _narkisr$elm_ui$Application$SystemsMsg = function (a) {
 };
 var _narkisr$elm_ui$Application$routeView = function (_p0) {
 	var _p1 = _p0;
+	var _p3 = _p1.systems;
 	var last = A2(
 		_elm_lang$core$Maybe$withDefault,
 		_elm_lang$core$Maybe$Nothing,
 		_elm_lang$core$List$head(
 			A2(_elm_lang$core$Debug$log, '', _p1.history)));
-	var _p2 = last;
-	_v1_2:
+	var _p2 = A2(_elm_lang$core$Debug$log, '', last);
+	_v1_3:
 	do {
 		if (_p2.ctor === 'Just') {
-			if (_p2._0.ctor === 'SystemsRoute') {
-				if (_p2._0._0 === 'list') {
+			switch (_p2._0.ctor) {
+				case 'SystemsRoute':
+					if (_p2._0._0 === 'list') {
+						return _narkisr$elm_ui$Common_Components$asList(
+							A2(
+								_elm_lang$html$Html$map,
+								_narkisr$elm_ui$Application$SystemsMsg,
+								_narkisr$elm_ui$Systems_Core$view(_p3)));
+					} else {
+						break _v1_3;
+					}
+				case 'JobsRoute':
+					if (_p2._0._0 === 'list') {
+						return _narkisr$elm_ui$Common_Components$asList(
+							A2(
+								_elm_lang$html$Html$map,
+								_narkisr$elm_ui$Application$JobsMsg,
+								_narkisr$elm_ui$Jobs_Core$view(_p1.jobs)));
+					} else {
+						break _v1_3;
+					}
+				default:
 					return _narkisr$elm_ui$Common_Components$asList(
 						A2(
 							_elm_lang$html$Html$map,
 							_narkisr$elm_ui$Application$SystemsMsg,
-							_narkisr$elm_ui$Systems_Core$view(_p1.systems)));
-				} else {
-					break _v1_2;
-				}
-			} else {
-				if (_p2._0._0 === 'list') {
-					return _narkisr$elm_ui$Common_Components$asList(
-						A2(
-							_elm_lang$html$Html$map,
-							_narkisr$elm_ui$Application$JobsMsg,
-							_narkisr$elm_ui$Jobs_Core$view(_p1.jobs)));
-				} else {
-					break _v1_2;
-				}
+							_narkisr$elm_ui$Systems_Core$view(_p3)));
 			}
 		} else {
-			break _v1_2;
+			break _v1_3;
 		}
 	} while(false);
 	return _narkisr$elm_ui$Common_Components$asList(
@@ -16725,9 +16677,9 @@ var _narkisr$elm_ui$Application$routeView = function (_p0) {
 				_1: {ctor: '[]'}
 			}));
 };
-var _narkisr$elm_ui$Application$view = function (_p3) {
-	var _p4 = _p3;
-	var _p5 = _p4.nav;
+var _narkisr$elm_ui$Application$view = function (_p4) {
+	var _p5 = _p4;
+	var _p6 = _p5.nav;
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -16749,7 +16701,7 @@ var _narkisr$elm_ui$Application$view = function (_p3) {
 					_0: A2(
 						_elm_lang$html$Html$map,
 						_narkisr$elm_ui$Application$NavMsg,
-						_narkisr$elm_ui$Nav_Core$headerView(_p5)),
+						_narkisr$elm_ui$Nav_Core$headerView(_p6)),
 					_1: {
 						ctor: '::',
 						_0: A2(
@@ -16759,13 +16711,13 @@ var _narkisr$elm_ui$Application$view = function (_p3) {
 								_0: _elm_lang$html$Html_Attributes$class('content'),
 								_1: {ctor: '[]'}
 							},
-							_narkisr$elm_ui$Application$routeView(_p4)),
+							_narkisr$elm_ui$Application$routeView(_p5)),
 						_1: {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$map,
 								_narkisr$elm_ui$Application$NavMsg,
-								_narkisr$elm_ui$Nav_Core$sideView(_p5)),
+								_narkisr$elm_ui$Nav_Core$sideView(_p6)),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -16779,6 +16731,7 @@ var _narkisr$elm_ui$Application$NavigateTo = function (a) {
 var _narkisr$elm_ui$Application$MenuMsg = function (a) {
 	return {ctor: 'MenuMsg', _0: a};
 };
+var _narkisr$elm_ui$Application$Home = {ctor: 'Home'};
 var _narkisr$elm_ui$Application$JobsRoute = function (a) {
 	return {ctor: 'JobsRoute', _0: a};
 };
@@ -16788,23 +16741,27 @@ var _narkisr$elm_ui$Application$SystemsRoute = function (a) {
 var _narkisr$elm_ui$Application$route = _evancz$url_parser$UrlParser$oneOf(
 	{
 		ctor: '::',
-		_0: A2(
-			_evancz$url_parser$UrlParser$map,
-			_narkisr$elm_ui$Application$SystemsRoute,
-			A2(
-				_evancz$url_parser$UrlParser_ops['</>'],
-				_evancz$url_parser$UrlParser$s('systems'),
-				_evancz$url_parser$UrlParser$string)),
+		_0: A2(_evancz$url_parser$UrlParser$map, _narkisr$elm_ui$Application$Home, _evancz$url_parser$UrlParser$top),
 		_1: {
 			ctor: '::',
 			_0: A2(
 				_evancz$url_parser$UrlParser$map,
-				_narkisr$elm_ui$Application$JobsRoute,
+				_narkisr$elm_ui$Application$SystemsRoute,
 				A2(
 					_evancz$url_parser$UrlParser_ops['</>'],
-					_evancz$url_parser$UrlParser$s('jobs'),
+					_evancz$url_parser$UrlParser$s('systems'),
 					_evancz$url_parser$UrlParser$string)),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_evancz$url_parser$UrlParser$map,
+					_narkisr$elm_ui$Application$JobsRoute,
+					A2(
+						_evancz$url_parser$UrlParser_ops['</>'],
+						_evancz$url_parser$UrlParser$s('jobs'),
+						_evancz$url_parser$UrlParser$string)),
+				_1: {ctor: '[]'}
+			}
 		}
 	});
 var _narkisr$elm_ui$Application$init = function (location) {
@@ -16813,18 +16770,18 @@ var _narkisr$elm_ui$Application$init = function (location) {
 		_0: A2(_evancz$url_parser$UrlParser$parsePath, _narkisr$elm_ui$Application$route, location),
 		_1: {ctor: '[]'}
 	};
-	var _p6 = _narkisr$elm_ui$Systems_Core$init;
-	var systems = _p6._0;
-	var systemsMsg = _p6._1;
-	var _p7 = _narkisr$elm_ui$Users_Core$init;
-	var users = _p7._0;
-	var usersMsg = _p7._1;
-	var _p8 = _narkisr$elm_ui$Nav_Core$init;
-	var nav = _p8._0;
-	var navMsg = _p8._1;
-	var _p9 = _narkisr$elm_ui$Jobs_Core$init;
-	var jobs = _p9._0;
-	var jobsMsg = _p9._1;
+	var _p7 = _narkisr$elm_ui$Systems_Core$init;
+	var systems = _p7._0;
+	var systemsMsg = _p7._1;
+	var _p8 = _narkisr$elm_ui$Users_Core$init;
+	var users = _p8._0;
+	var usersMsg = _p8._1;
+	var _p9 = _narkisr$elm_ui$Nav_Core$init;
+	var nav = _p9._0;
+	var navMsg = _p9._1;
+	var _p10 = _narkisr$elm_ui$Jobs_Core$init;
+	var jobs = _p10._0;
+	var jobsMsg = _p10._1;
 	var msgs = {
 		ctor: '::',
 		_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$UsersMsg, usersMsg),
@@ -16849,15 +16806,15 @@ var _narkisr$elm_ui$Application$init = function (location) {
 	};
 };
 var _narkisr$elm_ui$Application$update = F2(
-	function (msg, _p10) {
-		var _p11 = _p10;
-		var _p16 = _p11;
-		var _p12 = A2(_elm_lang$core$Debug$log, '', msg);
-		switch (_p12.ctor) {
+	function (msg, _p11) {
+		var _p12 = _p11;
+		var _p16 = _p12;
+		var _p13 = msg;
+		switch (_p13.ctor) {
 			case 'JobsMsg':
-				var _p13 = A2(_narkisr$elm_ui$Jobs_Core$update, _p12._0, _p11.jobs);
-				var newJob = _p13._0;
-				var msgs = _p13._1;
+				var _p14 = A2(_narkisr$elm_ui$Jobs_Core$update, _p13._0, _p12.jobs);
+				var newJob = _p14._0;
+				var msgs = _p14._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -16865,19 +16822,8 @@ var _narkisr$elm_ui$Application$update = F2(
 						{jobs: newJob}),
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$JobsMsg, msgs)
 				};
-			case 'UsersMsg':
-				var _p14 = A2(_narkisr$elm_ui$Users_Core$update, _p12._0, _p11.users);
-				var newUsers = _p14._0;
-				var msgs = _p14._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						_p16,
-						{users: newUsers}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$UsersMsg, msgs)
-				};
 			case 'SystemsMsg':
-				var _p15 = A2(_narkisr$elm_ui$Systems_Core$update, _p12._0, _p11.systems);
+				var _p15 = A2(_narkisr$elm_ui$Systems_Core$update, _p13._0, _p12.systems);
 				var newSystems = _p15._0;
 				var msgs = _p15._1;
 				return {
@@ -16888,16 +16834,26 @@ var _narkisr$elm_ui$Application$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$SystemsMsg, msgs)
 				};
 			case 'UrlChange':
-				return _narkisr$elm_ui$Common_Utils$none(
+				var newLocation = A2(_evancz$url_parser$UrlParser$parseHash, _narkisr$elm_ui$Application$route, _p13._0);
+				return _elm_lang$core$Native_Utils.eq(
+					newLocation,
+					_elm_lang$core$Maybe$Just(_narkisr$elm_ui$Application$Home)) ? {
+					ctor: '_Tuple2',
+					_0: _p16,
+					_1: _narkisr$elm_ui$Common_Redirect$redirect('/systems/list')
+				} : _narkisr$elm_ui$Common_Utils$none(
 					_elm_lang$core$Native_Utils.update(
 						_p16,
 						{
-							history: {
-								ctor: '::',
-								_0: A2(_evancz$url_parser$UrlParser$parseHash, _narkisr$elm_ui$Application$route, _p12._0),
-								_1: _p16.history
-							}
+							history: {ctor: '::', _0: newLocation, _1: _p16.history}
 						}));
+			case 'NewUrl':
+				return {
+					ctor: '_Tuple2',
+					_0: _p16,
+					_1: _elm_lang$navigation$Navigation$newUrl(
+						A2(_elm_lang$core$Debug$log, '', _p13._0))
+				};
 			default:
 				return _narkisr$elm_ui$Common_Utils$none(_p16);
 		}

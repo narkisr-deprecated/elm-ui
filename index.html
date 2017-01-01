@@ -48,8 +48,6 @@
   var outPorts = {
     parsingOk: empty,
     parsingErr: empty,
-    menuPort: ['','',''],
-    editorInPort: ['', '']
   }
   var main = Elm.Main.embed(elmDiv);
 
@@ -137,55 +135,6 @@
      }
    }); 
   
-  templateAction = function (e) {
-    return function(key, opt){
-      templateName = $(this).context.cells[0].innerHTML;
-	if (templateName !== undefined) {
-	  main.ports.menuPort.send(["Templates",e, templateName]); 
-	}
-    }
-  }
-
-  $.contextMenu({
-    selector: "#templateListing tr",
-    items: {
-        launch: { name: "Launch", callback: templateAction("launch")},
-        clear: { name: "Clear", callback: templateAction("clear") }
-    }
-  }); 
-
-  typesAction = function (e) {
-    return function(key, opt){
-      typeName = $(this).context.cells[0].innerHTML;
-	if (typeName !== undefined) {
-	  main.ports.menuPort.send(["Types",e, typeName]); 
-	}
-    }
-  }
-
-  $.contextMenu({
-    selector: "#typesListing tr",
-    items: {
-        launch: { name: "Edit", callback: typesAction("edit")},
-        clear: { name: "Clear", callback: typesAction("clear") }
-    }
-  });
-
-  usersAction = function (e) {
-    return function(key, opt){
-      typeName = $(this).context.cells[0].innerHTML;
-	if (typeName !== undefined) {
-	  main.ports.menuPort.send(["Users",e, typeName]); 
-	}
-    }
-  }
-  $.contextMenu({
-    selector: "#usersListing tr",
-    items: {
-        edit: { name: "Edit", callback: usersAction("edit")},
-        clear: { name: "Clear", callback: usersAction("clear") }
-    }
-  });
 </script>
 
 </html>
