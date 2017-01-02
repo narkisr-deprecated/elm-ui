@@ -61,7 +61,7 @@ init =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ job } as model) =
-    case msg of
+    case (Debug.log "" msg) of
         JobLaunched result ->
             successHandler result model (\res -> none model) NoOp
 

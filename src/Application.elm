@@ -116,28 +116,26 @@ routeView ({systems, jobs, history} as model) =
   let 
       last = Maybe.withDefault Nothing (List.head (Debug.log "" history))
   in
-    case (Debug.log "" last) of
+    case last of
       Just (SystemsRoute "list") ->
-        (asList (Html.map SystemsMsg (Systems.view systems)))
+        asList (Html.map SystemsMsg (Systems.view systems))
 
       Just (JobsRoute "list") ->
-        (asList (Html.map JobsMsg (Jobs.view jobs)))
+        asList (Html.map JobsMsg (Jobs.view jobs))
 
       Just Home ->
-        (asList (Html.map SystemsMsg (Systems.view systems)))
+        asList (Html.map SystemsMsg (Systems.view systems))
 
       _ -> 
-         asList(div [][text "non legal path"])
+        asList(div [][text "non legal path"])
 
 
 -- routing
-
 
 type Route
     = SystemsRoute String
     | JobsRoute String
     | Home
-
 
 route : Url.Parser (Route -> a) a
 route =

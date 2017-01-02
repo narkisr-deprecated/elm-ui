@@ -14574,7 +14574,7 @@ var _narkisr$elm_ui$Systems_Launch$update = F2(
 	function (msg, _p2) {
 		var _p3 = _p2;
 		var _p7 = _p3;
-		var _p4 = msg;
+		var _p4 = A2(_elm_lang$core$Debug$log, '', msg);
 		switch (_p4.ctor) {
 			case 'JobLaunched':
 				return A4(
@@ -16631,7 +16631,7 @@ var _narkisr$elm_ui$Application$routeView = function (_p0) {
 		_elm_lang$core$Maybe$Nothing,
 		_elm_lang$core$List$head(
 			A2(_elm_lang$core$Debug$log, '', _p1.history)));
-	var _p2 = A2(_elm_lang$core$Debug$log, '', last);
+	var _p2 = last;
 	_v1_3:
 	do {
 		if (_p2.ctor === 'Just') {
