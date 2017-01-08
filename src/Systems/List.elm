@@ -24,7 +24,7 @@ import Set exposing (Set)
 import Common.Components exposing (info, callout)
 import Pager exposing (..)
 import Table
-import Search
+import Search exposing (Msg(Result), parser)
 
 
 -- Model
@@ -62,6 +62,10 @@ init =
             Search.init
     in
         ( Model NoError systems Pager.init table search, getSystems 1 10 )
+
+
+listSearch result b =
+    (Searching (Result result b))
 
 
 
@@ -117,14 +121,17 @@ update msg ({ error, table } as model) =
                     (Search.update searchMsg model.search)
             in
                 case searchMsg of
-                    Search.Result True res ->
+                    Search.Result res True ->
                         ( { model | search = newSearch, error = NoError }, getSystemsQuery model.pager.page 10 newSearch.parsed )
 
-                    Search.Result False res ->
+                    Search.Result res False ->
                         if isEmpty newSearch.input then
                             ( { model | search = newSearch, error = NoError }, getSystems model.pager.page 10 )
                         else
                             none { model | search = newSearch, error = SearchParseFailed newSearch.error }
+
+                    Search.Parse s ->
+                        ( model, parser s )
 
                     _ ->
                         none model

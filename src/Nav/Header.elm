@@ -127,14 +127,5 @@ view ({ session } as model) =
             , span [ class "logo-lg" ] [ navHeader ]
             ]
         , nav [ class "navbar navbar-static-top", attribute "role" "navigation" ]
-            [ a
-                [ href "#"
-                , class "sidebar-toggle"
-                , attribute "data-toggle" "offcanvas"
-                , attribute "role" "button"
-                ]
-                [ span [ class "sr-only" ] [ text "Toggle navigation" ]
-                ]
-            , (topNav session)
-            ]
+            [ (topNav session) ]
         ]

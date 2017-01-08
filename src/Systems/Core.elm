@@ -1,14 +1,13 @@
 module Systems.Core exposing (..)
 
 import Html
-import Systems.List as List exposing (Error(NoSystemSelected, NoError))
+import Systems.List as List exposing (Error(NoSystemSelected, NoError), listSearch)
 import Systems.Launch as Launch exposing (Msg(Cancel, SetupJob, Run))
 import Nav.Common exposing (Active(Systems, Jobs, Templates), Section(Stats, Launch, Add, List, View))
 import Html exposing (..)
-import Platform.Cmd exposing (batch, map)
+import Platform.Cmd exposing (map)
 import Common.Utils exposing (none)
 import Common.Components exposing (notImplemented)
-import Common.Redirect exposing (redirect)
 import Table as Table
 import Set
 
@@ -38,6 +37,10 @@ type Msg
     | NoOp
 
 
+searching result b =
+    listSearch result b
+
+
 setupJob : Launch.Msg -> Model -> ( Model, Cmd Msg )
 setupJob msg ({ systemsList, systemsLaunch } as model) =
     let
@@ -63,7 +66,7 @@ setupJob msg ({ systemsList, systemsLaunch } as model) =
                 newList =
                     { systemsList | error = NoError }
             in
-                ( { model | systemsLaunch = newLaunch, systemsList = newList, navChange = Just "systems/launch" }, Cmd.map SystemsLaunch effect )
+                ( { model | systemsLaunch = newLaunch, systemsList = newList, navChange = Just "#/systems/launch" }, Cmd.map SystemsLaunch effect )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -77,12 +80,12 @@ update msg ({ systemsList } as model) =
                 ( { model | systemsList = newSystems }, Cmd.map SystemsListing effect )
 
         SystemsLaunch launchMsg ->
-            case Debug.log "" launchMsg of
+            case launchMsg of
                 Launch.Cancel ->
-                    none { model | navChange = Just "systems/list" }
+                    none { model | navChange = Just "#/systems/list" }
 
                 Launch.JobLaunched _ ->
-                    none { model | navChange = Just "jobs/list" }
+                    none { model | navChange = Just "#/jobs/list" }
 
                 SetupJob job ->
                     setupJob launchMsg model
@@ -101,6 +104,11 @@ update msg ({ systemsList } as model) =
             none model
 
 
-view : Model -> Html Msg
-view model =
-    Html.map SystemsListing (List.view model.systemsList)
+view : String -> Model -> Html Msg
+view path model =
+    case path of
+        "launch" ->
+            Html.map SystemsLaunch (Launch.view model.systemsLaunch)
+
+        _ ->
+            Html.map SystemsListing (List.view model.systemsList)

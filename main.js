@@ -11846,896 +11846,6 @@ var _mgold$elm_date_format$Date_Format$format = F2(
 	});
 var _mgold$elm_date_format$Date_Format$formatISO8601 = _mgold$elm_date_format$Date_Format$format('%Y-%m-%dT%H:%M:%SZ');
 
-var _narkisr$elm_ui$Systems_Model_AWS$endpoints = _elm_lang$core$Dict$fromList(
-	{
-		ctor: '::',
-		_0: {
-			ctor: '_Tuple2',
-			_0: 'us-east-1',
-			_1: {
-				ctor: '_Tuple3',
-				_0: 'US East (N. Virginia)',
-				_1: 'ec2.us-east-1.amazonaws.com',
-				_2: {
-					ctor: '::',
-					_0: 'a',
-					_1: {
-						ctor: '::',
-						_0: 'b',
-						_1: {
-							ctor: '::',
-							_0: 'd',
-							_1: {
-								ctor: '::',
-								_0: 'e',
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			}
-		},
-		_1: {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'us-west-1',
-				_1: {
-					ctor: '_Tuple3',
-					_0: 'US West (N. California)',
-					_1: 'ec2.us-west-1.amazonaws.com',
-					_2: {
-						ctor: '::',
-						_0: 'a',
-						_1: {
-							ctor: '::',
-							_0: 'b',
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'us-west-2',
-					_1: {
-						ctor: '_Tuple3',
-						_0: 'US West (Oregon)',
-						_1: 'ec2.us-west-2.amazonaws.com',
-						_2: {
-							ctor: '::',
-							_0: 'a',
-							_1: {
-								ctor: '::',
-								_0: 'b',
-								_1: {
-									ctor: '::',
-									_0: 'c',
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'eu-west-1',
-						_1: {
-							ctor: '_Tuple3',
-							_0: 'EU (Ireland)',
-							_1: 'ec2.eu-west-1.amazonaws.com',
-							_2: {
-								ctor: '::',
-								_0: 'a',
-								_1: {
-									ctor: '::',
-									_0: 'b',
-									_1: {
-										ctor: '::',
-										_0: 'c',
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'eu-central-1',
-							_1: {
-								ctor: '_Tuple3',
-								_0: 'EU (Frankfurt)',
-								_1: 'ec2.eu-central-1.amazonaws.com',
-								_2: {
-									ctor: '::',
-									_0: 'a',
-									_1: {
-										ctor: '::',
-										_0: 'b',
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'ap-southeast-1',
-								_1: {
-									ctor: '_Tuple3',
-									_0: 'Asia Pacific (Singapore)',
-									_1: 'ec2.ap-southeast-1.amazonaws.com',
-									_2: {
-										ctor: '::',
-										_0: 'a',
-										_1: {
-											ctor: '::',
-											_0: 'b',
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'ap-southeast-2',
-									_1: {
-										ctor: '_Tuple3',
-										_0: 'Asia Pacific (Sydney)',
-										_1: 'ec2.ap-southeast-2.amazonaws.com',
-										_2: {
-											ctor: '::',
-											_0: 'a',
-											_1: {
-												ctor: '::',
-												_0: 'b',
-												_1: {ctor: '[]'}
-											}
-										}
-									}
-								},
-								_1: {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'ap-northeast-1',
-										_1: {
-											ctor: '_Tuple3',
-											_0: 'Asia Pacific (Tokyo)',
-											_1: 'ec2.ap-northeast-1.amazonaws.com',
-											_2: {
-												ctor: '::',
-												_0: 'a',
-												_1: {
-													ctor: '::',
-													_0: 'c',
-													_1: {ctor: '[]'}
-												}
-											}
-										}
-									},
-									_1: {
-										ctor: '::',
-										_0: {
-											ctor: '_Tuple2',
-											_0: 'sa-east-1',
-											_1: {
-												ctor: '_Tuple3',
-												_0: 'South America (Sao Paulo)',
-												_1: 'ec2.sa-east-1.amazonaws.com',
-												_2: {
-													ctor: '::',
-													_0: 'a',
-													_1: {
-														ctor: '::',
-														_0: 'b',
-														_1: {
-															ctor: '::',
-															_0: 'c',
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										},
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	});
-var _narkisr$elm_ui$Systems_Model_AWS$instanceTypes = {
-	ctor: '::',
-	_0: 't1.micro',
-	_1: {
-		ctor: '::',
-		_0: 'm1.small',
-		_1: {
-			ctor: '::',
-			_0: 'm1.medium',
-			_1: {
-				ctor: '::',
-				_0: 'm1.large',
-				_1: {
-					ctor: '::',
-					_0: 'm1.xlarge',
-					_1: {
-						ctor: '::',
-						_0: 'm3.medium',
-						_1: {
-							ctor: '::',
-							_0: 'm3.large',
-							_1: {
-								ctor: '::',
-								_0: 'm3.xlarge',
-								_1: {
-									ctor: '::',
-									_0: 'm3.2xlarge',
-									_1: {
-										ctor: '::',
-										_0: 'c1.medium',
-										_1: {
-											ctor: '::',
-											_0: 'c1.xlarge',
-											_1: {
-												ctor: '::',
-												_0: 'c1.xlarge',
-												_1: {
-													ctor: '::',
-													_0: 'cc2.8xlarge',
-													_1: {
-														ctor: '::',
-														_0: 'c3.large',
-														_1: {
-															ctor: '::',
-															_0: 'c3.xlarge',
-															_1: {
-																ctor: '::',
-																_0: 'c3.2xlarge',
-																_1: {
-																	ctor: '::',
-																	_0: 'c3.4xlarge',
-																	_1: {
-																		ctor: '::',
-																		_0: 'c3.8xlarge',
-																		_1: {
-																			ctor: '::',
-																			_0: 'r3.large',
-																			_1: {
-																				ctor: '::',
-																				_0: 'r3.xlarge',
-																				_1: {
-																					ctor: '::',
-																					_0: 'r3.2xlarge',
-																					_1: {
-																						ctor: '::',
-																						_0: 'r3.4xlarge',
-																						_1: {
-																							ctor: '::',
-																							_0: 'r3.8xlarge',
-																							_1: {
-																								ctor: '::',
-																								_0: 'm2.xlarge',
-																								_1: {
-																									ctor: '::',
-																									_0: 'm2.2xlarge',
-																									_1: {
-																										ctor: '::',
-																										_0: 'm2.4xlarge',
-																										_1: {
-																											ctor: '::',
-																											_0: 'cr1.8xlarge',
-																											_1: {
-																												ctor: '::',
-																												_0: 'hi1.4xlarge',
-																												_1: {
-																													ctor: '::',
-																													_0: 'cg1.4xlarge',
-																													_1: {ctor: '[]'}
-																												}
-																											}
-																										}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-};
-var _narkisr$elm_ui$Systems_Model_AWS$Volume = F5(
-	function (a, b, c, d, e) {
-		return {type_: a, size: b, iops: c, device: d, clear: e};
-	});
-var _narkisr$elm_ui$Systems_Model_AWS$emptyVolume = A5(_narkisr$elm_ui$Systems_Model_AWS$Volume, 'Magnetic', 50, _elm_lang$core$Maybe$Nothing, '', false);
-var _narkisr$elm_ui$Systems_Model_AWS$Block = F2(
-	function (a, b) {
-		return {volume: a, device: b};
-	});
-var _narkisr$elm_ui$Systems_Model_AWS$emptyBlock = A2(_narkisr$elm_ui$Systems_Model_AWS$Block, '', '');
-var _narkisr$elm_ui$Systems_Model_AWS$VPC = F3(
-	function (a, b, c) {
-		return {subnetId: a, vpcId: b, assignPublic: c};
-	});
-var _narkisr$elm_ui$Systems_Model_AWS$emptyVpc = A3(_narkisr$elm_ui$Systems_Model_AWS$VPC, '', '', false);
-var _narkisr$elm_ui$Systems_Model_AWS$AWS = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return {instanceType: a, instanceId: b, keyName: c, endpoint: d, availabilityZone: e, securityGroups: f, ebsOptimized: g, volumes: h, blockDevices: i, vpc: j};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _narkisr$elm_ui$Systems_Model_AWS$emptyAws = function () {
-	var instanceType = function () {
-		var _p0 = _elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_AWS$instanceTypes);
-		if (_p0.ctor === 'Just') {
-			return _p0._0;
-		} else {
-			return '';
-		}
-	}();
-	var _p1 = A2(
-		_elm_lang$core$Maybe$withDefault,
-		{
-			ctor: '_Tuple3',
-			_0: '',
-			_1: '',
-			_2: {ctor: '[]'}
-		},
-		A2(_elm_lang$core$Dict$get, 'us-east-1', _narkisr$elm_ui$Systems_Model_AWS$endpoints));
-	var url = _p1._1;
-	var justString = _elm_lang$core$Maybe$Just('');
-	return _narkisr$elm_ui$Systems_Model_AWS$AWS(instanceType)(_elm_lang$core$Maybe$Nothing)('')(url)(_elm_lang$core$Maybe$Nothing)(
-		_elm_lang$core$Maybe$Just(
-			{ctor: '[]'}))(
-		_elm_lang$core$Maybe$Just(false))(
-		_elm_lang$core$Maybe$Just(
-			{ctor: '[]'}))(
-		_elm_lang$core$Maybe$Just(
-			{ctor: '[]'}))(
-		_elm_lang$core$Maybe$Just(_narkisr$elm_ui$Systems_Model_AWS$emptyVpc));
-}();
-
-var _narkisr$elm_ui$Systems_Model_GCE$zones = {
-	ctor: '::',
-	_0: 'us-east1-b',
-	_1: {
-		ctor: '::',
-		_0: 'us-east1-c',
-		_1: {
-			ctor: '::',
-			_0: 'us-east1-d',
-			_1: {
-				ctor: '::',
-				_0: 'us-central1-a',
-				_1: {
-					ctor: '::',
-					_0: 'us-central1-b',
-					_1: {
-						ctor: '::',
-						_0: 'us-central1-c',
-						_1: {
-							ctor: '::',
-							_0: 'us-central1-f',
-							_1: {
-								ctor: '::',
-								_0: 'europe-west1-b',
-								_1: {
-									ctor: '::',
-									_0: 'europe-west1-c',
-									_1: {
-										ctor: '::',
-										_0: 'europe-west1-d',
-										_1: {
-											ctor: '::',
-											_0: 'asia-east1-a',
-											_1: {
-												ctor: '::',
-												_0: 'asia-east1-b',
-												_1: {
-													ctor: '::',
-													_0: 'asia-east1-c',
-													_1: {ctor: '[]'}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-};
-var _narkisr$elm_ui$Systems_Model_GCE$machineTypes = {
-	ctor: '::',
-	_0: 'n1-standard-1',
-	_1: {
-		ctor: '::',
-		_0: 'n1-standard-2',
-		_1: {
-			ctor: '::',
-			_0: 'n1-standard-4',
-			_1: {
-				ctor: '::',
-				_0: 'n1-standard-8',
-				_1: {
-					ctor: '::',
-					_0: 'n1-standard-16',
-					_1: {
-						ctor: '::',
-						_0: 'n1-standard-32',
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		}
-	}
-};
-var _narkisr$elm_ui$Systems_Model_GCE$GCE = F5(
-	function (a, b, c, d, e) {
-		return {machineType: a, zone: b, tags: c, projectId: d, staticIp: e};
-	});
-var _narkisr$elm_ui$Systems_Model_GCE$emptyGce = function () {
-	var zone = A2(
-		_elm_lang$core$Maybe$withDefault,
-		'',
-		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$zones));
-	var type_ = A2(
-		_elm_lang$core$Maybe$withDefault,
-		'',
-		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$machineTypes));
-	return A5(
-		_narkisr$elm_ui$Systems_Model_GCE$GCE,
-		type_,
-		zone,
-		_elm_lang$core$Maybe$Just(
-			{ctor: '[]'}),
-		'',
-		_elm_lang$core$Maybe$Just(''));
-}();
-
-var _narkisr$elm_ui$Systems_Model_Digital$regions = {
-	ctor: '::',
-	_0: 'lon1',
-	_1: {
-		ctor: '::',
-		_0: 'nyc1',
-		_1: {
-			ctor: '::',
-			_0: 'ams1',
-			_1: {
-				ctor: '::',
-				_0: 'sfo1',
-				_1: {
-					ctor: '::',
-					_0: 'nyc2',
-					_1: {
-						ctor: '::',
-						_0: 'ams2',
-						_1: {
-							ctor: '::',
-							_0: 'sgp1',
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		}
-	}
-};
-var _narkisr$elm_ui$Systems_Model_Digital$sizes = {
-	ctor: '::',
-	_0: '512mb',
-	_1: {
-		ctor: '::',
-		_0: '1gb',
-		_1: {
-			ctor: '::',
-			_0: '2gb',
-			_1: {
-				ctor: '::',
-				_0: '4gb',
-				_1: {
-					ctor: '::',
-					_0: '8gb',
-					_1: {
-						ctor: '::',
-						_0: '16gb',
-						_1: {
-							ctor: '::',
-							_0: '32gb',
-							_1: {
-								ctor: '::',
-								_0: '48gb',
-								_1: {
-									ctor: '::',
-									_0: '64gb',
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-};
-var _narkisr$elm_ui$Systems_Model_Digital$Digital = F3(
-	function (a, b, c) {
-		return {size: a, region: b, privateNetworking: c};
-	});
-var _narkisr$elm_ui$Systems_Model_Digital$emptyDigital = A3(
-	_narkisr$elm_ui$Systems_Model_Digital$Digital,
-	A2(
-		_elm_lang$core$Maybe$withDefault,
-		'',
-		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$sizes)),
-	A2(
-		_elm_lang$core$Maybe$withDefault,
-		'',
-		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$regions)),
-	false);
-
-var _narkisr$elm_ui$Systems_Model_Openstack$Volume = F3(
-	function (a, b, c) {
-		return {device: a, size: b, clear: c};
-	});
-var _narkisr$elm_ui$Systems_Model_Openstack$emptyVolume = A3(_narkisr$elm_ui$Systems_Model_Openstack$Volume, '', 0, false);
-var _narkisr$elm_ui$Systems_Model_Openstack$Openstack = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {flavor: a, tenant: b, keyName: c, floatingIp: d, floatingIpPool: e, securityGroups: f, networks: g, volumes: h};
-	});
-var _narkisr$elm_ui$Systems_Model_Openstack$emptyOpenstack = A8(
-	_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
-	'',
-	'',
-	'',
-	_elm_lang$core$Maybe$Nothing,
-	_elm_lang$core$Maybe$Nothing,
-	_elm_lang$core$Maybe$Nothing,
-	{ctor: '[]'},
-	_elm_lang$core$Maybe$Nothing);
-
-var _narkisr$elm_ui$Systems_Model_Physical$Physical = F2(
-	function (a, b) {
-		return {mac: a, broadcast: b};
-	});
-var _narkisr$elm_ui$Systems_Model_Physical$emptyPhysical = A2(_narkisr$elm_ui$Systems_Model_Physical$Physical, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
-
-var _narkisr$elm_ui$Systems_Model_KVM$KVM = function (a) {
-	return {node: a};
-};
-var _narkisr$elm_ui$Systems_Model_KVM$emptyKVM = _narkisr$elm_ui$Systems_Model_KVM$KVM('');
-
-var _narkisr$elm_ui$Systems_Model_Common$Machine = F7(
-	function (a, b, c, d, e, f, g) {
-		return {user: a, hostname: b, domain: c, ip: d, os: e, ram: f, cpu: g};
-	});
-var _narkisr$elm_ui$Systems_Model_Common$emptyMachine = A7(_narkisr$elm_ui$Systems_Model_Common$Machine, '', '', '', _elm_lang$core$Maybe$Nothing, '', _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
-var _narkisr$elm_ui$Systems_Model_Common$resourcedMachine = F2(
-	function (cpu, ram) {
-		return A7(
-			_narkisr$elm_ui$Systems_Model_Common$Machine,
-			'',
-			'',
-			'',
-			_elm_lang$core$Maybe$Just(''),
-			'',
-			_elm_lang$core$Maybe$Just(ram),
-			_elm_lang$core$Maybe$Just(cpu));
-	});
-var _narkisr$elm_ui$Systems_Model_Common$System = function (a) {
-	return function (b) {
-		return function (c) {
-			return function (d) {
-				return function (e) {
-					return function (f) {
-						return function (g) {
-							return function (h) {
-								return function (i) {
-									return function (j) {
-										return {owner: a, env: b, type_: c, machine: d, aws: e, gce: f, digital: g, openstack: h, physical: i, kvm: j};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var _narkisr$elm_ui$Systems_Model_Common$emptySystem = function () {
-	var base = A3(_narkisr$elm_ui$Systems_Model_Common$System, '', '', '');
-	return A7(base, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
-}();
-
-var _narkisr$elm_ui$Common_Http$apply = F2(
-	function (func, value) {
-		return A3(
-			_elm_lang$core$Json_Decode$map2,
-			F2(
-				function (x, y) {
-					return x(y);
-				}),
-			func,
-			value);
-	});
-var _narkisr$elm_ui$Common_Http$httpJson = F5(
-	function (method, body, decoder, url, msg) {
-		var payload = {
-			method: method,
-			headers: {
-				ctor: '::',
-				_0: A2(_elm_lang$http$Http$header, 'Content-Type', 'application/json;charset=UTF-8'),
-				_1: {
-					ctor: '::',
-					_0: A2(_elm_lang$http$Http$header, 'Accept', 'application/json, text/plain, */*'),
-					_1: {ctor: '[]'}
-				}
-			},
-			url: url,
-			body: body,
-			expect: _elm_lang$http$Http$expectJson(decoder),
-			timeout: _elm_lang$core$Maybe$Nothing,
-			withCredentials: false
-		};
-		return A2(
-			_elm_lang$http$Http$send,
-			msg,
-			_elm_lang$http$Http$request(payload));
-	});
-var _narkisr$elm_ui$Common_Http$delete = A2(_narkisr$elm_ui$Common_Http$httpJson, 'DELETE', _elm_lang$http$Http$emptyBody);
-var _narkisr$elm_ui$Common_Http$getJson = A2(_narkisr$elm_ui$Common_Http$httpJson, 'GET', _elm_lang$http$Http$emptyBody);
-var _narkisr$elm_ui$Common_Http$postJson = _narkisr$elm_ui$Common_Http$httpJson('POST');
-var _narkisr$elm_ui$Common_Http$putJson = _narkisr$elm_ui$Common_Http$httpJson('PUT');
-
-var _narkisr$elm_ui$Systems_Decoders$machineDecoder = A8(
-	_elm_lang$core$Json_Decode$map7,
-	_narkisr$elm_ui$Systems_Model_Common$Machine,
-	A2(_elm_lang$core$Json_Decode$field, 'user', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'hostname', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'domain', _elm_lang$core$Json_Decode$string),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'ip', _elm_lang$core$Json_Decode$string)),
-	A2(_elm_lang$core$Json_Decode$field, 'os', _elm_lang$core$Json_Decode$string),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'ram', _elm_lang$core$Json_Decode$int)),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'cpu', _elm_lang$core$Json_Decode$int)));
-var _narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder = A4(
-	_elm_lang$core$Json_Decode$map3,
-	_narkisr$elm_ui$Systems_Model_Openstack$Volume,
-	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$int),
-	A2(_elm_lang$core$Json_Decode$field, 'clear', _elm_lang$core$Json_Decode$bool));
-var _narkisr$elm_ui$Systems_Decoders$openstackDecoder = A2(
-	_narkisr$elm_ui$Common_Http$apply,
-	A2(
-		_narkisr$elm_ui$Common_Http$apply,
-		A2(
-			_narkisr$elm_ui$Common_Http$apply,
-			A2(
-				_narkisr$elm_ui$Common_Http$apply,
-				A2(
-					_narkisr$elm_ui$Common_Http$apply,
-					A2(
-						_narkisr$elm_ui$Common_Http$apply,
-						A2(
-							_narkisr$elm_ui$Common_Http$apply,
-							A2(
-								_elm_lang$core$Json_Decode$map,
-								_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
-								A2(_elm_lang$core$Json_Decode$field, 'flavor', _elm_lang$core$Json_Decode$string)),
-							A2(_elm_lang$core$Json_Decode$field, 'tenant', _elm_lang$core$Json_Decode$string)),
-						A2(_elm_lang$core$Json_Decode$field, 'key-name', _elm_lang$core$Json_Decode$string)),
-					_elm_lang$core$Json_Decode$maybe(
-						A2(_elm_lang$core$Json_Decode$field, 'floating-ip', _elm_lang$core$Json_Decode$string))),
-				_elm_lang$core$Json_Decode$maybe(
-					A2(_elm_lang$core$Json_Decode$field, 'floating-ip-pool', _elm_lang$core$Json_Decode$string))),
-			_elm_lang$core$Json_Decode$maybe(
-				A2(
-					_elm_lang$core$Json_Decode$field,
-					'security-groups',
-					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
-		A2(
-			_elm_lang$core$Json_Decode$field,
-			'networks',
-			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(
-			_elm_lang$core$Json_Decode$field,
-			'volumes',
-			_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder))));
-var _narkisr$elm_ui$Systems_Decoders$kvmDecoder = A2(
-	_elm_lang$core$Json_Decode$map,
-	_narkisr$elm_ui$Systems_Model_KVM$KVM,
-	A2(_elm_lang$core$Json_Decode$field, 'node', _elm_lang$core$Json_Decode$string));
-var _narkisr$elm_ui$Systems_Decoders$physicalDecoder = A3(
-	_elm_lang$core$Json_Decode$map2,
-	_narkisr$elm_ui$Systems_Model_Physical$Physical,
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'mac', _elm_lang$core$Json_Decode$string)),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'broadcast', _elm_lang$core$Json_Decode$string)));
-var _narkisr$elm_ui$Systems_Decoders$digitalDecoder = A4(
-	_elm_lang$core$Json_Decode$map3,
-	_narkisr$elm_ui$Systems_Model_Digital$Digital,
-	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'region', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'private-networking', _elm_lang$core$Json_Decode$bool));
-var _narkisr$elm_ui$Systems_Decoders$gceDecoder = A6(
-	_elm_lang$core$Json_Decode$map5,
-	_narkisr$elm_ui$Systems_Model_GCE$GCE,
-	A2(_elm_lang$core$Json_Decode$field, 'machine-type', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'zone', _elm_lang$core$Json_Decode$string),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(
-			_elm_lang$core$Json_Decode$field,
-			'tags',
-			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
-	A2(_elm_lang$core$Json_Decode$field, 'project-id', _elm_lang$core$Json_Decode$string),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'static-ip', _elm_lang$core$Json_Decode$string)));
-var _narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder = A6(
-	_elm_lang$core$Json_Decode$map5,
-	_narkisr$elm_ui$Systems_Model_AWS$Volume,
-	A2(_elm_lang$core$Json_Decode$field, 'volume-type', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$int),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'iops', _elm_lang$core$Json_Decode$int)),
-	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'clear', _elm_lang$core$Json_Decode$bool));
-var _narkisr$elm_ui$Systems_Decoders$blockDecoder = A3(
-	_elm_lang$core$Json_Decode$map2,
-	_narkisr$elm_ui$Systems_Model_AWS$Block,
-	A2(_elm_lang$core$Json_Decode$field, 'volume', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string));
-var _narkisr$elm_ui$Systems_Decoders$vpcDecoder = A4(
-	_elm_lang$core$Json_Decode$map3,
-	_narkisr$elm_ui$Systems_Model_AWS$VPC,
-	A2(_elm_lang$core$Json_Decode$field, 'subnetId', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'vpcId', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'assignIp', _elm_lang$core$Json_Decode$bool));
-var _narkisr$elm_ui$Systems_Decoders$awsDecoder = A2(
-	_narkisr$elm_ui$Common_Http$apply,
-	A2(
-		_narkisr$elm_ui$Common_Http$apply,
-		A2(
-			_narkisr$elm_ui$Common_Http$apply,
-			A2(
-				_narkisr$elm_ui$Common_Http$apply,
-				A2(
-					_narkisr$elm_ui$Common_Http$apply,
-					A2(
-						_narkisr$elm_ui$Common_Http$apply,
-						A2(
-							_narkisr$elm_ui$Common_Http$apply,
-							A2(
-								_narkisr$elm_ui$Common_Http$apply,
-								A2(
-									_narkisr$elm_ui$Common_Http$apply,
-									A2(
-										_elm_lang$core$Json_Decode$map,
-										_narkisr$elm_ui$Systems_Model_AWS$AWS,
-										A2(_elm_lang$core$Json_Decode$field, 'instance-type', _elm_lang$core$Json_Decode$string)),
-									_elm_lang$core$Json_Decode$maybe(
-										A2(_elm_lang$core$Json_Decode$field, 'instance-id', _elm_lang$core$Json_Decode$string))),
-								A2(_elm_lang$core$Json_Decode$field, 'key-name', _elm_lang$core$Json_Decode$string)),
-							A2(_elm_lang$core$Json_Decode$field, 'endpoint', _elm_lang$core$Json_Decode$string)),
-						_elm_lang$core$Json_Decode$maybe(
-							A2(_elm_lang$core$Json_Decode$field, 'availability-zone', _elm_lang$core$Json_Decode$string))),
-					_elm_lang$core$Json_Decode$maybe(
-						A2(
-							_elm_lang$core$Json_Decode$field,
-							'security-groups',
-							_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
-				_elm_lang$core$Json_Decode$maybe(
-					A2(_elm_lang$core$Json_Decode$field, 'ebs-optimized', _elm_lang$core$Json_Decode$bool))),
-			_elm_lang$core$Json_Decode$maybe(
-				A2(
-					_elm_lang$core$Json_Decode$field,
-					'volumes',
-					_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder)))),
-		_elm_lang$core$Json_Decode$maybe(
-			A2(
-				_elm_lang$core$Json_Decode$field,
-				'block-devices',
-				_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$blockDecoder)))),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'vpc', _narkisr$elm_ui$Systems_Decoders$vpcDecoder)));
-var _narkisr$elm_ui$Systems_Decoders$systemDecoder = A2(
-	_narkisr$elm_ui$Common_Http$apply,
-	A2(
-		_narkisr$elm_ui$Common_Http$apply,
-		A2(
-			_narkisr$elm_ui$Common_Http$apply,
-			A2(
-				_narkisr$elm_ui$Common_Http$apply,
-				A2(
-					_narkisr$elm_ui$Common_Http$apply,
-					A2(
-						_narkisr$elm_ui$Common_Http$apply,
-						A2(
-							_narkisr$elm_ui$Common_Http$apply,
-							A2(
-								_narkisr$elm_ui$Common_Http$apply,
-								A2(
-									_narkisr$elm_ui$Common_Http$apply,
-									A2(
-										_elm_lang$core$Json_Decode$map,
-										_narkisr$elm_ui$Systems_Model_Common$System,
-										A2(_elm_lang$core$Json_Decode$field, 'owner', _elm_lang$core$Json_Decode$string)),
-									A2(_elm_lang$core$Json_Decode$field, 'env', _elm_lang$core$Json_Decode$string)),
-								A2(_elm_lang$core$Json_Decode$field, 'type', _elm_lang$core$Json_Decode$string)),
-							A2(_elm_lang$core$Json_Decode$field, 'machine', _narkisr$elm_ui$Systems_Decoders$machineDecoder)),
-						_elm_lang$core$Json_Decode$maybe(
-							A2(_elm_lang$core$Json_Decode$field, 'aws', _narkisr$elm_ui$Systems_Decoders$awsDecoder))),
-					_elm_lang$core$Json_Decode$maybe(
-						A2(_elm_lang$core$Json_Decode$field, 'gce', _narkisr$elm_ui$Systems_Decoders$gceDecoder))),
-				_elm_lang$core$Json_Decode$maybe(
-					A2(_elm_lang$core$Json_Decode$field, 'digital-ocean', _narkisr$elm_ui$Systems_Decoders$digitalDecoder))),
-			_elm_lang$core$Json_Decode$maybe(
-				A2(_elm_lang$core$Json_Decode$field, 'openstack', _narkisr$elm_ui$Systems_Decoders$openstackDecoder))),
-		_elm_lang$core$Json_Decode$maybe(
-			A2(_elm_lang$core$Json_Decode$field, 'physical', _narkisr$elm_ui$Systems_Decoders$physicalDecoder))),
-	_elm_lang$core$Json_Decode$maybe(
-		A2(_elm_lang$core$Json_Decode$field, 'kvm', _narkisr$elm_ui$Systems_Decoders$kvmDecoder)));
-
-var _narkisr$elm_ui$Common_Redirect$redirect = _elm_lang$core$Native_Platform.outgoingPort(
-	'redirect',
-	function (v) {
-		return v;
-	});
-
 var _narkisr$elm_ui$Common_Utils$capitalize = function (s) {
 	var _p0 = _elm_lang$core$String$uncons(s);
 	if (_p0.ctor === 'Just') {
@@ -13120,6 +12230,52 @@ var _narkisr$elm_ui$Common_Components$warningCallout = F4(
 				A3(_narkisr$elm_ui$Common_Components$dialogPanel, 'warning', message, body)));
 	});
 
+var _narkisr$elm_ui$Common_Http$apply = F2(
+	function (func, value) {
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			F2(
+				function (x, y) {
+					return x(y);
+				}),
+			func,
+			value);
+	});
+var _narkisr$elm_ui$Common_Http$httpJson = F5(
+	function (method, body, decoder, url, msg) {
+		var payload = {
+			method: method,
+			headers: {
+				ctor: '::',
+				_0: A2(_elm_lang$http$Http$header, 'Content-Type', 'application/json;charset=UTF-8'),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$http$Http$header, 'Accept', 'application/json, text/plain, */*'),
+					_1: {ctor: '[]'}
+				}
+			},
+			url: url,
+			body: body,
+			expect: _elm_lang$http$Http$expectJson(decoder),
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		};
+		return A2(
+			_elm_lang$http$Http$send,
+			msg,
+			_elm_lang$http$Http$request(payload));
+	});
+var _narkisr$elm_ui$Common_Http$delete = A2(_narkisr$elm_ui$Common_Http$httpJson, 'DELETE', _elm_lang$http$Http$emptyBody);
+var _narkisr$elm_ui$Common_Http$getJson = A2(_narkisr$elm_ui$Common_Http$httpJson, 'GET', _elm_lang$http$Http$emptyBody);
+var _narkisr$elm_ui$Common_Http$postJson = _narkisr$elm_ui$Common_Http$httpJson('POST');
+var _narkisr$elm_ui$Common_Http$putJson = _narkisr$elm_ui$Common_Http$httpJson('PUT');
+
+var _narkisr$elm_ui$Common_Redirect$redirect = _elm_lang$core$Native_Platform.outgoingPort(
+	'redirect',
+	function (v) {
+		return v;
+	});
+
 var _narkisr$elm_ui$Common_Errors$setErrors = F2(
 	function (_p0, es) {
 		var _p1 = _p0;
@@ -13437,6 +12593,194 @@ var _narkisr$elm_ui$Common_Errors$Nested = function (a) {
 };
 var _narkisr$elm_ui$Common_Errors$NoOp = {ctor: 'NoOp'};
 
+var _narkisr$elm_ui$Common_NewTab$newtab = _elm_lang$core$Native_Platform.outgoingPort(
+	'newtab',
+	function (v) {
+		return v;
+	});
+
+var _narkisr$elm_ui$Table$withCaption = F3(
+	function (enabled, title, body) {
+		return enabled ? A2(
+			_elm_lang$core$List$append,
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$caption,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(title),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			body) : body;
+	});
+var _narkisr$elm_ui$Table$headersMap = function (keys) {
+	return A2(
+		_elm_lang$core$List$map,
+		function (k) {
+			return A2(
+				_elm_lang$html$Html$th,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(k),
+					_1: {ctor: '[]'}
+				});
+		},
+		keys);
+};
+var _narkisr$elm_ui$Table$update = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p7 = _p1.selected;
+		var _p6 = _p1;
+		var _p2 = msg;
+		switch (_p2.ctor) {
+			case 'UpdateRows':
+				return _elm_lang$core$Native_Utils.update(
+					_p6,
+					{rows: _p2._0, selected: _elm_lang$core$Set$empty});
+			case 'SelectAll':
+				var all = _elm_lang$core$Set$fromList(
+					A2(
+						_elm_lang$core$List$map,
+						function (_p3) {
+							var _p4 = _p3;
+							return _p4._0;
+						},
+						_p1.rows));
+				return _elm_lang$core$Native_Utils.eq(_p7, all) ? _elm_lang$core$Native_Utils.update(
+					_p6,
+					{selected: _elm_lang$core$Set$empty}) : _elm_lang$core$Native_Utils.update(
+					_p6,
+					{selected: all});
+			case 'Select':
+				var _p5 = _p2._0;
+				return A2(_elm_lang$core$Set$member, _p5, _p6.selected) ? _elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						selected: A2(_elm_lang$core$Set$remove, _p5, _p7)
+					}) : _elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						selected: A2(_elm_lang$core$Set$insert, _p5, _p7)
+					});
+			default:
+				return _p6;
+		}
+	});
+var _narkisr$elm_ui$Table$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {id: a, caption: b, rows: c, headers: d, selected: e, title: f, rowFn: g};
+	});
+var _narkisr$elm_ui$Table$init = F5(
+	function (id, caption, hs, f, title) {
+		return A7(
+			_narkisr$elm_ui$Table$Model,
+			id,
+			caption,
+			{ctor: '[]'},
+			hs,
+			_elm_lang$core$Set$empty,
+			title,
+			f);
+	});
+var _narkisr$elm_ui$Table$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Table$UpdateRows = function (a) {
+	return {ctor: 'UpdateRows', _0: a};
+};
+var _narkisr$elm_ui$Table$SelectAll = {ctor: 'SelectAll'};
+var _narkisr$elm_ui$Table$View = function (a) {
+	return {ctor: 'View', _0: a};
+};
+var _narkisr$elm_ui$Table$Select = function (a) {
+	return {ctor: 'Select', _0: a};
+};
+var _narkisr$elm_ui$Table$applySelect = F3(
+	function (model, id, cols) {
+		var background = A2(_elm_lang$core$Set$member, id, model.selected) ? '#e7e7e7' : '';
+		return A2(
+			_elm_lang$html$Html$tr,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'background', _1: background},
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(
+						_narkisr$elm_ui$Table$Select(id)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onDoubleClick(
+							_narkisr$elm_ui$Table$View(id)),
+						_1: {ctor: '[]'}
+					}
+				}
+			},
+			cols);
+	});
+var _narkisr$elm_ui$Table$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$table,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('table table-bordered'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$id(model.id),
+				_1: {ctor: '[]'}
+			}
+		},
+		A3(
+			_narkisr$elm_ui$Table$withCaption,
+			model.caption,
+			model.title,
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$thead,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$tr,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Table$SelectAll),
+								_1: {ctor: '[]'}
+							},
+							_narkisr$elm_ui$Table$headersMap(model.headers)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tbody,
+						{ctor: '[]'},
+						A2(
+							_elm_lang$core$List$map,
+							function (_p8) {
+								var _p9 = _p8;
+								var _p10 = _p9._0;
+								return A3(
+									_narkisr$elm_ui$Table$applySelect,
+									model,
+									_p10,
+									A2(model.rowFn, _p10, _p9._1));
+							},
+							model.rows)),
+					_1: {ctor: '[]'}
+				}
+			}));
+};
+
 var _narkisr$elm_ui$Pager$pageCount = function (model) {
 	return _elm_lang$core$Basics$ceiling(model.total / model.offset);
 };
@@ -13673,1131 +13017,6 @@ var _narkisr$elm_ui$Pager$view = function (model) {
 			_1: {ctor: '[]'}
 		});
 };
-
-var _narkisr$elm_ui$Table$withCaption = F3(
-	function (enabled, title, body) {
-		return enabled ? A2(
-			_elm_lang$core$List$append,
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$caption,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(title),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			},
-			body) : body;
-	});
-var _narkisr$elm_ui$Table$headersMap = function (keys) {
-	return A2(
-		_elm_lang$core$List$map,
-		function (k) {
-			return A2(
-				_elm_lang$html$Html$th,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(k),
-					_1: {ctor: '[]'}
-				});
-		},
-		keys);
-};
-var _narkisr$elm_ui$Table$update = F2(
-	function (msg, _p0) {
-		var _p1 = _p0;
-		var _p7 = _p1.selected;
-		var _p6 = _p1;
-		var _p2 = msg;
-		switch (_p2.ctor) {
-			case 'UpdateRows':
-				return _elm_lang$core$Native_Utils.update(
-					_p6,
-					{rows: _p2._0, selected: _elm_lang$core$Set$empty});
-			case 'SelectAll':
-				var all = _elm_lang$core$Set$fromList(
-					A2(
-						_elm_lang$core$List$map,
-						function (_p3) {
-							var _p4 = _p3;
-							return _p4._0;
-						},
-						_p1.rows));
-				return _elm_lang$core$Native_Utils.eq(_p7, all) ? _elm_lang$core$Native_Utils.update(
-					_p6,
-					{selected: _elm_lang$core$Set$empty}) : _elm_lang$core$Native_Utils.update(
-					_p6,
-					{selected: all});
-			case 'Select':
-				var _p5 = _p2._0;
-				return A2(_elm_lang$core$Set$member, _p5, _p6.selected) ? _elm_lang$core$Native_Utils.update(
-					_p6,
-					{
-						selected: A2(_elm_lang$core$Set$remove, _p5, _p7)
-					}) : _elm_lang$core$Native_Utils.update(
-					_p6,
-					{
-						selected: A2(_elm_lang$core$Set$insert, _p5, _p7)
-					});
-			default:
-				return _p6;
-		}
-	});
-var _narkisr$elm_ui$Table$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {id: a, caption: b, rows: c, headers: d, selected: e, title: f, rowFn: g};
-	});
-var _narkisr$elm_ui$Table$init = F5(
-	function (id, caption, hs, f, title) {
-		return A7(
-			_narkisr$elm_ui$Table$Model,
-			id,
-			caption,
-			{ctor: '[]'},
-			hs,
-			_elm_lang$core$Set$empty,
-			title,
-			f);
-	});
-var _narkisr$elm_ui$Table$NoOp = {ctor: 'NoOp'};
-var _narkisr$elm_ui$Table$UpdateRows = function (a) {
-	return {ctor: 'UpdateRows', _0: a};
-};
-var _narkisr$elm_ui$Table$SelectAll = {ctor: 'SelectAll'};
-var _narkisr$elm_ui$Table$View = function (a) {
-	return {ctor: 'View', _0: a};
-};
-var _narkisr$elm_ui$Table$Select = function (a) {
-	return {ctor: 'Select', _0: a};
-};
-var _narkisr$elm_ui$Table$applySelect = F3(
-	function (model, id, cols) {
-		var background = A2(_elm_lang$core$Set$member, id, model.selected) ? '#e7e7e7' : '';
-		return A2(
-			_elm_lang$html$Html$tr,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'background', _1: background},
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_narkisr$elm_ui$Table$Select(id)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onDoubleClick(
-							_narkisr$elm_ui$Table$View(id)),
-						_1: {ctor: '[]'}
-					}
-				}
-			},
-			cols);
-	});
-var _narkisr$elm_ui$Table$view = function (model) {
-	return A2(
-		_elm_lang$html$Html$table,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('table table-bordered'),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$id(model.id),
-				_1: {ctor: '[]'}
-			}
-		},
-		A3(
-			_narkisr$elm_ui$Table$withCaption,
-			model.caption,
-			model.title,
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$thead,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$tr,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(_narkisr$elm_ui$Table$SelectAll),
-								_1: {ctor: '[]'}
-							},
-							_narkisr$elm_ui$Table$headersMap(model.headers)),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$tbody,
-						{ctor: '[]'},
-						A2(
-							_elm_lang$core$List$map,
-							function (_p8) {
-								var _p9 = _p8;
-								var _p10 = _p9._0;
-								return A3(
-									_narkisr$elm_ui$Table$applySelect,
-									model,
-									_p10,
-									A2(model.rowFn, _p10, _p9._1));
-							},
-							model.rows)),
-					_1: {ctor: '[]'}
-				}
-			}));
-};
-
-var _narkisr$elm_ui$Search$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		if (_p0.ctor === 'Result') {
-			if (_p0._0 === true) {
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{parsed: _p0._1.result, input: _p0._1.source, error: ''});
-			} else {
-				return _elm_lang$core$Native_Utils.update(
-					model,
-					{error: _p0._1.message, input: _p0._1.source});
-			}
-		} else {
-			return model;
-		}
-	});
-var _narkisr$elm_ui$Search$init = {input: '', parsed: '', error: ''};
-var _narkisr$elm_ui$Search$Model = F3(
-	function (a, b, c) {
-		return {input: a, parsed: b, error: c};
-	});
-var _narkisr$elm_ui$Search$ParseResult = F3(
-	function (a, b, c) {
-		return {message: a, source: b, result: c};
-	});
-var _narkisr$elm_ui$Search$NoOp = {ctor: 'NoOp'};
-var _narkisr$elm_ui$Search$Result = F2(
-	function (a, b) {
-		return {ctor: 'Result', _0: a, _1: b};
-	});
-var _narkisr$elm_ui$Search$Parse = function (a) {
-	return {ctor: 'Parse', _0: a};
-};
-var _narkisr$elm_ui$Search$searchForm = function (model) {
-	return A2(
-		_elm_lang$html$Html$form,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('form-horizontal'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('form-group'),
-					_1: {
-						ctor: '::',
-						_0: A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;'),
-						_1: {ctor: '[]'}
-					}
-				},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$label,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$for('systemSearch'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('col-sm-1 control-label'),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Filter:'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('col-sm-6'),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$input,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('form-control'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$type_('search'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$id('systemSearch'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$placeholder(''),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onInput(_narkisr$elm_ui$Search$Parse),
-														_1: {ctor: '[]'}
-													}
-												}
-											}
-										}
-									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		});
-};
-var _narkisr$elm_ui$Search$view = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('container-fluid'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: _narkisr$elm_ui$Common_Components$row_(
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('col-md-8 col-md-offset-2'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _narkisr$elm_ui$Search$searchForm(model),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		});
-};
-
-var _narkisr$elm_ui$Systems_List$systemPair = A3(
-	_elm_lang$core$Json_Decode$map2,
-	F2(
-		function (v0, v1) {
-			return {ctor: '_Tuple2', _0: v0, _1: v1};
-		}),
-	A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$index, 1, _narkisr$elm_ui$Systems_Decoders$systemDecoder));
-var _narkisr$elm_ui$Systems_List$systemPage = A3(
-	_elm_lang$core$Json_Decode$map2,
-	F2(
-		function (v0, v1) {
-			return {ctor: '_Tuple2', _0: v0, _1: v1};
-		}),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'meta',
-		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$int)),
-	A2(
-		_elm_lang$core$Json_Decode$field,
-		'systems',
-		_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_List$systemPair)));
-var _narkisr$elm_ui$Systems_List$flash = function (model) {
-	var result = _elm_lang$html$Html$div(
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('callout callout-danger'),
-			_1: {ctor: '[]'}
-		});
-	var _p0 = model.error;
-	switch (_p0.ctor) {
-		case 'NoError':
-			return A2(
-				_elm_lang$html$Html$div,
-				{ctor: '[]'},
-				{ctor: '[]'});
-		case 'NoSystemSelected':
-			return A2(
-				_narkisr$elm_ui$Common_Components$callout,
-				'danger',
-				_narkisr$elm_ui$Common_Components$info('Please select a system first'));
-		default:
-			return A2(
-				_narkisr$elm_ui$Common_Components$callout,
-				'danger',
-				_narkisr$elm_ui$Common_Components$info(_p0._0));
-	}
-};
-var _narkisr$elm_ui$Systems_List$systemRow = F2(
-	function (id, _p1) {
-		var _p2 = _p1;
-		return {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$td,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(id),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$td,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							function (_) {
-								return _.hostname;
-							}(_p2.machine)),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$td,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(_p2.type_),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$td,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p2.env),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$td,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p2.owner),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		};
-	});
-var _narkisr$elm_ui$Systems_List$setSystems = F2(
-	function (model, _p3) {
-		var _p4 = _p3;
-		var newTable = A2(
-			_narkisr$elm_ui$Table$update,
-			_narkisr$elm_ui$Table$UpdateRows(_p4._1),
-			model.table);
-		var total = A2(
-			_elm_lang$core$Maybe$withDefault,
-			0,
-			A2(_elm_lang$core$Dict$get, 'total', _p4._0));
-		var newPager = A2(
-			_narkisr$elm_ui$Pager$update,
-			_narkisr$elm_ui$Pager$UpdateTotal(
-				_elm_lang$core$Basics$toFloat(total)),
-			model.pager);
-		return _narkisr$elm_ui$Common_Utils$none(
-			_elm_lang$core$Native_Utils.update(
-				model,
-				{systems: _p4, pager: newPager, table: newTable}));
-	});
-var _narkisr$elm_ui$Systems_List$Model = F5(
-	function (a, b, c, d, e) {
-		return {error: a, systems: b, pager: c, table: d, search: e};
-	});
-var _narkisr$elm_ui$Systems_List$NoError = {ctor: 'NoError'};
-var _narkisr$elm_ui$Systems_List$SearchParseFailed = function (a) {
-	return {ctor: 'SearchParseFailed', _0: a};
-};
-var _narkisr$elm_ui$Systems_List$NoSystemSelected = {ctor: 'NoSystemSelected'};
-var _narkisr$elm_ui$Systems_List$NoOp = {ctor: 'NoOp'};
-var _narkisr$elm_ui$Systems_List$Searching = function (a) {
-	return {ctor: 'Searching', _0: a};
-};
-var _narkisr$elm_ui$Systems_List$LoadPage = function (a) {
-	return {ctor: 'LoadPage', _0: a};
-};
-var _narkisr$elm_ui$Systems_List$GotoPage = function (a) {
-	return {ctor: 'GotoPage', _0: a};
-};
-var _narkisr$elm_ui$Systems_List$view = function (model) {
-	var _p5 = model.systems;
-	var meta = _p5._0;
-	var systems = _p5._1;
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _narkisr$elm_ui$Common_Components$row_(
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$map,
-								_narkisr$elm_ui$Systems_List$Searching,
-								_narkisr$elm_ui$Search$view(model.search)),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: _narkisr$elm_ui$Common_Components$row_(
-					{
-						ctor: '::',
-						_0: _narkisr$elm_ui$Systems_List$flash(model),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _narkisr$elm_ui$Common_Components$panelDefault_(
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$map,
-												_narkisr$elm_ui$Systems_List$LoadPage,
-												_narkisr$elm_ui$Table$view(model.table)),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _narkisr$elm_ui$Common_Components$row_(
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$map,
-								_narkisr$elm_ui$Systems_List$GotoPage,
-								_narkisr$elm_ui$Pager$view(model.pager)),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
-			}
-		});
-};
-var _narkisr$elm_ui$Systems_List$SetSystems = function (a) {
-	return {ctor: 'SetSystems', _0: a};
-};
-var _narkisr$elm_ui$Systems_List$getSystems = F2(
-	function (page, offset) {
-		return A3(
-			_narkisr$elm_ui$Common_Http$getJson,
-			_narkisr$elm_ui$Systems_List$systemPage,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'/systems?page=',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(page),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						'&offset=',
-						_elm_lang$core$Basics$toString(offset)))),
-			_narkisr$elm_ui$Systems_List$SetSystems);
-	});
-var _narkisr$elm_ui$Systems_List$init = function () {
-	var search = _narkisr$elm_ui$Search$init;
-	var table = A5(
-		_narkisr$elm_ui$Table$init,
-		'systemsListing',
-		true,
-		{
-			ctor: '::',
-			_0: '#',
-			_1: {
-				ctor: '::',
-				_0: 'Hostname',
-				_1: {
-					ctor: '::',
-					_0: 'Type',
-					_1: {
-						ctor: '::',
-						_0: 'Env',
-						_1: {
-							ctor: '::',
-							_0: 'Owner',
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		},
-		_narkisr$elm_ui$Systems_List$systemRow,
-		'Systems');
-	var systems = {
-		ctor: '_Tuple2',
-		_0: _elm_lang$core$Dict$empty,
-		_1: {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: '', _1: _narkisr$elm_ui$Systems_Model_Common$emptySystem},
-			_1: {ctor: '[]'}
-		}
-	};
-	return {
-		ctor: '_Tuple2',
-		_0: A5(_narkisr$elm_ui$Systems_List$Model, _narkisr$elm_ui$Systems_List$NoError, systems, _narkisr$elm_ui$Pager$init, table, search),
-		_1: A2(_narkisr$elm_ui$Systems_List$getSystems, 1, 10)
-	};
-}();
-var _narkisr$elm_ui$Systems_List$getSystemsQuery = F3(
-	function (page, offset, query) {
-		return A3(
-			_narkisr$elm_ui$Common_Http$getJson,
-			_narkisr$elm_ui$Systems_List$systemPage,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'/systems/query?page=',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(page),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						'&offset=',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(offset),
-							A2(_elm_lang$core$Basics_ops['++'], '&query=', query))))),
-			_narkisr$elm_ui$Systems_List$SetSystems);
-	});
-var _narkisr$elm_ui$Systems_List$update = F2(
-	function (msg, _p6) {
-		var _p7 = _p6;
-		var _p14 = _p7;
-		var _p8 = msg;
-		switch (_p8.ctor) {
-			case 'SetSystems':
-				return A4(
-					_narkisr$elm_ui$Common_Errors$successHandler,
-					_p8._0,
-					_p14,
-					_narkisr$elm_ui$Systems_List$setSystems(_p14),
-					_narkisr$elm_ui$Systems_List$NoOp);
-			case 'GotoPage':
-				var _p11 = _p8._0;
-				var _p9 = _p11;
-				if (_p9.ctor === 'NextPage') {
-					var _p10 = _p9._0;
-					var newPager = A2(_narkisr$elm_ui$Pager$update, _p11, _p14.pager);
-					return _elm_lang$core$String$isEmpty(_p14.search.input) ? {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							_p14,
-							{pager: newPager}),
-						_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p10, 10)
-					} : {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							_p14,
-							{pager: newPager}),
-						_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p10, 10, _p14.search.parsed)
-					};
-				} else {
-					return _narkisr$elm_ui$Common_Utils$none(_p14);
-				}
-			case 'Searching':
-				var _p13 = _p8._0;
-				var newSearch = A2(_narkisr$elm_ui$Search$update, _p13, _p14.search);
-				var _p12 = _p13;
-				if (_p12.ctor === 'Result') {
-					if (_p12._0 === true) {
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								_p14,
-								{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
-							_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p14.pager.page, 10, newSearch.parsed)
-						};
-					} else {
-						return _elm_lang$core$String$isEmpty(newSearch.input) ? {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								_p14,
-								{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
-							_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p14.pager.page, 10)
-						} : _narkisr$elm_ui$Common_Utils$none(
-							_elm_lang$core$Native_Utils.update(
-								_p14,
-								{
-									search: newSearch,
-									error: _narkisr$elm_ui$Systems_List$SearchParseFailed(newSearch.error)
-								}));
-					}
-				} else {
-					return _narkisr$elm_ui$Common_Utils$none(_p14);
-				}
-			case 'LoadPage':
-				var newTable = A2(_narkisr$elm_ui$Table$update, _p8._0, _p14.table);
-				return (_elm_lang$core$Native_Utils.eq(_p7.error, _narkisr$elm_ui$Systems_List$NoSystemSelected) && (!_elm_lang$core$Native_Utils.eq(newTable.selected, _elm_lang$core$Set$empty))) ? _narkisr$elm_ui$Common_Utils$none(
-					_elm_lang$core$Native_Utils.update(
-						_p14,
-						{table: newTable, error: _narkisr$elm_ui$Systems_List$NoError})) : _narkisr$elm_ui$Common_Utils$none(
-					_elm_lang$core$Native_Utils.update(
-						_p14,
-						{table: newTable}));
-			default:
-				return _narkisr$elm_ui$Common_Utils$none(_p14);
-		}
-	});
-
-var _narkisr$elm_ui$Jobs_Common$JobResponse = F3(
-	function (a, b, c) {
-		return {message: a, id: b, job: c};
-	});
-var _narkisr$elm_ui$Jobs_Common$jobResponse = A4(
-	_elm_lang$core$Json_Decode$map3,
-	_narkisr$elm_ui$Jobs_Common$JobResponse,
-	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'job', _elm_lang$core$Json_Decode$string));
-var _narkisr$elm_ui$Jobs_Common$runJob = F3(
-	function (id, job, msg) {
-		return A2(
-			_elm_lang$http$Http$send,
-			msg,
-			A3(
-				_elm_lang$http$Http$post,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'/jobs/',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						job,
-						A2(_elm_lang$core$Basics_ops['++'], '/', id))),
-				_elm_lang$http$Http$emptyBody,
-				_narkisr$elm_ui$Jobs_Common$jobResponse));
-	});
-
-var _narkisr$elm_ui$Systems_Launch$message = function (job) {
-	return {
-		ctor: '::',
-		_0: A2(
-			_elm_lang$html$Html$h4,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Notice!'),
-				_1: {ctor: '[]'}
-			}),
-		_1: {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$span,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('A '),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$strong,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(job),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(' operation '),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('will be performed on the following systems:'),
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _narkisr$elm_ui$Systems_Launch$systemRow = F2(
-	function (id, _p0) {
-		var _p1 = _p0;
-		return {
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$td,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text(id),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$td,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							function (_) {
-								return _.hostname;
-							}(_p1.machine)),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$td,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text(_p1.type_),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$td,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(_p1.env),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$td,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p1.owner),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		};
-	});
-var _narkisr$elm_ui$Systems_Launch$Model = F2(
-	function (a, b) {
-		return {job: a, table: b};
-	});
-var _narkisr$elm_ui$Systems_Launch$init = function () {
-	var table = A5(
-		_narkisr$elm_ui$Table$init,
-		'launchListing',
-		false,
-		{
-			ctor: '::',
-			_0: '#',
-			_1: {
-				ctor: '::',
-				_0: 'Hostname',
-				_1: {
-					ctor: '::',
-					_0: 'Type',
-					_1: {
-						ctor: '::',
-						_0: 'Env',
-						_1: {
-							ctor: '::',
-							_0: 'Owner',
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		},
-		_narkisr$elm_ui$Systems_Launch$systemRow,
-		'Systems');
-	return _narkisr$elm_ui$Common_Utils$none(
-		A2(_narkisr$elm_ui$Systems_Launch$Model, '', table));
-}();
-var _narkisr$elm_ui$Systems_Launch$Cancel = {ctor: 'Cancel'};
-var _narkisr$elm_ui$Systems_Launch$NoOp = {ctor: 'NoOp'};
-var _narkisr$elm_ui$Systems_Launch$Run = {ctor: 'Run'};
-var _narkisr$elm_ui$Systems_Launch$JobLaunched = function (a) {
-	return {ctor: 'JobLaunched', _0: a};
-};
-var _narkisr$elm_ui$Systems_Launch$update = F2(
-	function (msg, _p2) {
-		var _p3 = _p2;
-		var _p7 = _p3;
-		var _p4 = A2(_elm_lang$core$Debug$log, '', msg);
-		switch (_p4.ctor) {
-			case 'JobLaunched':
-				return A4(
-					_narkisr$elm_ui$Common_Errors$successHandler,
-					_p4._0,
-					_p7,
-					function (res) {
-						return _narkisr$elm_ui$Common_Utils$none(_p7);
-					},
-					_narkisr$elm_ui$Systems_Launch$NoOp);
-			case 'SetupJob':
-				return _narkisr$elm_ui$Common_Utils$none(
-					_elm_lang$core$Native_Utils.update(
-						_p7,
-						{job: _p4._0}));
-			case 'LoadPage':
-				var newTable = A2(_narkisr$elm_ui$Table$update, _p4._0, _p7.table);
-				return _narkisr$elm_ui$Common_Utils$none(
-					_elm_lang$core$Native_Utils.update(
-						_p7,
-						{table: newTable}));
-			case 'Run':
-				var runAll = _elm_lang$core$Platform_Cmd$batch(
-					A2(
-						_elm_lang$core$List$map,
-						function (id) {
-							return A3(_narkisr$elm_ui$Jobs_Common$runJob, id, _p3.job, _narkisr$elm_ui$Systems_Launch$JobLaunched);
-						},
-						A2(
-							_elm_lang$core$List$map,
-							function (_p5) {
-								var _p6 = _p5;
-								return _p6._0;
-							},
-							_p7.table.rows)));
-				return {ctor: '_Tuple2', _0: _p7, _1: runAll};
-			case 'Cancel':
-				return _narkisr$elm_ui$Common_Utils$none(_p7);
-			default:
-				return _narkisr$elm_ui$Common_Utils$none(_p7);
-		}
-	});
-var _narkisr$elm_ui$Systems_Launch$LoadPage = function (a) {
-	return {ctor: 'LoadPage', _0: a};
-};
-var _narkisr$elm_ui$Systems_Launch$view = function (_p8) {
-	var _p9 = _p8;
-	var systemsTable = _narkisr$elm_ui$Common_Components$panelDefault_(
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$map,
-				_narkisr$elm_ui$Systems_Launch$LoadPage,
-				_narkisr$elm_ui$Table$view(_p9.table)),
-			_1: {ctor: '[]'}
-		});
-	return A4(
-		_narkisr$elm_ui$Common_Components$dangerCallout,
-		_narkisr$elm_ui$Systems_Launch$message(_p9.job),
-		systemsTable,
-		_narkisr$elm_ui$Systems_Launch$Cancel,
-		_narkisr$elm_ui$Systems_Launch$Run);
-};
-var _narkisr$elm_ui$Systems_Launch$SetupJob = function (a) {
-	return {ctor: 'SetupJob', _0: a};
-};
-
-var _narkisr$elm_ui$Nav_Common$Users = {ctor: 'Users'};
-var _narkisr$elm_ui$Nav_Common$Stacks = {ctor: 'Stacks'};
-var _narkisr$elm_ui$Nav_Common$Templates = {ctor: 'Templates'};
-var _narkisr$elm_ui$Nav_Common$Jobs = {ctor: 'Jobs'};
-var _narkisr$elm_ui$Nav_Common$Types = {ctor: 'Types'};
-var _narkisr$elm_ui$Nav_Common$Systems = {ctor: 'Systems'};
-var _narkisr$elm_ui$Nav_Common$Stats = {ctor: 'Stats'};
-var _narkisr$elm_ui$Nav_Common$View = {ctor: 'View'};
-var _narkisr$elm_ui$Nav_Common$List = {ctor: 'List'};
-var _narkisr$elm_ui$Nav_Common$Edit = {ctor: 'Edit'};
-var _narkisr$elm_ui$Nav_Common$Delete = {ctor: 'Delete'};
-var _narkisr$elm_ui$Nav_Common$Launch = {ctor: 'Launch'};
-var _narkisr$elm_ui$Nav_Common$Add = {ctor: 'Add'};
-
-var _narkisr$elm_ui$Systems_Core$Model = F3(
-	function (a, b, c) {
-		return {systemsList: a, systemsLaunch: b, navChange: c};
-	});
-var _narkisr$elm_ui$Systems_Core$NoOp = {ctor: 'NoOp'};
-var _narkisr$elm_ui$Systems_Core$SystemsLaunch = function (a) {
-	return {ctor: 'SystemsLaunch', _0: a};
-};
-var _narkisr$elm_ui$Systems_Core$setupJob = F2(
-	function (msg, _p0) {
-		var _p1 = _p0;
-		var _p7 = _p1.systemsList;
-		var _p6 = _p1;
-		var table = _p7.table;
-		var _p2 = _p7.systems;
-		var systems = _p2._1;
-		var selected = A2(
-			_elm_lang$core$List$filter,
-			function (_p3) {
-				var _p4 = _p3;
-				return A2(_elm_lang$core$Set$member, _p4._0, table.selected);
-			},
-			systems);
-		var selectedTable = _elm_lang$core$Native_Utils.update(
-			table,
-			{rows: selected, selected: _elm_lang$core$Set$empty, id: 'launchListing'});
-		var _p5 = A2(
-			_narkisr$elm_ui$Systems_Launch$update,
-			msg,
-			_elm_lang$core$Native_Utils.update(
-				_p1.systemsLaunch,
-				{table: selectedTable}));
-		var newLaunch = _p5._0;
-		var effect = _p5._1;
-		if (_elm_lang$core$List$isEmpty(selected)) {
-			return _narkisr$elm_ui$Common_Utils$none(
-				_elm_lang$core$Native_Utils.update(
-					_p6,
-					{
-						systemsList: _elm_lang$core$Native_Utils.update(
-							_p7,
-							{error: _narkisr$elm_ui$Systems_List$NoSystemSelected})
-					}));
-		} else {
-			var newList = _elm_lang$core$Native_Utils.update(
-				_p7,
-				{error: _narkisr$elm_ui$Systems_List$NoError});
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					_p6,
-					{
-						systemsLaunch: newLaunch,
-						systemsList: newList,
-						navChange: _elm_lang$core$Maybe$Just('systems/launch')
-					}),
-				_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
-			};
-		}
-	});
-var _narkisr$elm_ui$Systems_Core$SystemsListing = function (a) {
-	return {ctor: 'SystemsListing', _0: a};
-};
-var _narkisr$elm_ui$Systems_Core$init = function () {
-	var _p8 = _narkisr$elm_ui$Systems_Launch$init;
-	var systemsLaunch = _p8._0;
-	var _p9 = _narkisr$elm_ui$Systems_List$init;
-	var systemsList = _p9._0;
-	var systemsListMsg = _p9._1;
-	return {
-		ctor: '_Tuple2',
-		_0: A3(_narkisr$elm_ui$Systems_Core$Model, systemsList, systemsLaunch, _elm_lang$core$Maybe$Nothing),
-		_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, systemsListMsg)
-	};
-}();
-var _narkisr$elm_ui$Systems_Core$update = F2(
-	function (msg, _p10) {
-		var _p11 = _p10;
-		var _p17 = _p11;
-		var _p12 = msg;
-		switch (_p12.ctor) {
-			case 'SystemsListing':
-				var _p13 = A2(_narkisr$elm_ui$Systems_List$update, _p12._0, _p11.systemsList);
-				var newSystems = _p13._0;
-				var effect = _p13._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						_p17,
-						{systemsList: newSystems}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, effect)
-				};
-			case 'SystemsLaunch':
-				var _p16 = _p12._0;
-				var _p14 = A2(_elm_lang$core$Debug$log, '', _p16);
-				switch (_p14.ctor) {
-					case 'Cancel':
-						return _narkisr$elm_ui$Common_Utils$none(
-							_elm_lang$core$Native_Utils.update(
-								_p17,
-								{
-									navChange: _elm_lang$core$Maybe$Just('systems/list')
-								}));
-					case 'JobLaunched':
-						return _narkisr$elm_ui$Common_Utils$none(
-							_elm_lang$core$Native_Utils.update(
-								_p17,
-								{
-									navChange: _elm_lang$core$Maybe$Just('jobs/list')
-								}));
-					case 'SetupJob':
-						return A2(_narkisr$elm_ui$Systems_Core$setupJob, _p16, _p17);
-					case 'Run':
-						var _p15 = A2(_narkisr$elm_ui$Systems_Launch$update, _p16, _p17.systemsLaunch);
-						var newLaunch = _p15._0;
-						var effect = _p15._1;
-						return {
-							ctor: '_Tuple2',
-							_0: _elm_lang$core$Native_Utils.update(
-								_p17,
-								{systemsLaunch: newLaunch}),
-							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
-						};
-					default:
-						return _narkisr$elm_ui$Common_Utils$none(_p17);
-				}
-			default:
-				return _narkisr$elm_ui$Common_Utils$none(_p17);
-		}
-	});
-var _narkisr$elm_ui$Systems_Core$view = function (model) {
-	return A2(
-		_elm_lang$html$Html$map,
-		_narkisr$elm_ui$Systems_Core$SystemsListing,
-		_narkisr$elm_ui$Systems_List$view(model.systemsList));
-};
-
-var _narkisr$elm_ui$Common_NewTab$newtab = _elm_lang$core$Native_Platform.outgoingPort(
-	'newtab',
-	function (v) {
-		return v;
-	});
 
 var _narkisr$elm_ui$Jobs_List$apply = F2(
 	function (func, value) {
@@ -15732,6 +13951,1820 @@ var _narkisr$elm_ui$Users_Core$init = _narkisr$elm_ui$Common_Utils$none(
 	_narkisr$elm_ui$Users_Core$Model(_elm_lang$core$Maybe$Nothing));
 var _narkisr$elm_ui$Users_Core$NoOp = {ctor: 'NoOp'};
 
+var _narkisr$elm_ui$Systems_Model_AWS$endpoints = _elm_lang$core$Dict$fromList(
+	{
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'us-east-1',
+			_1: {
+				ctor: '_Tuple3',
+				_0: 'US East (N. Virginia)',
+				_1: 'ec2.us-east-1.amazonaws.com',
+				_2: {
+					ctor: '::',
+					_0: 'a',
+					_1: {
+						ctor: '::',
+						_0: 'b',
+						_1: {
+							ctor: '::',
+							_0: 'd',
+							_1: {
+								ctor: '::',
+								_0: 'e',
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'us-west-1',
+				_1: {
+					ctor: '_Tuple3',
+					_0: 'US West (N. California)',
+					_1: 'ec2.us-west-1.amazonaws.com',
+					_2: {
+						ctor: '::',
+						_0: 'a',
+						_1: {
+							ctor: '::',
+							_0: 'b',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'us-west-2',
+					_1: {
+						ctor: '_Tuple3',
+						_0: 'US West (Oregon)',
+						_1: 'ec2.us-west-2.amazonaws.com',
+						_2: {
+							ctor: '::',
+							_0: 'a',
+							_1: {
+								ctor: '::',
+								_0: 'b',
+								_1: {
+									ctor: '::',
+									_0: 'c',
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'eu-west-1',
+						_1: {
+							ctor: '_Tuple3',
+							_0: 'EU (Ireland)',
+							_1: 'ec2.eu-west-1.amazonaws.com',
+							_2: {
+								ctor: '::',
+								_0: 'a',
+								_1: {
+									ctor: '::',
+									_0: 'b',
+									_1: {
+										ctor: '::',
+										_0: 'c',
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'eu-central-1',
+							_1: {
+								ctor: '_Tuple3',
+								_0: 'EU (Frankfurt)',
+								_1: 'ec2.eu-central-1.amazonaws.com',
+								_2: {
+									ctor: '::',
+									_0: 'a',
+									_1: {
+										ctor: '::',
+										_0: 'b',
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'ap-southeast-1',
+								_1: {
+									ctor: '_Tuple3',
+									_0: 'Asia Pacific (Singapore)',
+									_1: 'ec2.ap-southeast-1.amazonaws.com',
+									_2: {
+										ctor: '::',
+										_0: 'a',
+										_1: {
+											ctor: '::',
+											_0: 'b',
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'ap-southeast-2',
+									_1: {
+										ctor: '_Tuple3',
+										_0: 'Asia Pacific (Sydney)',
+										_1: 'ec2.ap-southeast-2.amazonaws.com',
+										_2: {
+											ctor: '::',
+											_0: 'a',
+											_1: {
+												ctor: '::',
+												_0: 'b',
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'ap-northeast-1',
+										_1: {
+											ctor: '_Tuple3',
+											_0: 'Asia Pacific (Tokyo)',
+											_1: 'ec2.ap-northeast-1.amazonaws.com',
+											_2: {
+												ctor: '::',
+												_0: 'a',
+												_1: {
+													ctor: '::',
+													_0: 'c',
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'sa-east-1',
+											_1: {
+												ctor: '_Tuple3',
+												_0: 'South America (Sao Paulo)',
+												_1: 'ec2.sa-east-1.amazonaws.com',
+												_2: {
+													ctor: '::',
+													_0: 'a',
+													_1: {
+														ctor: '::',
+														_0: 'b',
+														_1: {
+															ctor: '::',
+															_0: 'c',
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$instanceTypes = {
+	ctor: '::',
+	_0: 't1.micro',
+	_1: {
+		ctor: '::',
+		_0: 'm1.small',
+		_1: {
+			ctor: '::',
+			_0: 'm1.medium',
+			_1: {
+				ctor: '::',
+				_0: 'm1.large',
+				_1: {
+					ctor: '::',
+					_0: 'm1.xlarge',
+					_1: {
+						ctor: '::',
+						_0: 'm3.medium',
+						_1: {
+							ctor: '::',
+							_0: 'm3.large',
+							_1: {
+								ctor: '::',
+								_0: 'm3.xlarge',
+								_1: {
+									ctor: '::',
+									_0: 'm3.2xlarge',
+									_1: {
+										ctor: '::',
+										_0: 'c1.medium',
+										_1: {
+											ctor: '::',
+											_0: 'c1.xlarge',
+											_1: {
+												ctor: '::',
+												_0: 'c1.xlarge',
+												_1: {
+													ctor: '::',
+													_0: 'cc2.8xlarge',
+													_1: {
+														ctor: '::',
+														_0: 'c3.large',
+														_1: {
+															ctor: '::',
+															_0: 'c3.xlarge',
+															_1: {
+																ctor: '::',
+																_0: 'c3.2xlarge',
+																_1: {
+																	ctor: '::',
+																	_0: 'c3.4xlarge',
+																	_1: {
+																		ctor: '::',
+																		_0: 'c3.8xlarge',
+																		_1: {
+																			ctor: '::',
+																			_0: 'r3.large',
+																			_1: {
+																				ctor: '::',
+																				_0: 'r3.xlarge',
+																				_1: {
+																					ctor: '::',
+																					_0: 'r3.2xlarge',
+																					_1: {
+																						ctor: '::',
+																						_0: 'r3.4xlarge',
+																						_1: {
+																							ctor: '::',
+																							_0: 'r3.8xlarge',
+																							_1: {
+																								ctor: '::',
+																								_0: 'm2.xlarge',
+																								_1: {
+																									ctor: '::',
+																									_0: 'm2.2xlarge',
+																									_1: {
+																										ctor: '::',
+																										_0: 'm2.4xlarge',
+																										_1: {
+																											ctor: '::',
+																											_0: 'cr1.8xlarge',
+																											_1: {
+																												ctor: '::',
+																												_0: 'hi1.4xlarge',
+																												_1: {
+																													ctor: '::',
+																													_0: 'cg1.4xlarge',
+																													_1: {ctor: '[]'}
+																												}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_AWS$Volume = F5(
+	function (a, b, c, d, e) {
+		return {type_: a, size: b, iops: c, device: d, clear: e};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyVolume = A5(_narkisr$elm_ui$Systems_Model_AWS$Volume, 'Magnetic', 50, _elm_lang$core$Maybe$Nothing, '', false);
+var _narkisr$elm_ui$Systems_Model_AWS$Block = F2(
+	function (a, b) {
+		return {volume: a, device: b};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyBlock = A2(_narkisr$elm_ui$Systems_Model_AWS$Block, '', '');
+var _narkisr$elm_ui$Systems_Model_AWS$VPC = F3(
+	function (a, b, c) {
+		return {subnetId: a, vpcId: b, assignPublic: c};
+	});
+var _narkisr$elm_ui$Systems_Model_AWS$emptyVpc = A3(_narkisr$elm_ui$Systems_Model_AWS$VPC, '', '', false);
+var _narkisr$elm_ui$Systems_Model_AWS$AWS = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {instanceType: a, instanceId: b, keyName: c, endpoint: d, availabilityZone: e, securityGroups: f, ebsOptimized: g, volumes: h, blockDevices: i, vpc: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Systems_Model_AWS$emptyAws = function () {
+	var instanceType = function () {
+		var _p0 = _elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_AWS$instanceTypes);
+		if (_p0.ctor === 'Just') {
+			return _p0._0;
+		} else {
+			return '';
+		}
+	}();
+	var _p1 = A2(
+		_elm_lang$core$Maybe$withDefault,
+		{
+			ctor: '_Tuple3',
+			_0: '',
+			_1: '',
+			_2: {ctor: '[]'}
+		},
+		A2(_elm_lang$core$Dict$get, 'us-east-1', _narkisr$elm_ui$Systems_Model_AWS$endpoints));
+	var url = _p1._1;
+	var justString = _elm_lang$core$Maybe$Just('');
+	return _narkisr$elm_ui$Systems_Model_AWS$AWS(instanceType)(_elm_lang$core$Maybe$Nothing)('')(url)(_elm_lang$core$Maybe$Nothing)(
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}))(
+		_elm_lang$core$Maybe$Just(false))(
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}))(
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}))(
+		_elm_lang$core$Maybe$Just(_narkisr$elm_ui$Systems_Model_AWS$emptyVpc));
+}();
+
+var _narkisr$elm_ui$Systems_Model_GCE$zones = {
+	ctor: '::',
+	_0: 'us-east1-b',
+	_1: {
+		ctor: '::',
+		_0: 'us-east1-c',
+		_1: {
+			ctor: '::',
+			_0: 'us-east1-d',
+			_1: {
+				ctor: '::',
+				_0: 'us-central1-a',
+				_1: {
+					ctor: '::',
+					_0: 'us-central1-b',
+					_1: {
+						ctor: '::',
+						_0: 'us-central1-c',
+						_1: {
+							ctor: '::',
+							_0: 'us-central1-f',
+							_1: {
+								ctor: '::',
+								_0: 'europe-west1-b',
+								_1: {
+									ctor: '::',
+									_0: 'europe-west1-c',
+									_1: {
+										ctor: '::',
+										_0: 'europe-west1-d',
+										_1: {
+											ctor: '::',
+											_0: 'asia-east1-a',
+											_1: {
+												ctor: '::',
+												_0: 'asia-east1-b',
+												_1: {
+													ctor: '::',
+													_0: 'asia-east1-c',
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_GCE$machineTypes = {
+	ctor: '::',
+	_0: 'n1-standard-1',
+	_1: {
+		ctor: '::',
+		_0: 'n1-standard-2',
+		_1: {
+			ctor: '::',
+			_0: 'n1-standard-4',
+			_1: {
+				ctor: '::',
+				_0: 'n1-standard-8',
+				_1: {
+					ctor: '::',
+					_0: 'n1-standard-16',
+					_1: {
+						ctor: '::',
+						_0: 'n1-standard-32',
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_GCE$GCE = F5(
+	function (a, b, c, d, e) {
+		return {machineType: a, zone: b, tags: c, projectId: d, staticIp: e};
+	});
+var _narkisr$elm_ui$Systems_Model_GCE$emptyGce = function () {
+	var zone = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$zones));
+	var type_ = A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_GCE$machineTypes));
+	return A5(
+		_narkisr$elm_ui$Systems_Model_GCE$GCE,
+		type_,
+		zone,
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}),
+		'',
+		_elm_lang$core$Maybe$Just(''));
+}();
+
+var _narkisr$elm_ui$Systems_Model_Digital$regions = {
+	ctor: '::',
+	_0: 'lon1',
+	_1: {
+		ctor: '::',
+		_0: 'nyc1',
+		_1: {
+			ctor: '::',
+			_0: 'ams1',
+			_1: {
+				ctor: '::',
+				_0: 'sfo1',
+				_1: {
+					ctor: '::',
+					_0: 'nyc2',
+					_1: {
+						ctor: '::',
+						_0: 'ams2',
+						_1: {
+							ctor: '::',
+							_0: 'sgp1',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_Digital$sizes = {
+	ctor: '::',
+	_0: '512mb',
+	_1: {
+		ctor: '::',
+		_0: '1gb',
+		_1: {
+			ctor: '::',
+			_0: '2gb',
+			_1: {
+				ctor: '::',
+				_0: '4gb',
+				_1: {
+					ctor: '::',
+					_0: '8gb',
+					_1: {
+						ctor: '::',
+						_0: '16gb',
+						_1: {
+							ctor: '::',
+							_0: '32gb',
+							_1: {
+								ctor: '::',
+								_0: '48gb',
+								_1: {
+									ctor: '::',
+									_0: '64gb',
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _narkisr$elm_ui$Systems_Model_Digital$Digital = F3(
+	function (a, b, c) {
+		return {size: a, region: b, privateNetworking: c};
+	});
+var _narkisr$elm_ui$Systems_Model_Digital$emptyDigital = A3(
+	_narkisr$elm_ui$Systems_Model_Digital$Digital,
+	A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$sizes)),
+	A2(
+		_elm_lang$core$Maybe$withDefault,
+		'',
+		_elm_lang$core$List$head(_narkisr$elm_ui$Systems_Model_Digital$regions)),
+	false);
+
+var _narkisr$elm_ui$Systems_Model_Openstack$Volume = F3(
+	function (a, b, c) {
+		return {device: a, size: b, clear: c};
+	});
+var _narkisr$elm_ui$Systems_Model_Openstack$emptyVolume = A3(_narkisr$elm_ui$Systems_Model_Openstack$Volume, '', 0, false);
+var _narkisr$elm_ui$Systems_Model_Openstack$Openstack = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {flavor: a, tenant: b, keyName: c, floatingIp: d, floatingIpPool: e, securityGroups: f, networks: g, volumes: h};
+	});
+var _narkisr$elm_ui$Systems_Model_Openstack$emptyOpenstack = A8(
+	_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
+	'',
+	'',
+	'',
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Maybe$Nothing,
+	_elm_lang$core$Maybe$Nothing,
+	{ctor: '[]'},
+	_elm_lang$core$Maybe$Nothing);
+
+var _narkisr$elm_ui$Systems_Model_Physical$Physical = F2(
+	function (a, b) {
+		return {mac: a, broadcast: b};
+	});
+var _narkisr$elm_ui$Systems_Model_Physical$emptyPhysical = A2(_narkisr$elm_ui$Systems_Model_Physical$Physical, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+
+var _narkisr$elm_ui$Systems_Model_KVM$KVM = function (a) {
+	return {node: a};
+};
+var _narkisr$elm_ui$Systems_Model_KVM$emptyKVM = _narkisr$elm_ui$Systems_Model_KVM$KVM('');
+
+var _narkisr$elm_ui$Systems_Model_Common$Machine = F7(
+	function (a, b, c, d, e, f, g) {
+		return {user: a, hostname: b, domain: c, ip: d, os: e, ram: f, cpu: g};
+	});
+var _narkisr$elm_ui$Systems_Model_Common$emptyMachine = A7(_narkisr$elm_ui$Systems_Model_Common$Machine, '', '', '', _elm_lang$core$Maybe$Nothing, '', _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+var _narkisr$elm_ui$Systems_Model_Common$resourcedMachine = F2(
+	function (cpu, ram) {
+		return A7(
+			_narkisr$elm_ui$Systems_Model_Common$Machine,
+			'',
+			'',
+			'',
+			_elm_lang$core$Maybe$Just(''),
+			'',
+			_elm_lang$core$Maybe$Just(ram),
+			_elm_lang$core$Maybe$Just(cpu));
+	});
+var _narkisr$elm_ui$Systems_Model_Common$System = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {owner: a, env: b, type_: c, machine: d, aws: e, gce: f, digital: g, openstack: h, physical: i, kvm: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _narkisr$elm_ui$Systems_Model_Common$emptySystem = function () {
+	var base = A3(_narkisr$elm_ui$Systems_Model_Common$System, '', '', '');
+	return A7(base, _narkisr$elm_ui$Systems_Model_Common$emptyMachine, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing);
+}();
+
+var _narkisr$elm_ui$Systems_Decoders$machineDecoder = A8(
+	_elm_lang$core$Json_Decode$map7,
+	_narkisr$elm_ui$Systems_Model_Common$Machine,
+	A2(_elm_lang$core$Json_Decode$field, 'user', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'hostname', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'domain', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'ip', _elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'os', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'ram', _elm_lang$core$Json_Decode$int)),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'cpu', _elm_lang$core$Json_Decode$int)));
+var _narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Systems_Model_Openstack$Volume,
+	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'clear', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$openstackDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_elm_lang$core$Json_Decode$map,
+								_narkisr$elm_ui$Systems_Model_Openstack$Openstack,
+								A2(_elm_lang$core$Json_Decode$field, 'flavor', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'tenant', _elm_lang$core$Json_Decode$string)),
+						A2(_elm_lang$core$Json_Decode$field, 'key-name', _elm_lang$core$Json_Decode$string)),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(_elm_lang$core$Json_Decode$field, 'floating-ip', _elm_lang$core$Json_Decode$string))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode$field, 'floating-ip-pool', _elm_lang$core$Json_Decode$string))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'security-groups',
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'networks',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'volumes',
+			_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$openstackVolumeDecoder))));
+var _narkisr$elm_ui$Systems_Decoders$kvmDecoder = A2(
+	_elm_lang$core$Json_Decode$map,
+	_narkisr$elm_ui$Systems_Model_KVM$KVM,
+	A2(_elm_lang$core$Json_Decode$field, 'node', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Systems_Decoders$physicalDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_narkisr$elm_ui$Systems_Model_Physical$Physical,
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'mac', _elm_lang$core$Json_Decode$string)),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'broadcast', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Systems_Decoders$digitalDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Systems_Model_Digital$Digital,
+	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'region', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'private-networking', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$gceDecoder = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_narkisr$elm_ui$Systems_Model_GCE$GCE,
+	A2(_elm_lang$core$Json_Decode$field, 'machine-type', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'zone', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'tags',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
+	A2(_elm_lang$core$Json_Decode$field, 'project-id', _elm_lang$core$Json_Decode$string),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'static-ip', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_narkisr$elm_ui$Systems_Model_AWS$Volume,
+	A2(_elm_lang$core$Json_Decode$field, 'volume-type', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'size', _elm_lang$core$Json_Decode$int),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'iops', _elm_lang$core$Json_Decode$int)),
+	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'clear', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$blockDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_narkisr$elm_ui$Systems_Model_AWS$Block,
+	A2(_elm_lang$core$Json_Decode$field, 'volume', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'device', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Systems_Decoders$vpcDecoder = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Systems_Model_AWS$VPC,
+	A2(_elm_lang$core$Json_Decode$field, 'subnetId', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'vpcId', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'assignIp', _elm_lang$core$Json_Decode$bool));
+var _narkisr$elm_ui$Systems_Decoders$awsDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_narkisr$elm_ui$Common_Http$apply,
+								A2(
+									_narkisr$elm_ui$Common_Http$apply,
+									A2(
+										_elm_lang$core$Json_Decode$map,
+										_narkisr$elm_ui$Systems_Model_AWS$AWS,
+										A2(_elm_lang$core$Json_Decode$field, 'instance-type', _elm_lang$core$Json_Decode$string)),
+									_elm_lang$core$Json_Decode$maybe(
+										A2(_elm_lang$core$Json_Decode$field, 'instance-id', _elm_lang$core$Json_Decode$string))),
+								A2(_elm_lang$core$Json_Decode$field, 'key-name', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'endpoint', _elm_lang$core$Json_Decode$string)),
+						_elm_lang$core$Json_Decode$maybe(
+							A2(_elm_lang$core$Json_Decode$field, 'availability-zone', _elm_lang$core$Json_Decode$string))),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(
+							_elm_lang$core$Json_Decode$field,
+							'security-groups',
+							_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode$field, 'ebs-optimized', _elm_lang$core$Json_Decode$bool))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'volumes',
+					_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$awsVolumeDecoder)))),
+		_elm_lang$core$Json_Decode$maybe(
+			A2(
+				_elm_lang$core$Json_Decode$field,
+				'block-devices',
+				_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_Decoders$blockDecoder)))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'vpc', _narkisr$elm_ui$Systems_Decoders$vpcDecoder)));
+var _narkisr$elm_ui$Systems_Decoders$systemDecoder = A2(
+	_narkisr$elm_ui$Common_Http$apply,
+	A2(
+		_narkisr$elm_ui$Common_Http$apply,
+		A2(
+			_narkisr$elm_ui$Common_Http$apply,
+			A2(
+				_narkisr$elm_ui$Common_Http$apply,
+				A2(
+					_narkisr$elm_ui$Common_Http$apply,
+					A2(
+						_narkisr$elm_ui$Common_Http$apply,
+						A2(
+							_narkisr$elm_ui$Common_Http$apply,
+							A2(
+								_narkisr$elm_ui$Common_Http$apply,
+								A2(
+									_narkisr$elm_ui$Common_Http$apply,
+									A2(
+										_elm_lang$core$Json_Decode$map,
+										_narkisr$elm_ui$Systems_Model_Common$System,
+										A2(_elm_lang$core$Json_Decode$field, 'owner', _elm_lang$core$Json_Decode$string)),
+									A2(_elm_lang$core$Json_Decode$field, 'env', _elm_lang$core$Json_Decode$string)),
+								A2(_elm_lang$core$Json_Decode$field, 'type', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'machine', _narkisr$elm_ui$Systems_Decoders$machineDecoder)),
+						_elm_lang$core$Json_Decode$maybe(
+							A2(_elm_lang$core$Json_Decode$field, 'aws', _narkisr$elm_ui$Systems_Decoders$awsDecoder))),
+					_elm_lang$core$Json_Decode$maybe(
+						A2(_elm_lang$core$Json_Decode$field, 'gce', _narkisr$elm_ui$Systems_Decoders$gceDecoder))),
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode$field, 'digital-ocean', _narkisr$elm_ui$Systems_Decoders$digitalDecoder))),
+			_elm_lang$core$Json_Decode$maybe(
+				A2(_elm_lang$core$Json_Decode$field, 'openstack', _narkisr$elm_ui$Systems_Decoders$openstackDecoder))),
+		_elm_lang$core$Json_Decode$maybe(
+			A2(_elm_lang$core$Json_Decode$field, 'physical', _narkisr$elm_ui$Systems_Decoders$physicalDecoder))),
+	_elm_lang$core$Json_Decode$maybe(
+		A2(_elm_lang$core$Json_Decode$field, 'kvm', _narkisr$elm_ui$Systems_Decoders$kvmDecoder)));
+
+var _narkisr$elm_ui$Search$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'Result':
+				if (_p0._1 === true) {
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{parsed: _p0._0.result, input: _p0._0.source, error: ''});
+				} else {
+					return _elm_lang$core$Native_Utils.update(
+						model,
+						{error: _p0._0.message, input: _p0._0.source});
+				}
+			case 'Parse':
+				return model;
+			default:
+				return model;
+		}
+	});
+var _narkisr$elm_ui$Search$init = {input: '', parsed: '', error: ''};
+var _narkisr$elm_ui$Search$parser = _elm_lang$core$Native_Platform.outgoingPort(
+	'parser',
+	function (v) {
+		return v;
+	});
+var _narkisr$elm_ui$Search$Model = F3(
+	function (a, b, c) {
+		return {input: a, parsed: b, error: c};
+	});
+var _narkisr$elm_ui$Search$ParseResult = F3(
+	function (a, b, c) {
+		return {message: a, source: b, result: c};
+	});
+var _narkisr$elm_ui$Search$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Search$Result = F2(
+	function (a, b) {
+		return {ctor: 'Result', _0: a, _1: b};
+	});
+var _narkisr$elm_ui$Search$Parse = function (a) {
+	return {ctor: 'Parse', _0: a};
+};
+var _narkisr$elm_ui$Search$searchForm = function (model) {
+	return A2(
+		_elm_lang$html$Html$form,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('form-horizontal'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('form-group'),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$html$Html_Attributes$attribute, 'onkeypress', 'return event.keyCode != 13;'),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$label,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$for('systemSearch'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('col-sm-1 control-label'),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Filter:'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('col-sm-6'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$input,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('form-control'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$type_('search'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$id('systemSearch'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$placeholder(''),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onInput(_narkisr$elm_ui$Search$Parse),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _narkisr$elm_ui$Search$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('container-fluid'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _narkisr$elm_ui$Common_Components$row_(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col-md-8 col-md-offset-2'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _narkisr$elm_ui$Search$searchForm(model),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+
+var _narkisr$elm_ui$Systems_List$systemPair = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$index, 1, _narkisr$elm_ui$Systems_Decoders$systemDecoder));
+var _narkisr$elm_ui$Systems_List$systemPage = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'meta',
+		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$int)),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'systems',
+		_elm_lang$core$Json_Decode$list(_narkisr$elm_ui$Systems_List$systemPair)));
+var _narkisr$elm_ui$Systems_List$flash = function (model) {
+	var result = _elm_lang$html$Html$div(
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('callout callout-danger'),
+			_1: {ctor: '[]'}
+		});
+	var _p0 = model.error;
+	switch (_p0.ctor) {
+		case 'NoError':
+			return A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{ctor: '[]'});
+		case 'NoSystemSelected':
+			return A2(
+				_narkisr$elm_ui$Common_Components$callout,
+				'danger',
+				_narkisr$elm_ui$Common_Components$info('Please select a system first'));
+		default:
+			return A2(
+				_narkisr$elm_ui$Common_Components$callout,
+				'danger',
+				_narkisr$elm_ui$Common_Components$info(_p0._0));
+	}
+};
+var _narkisr$elm_ui$Systems_List$systemRow = F2(
+	function (id, _p1) {
+		var _p2 = _p1;
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(id),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							function (_) {
+								return _.hostname;
+							}(_p2.machine)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(_p2.type_),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p2.env),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p2.owner),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		};
+	});
+var _narkisr$elm_ui$Systems_List$setSystems = F2(
+	function (model, _p3) {
+		var _p4 = _p3;
+		var newTable = A2(
+			_narkisr$elm_ui$Table$update,
+			_narkisr$elm_ui$Table$UpdateRows(_p4._1),
+			model.table);
+		var total = A2(
+			_elm_lang$core$Maybe$withDefault,
+			0,
+			A2(_elm_lang$core$Dict$get, 'total', _p4._0));
+		var newPager = A2(
+			_narkisr$elm_ui$Pager$update,
+			_narkisr$elm_ui$Pager$UpdateTotal(
+				_elm_lang$core$Basics$toFloat(total)),
+			model.pager);
+		return _narkisr$elm_ui$Common_Utils$none(
+			_elm_lang$core$Native_Utils.update(
+				model,
+				{systems: _p4, pager: newPager, table: newTable}));
+	});
+var _narkisr$elm_ui$Systems_List$Model = F5(
+	function (a, b, c, d, e) {
+		return {error: a, systems: b, pager: c, table: d, search: e};
+	});
+var _narkisr$elm_ui$Systems_List$NoError = {ctor: 'NoError'};
+var _narkisr$elm_ui$Systems_List$SearchParseFailed = function (a) {
+	return {ctor: 'SearchParseFailed', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$NoSystemSelected = {ctor: 'NoSystemSelected'};
+var _narkisr$elm_ui$Systems_List$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_List$Searching = function (a) {
+	return {ctor: 'Searching', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$listSearch = F2(
+	function (result, b) {
+		return _narkisr$elm_ui$Systems_List$Searching(
+			A2(_narkisr$elm_ui$Search$Result, result, b));
+	});
+var _narkisr$elm_ui$Systems_List$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$GotoPage = function (a) {
+	return {ctor: 'GotoPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$view = function (model) {
+	var _p5 = model.systems;
+	var meta = _p5._0;
+	var systems = _p5._1;
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _narkisr$elm_ui$Common_Components$row_(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col-md-12'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$map,
+								_narkisr$elm_ui$Systems_List$Searching,
+								_narkisr$elm_ui$Search$view(model.search)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _narkisr$elm_ui$Common_Components$row_(
+					{
+						ctor: '::',
+						_0: _narkisr$elm_ui$Systems_List$flash(model),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('col-md-offset-1 col-md-10'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _narkisr$elm_ui$Common_Components$panelDefault_(
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$map,
+												_narkisr$elm_ui$Systems_List$LoadPage,
+												_narkisr$elm_ui$Table$view(model.table)),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _narkisr$elm_ui$Common_Components$row_(
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$map,
+								_narkisr$elm_ui$Systems_List$GotoPage,
+								_narkisr$elm_ui$Pager$view(model.pager)),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _narkisr$elm_ui$Systems_List$SetSystems = function (a) {
+	return {ctor: 'SetSystems', _0: a};
+};
+var _narkisr$elm_ui$Systems_List$getSystems = F2(
+	function (page, offset) {
+		return A3(
+			_narkisr$elm_ui$Common_Http$getJson,
+			_narkisr$elm_ui$Systems_List$systemPage,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'/systems?page=',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(page),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'&offset=',
+						_elm_lang$core$Basics$toString(offset)))),
+			_narkisr$elm_ui$Systems_List$SetSystems);
+	});
+var _narkisr$elm_ui$Systems_List$init = function () {
+	var search = _narkisr$elm_ui$Search$init;
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'systemsListing',
+		true,
+		{
+			ctor: '::',
+			_0: '#',
+			_1: {
+				ctor: '::',
+				_0: 'Hostname',
+				_1: {
+					ctor: '::',
+					_0: 'Type',
+					_1: {
+						ctor: '::',
+						_0: 'Env',
+						_1: {
+							ctor: '::',
+							_0: 'Owner',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		},
+		_narkisr$elm_ui$Systems_List$systemRow,
+		'Systems');
+	var systems = {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Dict$empty,
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: '', _1: _narkisr$elm_ui$Systems_Model_Common$emptySystem},
+			_1: {ctor: '[]'}
+		}
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: A5(_narkisr$elm_ui$Systems_List$Model, _narkisr$elm_ui$Systems_List$NoError, systems, _narkisr$elm_ui$Pager$init, table, search),
+		_1: A2(_narkisr$elm_ui$Systems_List$getSystems, 1, 10)
+	};
+}();
+var _narkisr$elm_ui$Systems_List$getSystemsQuery = F3(
+	function (page, offset, query) {
+		return A3(
+			_narkisr$elm_ui$Common_Http$getJson,
+			_narkisr$elm_ui$Systems_List$systemPage,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'/systems/query?page=',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(page),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'&offset=',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(offset),
+							A2(_elm_lang$core$Basics_ops['++'], '&query=', query))))),
+			_narkisr$elm_ui$Systems_List$SetSystems);
+	});
+var _narkisr$elm_ui$Systems_List$update = F2(
+	function (msg, _p6) {
+		var _p7 = _p6;
+		var _p14 = _p7;
+		var _p8 = msg;
+		switch (_p8.ctor) {
+			case 'SetSystems':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p8._0,
+					_p14,
+					_narkisr$elm_ui$Systems_List$setSystems(_p14),
+					_narkisr$elm_ui$Systems_List$NoOp);
+			case 'GotoPage':
+				var _p11 = _p8._0;
+				var _p9 = _p11;
+				if (_p9.ctor === 'NextPage') {
+					var _p10 = _p9._0;
+					var newPager = A2(_narkisr$elm_ui$Pager$update, _p11, _p14.pager);
+					return _elm_lang$core$String$isEmpty(_p14.search.input) ? {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p14,
+							{pager: newPager}),
+						_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p10, 10)
+					} : {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p14,
+							{pager: newPager}),
+						_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p10, 10, _p14.search.parsed)
+					};
+				} else {
+					return _narkisr$elm_ui$Common_Utils$none(_p14);
+				}
+			case 'Searching':
+				var _p13 = _p8._0;
+				var newSearch = A2(_narkisr$elm_ui$Search$update, _p13, _p14.search);
+				var _p12 = _p13;
+				switch (_p12.ctor) {
+					case 'Result':
+						if (_p12._1 === true) {
+							return {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p14,
+									{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
+								_1: A3(_narkisr$elm_ui$Systems_List$getSystemsQuery, _p14.pager.page, 10, newSearch.parsed)
+							};
+						} else {
+							return _elm_lang$core$String$isEmpty(newSearch.input) ? {
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Native_Utils.update(
+									_p14,
+									{search: newSearch, error: _narkisr$elm_ui$Systems_List$NoError}),
+								_1: A2(_narkisr$elm_ui$Systems_List$getSystems, _p14.pager.page, 10)
+							} : _narkisr$elm_ui$Common_Utils$none(
+								_elm_lang$core$Native_Utils.update(
+									_p14,
+									{
+										search: newSearch,
+										error: _narkisr$elm_ui$Systems_List$SearchParseFailed(newSearch.error)
+									}));
+						}
+					case 'Parse':
+						return {
+							ctor: '_Tuple2',
+							_0: _p14,
+							_1: _narkisr$elm_ui$Search$parser(_p12._0)
+						};
+					default:
+						return _narkisr$elm_ui$Common_Utils$none(_p14);
+				}
+			case 'LoadPage':
+				var newTable = A2(_narkisr$elm_ui$Table$update, _p8._0, _p14.table);
+				return (_elm_lang$core$Native_Utils.eq(_p7.error, _narkisr$elm_ui$Systems_List$NoSystemSelected) && (!_elm_lang$core$Native_Utils.eq(newTable.selected, _elm_lang$core$Set$empty))) ? _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p14,
+						{table: newTable, error: _narkisr$elm_ui$Systems_List$NoError})) : _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p14,
+						{table: newTable}));
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p14);
+		}
+	});
+
+var _narkisr$elm_ui$Jobs_Common$JobResponse = F3(
+	function (a, b, c) {
+		return {message: a, id: b, job: c};
+	});
+var _narkisr$elm_ui$Jobs_Common$jobResponse = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_narkisr$elm_ui$Jobs_Common$JobResponse,
+	A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'id', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'job', _elm_lang$core$Json_Decode$string));
+var _narkisr$elm_ui$Jobs_Common$runJob = F3(
+	function (id, job, msg) {
+		return A2(
+			_elm_lang$http$Http$send,
+			msg,
+			A3(
+				_elm_lang$http$Http$post,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'/jobs/',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						job,
+						A2(_elm_lang$core$Basics_ops['++'], '/', id))),
+				_elm_lang$http$Http$emptyBody,
+				_narkisr$elm_ui$Jobs_Common$jobResponse));
+	});
+
+var _narkisr$elm_ui$Systems_Launch$message = function (job) {
+	return {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$html$Html$h4,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text('Notice!'),
+				_1: {ctor: '[]'}
+			}),
+		_1: {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('A '),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$strong,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(job),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(' operation '),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('will be performed on the following systems:'),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		}
+	};
+};
+var _narkisr$elm_ui$Systems_Launch$systemRow = F2(
+	function (id, _p0) {
+		var _p1 = _p0;
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$td,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(id),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$td,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							function (_) {
+								return _.hostname;
+							}(_p1.machine)),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$td,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(_p1.type_),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$td,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(_p1.env),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$td,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(_p1.owner),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		};
+	});
+var _narkisr$elm_ui$Systems_Launch$Model = F2(
+	function (a, b) {
+		return {job: a, table: b};
+	});
+var _narkisr$elm_ui$Systems_Launch$init = function () {
+	var table = A5(
+		_narkisr$elm_ui$Table$init,
+		'launchListing',
+		false,
+		{
+			ctor: '::',
+			_0: '#',
+			_1: {
+				ctor: '::',
+				_0: 'Hostname',
+				_1: {
+					ctor: '::',
+					_0: 'Type',
+					_1: {
+						ctor: '::',
+						_0: 'Env',
+						_1: {
+							ctor: '::',
+							_0: 'Owner',
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		},
+		_narkisr$elm_ui$Systems_Launch$systemRow,
+		'Systems');
+	return _narkisr$elm_ui$Common_Utils$none(
+		A2(_narkisr$elm_ui$Systems_Launch$Model, '', table));
+}();
+var _narkisr$elm_ui$Systems_Launch$Cancel = {ctor: 'Cancel'};
+var _narkisr$elm_ui$Systems_Launch$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Launch$Run = {ctor: 'Run'};
+var _narkisr$elm_ui$Systems_Launch$JobLaunched = function (a) {
+	return {ctor: 'JobLaunched', _0: a};
+};
+var _narkisr$elm_ui$Systems_Launch$update = F2(
+	function (msg, _p2) {
+		var _p3 = _p2;
+		var _p7 = _p3;
+		var _p4 = msg;
+		switch (_p4.ctor) {
+			case 'JobLaunched':
+				return A4(
+					_narkisr$elm_ui$Common_Errors$successHandler,
+					_p4._0,
+					_p7,
+					function (res) {
+						return _narkisr$elm_ui$Common_Utils$none(_p7);
+					},
+					_narkisr$elm_ui$Systems_Launch$NoOp);
+			case 'SetupJob':
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{job: _p4._0}));
+			case 'LoadPage':
+				var newTable = A2(_narkisr$elm_ui$Table$update, _p4._0, _p7.table);
+				return _narkisr$elm_ui$Common_Utils$none(
+					_elm_lang$core$Native_Utils.update(
+						_p7,
+						{table: newTable}));
+			case 'Run':
+				var runAll = _elm_lang$core$Platform_Cmd$batch(
+					A2(
+						_elm_lang$core$List$map,
+						function (id) {
+							return A3(_narkisr$elm_ui$Jobs_Common$runJob, id, _p3.job, _narkisr$elm_ui$Systems_Launch$JobLaunched);
+						},
+						A2(
+							_elm_lang$core$List$map,
+							function (_p5) {
+								var _p6 = _p5;
+								return _p6._0;
+							},
+							_p7.table.rows)));
+				return {ctor: '_Tuple2', _0: _p7, _1: runAll};
+			case 'Cancel':
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p7);
+		}
+	});
+var _narkisr$elm_ui$Systems_Launch$LoadPage = function (a) {
+	return {ctor: 'LoadPage', _0: a};
+};
+var _narkisr$elm_ui$Systems_Launch$view = function (_p8) {
+	var _p9 = _p8;
+	var systemsTable = _narkisr$elm_ui$Common_Components$panelDefault_(
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$map,
+				_narkisr$elm_ui$Systems_Launch$LoadPage,
+				_narkisr$elm_ui$Table$view(_p9.table)),
+			_1: {ctor: '[]'}
+		});
+	return A4(
+		_narkisr$elm_ui$Common_Components$dangerCallout,
+		_narkisr$elm_ui$Systems_Launch$message(_p9.job),
+		systemsTable,
+		_narkisr$elm_ui$Systems_Launch$Cancel,
+		_narkisr$elm_ui$Systems_Launch$Run);
+};
+var _narkisr$elm_ui$Systems_Launch$SetupJob = function (a) {
+	return {ctor: 'SetupJob', _0: a};
+};
+
+var _narkisr$elm_ui$Nav_Common$Users = {ctor: 'Users'};
+var _narkisr$elm_ui$Nav_Common$Stacks = {ctor: 'Stacks'};
+var _narkisr$elm_ui$Nav_Common$Templates = {ctor: 'Templates'};
+var _narkisr$elm_ui$Nav_Common$Jobs = {ctor: 'Jobs'};
+var _narkisr$elm_ui$Nav_Common$Types = {ctor: 'Types'};
+var _narkisr$elm_ui$Nav_Common$Systems = {ctor: 'Systems'};
+var _narkisr$elm_ui$Nav_Common$Stats = {ctor: 'Stats'};
+var _narkisr$elm_ui$Nav_Common$View = {ctor: 'View'};
+var _narkisr$elm_ui$Nav_Common$List = {ctor: 'List'};
+var _narkisr$elm_ui$Nav_Common$Edit = {ctor: 'Edit'};
+var _narkisr$elm_ui$Nav_Common$Delete = {ctor: 'Delete'};
+var _narkisr$elm_ui$Nav_Common$Launch = {ctor: 'Launch'};
+var _narkisr$elm_ui$Nav_Common$Add = {ctor: 'Add'};
+
+var _narkisr$elm_ui$Systems_Core$searching = F2(
+	function (result, b) {
+		return A2(_narkisr$elm_ui$Systems_List$listSearch, result, b);
+	});
+var _narkisr$elm_ui$Systems_Core$Model = F3(
+	function (a, b, c) {
+		return {systemsList: a, systemsLaunch: b, navChange: c};
+	});
+var _narkisr$elm_ui$Systems_Core$NoOp = {ctor: 'NoOp'};
+var _narkisr$elm_ui$Systems_Core$SystemsLaunch = function (a) {
+	return {ctor: 'SystemsLaunch', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$setupJob = F2(
+	function (msg, _p0) {
+		var _p1 = _p0;
+		var _p7 = _p1.systemsList;
+		var _p6 = _p1;
+		var table = _p7.table;
+		var _p2 = _p7.systems;
+		var systems = _p2._1;
+		var selected = A2(
+			_elm_lang$core$List$filter,
+			function (_p3) {
+				var _p4 = _p3;
+				return A2(_elm_lang$core$Set$member, _p4._0, table.selected);
+			},
+			systems);
+		var selectedTable = _elm_lang$core$Native_Utils.update(
+			table,
+			{rows: selected, selected: _elm_lang$core$Set$empty, id: 'launchListing'});
+		var _p5 = A2(
+			_narkisr$elm_ui$Systems_Launch$update,
+			msg,
+			_elm_lang$core$Native_Utils.update(
+				_p1.systemsLaunch,
+				{table: selectedTable}));
+		var newLaunch = _p5._0;
+		var effect = _p5._1;
+		if (_elm_lang$core$List$isEmpty(selected)) {
+			return _narkisr$elm_ui$Common_Utils$none(
+				_elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						systemsList: _elm_lang$core$Native_Utils.update(
+							_p7,
+							{error: _narkisr$elm_ui$Systems_List$NoSystemSelected})
+					}));
+		} else {
+			var newList = _elm_lang$core$Native_Utils.update(
+				_p7,
+				{error: _narkisr$elm_ui$Systems_List$NoError});
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					_p6,
+					{
+						systemsLaunch: newLaunch,
+						systemsList: newList,
+						navChange: _elm_lang$core$Maybe$Just('#/systems/launch')
+					}),
+				_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
+			};
+		}
+	});
+var _narkisr$elm_ui$Systems_Core$SystemsListing = function (a) {
+	return {ctor: 'SystemsListing', _0: a};
+};
+var _narkisr$elm_ui$Systems_Core$init = function () {
+	var _p8 = _narkisr$elm_ui$Systems_Launch$init;
+	var systemsLaunch = _p8._0;
+	var _p9 = _narkisr$elm_ui$Systems_List$init;
+	var systemsList = _p9._0;
+	var systemsListMsg = _p9._1;
+	return {
+		ctor: '_Tuple2',
+		_0: A3(_narkisr$elm_ui$Systems_Core$Model, systemsList, systemsLaunch, _elm_lang$core$Maybe$Nothing),
+		_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, systemsListMsg)
+	};
+}();
+var _narkisr$elm_ui$Systems_Core$update = F2(
+	function (msg, _p10) {
+		var _p11 = _p10;
+		var _p17 = _p11;
+		var _p12 = msg;
+		switch (_p12.ctor) {
+			case 'SystemsListing':
+				var _p13 = A2(_narkisr$elm_ui$Systems_List$update, _p12._0, _p11.systemsList);
+				var newSystems = _p13._0;
+				var effect = _p13._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p17,
+						{systemsList: newSystems}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsListing, effect)
+				};
+			case 'SystemsLaunch':
+				var _p16 = _p12._0;
+				var _p14 = _p16;
+				switch (_p14.ctor) {
+					case 'Cancel':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p17,
+								{
+									navChange: _elm_lang$core$Maybe$Just('#/systems/list')
+								}));
+					case 'JobLaunched':
+						return _narkisr$elm_ui$Common_Utils$none(
+							_elm_lang$core$Native_Utils.update(
+								_p17,
+								{
+									navChange: _elm_lang$core$Maybe$Just('#/jobs/list')
+								}));
+					case 'SetupJob':
+						return A2(_narkisr$elm_ui$Systems_Core$setupJob, _p16, _p17);
+					case 'Run':
+						var _p15 = A2(_narkisr$elm_ui$Systems_Launch$update, _p16, _p17.systemsLaunch);
+						var newLaunch = _p15._0;
+						var effect = _p15._1;
+						return {
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Native_Utils.update(
+								_p17,
+								{systemsLaunch: newLaunch}),
+							_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Systems_Core$SystemsLaunch, effect)
+						};
+					default:
+						return _narkisr$elm_ui$Common_Utils$none(_p17);
+				}
+			default:
+				return _narkisr$elm_ui$Common_Utils$none(_p17);
+		}
+	});
+var _narkisr$elm_ui$Systems_Core$view = F2(
+	function (path, model) {
+		var _p18 = path;
+		if (_p18 === 'launch') {
+			return A2(
+				_elm_lang$html$Html$map,
+				_narkisr$elm_ui$Systems_Core$SystemsLaunch,
+				_narkisr$elm_ui$Systems_Launch$view(model.systemsLaunch));
+		} else {
+			return A2(
+				_elm_lang$html$Html$map,
+				_narkisr$elm_ui$Systems_Core$SystemsListing,
+				_narkisr$elm_ui$Systems_List$view(model.systemsList));
+		}
+	});
+
 var _narkisr$elm_ui$Nav_Header$dropdown = function (attrs) {
 	return A2(
 		_elm_lang$core$List$append,
@@ -16220,46 +16253,8 @@ var _narkisr$elm_ui$Nav_Header$view = function (_p3) {
 					},
 					{
 						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$a,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$href('#'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('sidebar-toggle'),
-									_1: {
-										ctor: '::',
-										_0: A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'offcanvas'),
-										_1: {
-											ctor: '::',
-											_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'button'),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$span,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('sr-only'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Toggle navigation'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _narkisr$elm_ui$Nav_Header$topNav(_p4.session),
-							_1: {ctor: '[]'}
-						}
+						_0: _narkisr$elm_ui$Nav_Header$topNav(_p4.session),
+						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			}
@@ -16395,11 +16390,7 @@ var _narkisr$elm_ui$Nav_Side$adminMenus = {
 		{
 			ctor: '::',
 			_0: 'list',
-			_1: {
-				ctor: '::',
-				_0: 'add',
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		},
 		'fa fa-server'),
 	_1: {
@@ -16410,11 +16401,7 @@ var _narkisr$elm_ui$Nav_Side$adminMenus = {
 			{
 				ctor: '::',
 				_0: 'list',
-				_1: {
-					ctor: '::',
-					_0: 'stats',
-					_1: {ctor: '[]'}
-				}
+				_1: {ctor: '[]'}
 			},
 			'fa fa-tasks'),
 		_1: {ctor: '[]'}
@@ -16428,11 +16415,7 @@ var _narkisr$elm_ui$Nav_Side$userMenus = {
 		{
 			ctor: '::',
 			_0: 'list',
-			_1: {
-				ctor: '::',
-				_0: 'add',
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		},
 		'fa fa-server'),
 	_1: {
@@ -16443,11 +16426,7 @@ var _narkisr$elm_ui$Nav_Side$userMenus = {
 			{
 				ctor: '::',
 				_0: 'list',
-				_1: {
-					ctor: '::',
-					_0: 'stats',
-					_1: {ctor: '[]'}
-				}
+				_1: {ctor: '[]'}
 			},
 			'fa fa-tasks'),
 		_1: {ctor: '[]'}
@@ -16623,48 +16602,54 @@ var _narkisr$elm_ui$Application$JobsMsg = function (a) {
 var _narkisr$elm_ui$Application$SystemsMsg = function (a) {
 	return {ctor: 'SystemsMsg', _0: a};
 };
-var _narkisr$elm_ui$Application$routeView = function (_p0) {
-	var _p1 = _p0;
-	var _p3 = _p1.systems;
+var _narkisr$elm_ui$Application$searchMsg = F2(
+	function (v, b) {
+		var _p0 = v;
+		if (_p0.ctor === 'SearchMsg') {
+			return _narkisr$elm_ui$Application$SystemsMsg(
+				_narkisr$elm_ui$Systems_Core$SystemsListing(
+					A2(_narkisr$elm_ui$Systems_Core$searching, _p0._0, b)));
+		} else {
+			return _narkisr$elm_ui$Application$NoOp;
+		}
+	});
+var _narkisr$elm_ui$Application$routeView = function (_p1) {
+	var _p2 = _p1;
+	var _p4 = _p2.systems;
 	var last = A2(
 		_elm_lang$core$Maybe$withDefault,
 		_elm_lang$core$Maybe$Nothing,
-		_elm_lang$core$List$head(
-			A2(_elm_lang$core$Debug$log, '', _p1.history)));
-	var _p2 = last;
-	_v1_3:
+		_elm_lang$core$List$head(_p2.history));
+	var _p3 = last;
+	_v2_3:
 	do {
-		if (_p2.ctor === 'Just') {
-			switch (_p2._0.ctor) {
+		if (_p3.ctor === 'Just') {
+			switch (_p3._0.ctor) {
 				case 'SystemsRoute':
-					if (_p2._0._0 === 'list') {
-						return _narkisr$elm_ui$Common_Components$asList(
-							A2(
-								_elm_lang$html$Html$map,
-								_narkisr$elm_ui$Application$SystemsMsg,
-								_narkisr$elm_ui$Systems_Core$view(_p3)));
-					} else {
-						break _v1_3;
-					}
+					return _narkisr$elm_ui$Common_Components$asList(
+						A2(
+							_elm_lang$html$Html$map,
+							_narkisr$elm_ui$Application$SystemsMsg,
+							A2(_narkisr$elm_ui$Systems_Core$view, _p3._0._0, _p4)));
 				case 'JobsRoute':
-					if (_p2._0._0 === 'list') {
+					if (_p3._0._0 === 'list') {
 						return _narkisr$elm_ui$Common_Components$asList(
 							A2(
 								_elm_lang$html$Html$map,
 								_narkisr$elm_ui$Application$JobsMsg,
-								_narkisr$elm_ui$Jobs_Core$view(_p1.jobs)));
+								_narkisr$elm_ui$Jobs_Core$view(_p2.jobs)));
 					} else {
-						break _v1_3;
+						break _v2_3;
 					}
 				default:
 					return _narkisr$elm_ui$Common_Components$asList(
 						A2(
 							_elm_lang$html$Html$map,
 							_narkisr$elm_ui$Application$SystemsMsg,
-							_narkisr$elm_ui$Systems_Core$view(_p3)));
+							A2(_narkisr$elm_ui$Systems_Core$view, 'list', _p4)));
 			}
 		} else {
-			break _v1_3;
+			break _v2_3;
 		}
 	} while(false);
 	return _narkisr$elm_ui$Common_Components$asList(
@@ -16677,9 +16662,9 @@ var _narkisr$elm_ui$Application$routeView = function (_p0) {
 				_1: {ctor: '[]'}
 			}));
 };
-var _narkisr$elm_ui$Application$view = function (_p4) {
-	var _p5 = _p4;
-	var _p6 = _p5.nav;
+var _narkisr$elm_ui$Application$view = function (_p5) {
+	var _p6 = _p5;
+	var _p7 = _p6.nav;
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -16701,7 +16686,7 @@ var _narkisr$elm_ui$Application$view = function (_p4) {
 					_0: A2(
 						_elm_lang$html$Html$map,
 						_narkisr$elm_ui$Application$NavMsg,
-						_narkisr$elm_ui$Nav_Core$headerView(_p6)),
+						_narkisr$elm_ui$Nav_Core$headerView(_p7)),
 					_1: {
 						ctor: '::',
 						_0: A2(
@@ -16711,13 +16696,13 @@ var _narkisr$elm_ui$Application$view = function (_p4) {
 								_0: _elm_lang$html$Html_Attributes$class('content'),
 								_1: {ctor: '[]'}
 							},
-							_narkisr$elm_ui$Application$routeView(_p5)),
+							_narkisr$elm_ui$Application$routeView(_p6)),
 						_1: {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$map,
 								_narkisr$elm_ui$Application$NavMsg,
-								_narkisr$elm_ui$Nav_Core$sideView(_p6)),
+								_narkisr$elm_ui$Nav_Core$sideView(_p7)),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -16727,6 +16712,9 @@ var _narkisr$elm_ui$Application$view = function (_p4) {
 };
 var _narkisr$elm_ui$Application$NavigateTo = function (a) {
 	return {ctor: 'NavigateTo', _0: a};
+};
+var _narkisr$elm_ui$Application$SearchMsg = function (a) {
+	return {ctor: 'SearchMsg', _0: a};
 };
 var _narkisr$elm_ui$Application$MenuMsg = function (a) {
 	return {ctor: 'MenuMsg', _0: a};
@@ -16770,18 +16758,18 @@ var _narkisr$elm_ui$Application$init = function (location) {
 		_0: A2(_evancz$url_parser$UrlParser$parsePath, _narkisr$elm_ui$Application$route, location),
 		_1: {ctor: '[]'}
 	};
-	var _p7 = _narkisr$elm_ui$Systems_Core$init;
-	var systems = _p7._0;
-	var systemsMsg = _p7._1;
-	var _p8 = _narkisr$elm_ui$Users_Core$init;
-	var users = _p8._0;
-	var usersMsg = _p8._1;
-	var _p9 = _narkisr$elm_ui$Nav_Core$init;
-	var nav = _p9._0;
-	var navMsg = _p9._1;
-	var _p10 = _narkisr$elm_ui$Jobs_Core$init;
-	var jobs = _p10._0;
-	var jobsMsg = _p10._1;
+	var _p8 = _narkisr$elm_ui$Systems_Core$init;
+	var systems = _p8._0;
+	var systemsMsg = _p8._1;
+	var _p9 = _narkisr$elm_ui$Users_Core$init;
+	var users = _p9._0;
+	var usersMsg = _p9._1;
+	var _p10 = _narkisr$elm_ui$Nav_Core$init;
+	var nav = _p10._0;
+	var navMsg = _p10._1;
+	var _p11 = _narkisr$elm_ui$Jobs_Core$init;
+	var jobs = _p11._0;
+	var jobsMsg = _p11._1;
 	var msgs = {
 		ctor: '::',
 		_0: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$UsersMsg, usersMsg),
@@ -16806,89 +16794,91 @@ var _narkisr$elm_ui$Application$init = function (location) {
 	};
 };
 var _narkisr$elm_ui$Application$update = F2(
-	function (msg, _p11) {
-		var _p12 = _p11;
-		var _p16 = _p12;
-		var _p13 = msg;
-		switch (_p13.ctor) {
-			case 'JobsMsg':
-				var _p14 = A2(_narkisr$elm_ui$Jobs_Core$update, _p13._0, _p12.jobs);
-				var newJob = _p14._0;
-				var msgs = _p14._1;
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						_p16,
-						{jobs: newJob}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$JobsMsg, msgs)
-				};
-			case 'SystemsMsg':
-				var _p15 = A2(_narkisr$elm_ui$Systems_Core$update, _p13._0, _p12.systems);
-				var newSystems = _p15._0;
+	function (msg, _p12) {
+		var _p13 = _p12;
+		var _p20 = _p13;
+		var _p14 = msg;
+		switch (_p14.ctor) {
+			case 'NavMsg':
+				var _p15 = A2(_narkisr$elm_ui$Nav_Core$update, _p14._0, _p13.nav);
+				var newNav = _p15._0;
 				var msgs = _p15._1;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
-						_p16,
-						{systems: newSystems}),
-					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$SystemsMsg, msgs)
+						_p20,
+						{nav: newNav}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$NavMsg, msgs)
 				};
+			case 'JobsMsg':
+				var _p16 = A2(_narkisr$elm_ui$Jobs_Core$update, _p14._0, _p13.jobs);
+				var newJob = _p16._0;
+				var msgs = _p16._1;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						_p20,
+						{jobs: newJob}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$JobsMsg, msgs)
+				};
+			case 'SystemsMsg':
+				var _p19 = _p14._0;
+				var _p17 = A2(_narkisr$elm_ui$Systems_Core$update, _p19, _p13.systems);
+				var newSystems = _p17._0;
+				var msgs = _p17._1;
+				var systemMsgs = A2(_elm_lang$core$Platform_Cmd$map, _narkisr$elm_ui$Application$SystemsMsg, msgs);
+				var _p18 = _p19;
+				if (_p18.ctor === 'SystemsLaunch') {
+					var url = A2(_elm_lang$core$Maybe$withDefault, '#/systems/list', newSystems.navChange);
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p20,
+							{systems: newSystems}),
+						_1: _elm_lang$core$Platform_Cmd$batch(
+							{
+								ctor: '::',
+								_0: _elm_lang$navigation$Navigation$newUrl(url),
+								_1: {
+									ctor: '::',
+									_0: systemMsgs,
+									_1: {ctor: '[]'}
+								}
+							})
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							_p20,
+							{systems: newSystems}),
+						_1: systemMsgs
+					};
+				}
 			case 'UrlChange':
-				var newLocation = A2(_evancz$url_parser$UrlParser$parseHash, _narkisr$elm_ui$Application$route, _p13._0);
+				var newLocation = A2(_evancz$url_parser$UrlParser$parseHash, _narkisr$elm_ui$Application$route, _p14._0);
 				return _elm_lang$core$Native_Utils.eq(
 					newLocation,
 					_elm_lang$core$Maybe$Just(_narkisr$elm_ui$Application$Home)) ? {
 					ctor: '_Tuple2',
-					_0: _p16,
+					_0: _p20,
 					_1: _narkisr$elm_ui$Common_Redirect$redirect('/systems/list')
 				} : _narkisr$elm_ui$Common_Utils$none(
 					_elm_lang$core$Native_Utils.update(
-						_p16,
+						_p20,
 						{
-							history: {ctor: '::', _0: newLocation, _1: _p16.history}
+							history: {ctor: '::', _0: newLocation, _1: _p20.history}
 						}));
 			case 'NewUrl':
 				return {
 					ctor: '_Tuple2',
-					_0: _p16,
-					_1: _elm_lang$navigation$Navigation$newUrl(
-						A2(_elm_lang$core$Debug$log, '', _p13._0))
+					_0: _p20,
+					_1: _elm_lang$navigation$Navigation$newUrl(_p14._0)
 				};
 			default:
-				return _narkisr$elm_ui$Common_Utils$none(_p16);
+				return _narkisr$elm_ui$Common_Utils$none(_p20);
 		}
 	});
-
-var _narkisr$elm_ui$Common_Editor$editorInPort = _elm_lang$core$Native_Platform.incomingPort(
-	'editorInPort',
-	A2(
-		_elm_lang$core$Json_Decode$andThen,
-		function (x0) {
-			return A2(
-				_elm_lang$core$Json_Decode$andThen,
-				function (x1) {
-					return _elm_lang$core$Json_Decode$succeed(
-						{ctor: '_Tuple2', _0: x0, _1: x1});
-				},
-				A2(_elm_lang$core$Json_Decode$index, 1, _elm_lang$core$Json_Decode$string));
-		},
-		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
-var _narkisr$elm_ui$Common_Editor$editorOutPort = _elm_lang$core$Native_Platform.outgoingPort(
-	'editorOutPort',
-	function (v) {
-		return [v._0, v._1];
-	});
-var _narkisr$elm_ui$Common_Editor$unloadEditor = _narkisr$elm_ui$Common_Editor$editorOutPort(
-	{ctor: '_Tuple2', _0: 'unload', _1: ''});
-var _narkisr$elm_ui$Common_Editor$loadEditor = F2(
-	function (target, json) {
-		return _narkisr$elm_ui$Common_Editor$editorOutPort(
-			{ctor: '_Tuple2', _0: json, _1: target});
-	});
-var _narkisr$elm_ui$Common_Editor$Load = function (a) {
-	return {ctor: 'Load', _0: a};
-};
-var _narkisr$elm_ui$Common_Editor$NoOp = {ctor: 'NoOp'};
 
 var _narkisr$elm_ui$Common_Menu$intoMsg = function (msg) {
 	var _p0 = msg;
@@ -16925,6 +16915,44 @@ var _narkisr$elm_ui$Common_Menu$menuPort = _elm_lang$core$Native_Platform.incomi
 		},
 		A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string)));
 
+var _narkisr$elm_ui$Main$parsingErr = _elm_lang$core$Native_Platform.incomingPort(
+	'parsingErr',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (message) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (source) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (result) {
+							return _elm_lang$core$Json_Decode$succeed(
+								{message: message, source: source, result: result});
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'result', _elm_lang$core$Json_Decode$string));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'source', _elm_lang$core$Json_Decode$string));
+		},
+		A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string)));
+var _narkisr$elm_ui$Main$parsingOk = _elm_lang$core$Native_Platform.incomingPort(
+	'parsingOk',
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (message) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (source) {
+					return A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (result) {
+							return _elm_lang$core$Json_Decode$succeed(
+								{message: message, source: source, result: result});
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'result', _elm_lang$core$Json_Decode$string));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'source', _elm_lang$core$Json_Decode$string));
+		},
+		A2(_elm_lang$core$Json_Decode$field, 'message', _elm_lang$core$Json_Decode$string)));
 var _narkisr$elm_ui$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
@@ -16944,7 +16972,25 @@ var _narkisr$elm_ui$Main$subscriptions = function (model) {
 						return _narkisr$elm_ui$Application$JobsMsg(
 							_narkisr$elm_ui$Jobs_Core$JobsListing(_narkisr$elm_ui$Jobs_List$Polling));
 					}),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Platform_Sub$map,
+						function (v) {
+							return A2(_narkisr$elm_ui$Application$searchMsg, v, true);
+						},
+						_narkisr$elm_ui$Main$parsingOk(_narkisr$elm_ui$Application$SearchMsg)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$Platform_Sub$map,
+							function (v) {
+								return A2(_narkisr$elm_ui$Application$searchMsg, v, false);
+							},
+							_narkisr$elm_ui$Main$parsingErr(_narkisr$elm_ui$Application$SearchMsg)),
+						_1: {ctor: '[]'}
+					}
+				}
 			}
 		});
 };
@@ -16952,11 +16998,6 @@ var _narkisr$elm_ui$Main$main = A2(
 	_elm_lang$navigation$Navigation$program,
 	_narkisr$elm_ui$Application$UrlChange,
 	{init: _narkisr$elm_ui$Application$init, view: _narkisr$elm_ui$Application$view, update: _narkisr$elm_ui$Application$update, subscriptions: _narkisr$elm_ui$Main$subscriptions})();
-var _narkisr$elm_ui$Main$parser = _elm_lang$core$Native_Platform.outgoingPort(
-	'parser',
-	function (v) {
-		return v;
-	});
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};

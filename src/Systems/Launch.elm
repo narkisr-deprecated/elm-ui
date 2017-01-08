@@ -61,7 +61,7 @@ init =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg ({ job } as model) =
-    case (Debug.log "" msg) of
+    case msg of
         JobLaunched result ->
             successHandler result model (\res -> none model) NoOp
 
@@ -115,7 +115,3 @@ view { table, job } =
             panelDefault_ [ (Html.map LoadPage (Table.view table)) ]
     in
         dangerCallout (message job) systemsTable Cancel Run
-
-
-
--- Effects

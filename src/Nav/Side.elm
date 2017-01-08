@@ -18,7 +18,10 @@ init : Model
 init =
     Model emptySession
 
+
+
 -- Update
+
 
 type Msg
     = NavigateTo String
@@ -34,7 +37,10 @@ update msg model =
         _ ->
             none model
 
+
+
 -- View
+
 
 sectionItem : String -> String -> Html Msg
 sectionItem resource nested =
@@ -61,15 +67,15 @@ drop resource msgs icon =
 
 adminMenus : List (Html Msg)
 adminMenus =
-    [ drop "systems" [ "list", "add" ] "fa fa-server"
-    , drop "jobs" [ "list", "stats" ] "fa fa-tasks"
+    [ drop "systems" [ "list" ] "fa fa-server"
+    , drop "jobs" [ "list" ] "fa fa-tasks"
     ]
 
 
 userMenus : List (Html Msg)
 userMenus =
-    [ drop "systems" [ "list", "add" ] "fa fa-server"
-    , drop "jobs" [ "list", "stats" ] "fa fa-tasks"
+    [ drop "systems" [ "list" ] "fa fa-server"
+    , drop "jobs" [ "list" ] "fa fa-tasks"
     ]
 
 

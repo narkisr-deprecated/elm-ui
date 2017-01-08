@@ -1,7 +1,8 @@
-module Search exposing (..)
+port module Search exposing (..)
 
 import Task
 import Dict exposing (Dict, get)
+import Common.Utils exposing (none)
 
 
 -- Html
@@ -35,18 +36,21 @@ type alias ParseResult =
 
 type Msg
     = Parse String
-    | Result Bool ParseResult
+    | Result ParseResult Bool
     | NoOp
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        Result True { message, source, result } ->
+        Result { message, source, result } True ->
             ({ model | parsed = result, input = source, error = "" })
 
-        Result False { message, source } ->
+        Result { message, source } False ->
             ({ model | error = message, input = source })
+
+        Parse s ->
+            model
 
         _ ->
             model
@@ -82,3 +86,6 @@ view model =
             [ div [ class "col-md-8 col-md-offset-2" ] [ searchForm model ]
             ]
         ]
+
+
+port parser : String -> Cmd msg
